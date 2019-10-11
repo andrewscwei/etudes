@@ -1,0 +1,19 @@
+{
+  "name": "etudes",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrewscwei/etudes.git"
+  },
+  "author": "Andrew Wei",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/andrewscwei/etudes/issues"
+  },
+  "homepage": "https://github.com/andrewscwei/etudes#readme"
+}
