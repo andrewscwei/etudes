@@ -45,7 +45,7 @@
     "@types/webpack-env": "^1.15.1",
     "babel-loader": "^8.1.0",
     "debug": "^4.1.1",
-    "dirty-dom": "^4.0.0",
+    "dirty-dom": "^4.0.1",
     "html-webpack-plugin": "^4.0.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -62,7 +62,7 @@
     "webpack-dev-server": "^3.10.3"
   },
   "peerDependencies": {
-    "dirty-dom": "^4.0.0",
+    "dirty-dom": "^4.0.1",
     "react": "^16.13.1"
   }
 }
