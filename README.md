@@ -1,3 +1,3 @@
 # Études
 
-A study of React components.
+A study of styled React components.

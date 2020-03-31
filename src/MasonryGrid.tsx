@@ -8,8 +8,10 @@
 
 import { DirtyInfo, DirtyType, EventType, Rect, UpdateDelegate, UpdateDelegator } from 'dirty-dom';
 import React, { createRef, CSSProperties, PureComponent, ReactNode } from 'react';
+import styled from 'styled-components';
 
-interface Props {
+export interface Props {
+  areSectionsAligned: boolean;
   children?: ReactNode | Array<ReactNode>;
   className?: string;
   height?: string;
@@ -17,31 +19,31 @@ interface Props {
   isReversed: boolean;
   orientation: 'horizontal' | 'vertical';
   sections: number;
-  style?: CSSProperties;
+  style: CSSProperties;
   verticalSpacing: number;
   width?: string;
 }
 
 class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
   static defaultProps: Props = {
+    areSectionsAligned: false,
     horizontalSpacing: 0,
     isReversed: false,
     orientation: 'vertical',
     sections: 3,
+    style: {},
     verticalSpacing: 0,
   };
 
-  static BASE_MODIFIER_CLASS_PREFIX: string = 'mg-';
+  static BASE_MODIFIER_CLASS_PREFIX: string = 'base-';
 
   private nodeRefs = {
     root: createRef<HTMLDivElement>(),
   };
 
+  private maxLength: number = NaN;
+
   private updateDelegate?: UpdateDelegate = undefined;
-
-  private maxHeight: number = NaN;
-
-  private maxWidth: number = NaN;
 
   get width(): number {
     return Rect.from(this.nodeRefs.root.current)?.width ?? 0;
@@ -49,17 +51,6 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
 
   get height(): number {
     return Rect.from(this.nodeRefs.root.current)?.height ?? 0;
-  }
-
-  private get intrinsicStyle(): CSSProperties {
-    return {
-      boxSizing: 'border-box',
-      display: 'block',
-      height: this.props.height ?? (this.props.orientation === 'horizontal' ? '100%' : (isNaN(this.maxHeight) ? 'auto' : this.maxHeight)),
-      position: 'relative',
-      WebkitBoxSizing: 'border-box',
-      width: this.props.width ?? (this.props.orientation === 'horizontal' ? (isNaN(this.maxWidth) ? 'auto' : this.maxWidth) : '100%'),
-    };
   }
 
   componentDidMount() {
@@ -76,9 +67,18 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
 
   render() {
     return (
-      <div ref={this.nodeRefs.root} className={this.props.className} style={{ ...this.intrinsicStyle, ...this.props.style ?? {} }}>
+      <StyledRoot
+        ref={this.nodeRefs.root}
+        className={this.props.className}
+        orientation={this.props.orientation}
+        style={{
+          height: this.props.height ?? ((this.props.orientation === 'vertical' && !isNaN(this.maxLength)) ? `${this.maxLength}px` : ''),
+          width: this.props.width ?? ((this.props.orientation === 'horizontal' && !isNaN(this.maxLength)) ? `${this.maxLength}px` : ''),
+          ...this.props.style,
+        }}
+      >
         {this.props.children}
-      </div>
+      </StyledRoot>
     );
   }
 
@@ -86,18 +86,6 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
     if (info[DirtyType.SIZE]) {
       this.repositionChildren();
     }
-  }
-
-  private reconfigureUpdateDelegate() {
-    this.updateDelegate?.deinit();
-
-    this.updateDelegate = new UpdateDelegate(this, {
-      [EventType.RESIZE]: {
-        target: this.nodeRefs.root.current,
-      },
-    });
-
-    this.updateDelegate?.init();
   }
 
   /**
@@ -117,25 +105,11 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
     const pb = parseFloat(computedStyle.getPropertyValue('padding-bottom'));
     const pl = parseFloat(computedStyle.getPropertyValue('padding-left'));
 
-    if (this.props.sections <= 0) throw new Error('You must specifiy a minimum of 1 section(s) (a.k.a. row(s) for horizontal orientation, columnª for vertical orientation) for a MasonryGrid instance');
+    if (this.props.sections <= 0) throw new Error('You must specifiy a minimum of 1 section(s) (a.k.a. row(s) for horizontal orientation, column(s) for vertical orientation) for a MasonryGrid instance');
 
     if (this.props.orientation === 'vertical') {
-      let rowWidth = rect.width - pr - pl;
-
-      if (rowWidth < 0) {
-        // tslint:disable-next-line:no-console
-        console.warn('Unexpected computed row width of less than zero, ensure that the width of root element of the MasonryGrid instance can be computed, or check that its paddings are valid');
-        rowWidth = 0;
-      }
-
-      let colWidth = (rowWidth - this.props.horizontalSpacing * (this.props.sections - 1)) / this.props.sections;
-
-      if (colWidth < 0) {
-        // tslint:disable-next-line:no-console
-        console.warn('Unexpected computed column width of less than zero, ensure that the `horizontalSpacing` property is valid');
-        colWidth = 0;
-      }
-
+      const rowWidth = Math.max(0, rect.width - pr - pl);
+      const colWidth = Math.max(0, (rowWidth - this.props.horizontalSpacing * (this.props.sections - 1)) / this.props.sections);
       const sectionHeights: Array<number> = [...new Array(this.props.sections)].map(() => 0);
 
       for (let i = 0; i < children.length; i++) {
@@ -144,7 +118,7 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
         if (!(child instanceof HTMLElement)) continue;
 
         const base = this.computeBaseFromElement(child);
-        const [colIdx, y] = this.computeNextAvailableSectionAndLengthByBase(base, sectionHeights);
+        const [colIdx, y] = this.computeNextAvailableSectionAndLengthByBase(sectionHeights, base);
 
         child.style.position = 'absolute';
         child.style.width = `${(colWidth * base) + (this.props.horizontalSpacing * (base - 1))}px`;
@@ -155,10 +129,18 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
         for (let j = 0; j < base; j++) {
           sectionHeights[colIdx + j] = y + (y === 0 ? 0 : this.props.verticalSpacing) + (Rect.from(child)?.height ?? 0);
         }
+
+        if (this.props.areSectionsAligned && ((colIdx + base) === this.props.sections)) {
+          const m = this.computeMaxLength(sectionHeights);
+
+          for (let j = 0; j < this.props.sections; j++) {
+            sectionHeights[j] = m;
+          }
+        }
       }
 
-      this.maxHeight = this.computeMaxLength(this.props.sections, sectionHeights);
-      rootNode.style.height = `${this.maxHeight}px`;
+      this.maxLength = this.computeMaxLength(sectionHeights, this.props.sections);
+      rootNode.style.height = `${this.maxLength}px`;
 
       if (this.props.isReversed) {
         for (let i = 0; i < children.length; i++) {
@@ -173,22 +155,8 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
       }
     }
     else {
-      let colHeight = rect.height - pb - pt;
-
-      if (colHeight < 0) {
-        // tslint:disable-next-line:no-console
-        console.warn('Unexpected computed column height of less than zero, ensure that the height of root element of the MasonryGrid instance can be computed, or check that its paddings are valid');
-        colHeight = 0;
-      }
-
-      let rowHeight = (colHeight - this.props.verticalSpacing * (this.props.sections - 1)) / this.props.sections;
-
-      if (rowHeight < 0) {
-        // tslint:disable-next-line:no-console
-        console.warn('Unexpected computed row height of less than zero, ensure that the `verticalSpacing` property is valid');
-        rowHeight = 0;
-      }
-
+      const colHeight = Math.max(0, rect.height - pb - pt);
+      const rowHeight = Math.max(0, (colHeight - this.props.verticalSpacing * (this.props.sections - 1)) / this.props.sections);
       const sectionWidths: Array<number> = [...new Array(this.props.sections)].map(() => 0);
 
       for (let i = 0; i < children.length; i++) {
@@ -197,7 +165,7 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
         if (!(child instanceof HTMLElement)) continue;
 
         const base = this.computeBaseFromElement(child);
-        const [rowIdx, x] = this.computeNextAvailableSectionAndLengthByBase(base, sectionWidths);
+        const [rowIdx, x] = this.computeNextAvailableSectionAndLengthByBase(sectionWidths, base);
 
         child.style.position = 'absolute';
         child.style.width = '';
@@ -208,10 +176,18 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
         for (let j = 0; j < base; j++) {
           sectionWidths[rowIdx + j] = x + (x === 0 ? 0 : this.props.horizontalSpacing) + (Rect.from(child)?.width ?? 0);
         }
+
+        if (this.props.areSectionsAligned && ((rowIdx + base) === this.props.sections)) {
+          const m = this.computeMaxLength(sectionWidths);
+
+          for (let j = 0; j < this.props.sections; j++) {
+            sectionWidths[j] = m;
+          }
+        }
       }
 
-      this.maxWidth = this.computeMaxLength(this.props.sections, sectionWidths);
-      if (!isNaN(this.maxWidth)) rootNode.style.width = `${this.maxWidth}px`;
+      this.maxLength = this.computeMaxLength(sectionWidths, this.props.sections);
+      if (!isNaN(this.maxLength)) rootNode.style.width = `${this.maxLength}px`;
 
       if (this.props.isReversed) {
         for (let i = 0; i < children.length; i++) {
@@ -225,6 +201,76 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
         }
       }
     }
+  }
+
+  /**
+   * Computes the index and current length of the next available section for a
+   * specific base value, based on a provided array of existing section lengths.
+   *
+   * @param currentSectionLengths - An array of the current section lengths.
+   * @param base - The base value of the item to be inserted into the grid, and
+   *               to be used to evaluate the next available section.
+   *
+   * @returns An array consiting of the computed section index and its to-be
+   *          length if a new item were to be placed in it.
+   */
+  private computeNextAvailableSectionAndLengthByBase(currentSectionLengths: Array<number>, base: number): [number, number] {
+    if (currentSectionLengths.length !== this.props.sections) throw new Error('Unmatched number of provided section lengths');
+
+    const numSections = currentSectionLengths.length;
+
+    let sectionIdx = NaN;
+    let minLength = Infinity;
+
+    for (let i = 0; i < numSections; i++) {
+      const length = currentSectionLengths[i];
+      const isShorter = length < minLength;
+      const isEligibleSection = (i + base) <= numSections;
+      let hasRoomInSubsequentSections = true;
+
+      for (let j = 1; j < base; j++) {
+        if (currentSectionLengths[i + j] > length) {
+          hasRoomInSubsequentSections = false;
+        }
+      }
+
+      if (isShorter && isEligibleSection && hasRoomInSubsequentSections) {
+        sectionIdx = i;
+        minLength = length;
+      }
+    }
+
+    if (isNaN(sectionIdx)) {
+      return [0, this.computeMaxLength(currentSectionLengths, base)];
+    }
+    else {
+      return [sectionIdx, minLength];
+    }
+  }
+
+  /**
+   * A helper function that computes the max section length of an array of
+   * section lengths. Only the first n = `base` sections are inspected.
+   *
+   * @param currentSectionLengths - An array of section lengths.
+   * @param base - The number representing the first n sections to inspect.
+   *               Any non-numerical values will be ignored and return value
+   *               will be based on all sections. A `base` value will be clamped
+   *               between 1 and the maximum length of the array of section
+   *               lengths.
+   *
+   * @returns The max section length.
+   */
+  private computeMaxLength(currentSectionLengths: Array<number>, base?: number): number {
+    let arr = currentSectionLengths;
+
+    if (base !== undefined && base !== null && !isNaN(base)) {
+      arr = arr.slice(0, Math.max(1, Math.min(base, currentSectionLengths.length)));
+    }
+
+    return arr.reduce((out, curr, i) => {
+      return (curr > out) ? curr : out;
+    }, 0);
   }
 
   /**
@@ -250,65 +296,27 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
     return 1;
   }
 
-  /**
-   * Computes the index and current length of the next available section for a
-   * specific base value, based on a provided array of existing section lengths.
-   *
-   * @param base - The base value of the item to be inserted into the grid, and
-   *               to be used to evaluate the next available section.
-   * @param currentSectionLengths - An array of the current section lengths.
-   *
-   * @returns An array consiting of the computed section index and its to-be
-   *          length if a new item were to be placed in it.
-   */
-  private computeNextAvailableSectionAndLengthByBase(base: number, currentSectionLengths: Array<number>): [number, number] {
-    if (currentSectionLengths.length !== this.props.sections) throw new Error('Unmatched number of provided section lengths');
+  private reconfigureUpdateDelegate() {
+    this.updateDelegate?.deinit();
 
-    const numSections = currentSectionLengths.length;
+    this.updateDelegate = new UpdateDelegate(this, {
+      [EventType.RESIZE]: {
+        target: this.nodeRefs.root.current,
+      },
+    });
 
-    let sectionIdx = NaN;
-    let minLength = Infinity;
-
-    for (let i = 0; i < numSections; i++) {
-      const length = currentSectionLengths[i];
-      const isShorter = length < minLength;
-      const isEligibleColumn = (i + base) <= numSections;
-      let hasRoomInSubsequentSections = true;
-
-      for (let j = 1; j < base; j++) {
-        if (currentSectionLengths[i + j] > length) {
-          hasRoomInSubsequentSections = false;
-        }
-      }
-
-      if (isShorter && isEligibleColumn && hasRoomInSubsequentSections) {
-        sectionIdx = i;
-        minLength = length;
-      }
-    }
-
-    if (isNaN(sectionIdx)) {
-      return [0, this.computeMaxLength(base, currentSectionLengths)];
-    }
-    else {
-      return [sectionIdx, minLength];
-    }
-  }
-
-  /**
-   * A helper function that computes the max section length of an array of
-   * section lengths. Only the starting `base` sections are inspected.
-   *
-   * @param base - The base value to compute for
-   * @param currentSectionLengths - An array of section lengths.
-   *
-   * @returns The max section length.
-   */
-  private computeMaxLength(base: number, currentSectionLengths: Array<number>): number {
-    return currentSectionLengths.slice(0, base).reduce((out, curr, i) => {
-      return (curr > out) ? curr : out;
-    }, 0);
+    this.updateDelegate?.init();
   }
 }
+
+const StyledRoot = styled.div<{
+  orientation: Props['orientation'];
+}>`
+  box-sizing: border-box;
+  display: block;
+  height: ${props => props.orientation === 'vertical' ? 'auto' : '100%'};
+  position: relative;
+  width: ${props => props.orientation === 'horizontal' ? 'auto' : '100%'};
+`;
 
 export default MasonryGrid;
