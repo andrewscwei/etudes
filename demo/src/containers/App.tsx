@@ -3,14 +3,14 @@
  */
 
 import { align, container, selectors } from 'promptu';
-import React, { Fragment, PureComponent } from 'react';
+import React, { createRef, Fragment, PureComponent } from 'react';
 import { hot } from 'react-hot-loader/root';
 import { Route, RouteComponentProps, Switch } from 'react-router';
+import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import BurgerButton from '../../../lib/BurgerButton';
 import $$GithubIcon from '../assets/images/github-icon.svg';
 import routes from '../routes';
-import { NavLink } from 'react-router-dom';
 
 interface Props {
   route: RouteComponentProps<{}>;
@@ -25,10 +25,20 @@ class App extends PureComponent<Props, State> {
     isNavActive: false,
   };
 
+  nodeRefs = {
+    burgerButton: createRef<BurgerButton>(),
+  };
+
   generateRoutes() {
     return routes.map((route, index) => (
       <Route exact={route.exact} path={route.path} key={`route-${index}`} component={route.component}/>
     ));
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps.route.location.pathname !== this.props.route.location.pathname) {
+      this.nodeRefs.burgerButton.current?.deactivate();
+    }
   }
 
   render() {
@@ -42,6 +52,7 @@ class App extends PureComponent<Props, State> {
           <StyledNavLink to='/video'>Video</StyledNavLink>
         </StyledNav>
         <StyledBurgerButton
+          ref={this.nodeRefs.burgerButton}
           height={32}
           isFunky={true}
           thickness={6}

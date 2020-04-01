@@ -43,19 +43,23 @@ class BurgerButton extends PureComponent<Props, State> {
 
   toggle() {
     if (this.state.isActive) {
-      this.setState({
-        isActive: false,
-      });
-
-      if (this.props.onDeactivate) this.props.onDeactivate();
+      this.deactivate();
     }
     else {
-      this.setState({
-        isActive: true,
-      });
-
-      if (this.props.onActivate) this.props.onActivate();
+      this.activate();
     }
+  }
+
+  activate() {
+    if (this.state.isActive) return;
+    this.setState({ isActive: true });
+    if (this.props.onActivate) this.props.onActivate();
+  }
+
+  deactivate() {
+    if (!this.state.isActive) return;
+    this.setState({ isActive: false });
+    if (this.props.onDeactivate) this.props.onDeactivate();
   }
 
   render() {
