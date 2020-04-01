@@ -37,7 +37,7 @@ export default hot(class extends PureComponent<Props, State> {
             onRowDeselectAt={idx => this.setState({ selectedIndex: -1 })}
           />
         </StyledRoot>
-        <StyledDebugConsole title='?: Vlist' message={this.state.selectedIndex > -1 ? `You selected row <strong>#${this.state.selectedIndex + 1}</strong>!` : 'No rows selected!'}/>
+        <StyledDebugConsole margin={30} title='?: Vlist' message={this.state.selectedIndex > -1 ? `You selected row <strong>#${this.state.selectedIndex + 1}</strong>!` : 'No rows selected!'}/>
       </Fragment>
     );
   }

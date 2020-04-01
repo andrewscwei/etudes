@@ -1,12 +1,13 @@
 import React, { createRef, CSSProperties, PureComponent } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 interface Props {
+  align: 'tl' | 'tc' | 'tr' | 'cl' | 'cc' | 'cr' | 'bl' | 'bc' | 'br';
   className?: string;
+  margin: number;
   message?: string;
-  style?: CSSProperties;
+  style: CSSProperties;
   title?: string;
-  align?: 'tl' | 'tc' | 'tr' | 'cl' | 'cc' | 'cr' | 'bl' | 'bc' | 'br';
 }
 
 interface State {
@@ -14,6 +15,12 @@ interface State {
 }
 
 export default class DebugConsole extends PureComponent<Props, State> {
+  static defaultProps: Partial<Props> = {
+    margin: 0,
+    align: 'br',
+    style: {},
+  };
+
   nodeRefs = {
     messages: createRef<HTMLDivElement>(),
   };
@@ -46,11 +53,17 @@ export default class DebugConsole extends PureComponent<Props, State> {
   }
 
   render() {
-    const { className, style, title, message, align } = this.props;
-
     return (
-      <StyledRoot className={className} style={style} align={align}>
-        <h6>{title ?? 'Untitled'}</h6>
+      <StyledRoot
+        className={this.props.className}
+        style={{
+          ...this.props.style,
+          margin: 0,
+          position: 'fixed',
+          ...this.getStyleByAlignment(this.props.align),
+        }}
+      >
+        <h6>{this.props.title ?? 'Untitled'}</h6>
         <div ref={this.nodeRefs.messages}>
           {this.state.messages.map((v, i) => (
             <span key={`item-${i}`} dangerouslySetInnerHTML={{ __html: v }}/>
@@ -59,24 +72,40 @@ export default class DebugConsole extends PureComponent<Props, State> {
       </StyledRoot>
     );
   }
+
+  private getStyleByAlignment(align: Props['align']): CSSProperties {
+    switch (align) {
+      case 'tl': return { top: `${this.props.margin}px`, left: `${this.props.margin}px`, };
+      case 'tc': return { top: `${this.props.margin}px`, left: 0, right: 0, margin: '0 auto' };
+      case 'tr': return { top: `${this.props.margin}px`, right: `${this.props.margin}px` };
+      case 'cl': return { top: 0, left: `${this.props.margin}px`, bottom: 0, margin: 'auto 0' };
+      case 'cc': return { top: 0, left: 0, right: 0, bottom: 0, margin: 'auto' };
+      case 'cr': return { top: 0, bottom: 0, right: `${this.props.margin}px`, margin: 'auto 0' };
+      case 'bl': return { bottom: `${this.props.margin}px`, left: `${this.props.margin}px` };
+      case 'bc': return { bottom: `${this.props.margin}px`, left: 0, right: 0, margin: '0 auto' };
+      default: return { bottom: `${this.props.margin}px`, right: `${this.props.margin}px` };
+    }
+  }
 }
 
-const StyledRoot = styled.div<{
-  align: Props['align'];
-}>`
+const StyledRoot = styled.div`
   align-items: flex-start;
   background: #000;
-  bottom: 30px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   font-family: monospace;
   justify-content: flex-start;
-  width: 300px;
-  min-height: 10rem;
-  position: fixed;
-  right: 30px;
   max-height: 20rem;
+  min-height: 10rem;
+  width: 300px;
+
+  ${props => {
+    switch (props.align) {
+      default: return css`
+      `;
+    }
+  }}
 
   h6 {
     background: #fff;
