@@ -1,6 +1,8 @@
 import React, { ComponentType, CSSProperties, PureComponent } from 'react';
 import styled from 'styled-components';
 
+const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:vlist') : () => {};
+
 export interface RowProps<T> {
   data: T;
   isSelected: boolean;
@@ -57,6 +59,8 @@ export default class VList<T> extends PureComponent<Props<T>, State> {
     const { selectedIndex } = this.state;
 
     if (prevState.selectedIndex !== selectedIndex) {
+      debug(`Selected index changed: ${selectedIndex}`);
+
       if (shouldStaySelected) {
         if (!this.isOutOfRange(prevState.selectedIndex)) onRowDeselectAt?.(prevState.selectedIndex);
         if (!this.isOutOfRange(selectedIndex)) onRowSelectAt?.(selectedIndex);
@@ -137,7 +141,6 @@ const StyledRoot = styled.div<{
   justify-content: flex-start;
   overflow: visible;
   padding-right: ${props => props.scrollbarPadding}px;
-  transform: translate3d(0, 0, 0);
 
   > * {
     flex: 0 0 auto;

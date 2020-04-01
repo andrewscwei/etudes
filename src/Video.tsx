@@ -1,7 +1,7 @@
 import React, { createRef, CSSProperties, PureComponent } from 'react';
 import styled from 'styled-components';
 
-const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes') : () => {};
+const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:video') : () => {};
 
 export interface Props {
   autoLoop: boolean;

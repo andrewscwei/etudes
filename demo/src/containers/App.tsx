@@ -37,8 +37,8 @@ class App extends PureComponent<Props, State> {
   renderFeaturedComponent() {
     switch (this.state.featuredComponent) {
       case 'masonry-grid': return <MasonryGrid/>;
-      case 'video': return <Video/>
-      case 'vlist': return <VList/>
+      case 'video': return <Video/>;
+      case 'vlist': return <VList/>;
       default: return <Fragment/>;
     }
   }
@@ -46,23 +46,42 @@ class App extends PureComponent<Props, State> {
   render() {
     return (
       <Fragment>
-        {this.renderFeaturedComponent()}
-        <StyledNav isActive={this.state.isNavActive}>
-          <StyledNavButton onClick={() => this.setState({ featuredComponent: 'masonry-grid' })}>Masonry Grid</StyledNavButton>
-          <StyledNavButton onClick={() => this.setState({ featuredComponent: 'video' })}>Video</StyledNavButton>
-          <StyledNavButton onClick={() => this.setState({ featuredComponent: 'vlist' })}>Vlist</StyledNavButton>
-        </StyledNav>
-        <StyledBurgerButton
-          ref={this.nodeRefs.burgerButton}
-          height={32}
-          isFunky={true}
-          thickness={6}
-          tintColor={this.state.isNavActive ? '#000' : '#fff'}
-          width={36}
-          onActivate={() => this.setState({ isNavActive: true })}
-          onDeactivate={() => this.setState({ isNavActive: false })}
-        />
-        <StyledGithubButton href='https://github.com/andrewscwei/etudes'/>
+        <main style={{
+          height: '100%',
+          left: 0,
+          position: 'absolute',
+          top: 0,
+          width: '100%',
+        }}>
+          {this.renderFeaturedComponent()}
+        </main>
+        <aside style={{
+          height: '100%',
+          left: 0,
+          perspective: '80rem',
+          pointerEvents: 'none',
+          position: 'fixed',
+          top: 0,
+          transform: 'translate3d(0, 0, 0)',
+          width: '100%',
+        }}>
+          <StyledNav isActive={this.state.isNavActive}>
+            <StyledNavButton onClick={() => this.setState({ featuredComponent: 'masonry-grid' })}>Masonry Grid</StyledNavButton>
+            <StyledNavButton onClick={() => this.setState({ featuredComponent: 'video' })}>Video</StyledNavButton>
+            <StyledNavButton onClick={() => this.setState({ featuredComponent: 'vlist' })}>Vlist</StyledNavButton>
+          </StyledNav>
+          <StyledBurgerButton
+            ref={this.nodeRefs.burgerButton}
+            height={32}
+            isFunky={true}
+            thickness={6}
+            tintColor={this.state.isNavActive ? '#000' : '#fff'}
+            width={36}
+            onActivate={() => this.setState({ isNavActive: true })}
+            onDeactivate={() => this.setState({ isNavActive: false })}
+          />
+          <StyledGithubButton href='https://github.com/andrewscwei/etudes'/>
+        </aside>
       </Fragment>
     );
   }
@@ -73,8 +92,9 @@ export default hot(App);
 const StyledNavButton = styled.button`
   ${container.box}
   color: #000;
-  font-size: 3rem;
+  font-size: 2.2rem;
   font-weight: 700;
+  pointer-events: 'auto';
   text-align: right;
   text-transform: uppercase;
   transform: translate3d(0, 0, 0) rotateX(${Math.floor(Math.random() * 10) + 5}deg) rotateY(${Math.floor(Math.random() * 10) + 5}deg) rotateZ(0deg);
@@ -90,30 +110,35 @@ const StyledNav = styled.nav<{
 }>`
   ${container.fvtr}
   ${align.ftr}
-  padding: 10rem 3rem;
+  padding: 14rem 10rem 10rem 0rem;
   background: #fff;
   height: 100%;
-  width: 40rem;
+  width: 30rem;
   transition: all .1s ease-out;
   transform: ${props => props.isActive ?
-    'translate3d(0, 0, 100rem) rotateX(-5deg) rotateY(30deg) rotateZ(5deg)' :
-    'translate3d(100%, 0, 100rem) rotateX(0deg) rotateY(0deg) rotateZ(0deg)'
+    'translate3d(0, 2rem, 5rem) rotateX(0deg) rotateY(-20deg) rotateZ(0deg)' :
+    'translate3d(100%, 0, 5rem) rotateX(0deg) rotateY(0deg) rotateZ(0deg)'
   };
   pointer-events: ${props => props.isActive ? 'auto' : 'none'};
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
   z-index: 10;
+
+  ${selectors.eblc} {
+    margin-bottom: .6rem;
+  }
 `;
 
 const StyledBurgerButton = styled(BurgerButton)`
   ${align.ftr}
-  margin: 3rem;
+  margin: 12rem;
+  pointer-events: auto;
   transition: all .1s ease-out;
-  transform: translate3d(0, 0, 100rem) rotateX(-10deg) rotateY(30deg);
+  transform: translate3d(0, 0, 10rem) rotateX(-5deg) rotateY(-60deg) scale(1);
   z-index: 100;
 
   ${selectors.hwot} {
-    transform: translate3d(0, 0, 100rem) rotateX(-10deg) rotateY(30deg) scale(1.2);
+    transform: translate3d(0, 0, 10rem) rotateX(-5deg) rotateY(-20deg) scale(1.2);
   }
 `;
 
@@ -121,15 +146,16 @@ const StyledGithubButton = styled.a`
   ${container.box}
   ${align.fbl}
   background: url(${$$GithubIcon}) center / 100% no-repeat;
-  margin: 3rem;
-  transition: all .1s ease-out;
-  height: 4rem;
-  width: 4rem;
   cursor: pointer;
-  transform: translate3d(0, 0, 100rem) rotateX(10deg) rotateY(30deg);
+  height: 4rem;
+  margin: 12rem;
+  pointer-events: auto;
+  transform: translate3d(0, 0, 10rem) rotateX(-10deg) rotateY(-5deg) scale(1);
+  transition: all .1s ease-out;
+  width: 4rem;
   z-index: 100;
 
   ${selectors.hwot} {
-    transform: translate3d(0, 0, 100rem) rotateX(10deg) rotateY(30deg) scale(1.2);
+    transform: translate3d(0, 0, 10rem) rotateX(-10deg) rotateY(10deg) scale(1.2);
   }
 `;
