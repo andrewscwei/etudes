@@ -1,21 +1,16 @@
-/**
- * @file Entry file.
- */
-
 import React from 'react';
 import { hydrate, render } from 'react-dom';
+import { BrowserRouter as Router, Route, RouteComponentProps } from 'react-router-dom';
 import App from './containers/App';
 
-if (process.env.NODE_ENV === 'development') {
-  window.localStorage.debug = 'app*';
-}
-
-// Generator for base markup.
 const markup = () => (
-  <App/>
+  <Router>
+    <Route render={(routeProps: RouteComponentProps<any>) => (
+      <App route={routeProps}/>
+    )}/>
+  </Router>
 );
 
-// Render the app.
 const root = document.getElementById('app');
 
 if (root!.hasChildNodes() && process.env.NODE_ENV !== 'development') {
