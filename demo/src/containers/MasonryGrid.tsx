@@ -14,7 +14,7 @@ export interface Props {}
 export interface State {}
 
 export default hot(class extends PureComponent<Props, State> {
-  data = [...new Array(60)].map((v, i) => ({
+  data = [...new Array(1000)].map((v, i) => ({
     h: Math.floor(Math.random() * 6) + 1,
     b: Math.floor(Math.random() * 1) + 1,
   }));
@@ -59,8 +59,7 @@ const StyledMasonryGrid = styled(MasonryGrid)`
 `;
 
 const StyledRoot = styled.div`
-  ${container.box}
-  padding: 10rem 3rem;
+  ${container.fvtc}
   perspective: 80rem;
   width: 100%;
   height: 100%;

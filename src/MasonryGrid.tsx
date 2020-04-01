@@ -72,9 +72,10 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
         className={this.props.className}
         orientation={this.props.orientation}
         style={{
+          ...this.props.style,
           height: this.props.height ?? ((this.props.orientation === 'vertical' && !isNaN(this.maxLength)) ? `${this.maxLength}px` : ''),
           width: this.props.width ?? ((this.props.orientation === 'horizontal' && !isNaN(this.maxLength)) ? `${this.maxLength}px` : ''),
-          ...this.props.style,
+          flex: '0 0 auto',
         }}
       >
         {this.props.children}
