@@ -1,6 +1,6 @@
 {
   "name": "etudes",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A study of styled React components",
   "main": "lib",
   "scripts": {
@@ -71,8 +71,10 @@
     "webpack-dev-server": "^3.10.3"
   },
   "peerDependencies": {
-    "dirty-dom": "^4.0.1",
     "react": "^16.13.1",
     "styled-components": "^5.0.1"
+  },
+  "optionalDependencies": {
+    "dirty-dom": "^4.0.1"
   }
 }
