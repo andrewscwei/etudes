@@ -3,6 +3,10 @@ import { hydrate, render } from 'react-dom';
 import { BrowserRouter as Router, Route, RouteComponentProps } from 'react-router-dom';
 import App from './containers/App';
 
+if (process.env.NODE_ENV === 'development') {
+  window.localStorage.debug = 'etudes*';
+}
+
 const markup = () => (
   <Router>
     <Route render={(routeProps: RouteComponentProps<any>) => (

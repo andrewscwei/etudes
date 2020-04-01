@@ -50,6 +50,7 @@ class App extends PureComponent<Props, State> {
         <StyledNav isActive={this.state.isNavActive}>
           <StyledNavLink to='/masonry-grid'>Masonry Grid</StyledNavLink>
           <StyledNavLink to='/video'>Video</StyledNavLink>
+          <StyledNavLink to='/vlist'>Vlist</StyledNavLink>
         </StyledNav>
         <StyledBurgerButton
           ref={this.nodeRefs.burgerButton}

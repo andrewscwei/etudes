@@ -1,6 +1,7 @@
 import Home from '../containers/Home';
 import MasonryGrid from '../containers/MasonryGrid';
 import Video from '../containers/Video';
+import VList from '../containers/VList';
 
 export default [{
   path: '/',
@@ -14,4 +15,8 @@ export default [{
   path: '/video',
   exact: true,
   component: Video,
+}, {
+  path: '/vlist',
+  exact: true,
+  component: VList,
 }];

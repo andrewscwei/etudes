@@ -33,7 +33,6 @@ jobs:
           paths:
             - .circleci/
             - lib/
-            - demo/
             - node_modules/
             - package.json
   test:
@@ -47,6 +46,7 @@ jobs:
   deploy:
     <<: *defaults
     steps:
+      - checkout
       - attach_workspace:
           at: .
       - deploy:
