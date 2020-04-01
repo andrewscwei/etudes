@@ -1,13 +1,15 @@
-import React, { PureComponent } from 'react';
+import React, { CSSProperties, Fragment, PureComponent } from 'react';
 import styled from 'styled-components';
 
 interface Props {
+  className?: string;
   height: number;
   isActiveByDefault: boolean;
   isDoubleJointed: boolean;
   isFunky: boolean;
-  onActivate?: () => {};
-  onDeactivate?: () => {};
+  onActivate?: () => void;
+  onDeactivate?: () => void;
+  style: CSSProperties;
   thickness: number;
   tintColor: string;
   transitionDuration: number;
@@ -24,6 +26,7 @@ class BurgerButton extends PureComponent<Props, State> {
     isActiveByDefault: false,
     isDoubleJointed: true,
     isFunky: false,
+    style: {},
     thickness: 2,
     tintColor: '#000',
     transitionDuration: 200,
@@ -56,38 +59,43 @@ class BurgerButton extends PureComponent<Props, State> {
   }
 
   render() {
-    const { isDoubleJointed, width, height, thickness } = this.props;
-
-    const w = width * 0.5;
-    const h = height * 0.5;
-    const t = thickness * 0.5;
+    const w = this.props.width * 0.5;
+    const h = this.props.height * 0.5;
+    const t = this.props.thickness * 0.5;
     const d = 45;
     const r = d * Math.PI / 180;
+    const n = this.props.isDoubleJointed ? 2 : 1;
 
     return (
-      <StyledRoot {...this.props} {...this.state} onClick={() => this.toggle()} w={w} h={h} t={t} d={d} r={r}>
-        { isDoubleJointed &&
-          <>
-            <div>
-              <span/>
-              <span/>
-              <span/>
-            </div>
-            <div>
-              <span/>
-              <span/>
-              <span/>
-            </div>
-          </>
-          ||
-          <>
-            <div>
-              <span/>
-              <span/>
-              <span/>
-            </div>
-          </>
-        }
+      <StyledRoot
+        className={this.props.className}
+        height={this.props.height}
+        isActive={this.state.isActive}
+        isDoubleJointed={this.props.isDoubleJointed}
+        isFunky={this.props.isFunky}
+        onClick={() => this.toggle()}
+        style={this.props.style}
+        thickness={this.props.thickness}
+        tintColor={this.props.tintColor}
+        transitionDuration={this.props.transitionDuration}
+        width={this.props.width}
+        w={w}
+        h={h}
+        t={t}
+        d={d}
+        r={r}
+      >
+        {this.props.isDoubleJointed && (
+          <Fragment>
+            {[...new Array(n)].map((v, i) => (
+              <div key={`joint-${i}`}>
+                <span/>
+                <span/>
+                <span/>
+              </div>
+            ))}
+          </Fragment>
+        )}
       </StyledRoot>
     );
   }

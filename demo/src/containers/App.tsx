@@ -39,6 +39,7 @@ class App extends PureComponent<Props, State> {
         <Switch location={route.location}>{this.generateRoutes()}</Switch>
         <StyledNav isActive={this.state.isNavActive}>
           <StyledNavLink to='/masonry-grid'>Masonry Grid</StyledNavLink>
+          <StyledNavLink to='/video'>Video</StyledNavLink>
         </StyledNav>
         <StyledBurgerButton
           height={32}
@@ -60,10 +61,11 @@ export default hot(App);
 const StyledNavLink = styled(NavLink)`
   ${container.box}
   color: #000;
-  font-size: 4.6rem;
+  font-size: 3rem;
   font-weight: 700;
+  text-align: right;
   text-transform: uppercase;
-  transform: translate3d(0, 0, 0) rotateX(${Math.floor(Math.random() * 30) + 5}deg) rotateY(${Math.floor(Math.random() * 30) + 5}deg) rotateZ(0deg);
+  transform: translate3d(0, 0, 0) rotateX(${Math.floor(Math.random() * 10) + 5}deg) rotateY(${Math.floor(Math.random() * 10) + 5}deg) rotateZ(0deg);
   transition: all .1s ease-out;
 
   ${selectors.hwot} {
@@ -80,22 +82,26 @@ const StyledNav = styled.nav<{
   background: #fff;
   height: 100%;
   width: 40rem;
-  opacity: ${props => props.isActive ? 1 : 0};
   transition: all .1s ease-out;
-  transform: ${props => `translate3d(${props.isActive ? 0 : '100%'}, 0, 0) rotateX(-5deg) rotateY(30deg) rotateZ(5deg)`};
+  transform: ${props => props.isActive ?
+    'translate3d(0, 0, 100rem) rotateX(-5deg) rotateY(30deg) rotateZ(5deg)' :
+    'translate3d(100%, 0, 100rem) rotateX(0deg) rotateY(0deg) rotateZ(0deg)'
+  };
   pointer-events: ${props => props.isActive ? 'auto' : 'none'};
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
+  z-index: 10;
 `;
 
 const StyledBurgerButton = styled(BurgerButton)`
   ${align.ftr}
   margin: 3rem;
   transition: all .1s ease-out;
-  transform: translate3d(0, 0, 0) rotateX(-10deg) rotateY(30deg);
+  transform: translate3d(0, 0, 100rem) rotateX(-10deg) rotateY(30deg);
+  z-index: 100;
 
   ${selectors.hwot} {
-    transform: translate3d(0, 0, 0) rotateX(-10deg) rotateY(30deg) scale(1.2);
+    transform: translate3d(0, 0, 100rem) rotateX(-10deg) rotateY(30deg) scale(1.2);
   }
 `;
 
@@ -108,9 +114,10 @@ const StyledGithubButton = styled.a`
   height: 4rem;
   width: 4rem;
   cursor: pointer;
-  transform: translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg);
+  transform: translate3d(0, 0, 100rem) rotateX(10deg) rotateY(30deg);
+  z-index: 100;
 
   ${selectors.hwot} {
-    transform: translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg) scale(1.2);
+    transform: translate3d(0, 0, 100rem) rotateX(10deg) rotateY(30deg) scale(1.2);
   }
 `;

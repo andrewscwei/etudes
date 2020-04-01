@@ -1,5 +1,6 @@
 import Home from '../containers/Home';
 import MasonryGrid from '../containers/MasonryGrid';
+import Video from '../containers/Video';
 
 export default [{
   path: '/',
@@ -9,4 +10,8 @@ export default [{
   path: '/masonry-grid',
   exact: true,
   component: MasonryGrid,
+}, {
+  path: '/video',
+  exact: true,
+  component: Video,
 }];

@@ -13,18 +13,18 @@ export interface Props {}
 export interface State {}
 
 export default hot(class extends PureComponent<Props, State> {
+  data = [...new Array(60)].map((v, i) => ({
+    h: Math.floor(Math.random() * 6) + 1,
+    b: Math.floor(Math.random() * 1) + 1,
+  }));
+
   render() {
     return (
       <Fragment>
         <StyledRoot>
           <MasonryGrid sections={6} verticalSpacing={30} horizontalSpacing={30}>
-            {[...new Array(60)].map((v, i) => (
-              <StyledGridItem
-                key={i}
-                className={`h-${Math.floor(Math.random() * 6) + 1} mg-${Math.floor(Math.random() * 1) + 1}`}
-              >
-                {i}
-              </StyledGridItem>
+            {this.data.map((v, i) => (
+              <StyledGridItem key={i} className={`h-${v.h} base-${v.b}`}>{i}</StyledGridItem>
             ))}
           </MasonryGrid>
         </StyledRoot>

@@ -1,8 +1,4 @@
-/**
- * @file Client app root.
- */
-
-import { container } from 'promptu';
+import { align, container } from 'promptu';
 import React, { PureComponent } from 'react';
 import { hot } from 'react-hot-loader/root';
 import styled from 'styled-components';
@@ -13,6 +9,7 @@ export default hot(class extends PureComponent<Props> {
   render() {
     return (
       <StyledRoot>
+
       </StyledRoot>
     );
   }
@@ -20,4 +17,7 @@ export default hot(class extends PureComponent<Props> {
 
 const StyledRoot = styled.div`
   ${container.box}
+  ${align.tl}
+  width: 100%;
+  height: 100%;
 `;
