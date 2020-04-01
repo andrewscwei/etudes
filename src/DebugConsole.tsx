@@ -100,13 +100,6 @@ const StyledRoot = styled.div`
   min-height: 10rem;
   width: 300px;
 
-  ${props => {
-    switch (props.align) {
-      default: return css`
-      `;
-    }
-  }}
-
   h6 {
     background: #fff;
     color: #000;
