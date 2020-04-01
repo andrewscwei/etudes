@@ -1,6 +1,5 @@
 import React from 'react';
 import { hydrate, render } from 'react-dom';
-import { BrowserRouter as Router, Route, RouteComponentProps } from 'react-router-dom';
 import App from './containers/App';
 
 if (process.env.NODE_ENV === 'development') {
@@ -8,11 +7,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 const markup = () => (
-  <Router>
-    <Route render={(routeProps: RouteComponentProps<any>) => (
-      <App route={routeProps}/>
-    )}/>
-  </Router>
+  <App/>
 );
 
 const root = document.getElementById('app');

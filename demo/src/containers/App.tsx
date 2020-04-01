@@ -5,19 +5,18 @@
 import { align, container, selectors } from 'promptu';
 import React, { createRef, Fragment, PureComponent } from 'react';
 import { hot } from 'react-hot-loader/root';
-import { Route, RouteComponentProps, Switch } from 'react-router';
-import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import BurgerButton from '../../../lib/BurgerButton';
 import $$GithubIcon from '../assets/images/github-icon.svg';
-import routes from '../routes';
+import MasonryGrid from './MasonryGrid';
+import Video from './Video';
+import VList from './VList';
 
-interface Props {
-  route: RouteComponentProps<{}>;
-}
+interface Props {}
 
 interface State {
   isNavActive: boolean;
+  featuredComponent?: string;
 }
 
 class App extends PureComponent<Props, State> {
@@ -29,28 +28,29 @@ class App extends PureComponent<Props, State> {
     burgerButton: createRef<BurgerButton>(),
   };
 
-  generateRoutes() {
-    return routes.map((route, index) => (
-      <Route exact={route.exact} path={route.path} key={`route-${index}`} component={route.component}/>
-    ));
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (prevProps.route.location.pathname !== this.props.route.location.pathname) {
+  componentDidUpdate(prevProps: Props, prevState: State) {
+    if (prevState.featuredComponent !== this.state.featuredComponent) {
       this.nodeRefs.burgerButton.current?.deactivate();
     }
   }
 
-  render() {
-    const { route } = this.props;
+  renderFeaturedComponent() {
+    switch (this.state.featuredComponent) {
+      case 'masonry-grid': return <MasonryGrid/>;
+      case 'video': return <Video/>
+      case 'vlist': return <VList/>
+      default: return <Fragment/>;
+    }
+  }
 
+  render() {
     return (
       <Fragment>
-        <Switch location={route.location}>{this.generateRoutes()}</Switch>
+        {this.renderFeaturedComponent()}
         <StyledNav isActive={this.state.isNavActive}>
-          <StyledNavLink to='/masonry-grid'>Masonry Grid</StyledNavLink>
-          <StyledNavLink to='/video'>Video</StyledNavLink>
-          <StyledNavLink to='/vlist'>Vlist</StyledNavLink>
+          <StyledNavButton onClick={() => this.setState({ featuredComponent: 'masonry-grid' })}>Masonry Grid</StyledNavButton>
+          <StyledNavButton onClick={() => this.setState({ featuredComponent: 'video' })}>Video</StyledNavButton>
+          <StyledNavButton onClick={() => this.setState({ featuredComponent: 'vlist' })}>Vlist</StyledNavButton>
         </StyledNav>
         <StyledBurgerButton
           ref={this.nodeRefs.burgerButton}
@@ -70,7 +70,7 @@ class App extends PureComponent<Props, State> {
 
 export default hot(App);
 
-const StyledNavLink = styled(NavLink)`
+const StyledNavButton = styled.button`
   ${container.box}
   color: #000;
   font-size: 3rem;

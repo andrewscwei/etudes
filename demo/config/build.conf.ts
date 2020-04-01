@@ -1,10 +1,8 @@
 import HTMLPlugin from 'html-webpack-plugin';
 import path from 'path';
-import { Configuration, EnvironmentPlugin, IgnorePlugin, Plugin } from 'webpack';
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+import { Configuration, EnvironmentPlugin } from 'webpack';
 
 const isDev: boolean = process.env.NODE_ENV === 'development';
-const useBundleAnalyzer: boolean = process.env.ANALYZE_BUNDLE === 'true' ? true : false;
 const cwd: string = path.join(__dirname, '../');
 const inputDir: string = path.join(cwd, 'src');
 const outputDir: string = path.join(cwd, 'build');
@@ -39,14 +37,9 @@ const config: Configuration = {
   output: {
     filename: isDev ? '[name].js' : '[name].[chunkhash].js',
     path: outputDir,
-    publicPath: process.env.PUBLIC_PATH || '/',
+    publicPath: process.env.NODE_ENV === 'development' ? '/' : './',
     sourceMapFilename: '[file].map',
     globalObject: 'this', // https://github.com/webpack/webpack/issues/6642#issuecomment-371087342
-  },
-  performance: {
-    hints: isDev ? false : 'warning',
-    maxEntrypointSize: 512 * 1024,
-    maxAssetSize: 512 * 1024,
   },
   plugins: [
     new EnvironmentPlugin({
@@ -62,13 +55,7 @@ const config: Configuration = {
       },
       template: path.join(inputDir, 'templates', 'index.html'),
     }),
-    ...isDev ? [] : [
-      new IgnorePlugin(/^.*\/config\/.*$/),
-    ],
-    ...!useBundleAnalyzer ? [] : [
-      new BundleAnalyzerPlugin(),
-    ],
-  ] as Plugin[],
+  ],
   ...!isDev ? {} : {
     devServer: {
       historyApiFallback: true,
@@ -82,12 +69,6 @@ const config: Configuration = {
       },
     },
     extensions: ['.js', '.ts', '.tsx'],
-  },
-  stats: {
-    colors: true,
-    errorDetails: true,
-    modules: true,
-    reasons: true,
   },
   target: 'web',
 };
