@@ -20,16 +20,29 @@ interface State {
 }
 
 class App extends PureComponent<Props, State> {
-  state: State = {
-    isNavActive: false,
-  };
-
   nodeRefs = {
     burgerButton: createRef<BurgerButton>(),
   };
 
+  constructor(props: Props) {
+    super(props);
+
+    if (window.location.hash && window.location.hash !== '') {
+      this.state = {
+        isNavActive: false,
+        featuredComponent: window.location.hash.substring(1, window.location.hash.length),
+      };
+    }
+    else {
+      this.state = {
+        isNavActive: false,
+      };
+    }
+  }
+
   componentDidUpdate(prevProps: Props, prevState: State) {
     if (prevState.featuredComponent !== this.state.featuredComponent) {
+      if (this.state.featuredComponent) window.location.hash = this.state.featuredComponent;
       this.nodeRefs.burgerButton.current?.deactivate();
     }
   }
@@ -44,6 +57,7 @@ class App extends PureComponent<Props, State> {
   }
 
   render() {
+    console.log('foo', window.location.hash)
     return (
       <Fragment>
         <main style={{

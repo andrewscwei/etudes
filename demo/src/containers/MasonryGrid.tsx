@@ -6,6 +6,7 @@ import { container } from 'promptu';
 import React, { Fragment, PureComponent } from 'react';
 import { hot } from 'react-hot-loader/root';
 import styled from 'styled-components';
+import DebugConsole from '../../../lib/DebugConsole';
 import MasonryGrid from '../../../lib/MasonryGrid';
 
 export interface Props {}
@@ -22,16 +23,21 @@ export default hot(class extends PureComponent<Props, State> {
     return (
       <Fragment>
         <StyledRoot>
-          <MasonryGrid sections={6} verticalSpacing={30} horizontalSpacing={30}>
+          <StyledMasonryGrid sections={6} verticalSpacing={30} horizontalSpacing={30}>
             {this.data.map((v, i) => (
               <StyledGridItem key={i} className={`h-${v.h} base-${v.b}`}>{i}</StyledGridItem>
             ))}
-          </MasonryGrid>
+          </StyledMasonryGrid>
         </StyledRoot>
+        <StyledDebugConsole margin={30} title='?: Masonry Grid'/>
       </Fragment>
     );
   }
 });
+
+const StyledDebugConsole = styled(DebugConsole)`
+  transform: translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg);
+`;
 
 const StyledGridItem = styled.div`
   ${container.fvcc}
@@ -47,7 +53,15 @@ const StyledGridItem = styled.div`
   &.h-6 { height: 12rem; }
 `;
 
+const StyledMasonryGrid = styled(MasonryGrid)`
+  width: 80%;
+  transform: translate3d(0, 0, 0) rotate3d(1, 1, 0, 10deg);
+`;
+
 const StyledRoot = styled.div`
   ${container.box}
-  padding: 3rem;
+  padding: 10rem 3rem;
+  perspective: 80rem;
+  width: 100%;
+  height: 100%;
 `;
