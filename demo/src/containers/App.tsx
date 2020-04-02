@@ -57,7 +57,6 @@ class App extends PureComponent<Props, State> {
   }
 
   render() {
-    console.log('foo', window.location.hash)
     return (
       <Fragment>
         <main style={{
