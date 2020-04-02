@@ -9,14 +9,16 @@ import styled from 'styled-components';
 import DebugConsole from '../../../lib/DebugConsole';
 import VList, { RowProps } from '../../../lib/VList';
 
-export interface Props {}
+export interface Props {
+
+}
 
 export interface State {
   selectedIndex: number;
 }
 
 const Row: SFC<RowProps<string>> = ({ data, isSelected, onClick }) => (
-  <StyledRow isSelected={isSelected} onClick={() => onClick()}>{data}</StyledRow>
+  <StyledRow isSelected={isSelected ?? false} onClick={() => onClick?.()}>{data}</StyledRow>
 );
 
 export default hot(class extends PureComponent<Props, State> {
@@ -28,24 +30,31 @@ export default hot(class extends PureComponent<Props, State> {
     return (
       <Fragment>
         <StyledRoot>
-          <StyledVList
-            data={[...new Array(60)].map((v, i) => `${i}`)}
-            rowComponentClass={Row}
+          <VList
+            data={[...new Array(60)].map((v, i) => `${i + 1}`)}
             isTogglable={true}
+            onDeselectAt={idx => this.setState({ selectedIndex: -1 })}
+            onSelectAt={idx => this.setState({ selectedIndex: idx })}
+            rowComponentType={Row}
             shouldStaySelected={true}
-            onRowSelectAt={idx => this.setState({ selectedIndex: idx })}
-            onRowDeselectAt={idx => this.setState({ selectedIndex: -1 })}
+            style={{
+              width: '80%',
+              minWidth: '400px',
+              transform: 'translate3d(0, 0, 0) rotate3d(1, 1, 0, 10deg)',
+            }}
           />
         </StyledRoot>
-        <StyledDebugConsole margin={30} title='?: Vlist' message={this.state.selectedIndex > -1 ? `You selected row <strong>#${this.state.selectedIndex + 1}</strong>!` : 'No rows selected!'}/>
+        <DebugConsole
+          title='?: Vlist'
+          message={this.state.selectedIndex > -1 ? `You selected row <strong>#${this.state.selectedIndex + 1}</strong>!` : 'No rows selected!'}
+          style={{
+            transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)',
+          }}
+        />
       </Fragment>
     );
   }
 });
-
-const StyledDebugConsole = styled(DebugConsole)`
-  transform: translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg);
-`;
 
 const StyledRow = styled.button<{
   isSelected: boolean;
@@ -54,7 +63,7 @@ const StyledRow = styled.button<{
   transition: all .1s ease-out;
   padding: 20px;
   width: 100%;
-  background: ${props => props.isSelected ? '#fff' : '#e91e63'};
+  background: ${props => props.isSelected ? '#fff' : '#2b14d4'};
   color: ${props => props.isSelected ? '#000' : '#fff'};
   transform: translate3d(0, 0, 0) scale(1);
   transform-origin: center;
@@ -64,11 +73,6 @@ const StyledRow = styled.button<{
   ${selectors.hwot} {
     transform: translate3d(0, 0, 0) scale(1.1);
   }
-`;
-
-const StyledVList = styled(VList)`
-  width: 80%;
-  transform: translate3d(0, 0, 0) rotate3d(1, 1, 0, 10deg);
 `;
 
 const StyledRoot = styled.div`

@@ -14,7 +14,7 @@ export interface Props {}
 export interface State {}
 
 export default hot(class extends PureComponent<Props, State> {
-  data = [...new Array(100)].map((v, i) => ({
+  data = [...new Array(200)].map((v, i) => ({
     h: Math.floor(Math.random() * 6) + 1,
     b: Math.floor(Math.random() * 1) + 1,
   }));
@@ -25,37 +25,38 @@ export default hot(class extends PureComponent<Props, State> {
         <StyledRoot>
           <StyledMasonryGrid sections={6} verticalSpacing={30} horizontalSpacing={30}>
             {this.data.map((v, i) => (
-              <StyledGridItem key={i} className={`h-${v.h} base-${v.b}`}>{i}</StyledGridItem>
+              <StyledGridItem key={i} className={`h-${v.h} base-${v.b}`}>{i + 1}</StyledGridItem>
             ))}
           </StyledMasonryGrid>
         </StyledRoot>
-        <StyledDebugConsole margin={30} title='?: Masonry Grid'/>
+        <DebugConsole
+          title='?: Masonry Grid'
+          style={{
+            transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)',
+          }}
+        />
       </Fragment>
     );
   }
 });
 
-const StyledDebugConsole = styled(DebugConsole)`
-  transform: translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg);
-`;
-
 const StyledGridItem = styled.div`
   ${container.fvcc}
   padding: 20px;
   color: #fff;
-  background: #e91e63;
+  background: #2b14d4;
 
-  &.h-1 { height: 2rem; }
-  &.h-2 { height: 4rem; }
-  &.h-3 { height: 6rem; }
-  &.h-4 { height: 8rem; }
-  &.h-5 { height: 10rem; }
-  &.h-6 { height: 12rem; }
+  &.h-1 { height: 4rem; }
+  &.h-2 { height: 8rem; }
+  &.h-3 { height: 12rem; }
+  &.h-4 { height: 16rem; }
+  &.h-5 { height: 20rem; }
+  &.h-6 { height: 24rem; }
 `;
 
 const StyledMasonryGrid = styled(MasonryGrid)`
   width: 80%;
-  transform: translate3d(0, 0, 0) rotate3d(1, 1, 0, 10deg);
+  transform: translate3d(0, 0, 0) rotate3d(1, 1, 0, 6deg);
 `;
 
 const StyledRoot = styled.div`

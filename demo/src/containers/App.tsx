@@ -114,7 +114,7 @@ const StyledNavButton = styled.button`
   transition: all .1s ease-out;
 
   ${selectors.hwot} {
-    color: #e91e63;
+    color: #2b14d4;
   }
 `;
 
@@ -123,7 +123,7 @@ const StyledNav = styled.nav<{
 }>`
   ${container.fvtr}
   ${align.ftr}
-  padding: 14rem 10rem 10rem 0rem;
+  padding: 10rem 8vw 10rem 0rem;
   background: #fff;
   height: 100%;
   width: 30rem;
@@ -144,7 +144,7 @@ const StyledNav = styled.nav<{
 
 const StyledBurgerButton = styled(BurgerButton)`
   ${align.ftr}
-  margin: 12rem;
+  margin: 8vh 8vw;
   pointer-events: auto;
   transition: all .1s ease-out;
   transform: translate3d(0, 0, 10rem) rotateX(-5deg) rotateY(-60deg) scale(1);
@@ -161,7 +161,7 @@ const StyledGithubButton = styled.a`
   background: url(${$$GithubIcon}) center / 100% no-repeat;
   cursor: pointer;
   height: 4rem;
-  margin: 12rem;
+  margin: 8vh 8vw;
   pointer-events: auto;
   transform: translate3d(0, 0, 10rem) rotateX(-10deg) rotateY(-5deg) scale(1);
   transition: all .1s ease-out;
