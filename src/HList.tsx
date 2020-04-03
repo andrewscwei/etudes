@@ -11,21 +11,21 @@ export interface RowProps<T> {
 export interface Props<T> extends AbstractSelectableCollectionProps {
   data: Array<T>;
   padding?: number;
-  rowComponentType: ComponentType<RowProps<T>>;
+  columnComponentType: ComponentType<RowProps<T>>;
 }
 
 export interface State extends AbstractSelectableCollectionState {
 
 }
 
-export default class VList<T> extends AbstractSelectableCollection<Props<T>, State> {
+export default class HList<T> extends AbstractSelectableCollection<Props<T>, State> {
   isIndexOutOfRange(index: number): boolean {
     if (index >= this.props.data.length) return true;
     return super.isIndexOutOfRange(index);
   }
 
   render() {
-    const RowComponentType = this.props.rowComponentType;
+    const ColumnComponentType = this.props.columnComponentType;
 
     return (
       <StyledRoot
@@ -34,7 +34,7 @@ export default class VList<T> extends AbstractSelectableCollection<Props<T>, Sta
         style={this.props.style}
       >
         {this.props.data.map((t, i) => (
-          <RowComponentType
+          <ColumnComponentType
             key={`row-${i}`}
             data={t}
             isSelected={this.isSelectedAt(i)}
@@ -52,7 +52,7 @@ const StyledRoot = styled.div<{
   align-items: flex-start;
   box-sizing: border-box;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: flex-start;
   overflow: visible;
 
@@ -60,7 +60,7 @@ const StyledRoot = styled.div<{
     flex: 0 0 auto;
 
     &:not(:last-child) {
-      margin-bottom: ${props => props.padding}px;
+      margin-right: ${props => props.padding}px;
     }
   }
 `;

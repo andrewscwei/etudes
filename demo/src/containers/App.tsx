@@ -11,6 +11,7 @@ import $$GithubIcon from '../assets/images/github-icon.svg';
 import MasonryGrid from './MasonryGrid';
 import Video from './Video';
 import VList from './VList';
+import HList from './HList';
 
 interface Props {}
 
@@ -51,6 +52,7 @@ class App extends PureComponent<Props, State> {
     switch (this.state.featuredComponent) {
       case 'masonry-grid': return <MasonryGrid/>;
       case 'video': return <Video/>;
+      case 'hlist': return <HList/>;
       case 'vlist': return <VList/>;
       default: return <Fragment/>;
     }
@@ -81,6 +83,7 @@ class App extends PureComponent<Props, State> {
           <StyledNav isActive={this.state.isNavActive}>
             <StyledNavButton onClick={() => this.setState({ featuredComponent: 'masonry-grid' })}>Masonry Grid</StyledNavButton>
             <StyledNavButton onClick={() => this.setState({ featuredComponent: 'video' })}>Video</StyledNavButton>
+            <StyledNavButton onClick={() => this.setState({ featuredComponent: 'hlist' })}>Hlist</StyledNavButton>
             <StyledNavButton onClick={() => this.setState({ featuredComponent: 'vlist' })}>Vlist</StyledNavButton>
           </StyledNav>
           <StyledBurgerButton
