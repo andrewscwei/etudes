@@ -1,13 +1,13 @@
 {
   "name": "etudes",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "A study of styled React components",
   "main": "lib",
   "scripts": {
     "clean": "rimraf lib",
     "build": "npm run clean && tsc -p tsconfig.json",
     "build:demo": "webpack --config demo/config/build.conf.ts --port 8080",
-    "dev": "npm run clean && tsc -w -p tsconfig.json & NODE_ENV=development webpack-dev-server --display-error-details --hot --config demo/config/build.conf.ts",
+    "demo": "NODE_ENV=development webpack-dev-server --display-error-details --hot --config demo/config/build.conf.ts",
     "lint": "tslint \"src/**/*\" \"demo/**/*\" --project tsconfig.json",
     "lint:fix": "npm run lint -- --fix"
   },

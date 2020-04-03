@@ -2,8 +2,8 @@ import { container, selectors } from 'promptu';
 import React, { Fragment, PureComponent, SFC } from 'react';
 import { hot } from 'react-hot-loader/root';
 import styled from 'styled-components';
-import DebugConsole from '../../../lib/DebugConsole';
-import VList, { RowProps } from '../../../lib/VList';
+import DebugConsole from '../../../src/DebugConsole';
+import VList, { RowProps } from '../../../src/VList';
 
 export interface Props {}
 

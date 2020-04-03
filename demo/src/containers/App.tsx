@@ -6,12 +6,13 @@ import { align, container, selectors } from 'promptu';
 import React, { createRef, Fragment, PureComponent } from 'react';
 import { hot } from 'react-hot-loader/root';
 import styled from 'styled-components';
-import BurgerButton from '../../../lib/BurgerButton';
+import BurgerButton from '../../../src/BurgerButton';
 import $$GithubIcon from '../assets/images/github-icon.svg';
 import MasonryGrid from './MasonryGrid';
 import Video from './Video';
 import VList from './VList';
 import HList from './HList';
+import Dropdown from './Dropdown';
 
 interface Props {}
 
@@ -51,9 +52,10 @@ class App extends PureComponent<Props, State> {
   renderFeaturedComponent() {
     switch (this.state.featuredComponent) {
       case 'masonry-grid': return <MasonryGrid/>;
-      case 'video': return <Video/>;
       case 'hlist': return <HList/>;
       case 'vlist': return <VList/>;
+      case 'dropdown': return <Dropdown/>;
+      case 'video': return <Video/>;
       default: return <Fragment/>;
     }
   }
@@ -82,9 +84,10 @@ class App extends PureComponent<Props, State> {
         }}>
           <StyledNav isActive={this.state.isNavActive}>
             <StyledNavButton onClick={() => this.setState({ featuredComponent: 'masonry-grid' })}>Masonry Grid</StyledNavButton>
-            <StyledNavButton onClick={() => this.setState({ featuredComponent: 'video' })}>Video</StyledNavButton>
             <StyledNavButton onClick={() => this.setState({ featuredComponent: 'hlist' })}>Hlist</StyledNavButton>
             <StyledNavButton onClick={() => this.setState({ featuredComponent: 'vlist' })}>Vlist</StyledNavButton>
+            <StyledNavButton onClick={() => this.setState({ featuredComponent: 'dropdown' })}>Dropdown</StyledNavButton>
+            <StyledNavButton onClick={() => this.setState({ featuredComponent: 'video' })}>Video</StyledNavButton>
           </StyledNav>
           <StyledBurgerButton
             ref={this.nodeRefs.burgerButton}

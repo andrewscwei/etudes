@@ -6,8 +6,8 @@ import { container } from 'promptu';
 import React, { Fragment, PureComponent } from 'react';
 import { hot } from 'react-hot-loader/root';
 import styled from 'styled-components';
-import DebugConsole from '../../../lib/DebugConsole';
-import MasonryGrid from '../../../lib/MasonryGrid';
+import DebugConsole from '../../../src/DebugConsole';
+import MasonryGrid from '../../../src/MasonryGrid';
 
 export interface Props {}
 

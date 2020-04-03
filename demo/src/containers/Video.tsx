@@ -6,8 +6,8 @@ import { align, container } from 'promptu';
 import React, { Fragment, PureComponent } from 'react';
 import { hot } from 'react-hot-loader/root';
 import styled from 'styled-components';
-import DebugConsole from '../../../lib/DebugConsole';
-import Video from '../../../lib/Video';
+import DebugConsole from '../../../src/DebugConsole';
+import Video from '../../../src/Video';
 
 export interface Props {}
 

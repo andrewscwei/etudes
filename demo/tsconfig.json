@@ -18,8 +18,7 @@
   },
   "include": [
     "src/**/*",
-    "config/**/*",
-    "../lib/**/*"
+    "config/**/*"
   ],
   "exclude": [
     "node_modules",
