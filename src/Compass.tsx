@@ -29,10 +29,10 @@ interface Props {
   fov: number;
 
   /**
-   * Color of the highlight indicator.
+   * Radius of the component.
    * @optional
    */
-  highlightColor: string;
+  radius: number;
 
   /**
    * The thickness of the highlight indicator.
@@ -41,10 +41,10 @@ interface Props {
   highlightThickness: number;
 
   /**
-   * Radius of the component.
+   * Color of the highlight indicator.
    * @optional
    */
-  radius: number;
+  highlightColor: string;
 
   /**
    * The color of the circular compass track.

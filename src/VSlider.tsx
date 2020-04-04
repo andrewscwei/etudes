@@ -16,7 +16,21 @@
 import { Rect } from 'dirty-dom';
 import interact from 'interactjs';
 import React, { createRef, CSSProperties, PureComponent } from 'react';
-import styled, { css, FlattenSimpleInterpolation } from 'styled-components';
+import styled, { css } from 'styled-components';
+import { ExtendedCSSFunction, ExtendedCSSProps } from './types';
+
+type KnobCSSProps = Readonly<{
+  isAtBottom: boolean;
+  isAtTop: boolean;
+  isDragging: boolean;
+  isReleasing: boolean;
+}>;
+
+type GutterCSSProps = Readonly<{}>;
+
+type LabelCSSProps = Readonly<{
+  knobHeight: number;
+}>;
 
 export interface BreakpointDescriptor {
   label?: string;
@@ -38,8 +52,11 @@ export interface Props {
 
   /**
    * An array of breakpoint descriptors. A breakpoint is a point on the gutter
-   * where the knob should snap to if it stops near that point. You can
+   * where the knob should snap to if dragging stops near that it. You can
    * associate a label with a breakpoint so it can be displayed in the knob.
+   * If breakpoints are to be specified, ensure that there are at least two:
+   * one for the start of the gutter and one for the end.
+   * @optional
    */
   breakpoints?: ReadonlyArray<BreakpointDescriptor>;
 
@@ -47,6 +64,7 @@ export interface Props {
    * The default index. This is ignored if breakpoints are not provided. On the
    * other hand, if breakpoints are provided, the default position will be
    * calculated based on this value, making `defaultPosition` irrelevant.
+   * @optional
    */
   defaultIndex: number;
 
@@ -135,25 +153,25 @@ export interface Props {
    * Custom CSS provided to the top gutter.
    * @optional
    */
-  topGutterCSS: (props: Props) => FlattenSimpleInterpolation;
+  topGutterCSS: ExtendedCSSFunction<GutterCSSProps>;
 
   /**
    * Custom CSS provided to the bottom gutter.
    * @optional
    */
-  bottomGutterCSS: (props: Props) => FlattenSimpleInterpolation;
+  bottomGutterCSS: ExtendedCSSFunction<GutterCSSProps>;
 
   /**
    * Custom CSS provided to the knob.
    * @optional
    */
-  knobCSS: (props: Props) => FlattenSimpleInterpolation;
+  knobCSS: ExtendedCSSFunction<KnobCSSProps>;
 
   /**
    * Custom CSS provided to the label inside the knob.
    * @optional
    */
-  labelCSS: (props: Props) => FlattenSimpleInterpolation;
+  labelCSS: ExtendedCSSFunction<LabelCSSProps>;
 }
 
 interface State {
@@ -182,10 +200,10 @@ export default class VSlider extends PureComponent<Props, State> {
   };
 
   static breakpointsFactory(length: number, labelIterator?: (index: number, position: number) => string): ReadonlyArray<BreakpointDescriptor> {
-    if (length <= 0) throw new Error('`length` value cannot be less than or equal to 0');
+    if (length <= 1) throw new Error('`length` value must be greater than or equal to 2');
     if (Math.round(length) !== length) throw new Error('`length` value must be an integer');
 
-    const interval = 1 / length;
+    const interval = 1 / (length - 1);
 
     return Array(length).fill(null).map((v, i) => {
       const pos = interval * i;
@@ -334,24 +352,27 @@ export default class VSlider extends PureComponent<Props, State> {
       >
         <StyledGutter
           style={{ top: 0, height: `${this.topGutterHeight}px` }}
-          extendedCSS={topGutterCSS(this.props)}
+          extendedCSS={topGutterCSS}
         />
         <StyledKnob
-          gutterWidth={this.rect.width}
-          height={knobHeight}
           isAtBottom={isInverted ? (position === 0) : (position === 1)}
           isAtTop={isInverted ? (position === 1) : (position === 0)}
           isDragging={isDragging}
           isReleasing={isReleasing}
           ref={this.nodeRefs.knob}
-          style={{ transform: `translate3d(0, ${this.knobPosition}px, 0)` }}
-          extendedCSS={knobCSS(this.props)}
-          width={knobWidth}
+          extendedCSS={knobCSS}
+          style={{
+            height: `${knobHeight}px`,
+            margin: `${-knobHeight / 2 + this.knobPosition}px 0 0 ${(this.rect.width - knobWidth) / 2}px`,
+            position: 'absolute',
+            width: `${knobWidth}px`,
+            zIndex: 1,
+          }}
         >
           {breakpoints && isLabelVisible && (
             <StyledLabel
               knobHeight={knobHeight}
-              extendedCSS={labelCSS(this.props)}
+              extendedCSS={labelCSS}
             >
               {breakpoints[this.index].label ?? ''}
             </StyledLabel>
@@ -359,7 +380,7 @@ export default class VSlider extends PureComponent<Props, State> {
         </StyledKnob>
         <StyledGutter
           style={{ bottom: 0, height: `${this.bottomGutterHeight}px` }}
-          extendedCSS={bottomGutterCSS(this.props)}
+          extendedCSS={bottomGutterCSS}
         />
 
       </StyledRoot>
@@ -427,58 +448,39 @@ export default class VSlider extends PureComponent<Props, State> {
   }
 }
 
-const StyledGutter = styled.div<{
-  extendedCSS: FlattenSimpleInterpolation;
-}>`
+const StyledGutter = styled.div<ExtendedCSSProps<GutterCSSProps>>`
   left: 0;
   right: 0;
   margin: 0 auto;
   position: absolute;
   width: 100%;
   background: #fff;
-  ${props => props.extendedCSS}
+  ${props => props.extendedCSS(props)}
 `;
 
-const StyledLabel = styled.label<{
-  extendedCSS: FlattenSimpleInterpolation;
-  knobHeight: number;
-}>`
+const StyledLabel = styled.label<LabelCSSProps & ExtendedCSSProps<LabelCSSProps>>`
   font-size: ${props => props.knobHeight * .5}px;
   pointer-events: none;
   user-select: none;
   color: #000;
-  ${props => props.extendedCSS}
+  ${props => props.extendedCSS(props)}
 `;
 
-const StyledKnob = styled.div<{
-  gutterWidth: number;
-  height: number;
-  isAtBottom: boolean;
-  isAtTop: boolean;
-  isDragging: boolean;
-  isReleasing: boolean;
-  width: number;
-  extendedCSS: FlattenSimpleInterpolation;
-}>`
+const StyledKnob = styled.div<KnobCSSProps & ExtendedCSSProps<KnobCSSProps>>`
   align-items: center;
   background: #fff;
   box-sizing: border-box;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  height: ${props => props.height}px;
   justify-content: center;
-  margin: ${props => -props.height / 2}px 0 0 ${props => (-props.width + props.gutterWidth) / 2}px;
   opacity: ${props => props.isDragging ? .6 : 1};
-  position: relative;
   touch-action: none;
-  transition-duration: 150ms;
-  transition-property: ${props => props.isReleasing ? 'opacity, transform' : 'opacity'};
+  transition-duration: 100ms;
+  transition-property: ${props => props.isReleasing ? 'background, color, opacity, margin, transform' : 'background, color, transform, opacity'};
+  will-change: 'background, color, opacity, margin, transform';
   transition-timing-function: ease-out;
-  width: ${props => props.width}px;
-  z-index: 1;
-
-  ${props => props.extendedCSS}
+  ${props => props.extendedCSS(props)}
 `;
 
 const StyledRoot = styled.div`
