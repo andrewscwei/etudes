@@ -31,7 +31,6 @@ export default hot(class extends PureComponent<Props, State> {
             }}
           />
           <VSlider
-            autoSnap={false}
             isInverted={false}
             gutterPadding={10}
             onPositionChange={position => this.setState({ position })}

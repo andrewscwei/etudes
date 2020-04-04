@@ -13,12 +13,12 @@
  *       breakpoint.
  */
 
+import { Rect } from 'dirty-dom';
 import interact from 'interactjs';
 import React, { createRef, CSSProperties, PureComponent } from 'react';
-import styled, { FlattenSimpleInterpolation, css, SimpleInterpolation, FlattenInterpolation } from 'styled-components';
-import { Rect } from 'dirty-dom';
+import styled, { css, FlattenSimpleInterpolation } from 'styled-components';
 
-export interface DataProps {
+export interface BreakpointDescriptor {
   label?: string;
   position?: number;
 }
@@ -36,9 +36,26 @@ export interface Props {
    */
   style: CSSProperties;
 
-  breakpoints: ReadonlyArray<DataProps>;
+  /**
+   * An array of breakpoint descriptors. A breakpoint is a point on the gutter
+   * where the knob should snap to if it stops near that point. You can
+   * associate a label with a breakpoint so it can be displayed in the knob.
+   */
+  breakpoints?: ReadonlyArray<BreakpointDescriptor>;
 
+  /**
+   * The default index. This is ignored if breakpoints are not provided. On the
+   * other hand, if breakpoints are provided, the default position will be
+   * calculated based on this value, making `defaultPosition` irrelevant.
+   */
   defaultIndex: number;
+
+  /**
+   * The default position. This is ignored if `defaultIndex` and breakpoints are
+   * provided.
+   * @optional
+   */
+  defaultPosition: number;
 
   /**
    * Padding between the gutter and the knob in pixels.
@@ -148,8 +165,9 @@ interface State {
 export default class VSlider extends PureComponent<Props, State> {
   static defaultProps: Partial<Props> = {
     style: {},
-    breakpoints: VSlider.dataFactory(10, (index: number, position: number) => `${index}`),
+    breakpoints: VSlider.breakpointsFactory(10, (index: number, position: number) => `${index}`),
     defaultIndex: 0,
+    defaultPosition: 0,
     gutterPadding: 0,
     knobHeight: 30,
     knobWidth: 30,
@@ -163,7 +181,7 @@ export default class VSlider extends PureComponent<Props, State> {
     topGutterCSS: props => css``,
   };
 
-  static dataFactory(length: number, labelIterator?: (index: number, position: number) => string): ReadonlyArray<DataProps> {
+  static breakpointsFactory(length: number, labelIterator?: (index: number, position: number) => string): ReadonlyArray<BreakpointDescriptor> {
     if (length <= 0) throw new Error('`length` value cannot be less than or equal to 0');
     if (Math.round(length) !== length) throw new Error('`length` value must be an integer');
 
@@ -190,7 +208,7 @@ export default class VSlider extends PureComponent<Props, State> {
     this.state = {
       isDragging: false,
       isReleasing: false,
-      position: this.getPositionByIndex(this.props.defaultIndex),
+      position: ((this.props.breakpoints !== undefined) && (this.props.defaultIndex !== undefined)) ? this.getPositionByIndex(this.props.defaultIndex) : this.props.defaultPosition,
     };
   }
 
@@ -237,11 +255,14 @@ export default class VSlider extends PureComponent<Props, State> {
 
   /**
    * Gets the index of the breakpoint of which the current position is closest
-   * to.
+   * to. If for whatever reason the index cannot be computed (i.e. no
+   * breakpoints were provided), -1 is returned.
    */
   get index(): number {
     const { breakpoints } = this.props;
     const { position } = this.state;
+
+    if (!breakpoints) return -1;
 
     let idx = 0;
     let delta = NaN;
@@ -327,7 +348,7 @@ export default class VSlider extends PureComponent<Props, State> {
           extendedCSS={knobCSS(this.props)}
           width={knobWidth}
         >
-          {isLabelVisible && (
+          {breakpoints && isLabelVisible && (
             <StyledLabel
               knobHeight={knobHeight}
               extendedCSS={labelCSS(this.props)}
@@ -356,6 +377,7 @@ export default class VSlider extends PureComponent<Props, State> {
    */
   private getPositionByIndex(index: number): number {
     const { breakpoints } = this.props;
+    if (!breakpoints) return NaN;
     return breakpoints[index].position ?? (index / (breakpoints.length - 1));
   }
 
@@ -400,7 +422,7 @@ export default class VSlider extends PureComponent<Props, State> {
     this.setState({
       isDragging: false,
       isReleasing: true,
-      position: this.props.autoSnap ? this.getPositionByIndex(this.index) : this.state.position,
+      position: (this.props.autoSnap && this.props.breakpoints) ? this.getPositionByIndex(this.index) : this.state.position,
     });
   }
 }
