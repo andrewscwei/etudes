@@ -50,7 +50,7 @@ export default hot(class extends PureComponent<Props, State> {
           />
         </StyledRoot>
         <DebugConsole
-          title='?: Compass + VSlider'
+          title='?: Compass+VSlider'
           maxEntries={1}
           message={`Position: ${this.state.position.toFixed(3)}, Angle: ${Math.round(this.state.position * 360)}°`}
           style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
