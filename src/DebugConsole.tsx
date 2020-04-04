@@ -7,6 +7,7 @@ interface Props {
   margin: number;
   message?: string;
   style: CSSProperties;
+  maxEntries: number;
   title?: string;
 }
 
@@ -17,6 +18,7 @@ interface State {
 export default class DebugConsole extends PureComponent<Props, State> {
   static defaultProps: Partial<Props> = {
     margin: 0,
+    maxEntries: -1,
     align: 'br',
     style: {},
   };
@@ -35,9 +37,18 @@ export default class DebugConsole extends PureComponent<Props, State> {
 
   componentDidUpdate(prevProps: Props, prevState: State) {
     if (prevProps.message !== this.props.message) {
-      this.setState({
-        messages: [...this.state.messages, this.props.message ?? ''],
-      });
+      if (this.props.maxEntries < 0) {
+        this.setState({
+          messages: [...this.state.messages, this.props.message ?? ''],
+        });
+      }
+      else {
+        const n = this.state.messages.length;
+
+        this.setState({
+          messages: [...this.state.messages.slice(Math.max(0, n - (this.props.maxEntries - 1)), n), this.props.message ?? ''],
+        });
+      }
     }
 
     if (prevState.messages.length !== this.state.messages.length) {
