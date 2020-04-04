@@ -195,14 +195,14 @@ export default class VSlider extends PureComponent<Props, State> {
   }
 
   /**
-   * Computed rect of this component.
+   * Computed rect of the root element.
    */
   get rect(): Rect {
     return Rect.from(this.nodeRefs.root.current) ?? new Rect();
   }
 
   /**
-   * Height of the gutter above the knob.
+   * Height of the top gutter in pixels.
    */
   get topGutterHeight(): number {
     const { isInverted, gutterPadding, knobHeight } = this.props;
@@ -211,7 +211,7 @@ export default class VSlider extends PureComponent<Props, State> {
   }
 
   /**
-   * Height of the gutter below the knob.
+   * Height of the bottom gutter in pixels.
    */
   get bottomGutterHeight(): number {
     const { isInverted, gutterPadding, knobHeight } = this.props;
@@ -221,14 +221,14 @@ export default class VSlider extends PureComponent<Props, State> {
 
   /**
    * Position of the knob ranging from 0 to 1, inclusive. If for whatever reason
-   * the position cannot be computed, -1 is returned.
+   * the position cannot be computed, NaN is returned.
    */
   get knobPosition(): number {
     const { isInverted } = this.props;
     const { position } = this.state;
     const rootNode = this.nodeRefs.root.current;
 
-    if (!rootNode) return -1;
+    if (!rootNode) return NaN;
 
     const p = isInverted ? (1 - position) : position;
 
@@ -236,8 +236,8 @@ export default class VSlider extends PureComponent<Props, State> {
   }
 
   /**
-   * Gets the index of the breakpoints array of which the sliding position is pointing
-   * at.
+   * Gets the index of the breakpoint of which the current position is closest
+   * to.
    */
   get index(): number {
     const { breakpoints } = this.props;
@@ -346,12 +346,13 @@ export default class VSlider extends PureComponent<Props, State> {
   }
 
   /**
-   * Gets the knob position by breakpoints index. This value ranges between 0 - 1,
+   * Gets the position by breakpoint index. This value ranges between 0 - 1,
    * inclusive.
    *
-   * @param index - The breakpoints index.
+   * @param index - The breakpoint index.
    *
-   * @returns The position.
+   * @returns The position. If for whatever reason the position cannot be
+   *          determined, NaN is returned.
    */
   private getPositionByIndex(index: number): number {
     const { breakpoints } = this.props;
