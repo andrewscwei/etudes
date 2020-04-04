@@ -1,3 +1,18 @@
+/**
+ * @file A vertical slider component that divides the scroll gutter into two
+ *       different elements—one that is above the knob and one that is below the
+ *       knob. This allows for individual styling customizations. The width and
+ *       height of the root element of this component is taken from the
+ *       aggregated rect of both gutter parts. The dimension of knob itself does
+ *       not impact that of the root element. In addition to the tranditional
+ *       behavior of a scrollbar, this component allows you to provide
+ *       breakpoints along the gutter so the knob can automatically snap to them
+ *       (if feature is enabled) when dragging ends near the breakpoint
+ *       positions. You can also supply a label to each breakpoint and have it
+ *       display on the knob when the current position is close to the
+ *       breakpoint.
+ */
+
 import interact from 'interactjs';
 import React, { createRef, CSSProperties, PureComponent } from 'react';
 import styled, { FlattenSimpleInterpolation, css, SimpleInterpolation, FlattenInterpolation } from 'styled-components';
@@ -9,24 +24,118 @@ export interface DataProps {
 }
 
 export interface Props {
+  /**
+   * Class attribute of the root element.
+   * @optional
+   */
   className?: string;
+
+  /**
+   * Inline style attribute of the root element.
+   * @optional
+   */
   style: CSSProperties;
-  data: ReadonlyArray<DataProps>;
+
+  breakpoints: ReadonlyArray<DataProps>;
+
   defaultIndex: number;
+
+  /**
+   * Padding between the gutter and the knob in pixels.
+   * @optional
+   */
   gutterPadding: number;
-  gutterWidth: number;
+
+  /**
+   * Height of the knob in pixels.
+   * @optional
+   */
   knobHeight: number;
+
+  /**
+   * Width of the knob in pixels.
+   * @optional
+   */
   knobWidth: number;
+
+  /**
+   * Indicates whether the knob automatically snaps to the nearest breakpoint,
+   * if breakpoints are provided.
+   * @optional
+   */
   autoSnap: boolean;
+
+  /**
+   * By default the position is a value from 0 - 1, 0 being the top of the
+   * slider and 1 being the bottom. Switching on this flag inverts this
+   * behavior, where 0 becomes the bottom of the slider and 1 the top.
+   * @optional
+   */
   isInverted: boolean;
+
+  /**
+   * Indicates if the breakpoint label is visible inside the knob. Note that
+   * this is only applicable if breakpoints are provided.
+   * @optional
+   */
   isLabelVisible: boolean;
+
+  /**
+   * Indicates if position/index change events are dispatched when dragging
+   * ends. When disabled, aforementioned events are fired repeatedly while
+   * dragging.
+   * @optional
+   */
   onlyDispatchesOnDragEnd: boolean;
+
+  /**
+   * Handler invoked when dragging ends.
+   * @optional
+   */
   onDragEnd?: () => void;
+
+  /**
+   * Handler invoked when dragging begins.
+   * @optional
+   */
   onDragStart?: () => void;
+
+  /**
+   * Handler invoked when index changes. This happens simultaneously with
+   * `onPositionChange`. Note that this is only invoked if breakpoints are
+   * provided, because otherwise there will be no indexes.
+   * @optional
+   */
   onIndexChange?: (index: number) => void;
+
+  /**
+   * Handler invoked when position changes.
+   * @optional
+   */
   onPositionChange?: (position: number) => void;
-  gutterCSS: (props: Props) => FlattenSimpleInterpolation;
+
+  /**
+   * Custom CSS provided to the top gutter.
+   * @optional
+   */
+  topGutterCSS: (props: Props) => FlattenSimpleInterpolation;
+
+  /**
+   * Custom CSS provided to the bottom gutter.
+   * @optional
+   */
+  bottomGutterCSS: (props: Props) => FlattenSimpleInterpolation;
+
+  /**
+   * Custom CSS provided to the knob.
+   * @optional
+   */
   knobCSS: (props: Props) => FlattenSimpleInterpolation;
+
+  /**
+   * Custom CSS provided to the label inside the knob.
+   * @optional
+   */
   labelCSS: (props: Props) => FlattenSimpleInterpolation;
 }
 
@@ -39,11 +148,11 @@ interface State {
 export default class VSlider extends PureComponent<Props, State> {
   static defaultProps: Partial<Props> = {
     autoSnap: true,
-    data: VSlider.dataFactory(10, (index: number, position: number) => `${index}`),
+    breakpoints: VSlider.dataFactory(10, (index: number, position: number) => `${index}`),
     defaultIndex: 0,
-    gutterCSS: props => css``,
+    topGutterCSS: props => css``,
+    bottomGutterCSS: props => css``,
     gutterPadding: 0,
-    gutterWidth: 1,
     isInverted: false,
     isLabelVisible: true,
     knobCSS: props => css``,
@@ -127,17 +236,17 @@ export default class VSlider extends PureComponent<Props, State> {
   }
 
   /**
-   * Gets the index of the data array of which the sliding position is pointing
+   * Gets the index of the breakpoints array of which the sliding position is pointing
    * at.
    */
   get index(): number {
-    const { data } = this.props;
+    const { breakpoints } = this.props;
     const { position } = this.state;
 
     let idx = 0;
     let delta = NaN;
 
-    for (let i = 0, n = data.length; i < n; i++) {
+    for (let i = 0, n = breakpoints.length; i < n; i++) {
       const breakpoint = this.getPositionByIndex(i);
       const d = Math.abs(position - breakpoint);
 
@@ -193,7 +302,7 @@ export default class VSlider extends PureComponent<Props, State> {
   }
 
   render() {
-    const { className, data, knobHeight, knobWidth, isLabelVisible, isInverted, labelCSS, gutterCSS, knobCSS, style } = this.props;
+    const { className, breakpoints, knobHeight, knobWidth, isLabelVisible, isInverted, labelCSS, topGutterCSS, bottomGutterCSS, knobCSS, style } = this.props;
     const { isDragging, isReleasing, position } = this.state;
 
     return (
@@ -204,7 +313,7 @@ export default class VSlider extends PureComponent<Props, State> {
       >
         <StyledGutter
           style={{ top: 0, height: `${this.topGutterHeight}px` }}
-          extendedCSS={gutterCSS(this.props)}
+          extendedCSS={topGutterCSS(this.props)}
         />
         <StyledKnob
           gutterWidth={this.rect.width}
@@ -223,13 +332,13 @@ export default class VSlider extends PureComponent<Props, State> {
               knobHeight={knobHeight}
               extendedCSS={labelCSS(this.props)}
             >
-              {data[this.index].label ?? ''}
+              {breakpoints[this.index].label ?? ''}
             </StyledLabel>
           )}
         </StyledKnob>
         <StyledGutter
           style={{ bottom: 0, height: `${this.bottomGutterHeight}px` }}
-          extendedCSS={gutterCSS(this.props)}
+          extendedCSS={bottomGutterCSS(this.props)}
         />
 
       </StyledRoot>
@@ -237,16 +346,16 @@ export default class VSlider extends PureComponent<Props, State> {
   }
 
   /**
-   * Gets the knob position by data index. This value ranges between 0 - 1,
+   * Gets the knob position by breakpoints index. This value ranges between 0 - 1,
    * inclusive.
    *
-   * @param index - The data index.
+   * @param index - The breakpoints index.
    *
    * @returns The position.
    */
   private getPositionByIndex(index: number): number {
-    const { data } = this.props;
-    return data[index].position ?? (index / (data.length - 1));
+    const { breakpoints } = this.props;
+    return breakpoints[index].position ?? (index / (breakpoints.length - 1));
   }
 
   private reconfigureInteractivityIfNeeded() {

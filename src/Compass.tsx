@@ -3,6 +3,18 @@ import styled, { CSSProperties } from 'styled-components';
 
 interface Props {
   /**
+   * Class attribute of the component.
+   * @optional
+   */
+  className?: string;
+
+  /**
+   * Inline style attribute of the root element.
+   * @optional
+   */
+  style: CSSProperties;
+
+  /**
    * Current angle reading of the compass, between 0 - 360 (degrees), inclusive.
    */
   angle: number;
@@ -15,12 +27,6 @@ interface Props {
    *          that would mean the FOV is 500 / 1000 * 360 = 180 degrees.
    */
   fov: number;
-
-  /**
-   * Class attribute of the component.
-   * @optional
-   */
-  className?: string;
 
   /**
    * Color of the highlight indicator.
@@ -39,12 +45,6 @@ interface Props {
    * @optional
    */
   radius: number;
-
-  /**
-   * The inline CSS provided to the component.
-   * @optional
-   */
-  style: CSSProperties;
 
   /**
    * The color of the circular compass track.
