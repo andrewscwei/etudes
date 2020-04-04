@@ -3,17 +3,17 @@ import styled from 'styled-components';
 
 interface Props {
   className?: string;
-  height: number;
+  style: CSSProperties;
   isActiveByDefault: boolean;
   isDoubleJointed: boolean;
   isFunky: boolean;
-  onActivate?: () => void;
-  onDeactivate?: () => void;
-  style: CSSProperties;
+  height: number;
   thickness: number;
+  width: number;
   tintColor: string;
   transitionDuration: number;
-  width: number;
+  onActivate?: () => void;
+  onDeactivate?: () => void;
 }
 
 interface State {

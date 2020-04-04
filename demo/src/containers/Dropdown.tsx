@@ -1,9 +1,10 @@
-import { container } from 'promptu';
+import { container, selectors } from 'promptu';
 import React, { Fragment, PureComponent } from 'react';
 import { hot } from 'react-hot-loader/root';
 import styled, { css } from 'styled-components';
 import DebugConsole from '../../../src/DebugConsole';
 import Dropdown from '../../../src/Dropdown';
+import $$ExpandIcon from '!!raw-loader!../assets/images/expand-icon.svg';
 
 export interface Props {}
 
@@ -21,20 +22,54 @@ export default hot(class extends PureComponent<Props, State> {
       <Fragment>
         <StyledRoot>
           <StyledDropdown
-            data={[{ title: 'foo', description: 'foo' }, { title: 'bar', description: 'bar' }, { title: 'baz', description: 'baz' }]}
+            data={[{
+              title: 'foo',
+              description: 'Description for Foo',
+            }, {
+              title: 'bar',
+              description: 'Description for Bar',
+            }, {
+              title: 'baz',
+              description: 'Description for Baz',
+            }]}
             isInverted={false}
             borderThickness={2}
+            expandIconSvg={$$ExpandIcon}
             toggleCSS={props => css`
               font-size: 2rem;
               font-weight: 700;
               text-transform: uppercase;
+              transition: all .1s ease-out;
+
+              svg * {
+                transform: fill .1s ease-out;
+                fill: #000;
+              }
+
+              ${selectors.hwot} {
+                color: #fff;
+                background: #2b14d4;
+                transform: translate3d(0, 0, 0) scale(1.2);
+
+                svg * {
+                  transform: fill .1s ease-out;
+                  fill: #fff;
+                }
+              }
             `}
             itemCSS={props => css`
               font-size: 1.6rem;
+              transition: all .1s ease-out;
 
               > span {
                 font-weight: 700;
                 text-transform: uppercase;
+              }
+
+
+              ${selectors.hwot} {
+                color: #fff;
+                background: #2b14d4;
               }
             `}
             onIndexChange={idx => this.setState({ selectedIndex: idx })}

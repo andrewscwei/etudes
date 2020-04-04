@@ -1,6 +1,20 @@
 import { Rect } from 'dirty-dom';
 import React, { createRef, PureComponent } from 'react';
-import styled, { css, CSSProperties, FlattenSimpleInterpolation } from 'styled-components';
+import styled, { css, CSSProperties } from 'styled-components';
+import { ExtendedCSSFunction, ExtendedCSSProps } from './types';
+
+type ItemCSSProps = Readonly<{
+  borderColor: string;
+  borderThickness: number;
+  height: number;
+  isInverted: boolean;
+}>;
+
+type ToggleCSSProps = Readonly<{
+  borderColor: string;
+  borderThickness: number;
+  isActive: boolean;
+}>;
 
 export type DataProps<T> = T & {
   description: string;
@@ -9,20 +23,20 @@ export type DataProps<T> = T & {
 };
 
 export interface Props<T> {
-  borderColor?: string;
-  borderThickness?: number;
   className?: string;
+  style?: CSSProperties;
   data: Array<DataProps<T>>;
-  defaultLabel?: string;
-  defaultSelectedItemIndex?: number;
-  expandIconSvg?: string;
   isInverted?: boolean;
-  itemCSS?: (props: Props<T>) => FlattenSimpleInterpolation;
+  borderThickness?: number;
+  defaultSelectedItemIndex?: number;
   itemHeight?: number;
   maxVisibleItems?: number;
+  borderColor?: string;
+  defaultLabel?: string;
+  expandIconSvg?: string;
   onIndexChange?: (index: number) => void;
-  style?: CSSProperties;
-  toggleCSS?: (props: Props<T>) => FlattenSimpleInterpolation;
+  itemCSS?: ExtendedCSSFunction<ItemCSSProps>;
+  toggleCSS?: ExtendedCSSFunction<ToggleCSSProps>;
 }
 
 export interface State {
@@ -121,7 +135,7 @@ export default class Dropdown<T> extends PureComponent<Props<T>, State> {
     const borderColor = this.props.borderColor ?? '#000';
     const borderThickness = this.props.borderThickness ?? 1;
     const itemHeight = this.props.itemHeight ?? Rect.from(this.nodeRefs.root.current)?.height ?? 50;
-    const maxVisibleItems = this.props.maxVisibleItems ?? Infinity;
+    const maxVisibleItems = this.props.maxVisibleItems ?? -1;
     const numItems = this.props.data.length;
 
     return (
@@ -134,7 +148,7 @@ export default class Dropdown<T> extends PureComponent<Props<T>, State> {
         <StyledToggle
           borderColor={borderColor}
           borderThickness={borderThickness}
-          extendedCSS={this.props.toggleCSS?.(this.props) ?? css``}
+          extendedCSS={this.props.toggleCSS ?? (() => css``)}
           isActive={!this.state.isMenuHidden}
           onClick={() => this.toggleMenu()}
         >
@@ -148,8 +162,8 @@ export default class Dropdown<T> extends PureComponent<Props<T>, State> {
           borderThickness={borderThickness}
           isInverted={this.props.isInverted ?? false}
           style={{
-            height: `${!this.state.isMenuHidden ? itemHeight * (maxVisibleItems === Infinity ? numItems : Math.min(numItems, maxVisibleItems)) + borderThickness : 0}px`,
-            overflowY: maxVisibleItems ? 'hidden' : (maxVisibleItems < numItems ? 'scroll' : 'hidden'),
+            height: `${!this.state.isMenuHidden ? itemHeight * (maxVisibleItems === -1 ? numItems : Math.min(numItems, maxVisibleItems)) + borderThickness : 0}px`,
+            overflowY: (maxVisibleItems === -1) ? 'hidden' : (maxVisibleItems < numItems ? 'scroll' : 'hidden'),
           }}
         >
           <ol>
@@ -157,7 +171,7 @@ export default class Dropdown<T> extends PureComponent<Props<T>, State> {
               <StyledItem
                 borderColor={borderColor}
                 borderThickness={borderThickness}
-                extendedCSS={this.props.itemCSS?.(this.props) ?? css``}
+                extendedCSS={this.props.itemCSS ?? (() => css``)}
                 height={itemHeight}
                 isInverted={this.props.isInverted ?? false}
                 key={`${i}`}
@@ -174,13 +188,7 @@ export default class Dropdown<T> extends PureComponent<Props<T>, State> {
   }
 }
 
-const StyledItem = styled.button<{
-  borderColor: string;
-  borderThickness: number;
-  extendedCSS: FlattenSimpleInterpolation;
-  height: number;
-  isInverted: boolean;
-}>`
+const StyledItem = styled.button<ItemCSSProps & ExtendedCSSProps<ItemCSSProps>>`
   align-items: flex-start;
   background: #fff;
   border-bottom-width: 0;
@@ -224,7 +232,7 @@ const StyledItem = styled.button<{
     }
   `}
 
-  ${props => props.extendedCSS}
+  ${props => props.extendedCSS(props)}
   height: ${props => props.height}px;
 `;
 
@@ -242,9 +250,10 @@ const StyledItemList = styled.div<{
   border-top-width: ${props => props.isInverted ? props.borderThickness : 0}px;
   box-sizing: border-box;
   display: block;
-  overflow-x: hidden;
+  overflow: visible;
   position: absolute;
   transition: height .1s linear;
+  will-change: height;
   width: 100%;
 
   ${props => props.isInverted ? css`
@@ -268,12 +277,7 @@ const StyledItemList = styled.div<{
   ::-webkit-scrollbar-hover {}
 `;
 
-const StyledToggle = styled.button<{
-  borderThickness: number;
-  borderColor: string;
-  extendedCSS: FlattenSimpleInterpolation;
-  isActive: boolean;
-}>`
+const StyledToggle = styled.button<ToggleCSSProps & ExtendedCSSProps<ToggleCSSProps>>`
   > span {
     height: 15px;
     width: 15px;
@@ -287,7 +291,7 @@ const StyledToggle = styled.button<{
     line-height: inherit;
   }
 
-  ${props => props.extendedCSS}
+  ${props => props.extendedCSS(props)}
 
   align-items: center;
   background: #fff;
@@ -332,6 +336,7 @@ const StyledRoot = styled.div<{
   height: 50px;
   justify-content: flex-start;
   padding: 0;
+  overflow: visible;
   position: relative;
   width: 200px;
 `;

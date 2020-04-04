@@ -1,6 +1,6 @@
 {
   "name": "etudes",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "A study of styled React components",
   "main": "lib",
   "scripts": {
@@ -50,6 +50,7 @@
     "html-webpack-plugin": "^4.0.4",
     "interactjs": "^1.9.8",
     "promptu": "^2.3.0",
+    "raw-loader": "^4.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-hot-loader": "^4.12.20",

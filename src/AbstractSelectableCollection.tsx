@@ -4,12 +4,12 @@ const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:
 
 export interface Props {
   className?: string;
-  defaultSelectedIndex?: number;
+  style?: CSSProperties;
   isTogglable?: boolean;
+  shouldStaySelected?: boolean;
+  defaultSelectedIndex?: number;
   onDeselectAt?: (index: number) => void;
   onSelectAt?: (index: number) => void;
-  shouldStaySelected?: boolean;
-  style?: CSSProperties;
 }
 
 export interface State {

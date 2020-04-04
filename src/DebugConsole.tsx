@@ -1,13 +1,13 @@
 import React, { createRef, CSSProperties, PureComponent } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 interface Props {
-  align: 'tl' | 'tc' | 'tr' | 'cl' | 'cc' | 'cr' | 'bl' | 'bc' | 'br';
   className?: string;
-  margin: number;
-  message?: string;
   style: CSSProperties;
+  margin: number;
   maxEntries: number;
+  align: 'tl' | 'tc' | 'tr' | 'cl' | 'cc' | 'cr' | 'bl' | 'bc' | 'br';
+  message?: string;
   title?: string;
 }
 
@@ -17,9 +17,9 @@ interface State {
 
 export default class DebugConsole extends PureComponent<Props, State> {
   static defaultProps: Partial<Props> = {
+    align: 'br',
     margin: 0,
     maxEntries: -1,
-    align: 'br',
     style: {},
   };
 
@@ -86,7 +86,7 @@ export default class DebugConsole extends PureComponent<Props, State> {
 
   private getStyleByAlignment(align: Props['align']): CSSProperties {
     switch (align) {
-      case 'tl': return { top: `${this.props.margin}px`, left: `${this.props.margin}px`, };
+      case 'tl': return { top: `${this.props.margin}px`, left: `${this.props.margin}px` };
       case 'tc': return { top: `${this.props.margin}px`, left: 0, right: 0, margin: '0 auto' };
       case 'tr': return { top: `${this.props.margin}px`, right: `${this.props.margin}px` };
       case 'cl': return { top: 0, left: `${this.props.margin}px`, bottom: 0, margin: 'auto 0' };

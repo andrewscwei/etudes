@@ -23,7 +23,11 @@ export default hot(class extends PureComponent<Props, State> {
     return (
       <Fragment>
         <StyledRoot>
-          <StyledMasonryGrid sections={6} verticalSpacing={30} horizontalSpacing={30}>
+          <StyledMasonryGrid
+            sections={6}
+            verticalSpacing={30}
+            horizontalSpacing={30}
+          >
             {this.data.map((v, i) => (
               <StyledGridItem key={i} className={`h-${v.h} base-${v.b}`}>{i + 1}</StyledGridItem>
             ))}
@@ -56,7 +60,7 @@ const StyledGridItem = styled.div`
 
 const StyledMasonryGrid = styled(MasonryGrid)`
   width: 80%;
-  transform: translate3d(0, 0, 0) rotate3d(1, 1, 0, 6deg);
+  transform: translate3d(0, 0, 0) rotate3d(1, 1, 0, 2deg);
 `;
 
 const StyledRoot = styled.div`

@@ -15,6 +15,8 @@ import MasonryGrid from './MasonryGrid';
 import Video from './Video';
 import VList from './VList';
 
+const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes') : () => {};
+
 interface Props {}
 
 interface State {
@@ -30,27 +32,38 @@ class App extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    if (window.location.hash && window.location.hash !== '') {
-      this.state = {
-        isNavActive: false,
-        featuredComponent: window.location.hash.substring(1, window.location.hash.length),
-      };
-    }
-    else {
-      this.state = {
-        isNavActive: false,
-      };
-    }
+    this.state = {
+      isNavActive: false,
+    };
+  }
+
+  componentDidMount() {
+    window.addEventListener('hashchange', () => this.mapLocationToState());
+    this.mapLocationToState();
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
     if (prevState.featuredComponent !== this.state.featuredComponent) {
-      if (this.state.featuredComponent) window.location.hash = this.state.featuredComponent;
+      this.mapStateToLocation();
       this.nodeRefs.burgerButton.current?.deactivate();
     }
   }
 
+  mapLocationToState() {
+    const hasHash = window.location.hash && window.location.hash !== '';
+
+    this.setState({
+      featuredComponent: hasHash ? window.location.hash.substring(1, window.location.hash.length) : undefined,
+    });
+  }
+
+  mapStateToLocation() {
+    window.location.hash = this.state.featuredComponent ?? '';
+  }
+
   renderFeaturedComponent() {
+    debug(`Loading component ID ${this.state.featuredComponent}... OK`);
+
     switch (this.state.featuredComponent) {
       case 'masonry-grid': return <MasonryGrid/>;
       case 'hlist': return <HList/>;
@@ -58,7 +71,12 @@ class App extends PureComponent<Props, State> {
       case 'dropdown': return <Dropdown/>;
       case 'compass': return <Compass/>;
       case 'video': return <Video/>;
-      default: return <Fragment/>;
+      default: return (
+        <StyledIntroduction>
+          <h1>Études</h1>
+          <span>A study of styled React components</span>
+        </StyledIntroduction>
+      );
     }
   }
 
@@ -85,12 +103,12 @@ class App extends PureComponent<Props, State> {
           width: '100%',
         }}>
           <StyledNav isActive={this.state.isNavActive}>
-            <StyledNavButton onClick={() => this.setState({ featuredComponent: 'masonry-grid' })}>Masonry Grid</StyledNavButton>
-            <StyledNavButton onClick={() => this.setState({ featuredComponent: 'hlist' })}>Hlist</StyledNavButton>
-            <StyledNavButton onClick={() => this.setState({ featuredComponent: 'vlist' })}>Vlist</StyledNavButton>
-            <StyledNavButton onClick={() => this.setState({ featuredComponent: 'dropdown' })}>Dropdown</StyledNavButton>
-            <StyledNavButton onClick={() => this.setState({ featuredComponent: 'compass' })}>Compass</StyledNavButton>
-            <StyledNavButton onClick={() => this.setState({ featuredComponent: 'video' })}>Video</StyledNavButton>
+            <StyledNavButton isActive={this.state.featuredComponent === 'masonry-grid'} onClick={() => this.setState({ featuredComponent: 'masonry-grid' })}>Masonry Grid</StyledNavButton>
+            <StyledNavButton isActive={this.state.featuredComponent === 'hlist'} onClick={() => this.setState({ featuredComponent: 'hlist' })}>Hlist</StyledNavButton>
+            <StyledNavButton isActive={this.state.featuredComponent === 'vlist'} onClick={() => this.setState({ featuredComponent: 'vlist' })}>Vlist</StyledNavButton>
+            <StyledNavButton isActive={this.state.featuredComponent === 'dropdown'} onClick={() => this.setState({ featuredComponent: 'dropdown' })}>Dropdown</StyledNavButton>
+            <StyledNavButton isActive={this.state.featuredComponent === 'compass'} onClick={() => this.setState({ featuredComponent: 'compass' })}>Compass</StyledNavButton>
+            <StyledNavButton isActive={this.state.featuredComponent === 'video'} onClick={() => this.setState({ featuredComponent: 'video' })}>Video</StyledNavButton>
           </StyledNav>
           <StyledBurgerButton
             ref={this.nodeRefs.burgerButton}
@@ -111,12 +129,14 @@ class App extends PureComponent<Props, State> {
 
 export default hot(App);
 
-const StyledNavButton = styled.button`
+const StyledNavButton = styled.button<{
+  isActive: boolean;
+}>`
   ${container.box}
-  color: #000;
+  color: ${props => props.isActive ? '#2b14d4' : '#000'};
   font-size: 2.2rem;
   font-weight: 700;
-  pointer-events: 'auto';
+  pointer-events: ${props => props.isActive ? 'none' : 'auto'};
   text-align: right;
   text-transform: uppercase;
   transform: translate3d(0, 0, 0) rotateX(${Math.floor(Math.random() * 10) + 5}deg) rotateY(${Math.floor(Math.random() * 10) + 5}deg) rotateZ(0deg);
@@ -148,6 +168,36 @@ const StyledNav = styled.nav<{
 
   ${selectors.eblc} {
     margin-bottom: .6rem;
+  }
+`;
+
+const StyledIntroduction = styled.div`
+  ${container.fvcc}
+  ${align.tl}
+  width: 100%;
+  height: 100%;
+  perspective: 80rem;
+
+  h1 {
+    font-size: 8rem;
+    color: #fff;
+    text-shadow: -12px 4px 0px rgba(43, 20, 212, 1);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1rem;
+    transform: translate3d(0, 0, 10rem) rotateX(10deg) rotateY(30deg) scale(1);
+  }
+
+  span {
+    font-size: 1.8rem;
+    color: #fff;
+    max-width: 26rem;
+    text-align: center;
+    text-shadow: -2px 4px 0px rgba(255, 255, 255, .3);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1rem;
+    transform: translate3d(0, 0, 10rem) rotateX(10deg) rotateY(-30deg) scale(1);
   }
 `;
 
