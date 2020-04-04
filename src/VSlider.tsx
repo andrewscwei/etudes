@@ -147,20 +147,20 @@ interface State {
 
 export default class VSlider extends PureComponent<Props, State> {
   static defaultProps: Partial<Props> = {
-    autoSnap: true,
+    style: {},
     breakpoints: VSlider.dataFactory(10, (index: number, position: number) => `${index}`),
     defaultIndex: 0,
-    topGutterCSS: props => css``,
-    bottomGutterCSS: props => css``,
     gutterPadding: 0,
-    isInverted: false,
-    isLabelVisible: true,
-    knobCSS: props => css``,
     knobHeight: 30,
     knobWidth: 30,
-    labelCSS: props => css``,
+    autoSnap: true,
+    isInverted: false,
+    isLabelVisible: true,
     onlyDispatchesOnDragEnd: false,
-    style: {},
+    bottomGutterCSS: props => css``,
+    knobCSS: props => css``,
+    labelCSS: props => css``,
+    topGutterCSS: props => css``,
   };
 
   static dataFactory(length: number, labelIterator?: (index: number, position: number) => string): ReadonlyArray<DataProps> {
