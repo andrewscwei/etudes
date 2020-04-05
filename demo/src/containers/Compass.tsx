@@ -69,8 +69,8 @@ export default hot(class extends PureComponent<Props, State> {
         <HRangeSlider
           min={0}
           max={360}
-          defaultRange={[60, 182]}
-          steps={35}
+          defaultRange={[0, 360]}
+          steps={359}
           tintColor='#fff'
           labelCSS={props => css`
             font-weight: 700;
