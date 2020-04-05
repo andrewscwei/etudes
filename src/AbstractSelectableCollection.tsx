@@ -60,6 +60,12 @@ export interface State {
  * collection.
  */
 export default class AbstractSelectableCollection<P extends Props = Props, S extends State = State> extends PureComponent<P, S> {
+  constructor(props: P) {
+    super(props);
+
+    this.state = {} as any;
+  }
+
   componentDidMount() {
     if (this.state.selectedIndex > -1) {
       this.props.onSelectAt?.(this.state.selectedIndex ?? -1);
