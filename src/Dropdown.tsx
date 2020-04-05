@@ -54,6 +54,11 @@ export interface State {
   isMenuHidden: boolean;
 }
 
+/**
+ * A dropdown menu component that is invertible (can "dropup" instead). Provide
+ * data and item component type to this component to automatically generate
+ * dropped down items.
+ */
 export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
   nodeRefs = {
     root: createRef<HTMLDivElement>(),
