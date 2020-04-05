@@ -5,3 +5,5 @@ export type ExtendedCSSFunction<P = {}> = (props: P) => FlattenSimpleInterpolati
 export type ExtendedCSSProps<P = {}> = Readonly<{ extendedCSS: ExtendedCSSFunction<P>; }>;
 
 export type Range = Readonly<[number, number]>;
+
+export type Orientation = 'horizontal' | 'vertical';

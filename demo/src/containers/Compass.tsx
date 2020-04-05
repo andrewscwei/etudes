@@ -1,11 +1,11 @@
-import { container, selectors, align } from 'promptu';
+import { align, container, selectors } from 'promptu';
 import React, { Fragment, PureComponent } from 'react';
 import { hot } from 'react-hot-loader/root';
 import styled, { css } from 'styled-components';
 import Compass from '../../../src/Compass';
 import DebugConsole from '../../../src/DebugConsole';
 import HRangeSlider from '../../../src/HRangeSlider';
-import VSlider from '../../../src/VSlider';
+import Slider from '../../../src/Slider';
 
 export interface Props {}
 
@@ -42,12 +42,13 @@ export default hot(class extends PureComponent<Props, State> {
             highlightColor='#2b14d4'
             style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg)' }}
           />
-          <VSlider
+          <Slider
             gutterPadding={10}
             onPositionChange={position => this.setState({ position })}
-            breakpoints={VSlider.breakpointsFactory(10, (i, p) => `${Math.round(this.getAngleByPosition(p))}°`)}
+            breakpoints={Slider.breakpointsFactory(10, (i, p) => `${Math.round(this.getAngleByPosition(p))}°`)}
             knobWidth={60}
             knobHeight={40}
+            orientation='vertical'
             defaultPosition={0.6}
             css={css`
               ${align.cc}

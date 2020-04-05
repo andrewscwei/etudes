@@ -6,6 +6,7 @@ import styled, { css } from 'styled-components';
 import DebugConsole from '../../../src/DebugConsole';
 import Dropdown, { ItemComponentProps as DropdownItemComponentProps } from '../../../src/Dropdown';
 import List, { ItemComponentProps as ListItemComponentProps } from '../../../src/List';
+import { Orientation } from '../../../src/types';
 
 export interface Props {}
 
@@ -132,7 +133,7 @@ const StyledDropdownItem = styled.button<{
 
 const StyledListItem = styled.button<{
   isSelected: boolean;
-  orientation: 'horizontal' | 'vertical';
+  orientation: Orientation;
 }>`
   ${container.fvcc}
   ${animations.transition('transform', 100)}
@@ -158,7 +159,7 @@ const StyledListItem = styled.button<{
 `;
 
 const StyledRoot = styled.div<{
-  orientation: 'horizontal' | 'vertical';
+  orientation: Orientation;
 }>`
   padding: 10rem 3rem;
   perspective: 80rem;

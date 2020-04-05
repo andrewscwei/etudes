@@ -1,6 +1,7 @@
 import { DirtyInfo, DirtyType, EventType, Rect, UpdateDelegate, UpdateDelegator } from 'dirty-dom';
 import React, { createRef, CSSProperties, PureComponent, ReactNode } from 'react';
 import styled from 'styled-components';
+import { Orientation } from './types';
 
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:masonry-grid') : () => {};
 
@@ -11,7 +12,7 @@ export interface Props {
   areSectionsAligned: boolean;
   isReversed: boolean;
   horizontalSpacing: number;
-  orientation: 'horizontal' | 'vertical';
+  orientation: Orientation;
   sections: number;
   verticalSpacing: number;
   height?: string;

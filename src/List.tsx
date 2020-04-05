@@ -1,6 +1,7 @@
 import React, { ComponentType, CSSProperties } from 'react';
 import styled, { css } from 'styled-components';
 import AbstractSelectableCollection, { Props as AbstractSelectableCollectionProps } from './AbstractSelectableCollection';
+import { Orientation } from './types';
 
 /**
  * Interface defining the props of the item component type to be provided to the
@@ -30,7 +31,7 @@ export interface ItemComponentProps<T = {}> {
   /**
    * Orientation of the list.
    */
-  orientation: 'horizontal' | 'vertical';
+  orientation: Orientation;
 
   /**
    * Handler invoked when the item is clicked.
@@ -66,7 +67,7 @@ export interface Props<T = {}> extends AbstractSelectableCollectionProps {
   /**
    * Orientation of the list.
    */
-  orientation?: 'horizontal' | 'vertical';
+  orientation?: Orientation;
 
   /**
    * Color of item borders.

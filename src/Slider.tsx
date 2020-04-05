@@ -2,17 +2,17 @@ import { Rect } from 'dirty-dom';
 import interact from 'interactjs';
 import React, { createRef, CSSProperties, PureComponent } from 'react';
 import styled, { css } from 'styled-components';
-import { ExtendedCSSFunction, ExtendedCSSProps } from './types';
+import { ExtendedCSSFunction, ExtendedCSSProps, Orientation } from './types';
 
 export type KnobCSSProps = Readonly<{
-  isAtBottom: boolean;
-  isAtTop: boolean;
+  isAtEnd: boolean;
+  isAtBeginning: boolean;
   isDragging: boolean;
   isReleasing: boolean;
 }>;
 
 export type GutterCSSProps = Readonly<{
-
+  orientation: Orientation;
 }>;
 
 export type LabelCSSProps = Readonly<{
@@ -45,6 +45,32 @@ export interface Props {
   breakpoints?: ReadonlyArray<BreakpointDescriptor>;
 
   /**
+   * Indicates whether the knob automatically snaps to the nearest breakpoint,
+   * if breakpoints are provided.
+   */
+  autoSnap: boolean;
+
+  /**
+   * By default the position is a value from 0 - 1, 0 being the top of the
+   * slider and 1 being the bottom. Switching on this flag inverts this
+   * behavior, where 0 becomes the bottom of the slider and 1 the top.
+   */
+  isInverted: boolean;
+
+  /**
+   * Indicates if the breakpoint label is visible inside the knob. Note that
+   * this is only applicable if breakpoints are provided.
+   */
+  isLabelVisible: boolean;
+
+  /**
+   * Indicates if position/index change events are dispatched when dragging
+   * ends. When disabled, aforementioned events are fired repeatedly while
+   * dragging.
+   */
+  onlyDispatchesOnDragEnd: boolean;
+
+  /**
    * The default index. This is ignored if breakpoints are not provided. On the
    * other hand, if breakpoints are provided, the default position will be
    * calculated based on this value, making `defaultPosition` irrelevant.
@@ -73,30 +99,9 @@ export interface Props {
   knobWidth: number;
 
   /**
-   * Indicates whether the knob automatically snaps to the nearest breakpoint,
-   * if breakpoints are provided.
+   * Orientation of the slider.
    */
-  autoSnap: boolean;
-
-  /**
-   * By default the position is a value from 0 - 1, 0 being the top of the
-   * slider and 1 being the bottom. Switching on this flag inverts this
-   * behavior, where 0 becomes the bottom of the slider and 1 the top.
-   */
-  isInverted: boolean;
-
-  /**
-   * Indicates if the breakpoint label is visible inside the knob. Note that
-   * this is only applicable if breakpoints are provided.
-   */
-  isLabelVisible: boolean;
-
-  /**
-   * Indicates if position/index change events are dispatched when dragging
-   * ends. When disabled, aforementioned events are fired repeatedly while
-   * dragging.
-   */
-  onlyDispatchesOnDragEnd: boolean;
+  orientation: Orientation;
 
   /**
    * Handler invoked when dragging ends.
@@ -121,14 +126,14 @@ export interface Props {
   onPositionChange?: (position: number) => void;
 
   /**
-   * Custom CSS provided to the top gutter.
+   * Custom CSS provided to the gutter before the knob.
    */
-  topGutterCSS: ExtendedCSSFunction<GutterCSSProps>;
+  startingGutterCSS: ExtendedCSSFunction<GutterCSSProps>;
 
   /**
-   * Custom CSS provided to the bottom gutter.
+   * Custom CSS provided to the gutter after the knob.
    */
-  bottomGutterCSS: ExtendedCSSFunction<GutterCSSProps>;
+  endingGutterCSS: ExtendedCSSFunction<GutterCSSProps>;
 
   /**
    * Custom CSS provided to the knob.
@@ -160,34 +165,36 @@ interface State {
 }
 
 /**
- * A vertical slider component that divides the scroll gutter into two different
- * elements—one that is above the knob and one that is below the knob. This
+ * A slider component that divides the scroll gutter into two different
+ * elements—one that is before the knob and one that is after the knob. This
  * allows for individual styling customizations. The width and height of the
  * root element of this component is taken from the aggregated rect of both
- * gutter parts. The dimension of knob itself does not impact that of the root
- * element. In addition to the tranditional behavior of a scrollbar, this
+ * gutter parts. The dimension of the knob itself does not impact that of the
+ * root element. In addition to the tranditional behavior of a scrollbar, this
  * component allows you to provide breakpoints along the gutter so the knob can
  * automatically snap to them (if feature is enabled) when dragging ends near
  * the breakpoint positions. You can also supply a label to each breakpoint and
  * have it display on the knob when the current position is close to the
- * breakpoint.
+ * breakpoint. This component supports both horizontal and vertical
+ * orientations.
  */
-export default class VSlider extends PureComponent<Props, State> {
+export default class Slider extends PureComponent<Props, State> {
   static defaultProps: Partial<Props> = {
     style: {},
-    breakpoints: VSlider.breakpointsFactory(10, (index: number, position: number) => `${index}`),
-    defaultPosition: 0,
-    gutterPadding: 0,
-    knobHeight: 30,
-    knobWidth: 30,
+    breakpoints: Slider.breakpointsFactory(10, (index: number, position: number) => `${index}`),
     autoSnap: true,
     isInverted: false,
     isLabelVisible: true,
     onlyDispatchesOnDragEnd: false,
-    bottomGutterCSS: props => css``,
+    defaultPosition: 0,
+    gutterPadding: 0,
+    knobHeight: 30,
+    knobWidth: 30,
     knobCSS: props => css``,
     labelCSS: props => css``,
-    topGutterCSS: props => css``,
+    orientation: 'vertical',
+    endingGutterCSS: props => css``,
+    startingGutterCSS: props => css``,
   };
 
   /**
@@ -224,10 +231,12 @@ export default class VSlider extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
 
+    const hasDefaultIndex = (this.props.breakpoints !== undefined) && (this.props.defaultIndex !== undefined);
+
     this.state = {
       isDragging: false,
       isReleasing: false,
-      position: ((this.props.breakpoints !== undefined) && (this.props.defaultIndex !== undefined)) ? this.getPositionByIndex(this.props.defaultIndex) : this.props.defaultPosition,
+      position: hasDefaultIndex ? this.getPositionByIndex(this.props.defaultIndex!) : this.props.defaultPosition,
     };
   }
 
@@ -239,21 +248,35 @@ export default class VSlider extends PureComponent<Props, State> {
   }
 
   /**
-   * Height of the top gutter in pixels.
+   * Length of the top gutter in pixels. If the orientation of the slider is
+   * horizontal, this refers to the width, else this refers to the height.
    */
-  get topGutterHeight(): number {
-    const { isInverted, gutterPadding, knobHeight } = this.props;
+  get startingGutterLength(): number {
+    const { isInverted, gutterPadding, knobWidth, knobHeight, orientation } = this.props;
     const { position } = this.state;
-    return Math.max(0, (isInverted ? (1 - position) : position) * this.rect.height - (knobHeight / 2) - gutterPadding);
+
+    if (orientation === 'vertical') {
+      return Math.max(0, (isInverted ? (1 - position) : position) * this.rect.height - (knobHeight / 2) - gutterPadding);
+    }
+    else {
+      return Math.max(0, (isInverted ? (1 - position) : position) * this.rect.width - (knobWidth / 2) - gutterPadding);
+    }
   }
 
   /**
-   * Height of the bottom gutter in pixels.
+   * Length of the bottom gutter in pixels. If the orientation of the slider is
+   * horizontal, this refers to the width, else this refers to the height.
    */
-  get bottomGutterHeight(): number {
-    const { isInverted, gutterPadding, knobHeight } = this.props;
+  get endingGutterLength(): number {
+    const { isInverted, gutterPadding, knobWidth, knobHeight, orientation } = this.props;
     const { position } = this.state;
-    return Math.max(0, (isInverted ? position : (1 - position)) * this.rect.height - (knobHeight / 2) - gutterPadding);
+
+    if (orientation === 'vertical') {
+      return Math.max(0, (isInverted ? position : (1 - position)) * this.rect.height - (knobHeight / 2) - gutterPadding);
+    }
+    else {
+      return Math.max(0, (isInverted ? position : (1 - position)) * this.rect.width - (knobWidth / 2) - gutterPadding);
+    }
   }
 
   /**
@@ -261,7 +284,7 @@ export default class VSlider extends PureComponent<Props, State> {
    * the position cannot be computed, NaN is returned.
    */
   get knobPosition(): number {
-    const { isInverted } = this.props;
+    const { isInverted, orientation } = this.props;
     const { position } = this.state;
     const rootNode = this.nodeRefs.root.current;
 
@@ -269,7 +292,12 @@ export default class VSlider extends PureComponent<Props, State> {
 
     const p = isInverted ? (1 - position) : position;
 
-    return p * this.rect.height;
+    if (orientation === 'vertical') {
+      return p * this.rect.height;
+    }
+    else {
+      return p * this.rect.width;
+    }
   }
 
   /**
@@ -342,35 +370,51 @@ export default class VSlider extends PureComponent<Props, State> {
         this.props.onDragStart?.();
       }
     }
+
+    if (prevProps.orientation !== this.props.orientation) {
+      this.forceUpdate();
+    }
   }
 
   render() {
-    const { className, breakpoints, knobHeight, knobWidth, isLabelVisible, isInverted, labelCSS, topGutterCSS, bottomGutterCSS, knobCSS, style } = this.props;
+    const { className, breakpoints, knobHeight, knobWidth, isLabelVisible, isInverted, labelCSS, orientation, startingGutterCSS, endingGutterCSS, knobCSS, style } = this.props;
     const { isDragging, isReleasing, position } = this.state;
 
     return (
       <StyledRoot
         className={className}
         ref={this.nodeRefs.root}
+        orientation={orientation}
         style={style}
       >
         <StyledGutter
-          style={{ top: 0, height: `${this.topGutterHeight}px` }}
-          extendedCSS={topGutterCSS}
+          orientation={orientation}
+          style={orientation === 'vertical' ? {
+            top: 0,
+            height: `${this.startingGutterLength}px`,
+          } : {
+            left: 0,
+            width: `${this.startingGutterLength}px`,
+          }}
+          extendedCSS={startingGutterCSS}
         />
         <StyledKnob
-          isAtBottom={isInverted ? (position === 0) : (position === 1)}
-          isAtTop={isInverted ? (position === 1) : (position === 0)}
+          isAtEnd={isInverted ? (position === 0) : (position === 1)}
+          isAtBeginning={isInverted ? (position === 1) : (position === 0)}
           isDragging={isDragging}
           isReleasing={isReleasing}
           ref={this.nodeRefs.knob}
           extendedCSS={knobCSS}
           style={{
             height: `${knobHeight}px`,
-            margin: `${-knobHeight / 2 + this.knobPosition}px 0 0 ${(this.rect.width - knobWidth) / 2}px`,
             position: 'absolute',
             width: `${knobWidth}px`,
             zIndex: 1,
+            ...(orientation === 'vertical' ? {
+              margin: `${-knobHeight / 2 + this.knobPosition}px 0 0 ${(this.rect.width - knobWidth) / 2}px`,
+            } : {
+              margin: `${(this.rect.height - knobHeight) / 2}px 0 0 ${-knobWidth / 2 + this.knobPosition}px`,
+            }),
           }}
         >
           {breakpoints && isLabelVisible && (
@@ -383,8 +427,15 @@ export default class VSlider extends PureComponent<Props, State> {
           )}
         </StyledKnob>
         <StyledGutter
-          style={{ bottom: 0, height: `${this.bottomGutterHeight}px` }}
-          extendedCSS={bottomGutterCSS}
+          orientation={orientation}
+          style={orientation === 'vertical' ? {
+            bottom: 0,
+            height: `${this.endingGutterLength}px`,
+          } : {
+            right: 0,
+            width: `${this.endingGutterLength}px`,
+          }}
+          extendedCSS={endingGutterCSS}
         />
 
       </StyledRoot>
@@ -417,7 +468,7 @@ export default class VSlider extends PureComponent<Props, State> {
         interact(knobNode).draggable({
           inertia: true,
           onstart: () => this.onKnobDragStart(),
-          onmove: ({ dy }) => this.onKnobDragMove(dy),
+          onmove: ({ dx, dy }) => this.onKnobDragMove(this.props.orientation === 'vertical' ? dy : dx),
           onend: () => this.onKnobDragStop(),
         });
       }
@@ -441,12 +492,13 @@ export default class VSlider extends PureComponent<Props, State> {
    *                of this handler.
    */
   private onKnobDragMove(delta: number) {
-    const { isInverted } = this.props;
+    const { isInverted, orientation } = this.props;
     const { position } = this.state;
     const rect = this.rect;
     const p = isInverted ? (1 - position) : position;
+    const x = p * rect.width + delta;
     const y = p * rect.height + delta;
-    const t = (Math.max(0, Math.min(1, y / rect.height)));
+    const t = (orientation === 'vertical') ? Math.max(0, Math.min(1, y / rect.height)) : Math.max(0, Math.min(1, x / rect.width));
 
     this.setState({
       isDragging: true,
@@ -482,13 +534,22 @@ export default class VSlider extends PureComponent<Props, State> {
   }
 }
 
-const StyledGutter = styled.div<ExtendedCSSProps<GutterCSSProps>>`
-  left: 0;
-  right: 0;
-  margin: 0 auto;
+const StyledGutter = styled.div<GutterCSSProps & ExtendedCSSProps<GutterCSSProps>>`
   position: absolute;
-  width: 100%;
   background: #fff;
+
+  ${props => props.orientation === 'vertical' ? css`
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 100%;
+  ` : css`
+    top: 0;
+    bottom: 0;
+    margin: auto 0;
+    height: 100%;
+  `}
+
   ${props => props.extendedCSS(props)}
 `;
 
@@ -517,10 +578,12 @@ const StyledKnob = styled.div<KnobCSSProps & ExtendedCSSProps<KnobCSSProps>>`
   ${props => props.extendedCSS(props)}
 `;
 
-const StyledRoot = styled.div`
+const StyledRoot = styled.div<{
+  orientation: Orientation;
+}>`
   box-sizing: border-box;
   display: block;
-  height: 300px;
+  height: ${props => props.orientation === 'vertical' ? '300px' : '4px'};
   position: relative;
-  width: 4px;
+  width: ${props => props.orientation === 'vertical' ? '4px' : '300px'};
 `;
