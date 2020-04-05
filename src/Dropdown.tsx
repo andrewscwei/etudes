@@ -1,8 +1,8 @@
 import { Rect } from 'dirty-dom';
 import React, { ComponentType, createRef, PureComponent } from 'react';
 import styled, { css, CSSProperties } from 'styled-components';
+import List, { ItemComponentProps as ListItemComponentProps } from './List';
 import { ExtendedCSSFunction, ExtendedCSSProps } from './types';
-import VList, { RowComponentProps } from './VList';
 
 type ButtonCSSProps = Readonly<{
   borderColor: string;
@@ -21,7 +21,7 @@ export type DataProps<T = {}> = T & {
  * Interface defining the props of the item component type to be provided to the
  * component. The data type is generic.
  */
-export type ItemComponentProps<T = {}> = RowComponentProps<DataProps<T>>;
+export type ItemComponentProps<T = {}> = ListItemComponentProps<DataProps<T>>;
 
 export interface Props<T = {}> {
   /**
@@ -142,10 +142,7 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
 
   componentDidMount() {
     window.addEventListener('click', this.onClickOutside);
-
-    if (this.state.selectedItemIndex > -1) {
-      this.props.onIndexChange?.(this.state.selectedItemIndex);
-    }
+    this.props.onIndexChange?.(this.state.selectedItemIndex);
   }
 
   componentWillUnmount() {
@@ -189,13 +186,14 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
           borderColor={borderColor}
           borderThickness={borderThickness}
           data={this.props.data}
+          orientation='vertical'
           defaultSelectedIndex={this.props.defaultSelectedItemIndex ?? -1}
           isInverted={this.props.isInverted ?? false}
           isTogglable={isTogglable}
           onDeselectAt={idx => this.selectItemAt(-1)}
           onSelectAt={idx => this.selectItemAt(idx)}
-          rowComponentType={this.props.itemComponentType as any} // HACK: Generic types cannot be inferred by props, so this is the only way.
-          rowStyle={{ height: itemHeight}}
+          itemComponentType={this.props.itemComponentType as any} // HACK: Generic types cannot be inferred by props, so this is the only way.
+          itemStyle={{ height: itemHeight}}
           shouldStaySelected={true}
           style={{
             height: this.state.isCollapsed ? '0px' : `${(itemHeight - borderThickness) * (maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)) + borderThickness}px`,
@@ -224,8 +222,6 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
    * @param index - The index of the item to select.
    */
   selectItemAt(index: number) {
-    if (index < 0 || index >= this.props.data.length) throw new Error(`Index ${index} is out of range`);
-
     this.setState({
       selectedItemIndex: index,
       isCollapsed: true,
@@ -290,7 +286,7 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
   }
 }
 
-const StyledItemList = styled(VList)<{
+const StyledItemList = styled(List)<{
   isInverted: boolean;
 }>`
   position: absolute;
@@ -298,11 +294,11 @@ const StyledItemList = styled(VList)<{
   will-change: height;
 
   ${props => props.isInverted ? css`
-    margin-bottom: ${-props.borderThickness}px;
+    margin-bottom: ${-(props.borderThickness ?? 0)}px;
     bottom: 100%;
   ` : css`
     top: 100%;
-    margin-top: ${-props.borderThickness}px;
+    margin-top: ${-(props.borderThickness ?? 0)}px;
   `}
 
   ::-webkit-scrollbar {}

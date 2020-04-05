@@ -63,7 +63,9 @@ export default class AbstractSelectableCollection<P extends Props = Props, S ext
   constructor(props: P) {
     super(props);
 
-    this.state = {} as any;
+    this.state = {
+      selectedIndex: this.props.defaultSelectedIndex ?? -1,
+    } as any;
   }
 
   componentDidMount() {

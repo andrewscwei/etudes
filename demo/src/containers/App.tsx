@@ -10,11 +10,9 @@ import BurgerButton from '../../../src/BurgerButton';
 import $$GithubIcon from '../assets/images/github-icon.svg';
 import Accordion from './Accordion';
 import Compass from './Compass';
-import Dropdown from './Dropdown';
-import HList from './HList';
+import List from './List';
 import MasonryGrid from './MasonryGrid';
 import Video from './Video';
-import VList from './VList';
 
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes') : () => {};
 
@@ -67,10 +65,8 @@ class App extends PureComponent<Props, State> {
 
     switch (this.state.featuredComponent) {
       case 'masonry-grid': return <MasonryGrid/>;
-      case 'hlist': return <HList/>;
-      case 'vlist': return <VList/>;
+      case 'list': return <List/>;
       case 'accordion': return <Accordion/>;
-      case 'dropdown': return <Dropdown/>;
       case 'compass': return <Compass/>;
       case 'video': return <Video/>;
       default: return (
@@ -106,10 +102,8 @@ class App extends PureComponent<Props, State> {
         }}>
           <StyledNav isActive={this.state.isNavActive}>
             <StyledNavButton isActive={this.state.featuredComponent === 'masonry-grid'} onClick={() => this.setState({ featuredComponent: 'masonry-grid' })}>Masonry Grid</StyledNavButton>
-            <StyledNavButton isActive={this.state.featuredComponent === 'hlist'} onClick={() => this.setState({ featuredComponent: 'hlist' })}>Hlist</StyledNavButton>
-            <StyledNavButton isActive={this.state.featuredComponent === 'vlist'} onClick={() => this.setState({ featuredComponent: 'vlist' })}>Vlist</StyledNavButton>
+            <StyledNavButton isActive={this.state.featuredComponent === 'list'} onClick={() => this.setState({ featuredComponent: 'list' })}>List+Dropdown</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'accordion'} onClick={() => this.setState({ featuredComponent: 'accordion' })}>Accordion</StyledNavButton>
-            <StyledNavButton isActive={this.state.featuredComponent === 'dropdown'} onClick={() => this.setState({ featuredComponent: 'dropdown' })}>Dropdown</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'compass'} onClick={() => this.setState({ featuredComponent: 'compass' })}>Compass+Sliders</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'video'} onClick={() => this.setState({ featuredComponent: 'video' })}>Video</StyledNavButton>
           </StyledNav>

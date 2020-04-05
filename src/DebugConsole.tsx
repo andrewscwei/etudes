@@ -37,23 +37,27 @@ export default class DebugConsole extends PureComponent<Props, State> {
 
   componentDidUpdate(prevProps: Props, prevState: State) {
     if (prevProps.message !== this.props.message) {
-      if (this.props.maxEntries < 0) {
-        this.setState({
-          messages: [...this.state.messages, this.props.message ?? ''],
-        });
-      }
-      else {
-        const n = this.state.messages.length;
-
-        this.setState({
-          messages: [...this.state.messages.slice(Math.max(0, n - (this.props.maxEntries - 1)), n), this.props.message ?? ''],
-        });
-      }
+      this.push(this.props.message ?? '');
     }
 
     if (prevState.messages.length !== this.state.messages.length) {
       const m = this.nodeRefs.messages.current?.scrollHeight ?? 0;
       this.nodeRefs.messages.current?.scrollTo(0, m);
+    }
+  }
+
+  push(message: string) {
+    if (this.props.maxEntries < 0) {
+      this.setState({
+        messages: [...this.state.messages, message],
+      });
+    }
+    else {
+      const n = this.state.messages.length;
+
+      this.setState({
+        messages: [...this.state.messages.slice(Math.max(0, n - (this.props.maxEntries - 1)), n), message],
+      });
     }
   }
 
