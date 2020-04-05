@@ -38,7 +38,7 @@ export default hot(class extends PureComponent<Props, State> {
             borderThickness={2}
             maxVisibleItems={-1}
             expandIconSvg={$$ExpandIcon}
-            toggleCSS={props => css`
+            buttonCSS={props => css`
               font-size: 2rem;
               font-weight: 700;
               text-transform: uppercase;
