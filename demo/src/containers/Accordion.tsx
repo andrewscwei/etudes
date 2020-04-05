@@ -34,7 +34,7 @@ export default hot(class extends PureComponent<Props, State> {
                 title: 'bar',
               }, {
                 title: 'baz',
-              }]
+              }],
             }, {
               title: 'Section 2',
               items: [{
@@ -43,7 +43,7 @@ export default hot(class extends PureComponent<Props, State> {
                 title: 'bar',
               }, {
                 title: 'baz',
-              }]
+              }],
             }, {
               title: 'Section 3',
               items: [{
@@ -52,7 +52,7 @@ export default hot(class extends PureComponent<Props, State> {
                 title: 'bar',
               }, {
                 title: 'baz',
-              }]
+              }],
             }]}
             itemCSS={props => css`
               ${selectors.hwot} {

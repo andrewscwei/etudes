@@ -1,24 +1,23 @@
-import React, { ComponentType } from 'react';
+import React, { ComponentType, CSSProperties } from 'react';
 import styled from 'styled-components';
-import AbstractSelectableCollection, { Props as AbstractSelectableCollectionProps, State as AbstractSelectableCollectionState } from './AbstractSelectableCollection';
+import AbstractSelectableCollection, { Props as AbstractSelectableCollectionProps } from './AbstractSelectableCollection';
 
 export interface RowProps<T> {
+  className?: string;
+  style: CSSProperties;
   data: T;
   isSelected?: boolean;
   onClick?: () => void;
 }
 
 export interface Props<T> extends AbstractSelectableCollectionProps {
+  borderThickness: number;
   data: Array<T>;
   padding?: number;
   rowComponentType: ComponentType<RowProps<T>>;
 }
 
-export interface State extends AbstractSelectableCollectionState {
-
-}
-
-export default class VList<T> extends AbstractSelectableCollection<Props<T>, State> {
+export default class VList<T> extends AbstractSelectableCollection<Props<T>> {
   isIndexOutOfRange(index: number): boolean {
     if (index >= this.props.data.length) return true;
     return super.isIndexOutOfRange(index);
@@ -26,12 +25,15 @@ export default class VList<T> extends AbstractSelectableCollection<Props<T>, Sta
 
   render() {
     const RowComponentType = this.props.rowComponentType;
+    const borderThickness = this.props.borderThickness ?? 0;
 
     return (
       <StyledRoot
         className={this.props.className}
-        padding={this.props.padding ?? 12}
-        style={this.props.style}
+        padding={this.props.padding ?? 0}
+        style={{
+          ...this.props.style ?? {},
+        }}
       >
         {this.props.data.map((t, i) => (
           <RowComponentType
@@ -39,6 +41,10 @@ export default class VList<T> extends AbstractSelectableCollection<Props<T>, Sta
             data={t}
             isSelected={this.isSelectedAt(i)}
             onClick={() => this.toggleAt(i)}
+            style={{
+              borderWidth: `${borderThickness}px`,
+              marginTop: `${i === 0 ? 0 : -borderThickness}px`,
+            }}
           />
         ))}
       </StyledRoot>

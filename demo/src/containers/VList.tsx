@@ -11,8 +11,8 @@ export interface State {
   selectedIndex: number;
 }
 
-const Row: SFC<RowProps<string>> = ({ data, isSelected, onClick }) => (
-  <StyledRow isSelected={isSelected ?? false} onClick={() => onClick?.()}>{data}</StyledRow>
+const Row: SFC<RowProps<string>> = ({ data, isSelected, onClick, style }) => (
+  <StyledRow isSelected={isSelected ?? false} onClick={() => onClick?.()} style={style}>{data}</StyledRow>
 );
 
 export default hot(class extends PureComponent<Props, State> {
@@ -31,6 +31,7 @@ export default hot(class extends PureComponent<Props, State> {
             onSelectAt={idx => this.setState({ selectedIndex: idx })}
             rowComponentType={Row}
             shouldStaySelected={true}
+            padding={20}
             style={{
               width: '80%',
               minWidth: '400px',
@@ -54,15 +55,17 @@ const StyledRow = styled.button<{
   isSelected: boolean;
 }>`
   ${container.fvcc}
-  transition: all .1s ease-out;
-  padding: 20px;
-  width: 100%;
-  background: ${props => props.isSelected ? '#fff' : '#2b14d4'};
-  color: ${props => props.isSelected ? '#000' : '#fff'};
-  transform: translate3d(0, 0, 0) scale(1);
-  transform-origin: center;
+  background: ${props => props.isSelected ? '#2b14d4' : '#fff'};
+  border-color: #fff;
+  border-style: solid;
+  color: ${props => props.isSelected ? '#fff' : '#000'};
   font-size: 3rem;
   font-weight: 700;
+  padding: 20px;
+  transform-origin: center;
+  transform: translate3d(0, 0, 0) scale(1);
+  transition: all .1s ease-out;
+  width: 100%;
   z-index: 0;
 
   ${selectors.hwot} {
