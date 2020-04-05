@@ -162,7 +162,7 @@ export default class Dropdown<T> extends PureComponent<Props<T>, State> {
           borderThickness={borderThickness}
           isInverted={this.props.isInverted ?? false}
           style={{
-            height: `${!this.state.isMenuHidden ? itemHeight * (maxVisibleItems === -1 ? numItems : Math.min(numItems, maxVisibleItems)) + borderThickness : 0}px`,
+            height: `${!this.state.isMenuHidden ? itemHeight * (maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)) + borderThickness : 0}px`,
             overflowY: (maxVisibleItems === -1) ? 'hidden' : (maxVisibleItems < numItems ? 'scroll' : 'hidden'),
           }}
         >

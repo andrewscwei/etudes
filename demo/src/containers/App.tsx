@@ -8,6 +8,7 @@ import { hot } from 'react-hot-loader/root';
 import styled from 'styled-components';
 import BurgerButton from '../../../src/BurgerButton';
 import $$GithubIcon from '../assets/images/github-icon.svg';
+import Accordion from './Accordion';
 import Compass from './Compass';
 import Dropdown from './Dropdown';
 import HList from './HList';
@@ -68,6 +69,7 @@ class App extends PureComponent<Props, State> {
       case 'masonry-grid': return <MasonryGrid/>;
       case 'hlist': return <HList/>;
       case 'vlist': return <VList/>;
+      case 'accordion': return <Accordion/>;
       case 'dropdown': return <Dropdown/>;
       case 'compass': return <Compass/>;
       case 'video': return <Video/>;
@@ -106,6 +108,7 @@ class App extends PureComponent<Props, State> {
             <StyledNavButton isActive={this.state.featuredComponent === 'masonry-grid'} onClick={() => this.setState({ featuredComponent: 'masonry-grid' })}>Masonry Grid</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'hlist'} onClick={() => this.setState({ featuredComponent: 'hlist' })}>Hlist</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'vlist'} onClick={() => this.setState({ featuredComponent: 'vlist' })}>Vlist</StyledNavButton>
+            <StyledNavButton isActive={this.state.featuredComponent === 'accordion'} onClick={() => this.setState({ featuredComponent: 'accordion' })}>Accordion</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'dropdown'} onClick={() => this.setState({ featuredComponent: 'dropdown' })}>Dropdown</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'compass'} onClick={() => this.setState({ featuredComponent: 'compass' })}>Compass+Sliders</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'video'} onClick={() => this.setState({ featuredComponent: 'video' })}>Video</StyledNavButton>
