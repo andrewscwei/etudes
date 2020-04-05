@@ -69,7 +69,7 @@ class App extends PureComponent<Props, State> {
       case 'hlist': return <HList/>;
       case 'vlist': return <VList/>;
       case 'dropdown': return <Dropdown/>;
-      case 'compass-vslider': return <Compass/>;
+      case 'compass': return <Compass/>;
       case 'video': return <Video/>;
       default: return (
         <StyledIntroduction>
@@ -107,7 +107,7 @@ class App extends PureComponent<Props, State> {
             <StyledNavButton isActive={this.state.featuredComponent === 'hlist'} onClick={() => this.setState({ featuredComponent: 'hlist' })}>Hlist</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'vlist'} onClick={() => this.setState({ featuredComponent: 'vlist' })}>Vlist</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'dropdown'} onClick={() => this.setState({ featuredComponent: 'dropdown' })}>Dropdown</StyledNavButton>
-            <StyledNavButton isActive={this.state.featuredComponent === 'compass-vslider'} onClick={() => this.setState({ featuredComponent: 'compass-vslider' })}>Compass+VSlider</StyledNavButton>
+            <StyledNavButton isActive={this.state.featuredComponent === 'compass'} onClick={() => this.setState({ featuredComponent: 'compass' })}>Compass+Sliders</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'video'} onClick={() => this.setState({ featuredComponent: 'video' })}>Video</StyledNavButton>
           </StyledNav>
           <StyledBurgerButton

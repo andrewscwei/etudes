@@ -1,39 +1,57 @@
-import { align, container, selectors } from 'promptu';
+import { container, selectors, align } from 'promptu';
 import React, { Fragment, PureComponent } from 'react';
 import { hot } from 'react-hot-loader/root';
 import styled, { css } from 'styled-components';
 import Compass from '../../../src/Compass';
 import DebugConsole from '../../../src/DebugConsole';
+import HRangeSlider from '../../../src/HRangeSlider';
 import VSlider from '../../../src/VSlider';
 
 export interface Props {}
 
 export interface State {
   position: number;
+  min: number;
+  max: number;
 }
 
 export default hot(class extends PureComponent<Props, State> {
   state: State = {
     position: 0,
+    min: 0,
+    max: 360,
   };
 
+  getAngleByPosition(position: number): number {
+    return position * (this.state.max - this.state.min) + this.state.min;
+  }
+
   render() {
+    const angle = this.getAngleByPosition(this.state.position);
+
     return (
       <Fragment>
         <StyledRoot>
           <Compass
-            angle={this.state.position * 360}
+            angle={angle}
             fov={50}
             radius={200}
+            css={css`
+              ${align.cc}
+            `}
             highlightColor='#2b14d4'
             style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg)' }}
           />
           <VSlider
             gutterPadding={10}
             onPositionChange={position => this.setState({ position })}
-            breakpoints={VSlider.breakpointsFactory(180, (i, p) => `${Math.round(p * 360)}°`)}
+            breakpoints={VSlider.breakpointsFactory(10, (i, p) => `${Math.round(this.getAngleByPosition(p))}°`)}
             knobWidth={60}
             knobHeight={40}
+            defaultPosition={0.6}
+            css={css`
+              ${align.cc}
+            `}
             labelCSS={props => css`
               font-size: 1.8rem;
               font-weight: 700;
@@ -44,15 +62,37 @@ export default hot(class extends PureComponent<Props, State> {
               }
             `}
             style={{
-              marginLeft: '3rem',
+              transform: 'translate3d(0, 0, 0) rotateX(20deg) rotateY(-20deg)',
+            }}
+          />
+          <HRangeSlider
+            min={0}
+            max={360}
+            defaultRange={[60, 182]}
+            steps={35}
+            tintColor='#fff'
+            css={css`
+              margin-top: 50rem;
+            `}
+            labelCSS={props => css`
+              font-weight: 700;
+              font-size: 2rem;
+            `}
+            knobCSS={props => css`
+              ${selectors.hwot} {
+                transform: scale(1.2);
+              }
+            `}
+            onRangeChange={range => this.setState({ min: range[0], max: range[1] })}
+            style={{
               transform: 'translate3d(0, 0, 0) rotateX(20deg) rotateY(-20deg)',
             }}
           />
         </StyledRoot>
         <DebugConsole
-          title='?: Compass+VSlider'
+          title='?: Compass+Sliders'
           maxEntries={1}
-          message={`Position: ${this.state.position.toFixed(3)}, Angle: ${Math.round(this.state.position * 360)}°`}
+          message={`Position: ${this.state.position.toFixed(3)}, Angle: ${Math.round(angle)}°, Min: ${Math.round(this.state.min)}, Max: ${Math.round(this.state.max)}`}
           style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
         />
       </Fragment>

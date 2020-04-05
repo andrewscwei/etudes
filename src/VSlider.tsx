@@ -66,7 +66,7 @@ export interface Props {
    * calculated based on this value, making `defaultPosition` irrelevant.
    * @optional
    */
-  defaultIndex: number;
+  defaultIndex?: number;
 
   /**
    * The default position. This is ignored if `defaultIndex` and breakpoints are
@@ -184,7 +184,6 @@ export default class VSlider extends PureComponent<Props, State> {
   static defaultProps: Partial<Props> = {
     style: {},
     breakpoints: VSlider.breakpointsFactory(10, (index: number, position: number) => `${index}`),
-    defaultIndex: 0,
     defaultPosition: 0,
     gutterPadding: 0,
     knobHeight: 30,
@@ -301,18 +300,21 @@ export default class VSlider extends PureComponent<Props, State> {
   componentDidMount() {
     this.reconfigureInteractivityIfNeeded();
 
-    if (!this.props.onlyDispatchesOnDragEnd && this.state.isDragging) {
-      this.props.onPositionChange?.(this.state.position);
-      this.props.onIndexChange?.(this.index);
-    }
+    if (this.props.breakpoints) {
+      const index = this.index;
 
-    if (!this.state.isDragging) {
-      this.props.onPositionChange?.(this.state.position);
-      this.props.onIndexChange?.(this.index);
-      this.props.onDragEnd?.();
+      if (this.props.autoSnap) {
+        this.snapToClosestBreakpoint();
+        this.props.onPositionChange?.(this.getPositionByIndex(index));
+      }
+      else {
+        this.props.onPositionChange?.(this.state.position);
+      }
+
+      this.props.onIndexChange?.(index);
     }
     else {
-      this.props.onDragStart?.();
+      this.props.onPositionChange?.(this.state.position);
     }
 
     this.forceUpdate();
@@ -324,14 +326,14 @@ export default class VSlider extends PureComponent<Props, State> {
     if (prevState.position !== this.state.position) {
       if (!this.props.onlyDispatchesOnDragEnd && this.state.isDragging) {
         this.props.onPositionChange?.(this.state.position);
-        this.props.onIndexChange?.(this.index);
+        if (this.props.breakpoints) this.props.onIndexChange?.(this.index);
       }
     }
 
     if (prevState.isDragging !== this.state.isDragging) {
       if (!this.state.isDragging) {
         this.props.onPositionChange?.(this.state.position);
-        this.props.onIndexChange?.(this.index);
+        if (this.props.breakpoints) this.props.onIndexChange?.(this.index);
         this.props.onDragEnd?.();
       }
       else {
@@ -443,7 +445,18 @@ export default class VSlider extends PureComponent<Props, State> {
     this.setState({
       isDragging: false,
       isReleasing: true,
-      position: (this.props.autoSnap && this.props.breakpoints) ? this.getPositionByIndex(this.index) : this.state.position,
+    });
+
+    this.snapToClosestBreakpoint();
+  }
+
+  private snapToClosestBreakpoint() {
+    if (!this.props.autoSnap || !this.props.breakpoints) return;
+
+    const position = this.getPositionByIndex(this.index);
+
+    this.setState({
+      position,
     });
   }
 }
@@ -478,7 +491,7 @@ const StyledKnob = styled.div<KnobCSSProps & ExtendedCSSProps<KnobCSSProps>>`
   touch-action: none;
   transition-duration: 100ms;
   transition-property: ${props => props.isReleasing ? 'background, color, opacity, margin, transform' : 'background, color, transform, opacity'};
-  will-change: 'background, color, opacity, margin, transform';
+  will-change: background, color, opacity, margin, transform;
   transition-timing-function: ease-out;
   ${props => props.extendedCSS(props)}
 `;
