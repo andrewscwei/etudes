@@ -1,11 +1,3 @@
-/**
- * @file This is a React component that aligns all of its immediate children in
- *       a masonry grid. Refrain from assigning CSS styles to it via `className`
- *       or `style` property, although they are handled if absolutely necessary.
- *       Customize the grid via its supported properties. The grid can be either
- *       vertical or horizontal orientation.
- */
-
 import { DirtyInfo, DirtyType, EventType, Rect, UpdateDelegate, UpdateDelegator } from 'dirty-dom';
 import React, { createRef, CSSProperties, PureComponent, ReactNode } from 'react';
 import styled from 'styled-components';
@@ -13,19 +5,26 @@ import styled from 'styled-components';
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:masonry-grid') : () => {};
 
 export interface Props {
-  areSectionsAligned: boolean;
-  children?: ReactNode | Array<ReactNode>;
   className?: string;
-  height?: string;
-  horizontalSpacing: number;
+  style: CSSProperties;
+  children?: ReactNode | Array<ReactNode>;
+  areSectionsAligned: boolean;
   isReversed: boolean;
+  horizontalSpacing: number;
   orientation: 'horizontal' | 'vertical';
   sections: number;
-  style: CSSProperties;
   verticalSpacing: number;
+  height?: string;
   width?: string;
 }
 
+/**
+ * This is a React component that aligns all of its immediate children in a
+ * masonry grid. Refrain from assigning CSS styles to it via `className` or
+ * `style` property, although they are handled if absolutely necessary.
+ * Customize the grid via its supported properties. The grid can be either
+ * vertical or horizontal orientation.
+ */
 class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
   static defaultProps: Props = {
     areSectionsAligned: false,

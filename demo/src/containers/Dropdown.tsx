@@ -1,16 +1,20 @@
-import { container, selectors } from 'promptu';
-import React, { Fragment, PureComponent } from 'react';
+import $$ExpandIcon from '!!raw-loader!../assets/images/expand-icon.svg';
+import { animations, container, selectors } from 'promptu';
+import React, { Fragment, PureComponent, SFC } from 'react';
 import { hot } from 'react-hot-loader/root';
 import styled, { css } from 'styled-components';
 import DebugConsole from '../../../src/DebugConsole';
-import Dropdown from '../../../src/Dropdown';
-import $$ExpandIcon from '!!raw-loader!../assets/images/expand-icon.svg';
+import Dropdown, { ItemComponentProps } from '../../../src/Dropdown';
 
 export interface Props {}
 
 export interface State {
   selectedIndex: number;
 }
+
+const Item: SFC<ItemComponentProps<{}>> = ({ data, isSelected, onClick, style }) => (
+  <StyledItem isSelected={isSelected ?? false} onClick={() => onClick?.()} style={style}>{data.label}</StyledItem>
+);
 
 export default hot(class extends PureComponent<Props, State> {
   state: State = {
@@ -23,17 +27,16 @@ export default hot(class extends PureComponent<Props, State> {
         <StyledRoot>
           <StyledDropdown
             data={[{
-              title: 'foo',
-              description: 'Description for Foo',
+              label: 'foo',
             }, {
-              title: 'bar',
-              description: 'Description for Bar',
+              label: 'bar',
             }, {
-              title: 'baz',
-              description: 'Description for Baz',
+              label: 'baz',
             }]}
+            itemComponentType={Item}
             isInverted={false}
             borderThickness={2}
+            maxVisibleItems={-1}
             expandIconSvg={$$ExpandIcon}
             toggleCSS={props => css`
               font-size: 2rem;
@@ -57,21 +60,6 @@ export default hot(class extends PureComponent<Props, State> {
                 }
               }
             `}
-            itemCSS={props => css`
-              font-size: 1.6rem;
-              transition: all .1s ease-out;
-
-              > span {
-                font-weight: 700;
-                text-transform: uppercase;
-              }
-
-
-              ${selectors.hwot} {
-                color: #fff;
-                background: #2b14d4;
-              }
-            `}
             onIndexChange={idx => this.setState({ selectedIndex: idx })}
           />
         </StyledRoot>
@@ -86,6 +74,25 @@ export default hot(class extends PureComponent<Props, State> {
     );
   }
 });
+
+const StyledItem = styled.button<{
+  isSelected: boolean;
+}>`
+  ${container.fvcl}
+  ${animations.transition(['background', 'color'], 100)}
+  flex: 0 0 auto;
+  background: ${props => props.isSelected ? '#2b14d4' : '#fff'};
+  color: ${props => props.isSelected ? '#fff' : '#000'};
+  border-style: solid;
+  padding: 0 10px;
+  text-align: left;
+  width: 100%;
+
+  ${selectors.hwot} {
+    background: #2b14d4;
+    color: #fff;
+  }
+`;
 
 const StyledDropdown = styled(Dropdown)`
   width: 30rem;

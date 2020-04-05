@@ -1,7 +1,8 @@
 import { Rect } from 'dirty-dom';
-import React, { createRef, PureComponent } from 'react';
+import React, { ComponentType, createRef, PureComponent } from 'react';
 import styled, { css, CSSProperties } from 'styled-components';
 import { ExtendedCSSFunction, ExtendedCSSProps } from './types';
+import VList, { RowComponentProps } from './VList';
 
 type ItemCSSProps = Readonly<{
   borderColor: string;
@@ -16,17 +17,25 @@ type ToggleCSSProps = Readonly<{
   isActive: boolean;
 }>;
 
-export type DataProps<T> = T & {
-  description: string;
+/**
+ * Type constraint of the data passed to each item in the component.
+ */
+export type DataProps<T = {}> = T & {
   label?: string;
-  title: string;
 };
 
-export interface Props<T> {
+/**
+ * Interface defining the props of the item component type to be provided to the
+ * component. The data type is generic.
+ */
+export type ItemComponentProps<T = {}> = RowComponentProps<DataProps<T>>;
+
+export interface Props<T = {}> {
   className?: string;
   style?: CSSProperties;
   data: Array<DataProps<T>>;
   isInverted?: boolean;
+  isTogglable?: boolean;
   borderThickness?: number;
   defaultSelectedItemIndex?: number;
   itemHeight?: number;
@@ -34,6 +43,7 @@ export interface Props<T> {
   borderColor?: string;
   defaultLabel?: string;
   expandIconSvg?: string;
+  itemComponentType: ComponentType<ItemComponentProps<T>>;
   onIndexChange?: (index: number) => void;
   itemCSS?: ExtendedCSSFunction<ItemCSSProps>;
   toggleCSS?: ExtendedCSSFunction<ToggleCSSProps>;
@@ -44,7 +54,7 @@ export interface State {
   isMenuHidden: boolean;
 }
 
-export default class Dropdown<T> extends PureComponent<Props<T>, State> {
+export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
   nodeRefs = {
     root: createRef<HTMLDivElement>(),
   };
@@ -52,35 +62,10 @@ export default class Dropdown<T> extends PureComponent<Props<T>, State> {
   constructor(props: Props<T>) {
     super(props);
 
-    const initialState: State = {
+    this.state = {
       selectedItemIndex: this.props.defaultSelectedItemIndex ?? -1,
       isMenuHidden: true,
     };
-
-    this.state = initialState as State;
-  }
-
-  onClickOutside = (event: any) => {
-    if (this.state.isMenuHidden) return;
-    if (!(event.target instanceof Node)) return;
-
-    let isOutside = true;
-    let node = event.target;
-
-    while (node) {
-      if (node === this.nodeRefs.root.current) {
-        isOutside = false;
-        break;
-      }
-
-      if (!node.parentNode) break;
-
-      node = node.parentNode;
-    }
-
-    if (!isOutside) return;
-
-    this.closeMenu();
   }
 
   componentDidMount() {
@@ -101,42 +86,13 @@ export default class Dropdown<T> extends PureComponent<Props<T>, State> {
     }
   }
 
-  isItemSelectedAt(index: number) {
-    return (this.state.selectedItemIndex === index);
-  }
-
-  selectItemAt(index: number) {
-    this.setState({
-      selectedItemIndex: index,
-      isMenuHidden: true,
-    });
-  }
-
-  openMenu() {
-    if (!this.state.isMenuHidden) return;
-    this.setState({ isMenuHidden: false });
-  }
-
-  closeMenu() {
-    if (this.state.isMenuHidden) return;
-    this.setState({ isMenuHidden: true });
-  }
-
-  toggleMenu() {
-    if (this.state.isMenuHidden) {
-      this.openMenu();
-    }
-    else {
-      this.closeMenu();
-    }
-  }
-
   render() {
     const borderColor = this.props.borderColor ?? '#000';
     const borderThickness = this.props.borderThickness ?? 1;
     const itemHeight = this.props.itemHeight ?? Rect.from(this.nodeRefs.root.current)?.height ?? 50;
     const maxVisibleItems = this.props.maxVisibleItems ?? -1;
     const numItems = this.props.data.length;
+    const isTogglable = this.props.isTogglable ?? true;
 
     return (
       <StyledRoot
@@ -150,111 +106,124 @@ export default class Dropdown<T> extends PureComponent<Props<T>, State> {
           borderThickness={borderThickness}
           extendedCSS={this.props.toggleCSS ?? (() => css``)}
           isActive={!this.state.isMenuHidden}
-          onClick={() => this.toggleMenu()}
+          onClick={() => this.toggle()}
         >
           <label>
-            {this.state.selectedItemIndex === -1 ? (this.props.defaultLabel ?? 'Select') : (this.props.data[this.state.selectedItemIndex].label ?? this.props.data[this.state.selectedItemIndex].title)}
+            {this.state.selectedItemIndex === -1 ? (this.props.defaultLabel ?? 'Select') : this.props.data[this.state.selectedItemIndex].label}
           </label>
           {this.props.expandIconSvg && <span dangerouslySetInnerHTML={{ __html: this.props.expandIconSvg }}/>}
         </StyledToggle>
         <StyledItemList
           borderColor={borderColor}
           borderThickness={borderThickness}
+          data={this.props.data}
+          defaultSelectedIndex={this.props.defaultSelectedItemIndex ?? -1}
           isInverted={this.props.isInverted ?? false}
+          isTogglable={isTogglable}
+          onDeselectAt={idx => this.selectItemAt(-1)}
+          onSelectAt={idx => this.selectItemAt(idx)}
+          rowComponentType={this.props.itemComponentType as any} // HACK: Generic types cannot be inferred by props, so this is the only way.
+          rowStyle={{ height: itemHeight}}
+          shouldStaySelected={true}
           style={{
-            height: `${!this.state.isMenuHidden ? itemHeight * (maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)) + borderThickness : 0}px`,
+            height: this.state.isMenuHidden ? '0px' : `${(itemHeight - borderThickness) * (maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)) + borderThickness}px`,
             overflowY: (maxVisibleItems === -1) ? 'hidden' : (maxVisibleItems < numItems ? 'scroll' : 'hidden'),
           }}
-        >
-          <ol>
-            {this.props.data.map((v, i) => (
-              <StyledItem
-                borderColor={borderColor}
-                borderThickness={borderThickness}
-                extendedCSS={this.props.itemCSS ?? (() => css``)}
-                height={itemHeight}
-                isInverted={this.props.isInverted ?? false}
-                key={`${i}`}
-                onClick={() => this.selectItemAt(i)}
-              >
-                <span dangerouslySetInnerHTML={{ __html: v.title }}/>
-                {v.description && <small dangerouslySetInnerHTML={{ __html: v.description }}/>}
-              </StyledItem>
-            ))}
-          </ol>
-        </StyledItemList>
+        />
       </StyledRoot>
     );
   }
+
+  /**
+   * Indicates if the item at the specified index is selected.
+   *
+   * @param index - The index of the item.
+   *
+   * @returns `true` if the item at the specified index is selected, `false`
+   *          otherwise.
+   */
+  isItemSelectedAt(index: number) {
+    return (this.state.selectedItemIndex === index);
+  }
+
+  /**
+   * Selects the item at the specified index.
+   *
+   * @param index - The index of the item to select.
+   */
+  selectItemAt(index: number) {
+    if (index < 0 || index >= this.props.data.length) throw new Error(`Index ${index} is out of range`);
+
+    this.setState({
+      selectedItemIndex: index,
+      isMenuHidden: true,
+    });
+  }
+
+  /**
+   * Expands the component, revealing its items.
+   */
+  expand() {
+    if (!this.state.isMenuHidden) return;
+    this.setState({ isMenuHidden: false });
+  }
+
+  /**
+   * Collapses the component, concealing its items.
+   */
+  collapse() {
+    if (this.state.isMenuHidden) return;
+    this.setState({ isMenuHidden: true });
+  }
+
+  /**
+   * Toggles the visibility of the items.
+   */
+  toggle() {
+    if (this.state.isMenuHidden) {
+      this.expand();
+    }
+    else {
+      this.collapse();
+    }
+  }
+
+  /**
+   * Handler invoked when click input is detected outside of the root element
+   * of the component.
+   *
+   * @param event - The MouseEvent passed to the handler.
+   */
+  private onClickOutside = (event: MouseEvent) => {
+    if (this.state.isMenuHidden) return;
+    if (!(event.target instanceof Node)) return;
+
+    let isOutside = true;
+    let node = event.target;
+
+    while (node) {
+      if (node === this.nodeRefs.root.current) {
+        isOutside = false;
+        break;
+      }
+
+      if (!node.parentNode) break;
+
+      node = node.parentNode;
+    }
+
+    if (!isOutside) return;
+
+    this.collapse();
+  }
 }
 
-const StyledItem = styled.button<ItemCSSProps & ExtendedCSSProps<ItemCSSProps>>`
-  align-items: flex-start;
-  background: #fff;
-  border-bottom-width: 0;
-  border-color: ${props => props.borderColor};
-  border-left-width: 0;
-  border-right-width: 0;
-  border-style: solid;
-  border-top-width: 0;
-  box-sizing: border-box;
-  color: #000;
-  counter-increment: item-counter;
-  display: flex;
-  flex-direction: column;
-  flex: 0 0 auto;
-  justify-content: center;
-  overflow: hidden;
-  padding: 0 10px;
-  width: 100%;
-
-  span {
-    text-align: left;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-
-  &[disabled] {
-    pointer-events: none;
-  }
-
-  &:not(:last-child) {
-    border-bottom-width: ${props => props.borderThickness}px;
-  }
-
-  ${props => props.isInverted ? css`
-    &:last-child {
-      height: ${props.height + props.borderThickness}px;
-    }
-  ` : css`
-    &:first-child {
-      height: ${props.height + props.borderThickness}px;
-    }
-  `}
-
-  ${props => props.extendedCSS(props)}
-  height: ${props => props.height}px;
-`;
-
-const StyledItemList = styled.div<{
-  borderColor: string;
-  borderThickness: number;
+const StyledItemList = styled(VList)<{
   isInverted: boolean;
 }>`
-  -webkit-overflow-scrolling: touch;
-  border-bottom-width: ${props => props.isInverted ? 0 : props.borderThickness}px;
-  border-color: ${props => props.borderColor};
-  border-left-width: ${props => props.borderThickness}px;
-  border-right-width: ${props => props.borderThickness}px;;
-  border-style: solid;
-  border-top-width: ${props => props.isInverted ? props.borderThickness : 0}px;
-  box-sizing: border-box;
-  display: block;
-  overflow: visible;
   position: absolute;
   transition: height .1s linear;
   will-change: height;
-  width: 100%;
 
   ${props => props.isInverted ? css`
     margin-bottom: ${-props.borderThickness}px;
@@ -263,13 +232,6 @@ const StyledItemList = styled.div<{
     top: 100%;
     margin-top: ${-props.borderThickness}px;
   `}
-
-  ol {
-    border-color: inherit;
-    counter-reset: item-counter;
-    list-style: none;
-    width: 100%;
-  }
 
   ::-webkit-scrollbar {}
   ::-webkit-scrollbar-track {}

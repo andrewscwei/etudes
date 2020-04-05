@@ -3,7 +3,7 @@ import React, { Fragment, PureComponent, SFC } from 'react';
 import { hot } from 'react-hot-loader/root';
 import styled from 'styled-components';
 import DebugConsole from '../../../src/DebugConsole';
-import VList, { RowProps } from '../../../src/VList';
+import VList, { RowComponentProps } from '../../../src/VList';
 
 export interface Props {}
 
@@ -11,7 +11,7 @@ export interface State {
   selectedIndex: number;
 }
 
-const Row: SFC<RowProps<string>> = ({ data, isSelected, onClick, style }) => (
+const Row: SFC<RowComponentProps<string>> = ({ data, isSelected, onClick, style }) => (
   <StyledRow isSelected={isSelected ?? false} onClick={() => onClick?.()} style={style}>{data}</StyledRow>
 );
 
