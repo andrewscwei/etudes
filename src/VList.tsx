@@ -15,6 +15,8 @@ export interface Props<T> extends AbstractSelectableCollectionProps {
   data: Array<T>;
   padding?: number;
   rowComponentType: ComponentType<RowProps<T>>;
+  maxHeight?: number;
+  scrollBarPadding?: number;
 }
 
 export default class VList<T> extends AbstractSelectableCollection<Props<T>> {
@@ -26,6 +28,8 @@ export default class VList<T> extends AbstractSelectableCollection<Props<T>> {
   render() {
     const RowComponentType = this.props.rowComponentType;
     const borderThickness = this.props.borderThickness ?? 0;
+    const maxHeight = this.props.maxHeight ?? -1;
+    const scrollBarPadding = this.props.scrollBarPadding ?? 0;
 
     return (
       <StyledRoot
@@ -33,6 +37,12 @@ export default class VList<T> extends AbstractSelectableCollection<Props<T>> {
         padding={this.props.padding ?? 0}
         style={{
           ...this.props.style ?? {},
+          ...(maxHeight < 0 ? {} : {
+            height: `${maxHeight}px`,
+            WebkitOverflowScrolling: 'touch',
+            overflowY: 'scroll',
+            paddingRight: `${scrollBarPadding}px`,
+          }),
         }}
       >
         {this.props.data.map((t, i) => (
@@ -59,8 +69,10 @@ const StyledRoot = styled.div<{
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  flex: 0 0 auto;
   justify-content: flex-start;
-  overflow: visible;
+  overflow-x: visible;
+  overflow-y: visible;
 
   > * {
     flex: 0 0 auto;
