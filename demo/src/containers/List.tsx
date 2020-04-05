@@ -160,9 +160,16 @@ const StyledListItem = styled.button<{
 const StyledRoot = styled.div<{
   orientation: 'horizontal' | 'vertical';
 }>`
-  ${props => props.orientation === 'vertical' ? container.fvtc : container.fhcl}
   padding: 10rem 3rem;
   perspective: 80rem;
   width: 100%;
   height: 100%;
+
+  ${props => props.orientation === 'vertical' ? css`
+    ${container.fvtc}
+    overflow-x: hidden;
+  ` : css`
+    ${container.fhcl}
+    overflow-y: hidden;
+  `}
 `;

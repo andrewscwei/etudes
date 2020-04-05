@@ -161,7 +161,7 @@ const StyledNav = styled.nav<{
   pointer-events: ${props => props.isActive ? 'auto' : 'none'};
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
-  z-index: 10;
+  z-index: 100;
 
   ${selectors.eblc} {
     margin-bottom: .6rem;
@@ -204,7 +204,7 @@ const StyledBurgerButton = styled(BurgerButton)`
   pointer-events: auto;
   transition: all .1s ease-out;
   transform: translate3d(0, 0, 10rem) rotateX(-5deg) rotateY(-60deg) scale(1);
-  z-index: 100;
+  z-index: 1000;
 
   ${selectors.hwot} {
     transform: translate3d(0, 0, 10rem) rotateX(-5deg) rotateY(-20deg) scale(1.2);
@@ -222,7 +222,7 @@ const StyledGithubButton = styled.a`
   transform: translate3d(0, 0, 10rem) rotateX(-10deg) rotateY(-5deg) scale(1);
   transition: all .1s ease-out;
   width: 4rem;
-  z-index: 100;
+  z-index: 1000;
 
   ${selectors.hwot} {
     transform: translate3d(0, 0, 10rem) rotateX(-10deg) rotateY(10deg) scale(1.2);

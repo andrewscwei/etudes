@@ -65,30 +65,31 @@ export default hot(class extends PureComponent<Props, State> {
               transform: 'translate3d(0, 0, 0) rotateX(20deg) rotateY(-20deg)',
             }}
           />
-          <HRangeSlider
-            min={0}
-            max={360}
-            defaultRange={[60, 182]}
-            steps={35}
-            tintColor='#fff'
-            css={css`
-              margin-top: 50rem;
-            `}
-            labelCSS={props => css`
-              font-weight: 700;
-              font-size: 2rem;
-            `}
-            knobCSS={props => css`
-              ${selectors.hwot} {
-                transform: scale(1.2);
-              }
-            `}
-            onRangeChange={range => this.setState({ min: range[0], max: range[1] })}
-            style={{
-              transform: 'translate3d(0, 0, 0) rotateX(20deg) rotateY(-20deg)',
-            }}
-          />
         </StyledRoot>
+        <HRangeSlider
+          min={0}
+          max={360}
+          defaultRange={[60, 182]}
+          steps={35}
+          tintColor='#fff'
+          labelCSS={props => css`
+            font-weight: 700;
+            font-size: 2rem;
+          `}
+          knobCSS={props => css`
+            ${selectors.hwot} {
+              transform: scale(1.2);
+            }
+          `}
+          onRangeChange={range => this.setState({ min: range[0], max: range[1] })}
+          style={{
+            margin: '8vh 4vw',
+            transform: 'translate3d(0, 0, 0) rotateX(20deg) rotateY(-20deg)',
+            position: 'fixed',
+            top: '0',
+            left: '0',
+          }}
+        />
         <DebugConsole
           title='?: Compass+Sliders'
           maxEntries={1}
