@@ -216,15 +216,15 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
           isTogglable={isTogglable}
           itemComponentType={this.props.itemComponentType as any} // HACK: Generic types cannot be inferred by props, so this is the only way.
           itemPadding={itemPadding}
+          onDeselectAt={idx => this.selectItemAt(-1)}
+          onSelectAt={idx => this.selectItemAt(idx)}
+          orientation={orientation}
+          shouldStaySelected={true}
           itemStyle={orientation === 'vertical' ? {
             height: `${itemLength}px`,
           } : {
             width: `${itemLength}px`,
           }}
-          orientation={orientation}
-          onDeselectAt={idx => this.selectItemAt(-1)}
-          onSelectAt={idx => this.selectItemAt(idx)}
-          shouldStaySelected={true}
           style={orientation === 'vertical' ? {
             height: this.state.isCollapsed ? '0px' : `${menuLength}px`,
             overflowY: (maxVisibleItems === -1) ? 'hidden' : (maxVisibleItems < numItems ? 'scroll' : 'hidden'),
@@ -333,7 +333,7 @@ const StyledItemList = styled(List)<{
   ::-webkit-scrollbar-hover {}
 
   ${props => props.orientation === 'vertical' ? css`
-    transition: height 100ms linear;
+    transition: height 100ms ease-out;
     will-change: height;
 
     ${props.isInverted ? css`
@@ -344,7 +344,7 @@ const StyledItemList = styled(List)<{
       margin-top: ${props.itemPadding - props.borderThickness}px;
     `}
   ` : css`
-    transition: width 100ms linear;
+    transition: width 100ms ease-out;
     will-change: width;
 
     ${props.isInverted ? css`

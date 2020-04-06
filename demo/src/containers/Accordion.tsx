@@ -1,10 +1,11 @@
 import $$ExpandIcon from '!!raw-loader!../assets/images/expand-icon.svg';
-import { container, selectors } from 'promptu';
-import React, { Fragment, PureComponent } from 'react';
+import { animations, container, selectors } from 'promptu';
+import React, { Fragment, PureComponent, SFC } from 'react';
 import { hot } from 'react-hot-loader/root';
 import styled, { css } from 'styled-components';
-import Accordion from '../../../src/Accordion';
+import Accordion, { ItemComponentProps } from '../../../src/Accordion';
 import DebugConsole from '../../../src/DebugConsole';
+import { Orientation } from '../../../src/types';
 
 export interface Props {}
 
@@ -12,6 +13,10 @@ export interface State {
   itemIndex: number;
   sectionIndex: number;
 }
+
+const ItemComponent: SFC<ItemComponentProps<string>> = ({ data, orientation, isSelected, onClick, style }) => (
+  <StyledItem orientation={orientation} isSelected={isSelected ?? false} onClick={() => onClick?.()} style={style}>{data}</StyledItem>
+);
 
 export default hot(class extends PureComponent<Props, State> {
   state: State = {
@@ -24,45 +29,20 @@ export default hot(class extends PureComponent<Props, State> {
       <Fragment>
         <StyledRoot>
           <Accordion
-            itemHeight={50}
+            orientation='vertical'
             expandIconSvg={$$ExpandIcon}
+            itemComponentType={ItemComponent as any}
+            itemLength={50}
             data={[{
-              title: 'Section 1',
-              items: [{
-                title: 'foo',
-              }, {
-                title: 'bar',
-              }, {
-                title: 'baz',
-              }],
+              label: 'Section 1',
+              items: ['foo', 'bar', 'baz'],
             }, {
-              title: 'Section 2',
-              items: [{
-                title: 'foo',
-              }, {
-                title: 'bar',
-              }, {
-                title: 'baz',
-              }],
+              label: 'Section 2',
+              items: ['foo', 'bar', 'baz'],
             }, {
-              title: 'Section 3',
-              items: [{
-                title: 'foo',
-              }, {
-                title: 'bar',
-              }, {
-                title: 'baz',
-              }],
+              label: 'Section 3',
+              items: ['foo', 'bar', 'baz'],
             }]}
-            itemCSS={props => css`
-              ${selectors.hwot} {
-                background: #2b14d4;
-                color: #fff;
-              }
-
-              background: ${props.isActive ? '#2b14d4' : '#fff'};
-              color: ${props.isActive ? '#fff' : '#000'};
-            `}
             sectionHeaderCSS={props => css`
               label {
                 text-transform: uppercase;
@@ -102,6 +82,33 @@ export default hot(class extends PureComponent<Props, State> {
     );
   }
 });
+
+const StyledItem = styled.button<{
+  isSelected: boolean;
+  orientation: Orientation;
+}>`
+  ${container.fvcc}
+  ${animations.transition(['transform', 'background', 'color'], 100)}
+  background: ${props => props.isSelected ? '#2b14d4' : '#fff'};
+  color: ${props => props.isSelected ? '#fff' : '#000'};
+  font-size: 1.6rem;
+  border-style: solid;
+  padding: 20px;
+  transform-origin: center;
+  transform: translate3d(0, 0, 0) scale(1);
+  z-index: 0;
+
+  ${props => props.orientation === 'vertical' ? css`
+    width: 100%;
+  ` : css`
+    height: 100%;
+  `}
+
+  ${selectors.hwot} {
+    background: #2b14d4;
+    color: #fff;
+  }
+`;
 
 const StyledRoot = styled.div`
   ${container.fhcc}
