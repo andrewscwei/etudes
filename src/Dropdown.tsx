@@ -71,6 +71,11 @@ export interface Props<T = {}> {
   itemLength?: number;
 
   /**
+   * Padding (in pixels) of each item.
+   */
+  itemPadding?: number;
+
+  /**
    * Maximum number of items that are viside when the component expands. When a
    * value greater than or equal to 0 is specified, only that number of items
    * will be visible at a time, and a scrollbar will appear to scroll to
@@ -172,8 +177,11 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
     const orientation = this.props.orientation ?? 'vertical';
     const itemLength = this.props.itemLength ?? (orientation === 'vertical' ? this.rect.height : this.rect.width);
     const maxVisibleItems = this.props.maxVisibleItems ?? -1;
-    const numItems = this.props.data.length;
     const isTogglable = this.props.isTogglable ?? true;
+    const itemPadding = this.props.itemPadding ?? 0;
+    const numItems = this.props.data.length;
+    const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems);
+    const menuLength = (itemLength - borderThickness) * numVisibleItems + itemPadding * (numVisibleItems - 1) + borderThickness;
 
     return (
       <StyledRoot
@@ -203,6 +211,7 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
           isInverted={this.props.isInverted ?? false}
           isTogglable={isTogglable}
           itemComponentType={this.props.itemComponentType as any} // HACK: Generic types cannot be inferred by props, so this is the only way.
+          itemPadding={itemPadding}
           itemStyle={orientation === 'vertical' ? {
             height: `${itemLength}px`,
           } : {
@@ -213,10 +222,10 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
           onSelectAt={idx => this.selectItemAt(idx)}
           shouldStaySelected={true}
           style={orientation === 'vertical' ? {
-            height: this.state.isCollapsed ? '0px' : `${(itemLength - borderThickness) * (maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)) + borderThickness}px`,
+            height: this.state.isCollapsed ? '0px' : `${menuLength}px`,
             overflowY: (maxVisibleItems === -1) ? 'hidden' : (maxVisibleItems < numItems ? 'scroll' : 'hidden'),
           } : {
-            width: this.state.isCollapsed ? '0px' : `${(itemLength - borderThickness) * (maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)) + borderThickness}px`,
+            width: this.state.isCollapsed ? '0px' : `${menuLength}px`,
             overflowX: (maxVisibleItems === -1) ? 'hidden' : (maxVisibleItems < numItems ? 'scroll' : 'hidden'),
           }}
         />
@@ -308,6 +317,8 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
 
 const StyledItemList = styled(List)<{
   isInverted: boolean;
+  itemPadding: number;
+  borderThickness: number;
   orientation: Orientation;
 }>`
   position: absolute;
@@ -322,22 +333,22 @@ const StyledItemList = styled(List)<{
     will-change: height;
 
     ${props.isInverted ? css`
-      margin-bottom: ${-(props.borderThickness ?? 0)}px;
+      margin-bottom: ${props.itemPadding - props.borderThickness}px;
       bottom: 100%;
     ` : css`
       top: 100%;
-      margin-top: ${-(props.borderThickness ?? 0)}px;
+      margin-top: ${props.itemPadding - props.borderThickness}px;
     `}
   ` : css`
     transition: width 100ms linear;
     will-change: width;
 
     ${props.isInverted ? css`
-      margin-right: ${-(props.borderThickness ?? 0)}px;
+      margin-right: ${props.itemPadding - props.borderThickness}px;
       right: 100%;
     ` : css`
       left: 100%;
-      margin-left: ${-(props.borderThickness ?? 0)}px;
+      margin-left: ${props.itemPadding - props.borderThickness}px;
     `}
   `}
 `;

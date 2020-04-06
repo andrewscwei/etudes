@@ -43,7 +43,7 @@ export default hot(class extends PureComponent<Props, State> {
             onSelectAt={idx => this.setState({ selectedItemIndex: idx })}
             itemComponentType={ListItemComponent as any}
             shouldStaySelected={true}
-            padding={20}
+            itemPadding={20}
             style={{
               ...(orientation === 'vertical' ? {
                 width: '80%',
@@ -59,6 +59,7 @@ export default hot(class extends PureComponent<Props, State> {
         </StyledRoot>
         <Dropdown
           borderThickness={2}
+          itemPadding={10}
           data={[{ label: 'Vertical' }, { label: 'Horizontal' }]}
           defaultLabel='Select orientation'
           defaultSelectedItemIndex={this.state.selectedOrientationIndex}

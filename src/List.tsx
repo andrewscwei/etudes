@@ -57,7 +57,7 @@ export interface Props<T = {}> extends AbstractSelectableCollectionProps {
   /**
    * Padding between every item (in pixels).
    */
-  padding?: number;
+  itemPadding?: number;
 
   /**
    * Thickness of item borders (in pixels). 0 indicates no borders.
@@ -114,7 +114,7 @@ export default class List<T = {}> extends AbstractSelectableCollection<Props<T>>
       <StyledRoot
         className={this.props.className}
         orientation={orientation}
-        padding={this.props.padding ?? 0}
+        itemPadding={this.props.itemPadding ?? 0}
         style={{
           ...this.props.style ?? {},
           ...(maxLength < 0 ? {} : (
@@ -165,7 +165,7 @@ export default class List<T = {}> extends AbstractSelectableCollection<Props<T>>
 }
 
 const StyledRoot = styled.ol<{
-  padding: number;
+  itemPadding: number;
   orientation: Props['orientation'];
 }>`
   counter-reset: item-counter;
@@ -186,9 +186,9 @@ const StyledRoot = styled.ol<{
 
     &:not(:last-child) {
       ${props => props.orientation === 'horizontal' ? css`
-        margin-right: ${props.padding}px;
+        margin-right: ${props.itemPadding}px;
       ` : css`
-        margin-bottom: ${props.padding}px;
+        margin-bottom: ${props.itemPadding}px;
       `}
     }
   }
