@@ -12,6 +12,7 @@ import Accordion from './Accordion';
 import Compass from './Compass';
 import List from './List';
 import MasonryGrid from './MasonryGrid';
+import Panorama from './Panorama';
 import Video from './Video';
 
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes') : () => {};
@@ -69,6 +70,7 @@ class App extends PureComponent<Props, State> {
       case 'accordion': return <Accordion/>;
       case 'compass': return <Compass/>;
       case 'video': return <Video/>;
+      case 'panorama': return <Panorama/>;
       default: return (
         <StyledIntroduction>
           <h1>Études</h1>
@@ -106,6 +108,7 @@ class App extends PureComponent<Props, State> {
             <StyledNavButton isActive={this.state.featuredComponent === 'accordion'} onClick={() => this.setState({ featuredComponent: 'accordion' })}>Accordion</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'compass'} onClick={() => this.setState({ featuredComponent: 'compass' })}>Compass+Sliders</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'video'} onClick={() => this.setState({ featuredComponent: 'video' })}>Video</StyledNavButton>
+            <StyledNavButton isActive={this.state.featuredComponent === 'panorama'} onClick={() => this.setState({ featuredComponent: 'panorama' })}>Panorama</StyledNavButton>
           </StyledNav>
           <StyledBurgerButton
             ref={this.nodeRefs.burgerButton}

@@ -137,6 +137,8 @@ export default class RangeSlider extends PureComponent<Props, State> {
     if (prevProps.orientation !== this.props.orientation) {
       this.forceUpdate();
     }
+
+    this.reconfigureInteractivityIfNeeded();
   }
 
   render() {
