@@ -108,7 +108,7 @@ class App extends PureComponent<Props, State> {
             <StyledNavButton isActive={this.state.featuredComponent === 'accordion'} onClick={() => this.setState({ featuredComponent: 'accordion' })}>Accordion</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'compass'} onClick={() => this.setState({ featuredComponent: 'compass' })}>Compass+Sliders</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'video'} onClick={() => this.setState({ featuredComponent: 'video' })}>Video</StyledNavButton>
-            <StyledNavButton isActive={this.state.featuredComponent === 'panorama'} onClick={() => this.setState({ featuredComponent: 'panorama' })}>Panorama</StyledNavButton>
+            <StyledNavButton isActive={this.state.featuredComponent === 'panorama'} onClick={() => this.setState({ featuredComponent: 'panorama' })}>Panorama+Slider</StyledNavButton>
           </StyledNav>
           <StyledBurgerButton
             ref={this.nodeRefs.burgerButton}

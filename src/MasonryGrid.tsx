@@ -43,8 +43,9 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
     root: createRef<HTMLDivElement>(),
   };
 
+  private minWidth: number = NaN;
   private maxWidth: number = NaN;
-
+  private minHeight: number = NaN;
   private maxHeight: number = NaN;
 
   private updateDelegate?: UpdateDelegate = undefined;
@@ -77,8 +78,8 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
         orientation={this.props.orientation}
         style={{
           ...this.props.style,
-          height: this.props.height ?? ((this.props.orientation === 'vertical' && !isNaN(this.maxHeight)) ? `${this.maxHeight}px` : ''),
-          width: this.props.width ?? ((this.props.orientation === 'horizontal' && !isNaN(this.maxWidth)) ? `${this.maxWidth}px` : ''),
+          height: this.props.height ?? ((this.props.orientation === 'vertical' && !isNaN(this.minHeight)) ? `${this.minHeight}px` : ''),
+          width: this.props.width ?? ((this.props.orientation === 'horizontal' && !isNaN(this.minWidth)) ? `${this.minWidth}px` : ''),
           flex: '0 0 auto',
         }}
       >
@@ -91,15 +92,8 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
     const { [DirtyType.SIZE]: dirtySize } = info;
 
     if (dirtySize) {
-      if (this.props.orientation === 'vertical') {
-        if (this.maxWidth !== this.width) {
-          this.repositionChildren();
-        }
-      }
-      else {
-        if (this.maxHeight !== this.height) {
-          this.repositionChildren();
-        }
+      if ((this.minWidth !== this.width) || (this.minHeight !== this.height) || (dirtySize.maxSize.width !== this.maxWidth) || dirtySize.maxSize.height !== this.maxHeight) {
+        this.repositionChildren();
       }
     }
   }
@@ -157,9 +151,9 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
         }
       }
 
-      this.maxWidth = this.width;
-      this.maxHeight = this.computeMaxLength(sectionHeights, this.props.sections);
-      rootNode.style.height = `${this.maxHeight}px`;
+      this.minWidth = this.width;
+      this.minHeight = this.computeMaxLength(sectionHeights, this.props.sections);
+      rootNode.style.height = `${this.minHeight}px`;
 
       if (this.props.isReversed) {
         for (let i = 0; i < children.length; i++) {
@@ -205,9 +199,9 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
         }
       }
 
-      this.maxHeight = this.height;
-      this.maxWidth = this.computeMaxLength(sectionWidths, this.props.sections);
-      if (!isNaN(this.maxWidth)) rootNode.style.width = `${this.maxWidth}px`;
+      this.minHeight = this.height;
+      this.minWidth = this.computeMaxLength(sectionWidths, this.props.sections);
+      if (!isNaN(this.minWidth)) rootNode.style.width = `${this.minWidth}px`;
 
       if (this.props.isReversed) {
         for (let i = 0; i < children.length; i++) {

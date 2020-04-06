@@ -46,9 +46,11 @@ export default hot(class extends PureComponent<Props, State> {
 
 const StyledGridItem = styled.div`
   ${container.fvcc}
-  padding: 20px;
-  color: #fff;
   background: #2b14d4;
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+  padding: 20px;
 
   &.h-1 { height: 4rem; }
   &.h-2 { height: 8rem; }

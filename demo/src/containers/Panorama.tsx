@@ -79,7 +79,7 @@ export default hot(class extends PureComponent<Props, State> {
           />
         </StyledRoot>
         <DebugConsole
-          title='?: Panorama'
+          title='?: Panorama+Slider'
           maxEntries={1}
           message={`Angle: ${Math.round(this.state.angle)}°`}
           style={{
