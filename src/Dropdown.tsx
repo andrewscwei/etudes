@@ -169,6 +169,10 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
     if (prevState.selectedItemIndex !== this.state.selectedItemIndex) {
       this.props.onIndexChange?.(this.state.selectedItemIndex);
     }
+
+    if (!prevProps.orientation !== this.props.orientation) {
+      this.forceUpdate();
+    }
   }
 
   render() {
