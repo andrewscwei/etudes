@@ -2,7 +2,7 @@ import { Rect } from 'dirty-dom';
 import React, { ComponentType, createRef, PureComponent } from 'react';
 import styled, { css, CSSProperties } from 'styled-components';
 import List, { ItemComponentProps as ListItemComponentProps } from './List';
-import { ExtendedCSSFunction, ExtendedCSSProps } from './types';
+import { ExtendedCSSFunction, ExtendedCSSProps, Orientation } from './types';
 
 type ButtonCSSProps = Readonly<{
   borderColor: string;
@@ -36,12 +36,13 @@ export interface Props<T = {}> {
 
   /**
    * Data of every item in the component. This is used to generate individual
-   * dropped down items. Data type is generic.
+   * menu items. Data type is generic.
    */
   data: Array<DataProps<T>>;
 
   /**
-   * Indicates if the component is inverted ("dropup" instead of dropdown).
+   * Indicates if the component is inverted (i.e. "dropup" instead of dropdown).
+   * Supports all orientations.
    */
   isInverted?: boolean;
 
@@ -63,10 +64,11 @@ export interface Props<T = {}> {
   defaultSelectedItemIndex?: number;
 
   /**
-   * Height (in pixels) of each item. This does not apply to the dropdown button
-   * itself.
+   * Length (in pixels) of each item. This does not apply to the dropdown button
+   * itself. Length refers to the height in vertical orientation and width in
+   * horizontal orientation.
    */
-  itemHeight?: number;
+  itemLength?: number;
 
   /**
    * Maximum number of items that are viside when the component expands. When a
@@ -76,6 +78,11 @@ export interface Props<T = {}> {
    * visible when the component expands.
    */
   maxVisibleItems?: number;
+
+  /**
+   * Orientation of the component.
+   */
+  orientation?: Orientation;
 
   /**
    * Color of the border of every item and the dropdown button itself.
@@ -122,9 +129,9 @@ export interface State {
 }
 
 /**
- * A dropdown menu component that is invertible (can "dropup" instead). Provide
- * data and item component type to this component to automatically generate
- * dropped down items.
+ * A dropdown menu component that is invertible (i.e. can "dropup" instead) and
+ * supports both horizontal and vertical orientations. Provide data and item
+ * component type to this component to automatically generate menu items.
  */
 export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
   nodeRefs = {
@@ -138,6 +145,10 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
       selectedItemIndex: this.props.defaultSelectedItemIndex ?? -1,
       isCollapsed: true,
     };
+  }
+
+  get rect(): Rect {
+    return Rect.from(this.nodeRefs.root.current) ?? new Rect();
   }
 
   componentDidMount() {
@@ -158,7 +169,8 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
   render() {
     const borderColor = this.props.borderColor ?? '#000';
     const borderThickness = this.props.borderThickness ?? 1;
-    const itemHeight = this.props.itemHeight ?? Rect.from(this.nodeRefs.root.current)?.height ?? 50;
+    const orientation = this.props.orientation ?? 'vertical';
+    const itemLength = this.props.itemLength ?? (orientation === 'vertical' ? this.rect.height : this.rect.width);
     const maxVisibleItems = this.props.maxVisibleItems ?? -1;
     const numItems = this.props.data.length;
     const isTogglable = this.props.isTogglable ?? true;
@@ -166,6 +178,7 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
     return (
       <StyledRoot
         className={this.props.className}
+        orientation={orientation}
         isInverted={this.props.isInverted ?? false}
         ref={this.nodeRefs.root}
         style={this.props.style ?? {}}
@@ -186,18 +199,25 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
           borderColor={borderColor}
           borderThickness={borderThickness}
           data={this.props.data}
-          orientation='vertical'
           defaultSelectedIndex={this.props.defaultSelectedItemIndex ?? -1}
           isInverted={this.props.isInverted ?? false}
           isTogglable={isTogglable}
+          itemComponentType={this.props.itemComponentType as any} // HACK: Generic types cannot be inferred by props, so this is the only way.
+          itemStyle={orientation === 'vertical' ? {
+            height: `${itemLength}px`,
+          } : {
+            width: `${itemLength}px`,
+          }}
+          orientation={orientation}
           onDeselectAt={idx => this.selectItemAt(-1)}
           onSelectAt={idx => this.selectItemAt(idx)}
-          itemComponentType={this.props.itemComponentType as any} // HACK: Generic types cannot be inferred by props, so this is the only way.
-          itemStyle={{ height: itemHeight}}
           shouldStaySelected={true}
-          style={{
-            height: this.state.isCollapsed ? '0px' : `${(itemHeight - borderThickness) * (maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)) + borderThickness}px`,
+          style={orientation === 'vertical' ? {
+            height: this.state.isCollapsed ? '0px' : `${(itemLength - borderThickness) * (maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)) + borderThickness}px`,
             overflowY: (maxVisibleItems === -1) ? 'hidden' : (maxVisibleItems < numItems ? 'scroll' : 'hidden'),
+          } : {
+            width: this.state.isCollapsed ? '0px' : `${(itemLength - borderThickness) * (maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)) + borderThickness}px`,
+            overflowX: (maxVisibleItems === -1) ? 'hidden' : (maxVisibleItems < numItems ? 'scroll' : 'hidden'),
           }}
         />
       </StyledRoot>
@@ -229,7 +249,7 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
   }
 
   /**
-   * Expands the component, revealing its items.
+   * Expands the menu, revealing its items.
    */
   expand() {
     if (!this.state.isCollapsed) return;
@@ -237,7 +257,7 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
   }
 
   /**
-   * Collapses the component, concealing its items.
+   * Collapses the menu, concealing its items.
    */
   collapse() {
     if (this.state.isCollapsed) return;
@@ -245,7 +265,7 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
   }
 
   /**
-   * Toggles the visibility of the items.
+   * Toggles the visibility of the menu.
    */
   toggle() {
     if (this.state.isCollapsed) {
@@ -288,23 +308,38 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
 
 const StyledItemList = styled(List)<{
   isInverted: boolean;
+  orientation: Orientation;
 }>`
   position: absolute;
-  transition: height .1s linear;
-  will-change: height;
-
-  ${props => props.isInverted ? css`
-    margin-bottom: ${-(props.borderThickness ?? 0)}px;
-    bottom: 100%;
-  ` : css`
-    top: 100%;
-    margin-top: ${-(props.borderThickness ?? 0)}px;
-  `}
 
   ::-webkit-scrollbar {}
   ::-webkit-scrollbar-track {}
   ::-webkit-scrollbar-thumb {}
   ::-webkit-scrollbar-hover {}
+
+  ${props => props.orientation === 'vertical' ? css`
+    transition: height 100ms linear;
+    will-change: height;
+
+    ${props.isInverted ? css`
+      margin-bottom: ${-(props.borderThickness ?? 0)}px;
+      bottom: 100%;
+    ` : css`
+      top: 100%;
+      margin-top: ${-(props.borderThickness ?? 0)}px;
+    `}
+  ` : css`
+    transition: width 100ms linear;
+    will-change: width;
+
+    ${props.isInverted ? css`
+      margin-right: ${-(props.borderThickness ?? 0)}px;
+      right: 100%;
+    ` : css`
+      left: 100%;
+      margin-left: ${-(props.borderThickness ?? 0)}px;
+    `}
+  `}
 `;
 
 const StyledToggle = styled.button<ButtonCSSProps & ExtendedCSSProps<ButtonCSSProps>>`
@@ -358,15 +393,23 @@ const StyledToggle = styled.button<ButtonCSSProps & ExtendedCSSProps<ButtonCSSPr
 
 const StyledRoot = styled.div<{
   isInverted: boolean;
+  orientation: Orientation;
 }>`
   align-items: center;
   box-sizing: border-box;
   display: flex;
-  flex-direction: ${props => props.isInverted ? 'column-reverse' : 'column'};
-  height: 50px;
   justify-content: flex-start;
   padding: 0;
   overflow: visible;
   position: relative;
-  width: 200px;
+
+  ${props => props.orientation === 'vertical' ? css`
+    flex-direction: ${props.isInverted ? 'column-reverse' : 'column'};
+    height: 50px;
+    width: 200px;
+  ` : css`
+    flex-direction: ${props.isInverted ? 'row-reverse' : 'row'};
+    height: 200px;
+    width: 50px;
+  `}
 `;

@@ -58,15 +58,16 @@ export default hot(class extends PureComponent<Props, State> {
           />
         </StyledRoot>
         <Dropdown
+          borderThickness={2}
           data={[{ label: 'Vertical' }, { label: 'Horizontal' }]}
           defaultLabel='Select orientation'
-          onIndexChange={idx => this.setState({ selectedOrientationIndex: idx })}
-          itemComponentType={DropdownItemComponent as any}
-          isInverted={false}
           defaultSelectedItemIndex={this.state.selectedOrientationIndex}
-          borderThickness={2}
-          maxVisibleItems={-1}
           expandIconSvg={$$ExpandIcon}
+          isInverted={false}
+          itemComponentType={DropdownItemComponent as any}
+          maxVisibleItems={-1}
+          onIndexChange={idx => this.setState({ selectedOrientationIndex: idx })}
+          orientation='vertical'
           buttonCSS={props => css`
             font-size: 2rem;
             font-weight: 700;
@@ -117,10 +118,11 @@ const StyledDropdownItem = styled.button<{
 }>`
   ${container.fvcl}
   ${animations.transition(['background', 'color'], 100)}
-  flex: 0 0 auto;
   background: ${props => props.isSelected ? '#2b14d4' : '#fff'};
-  color: ${props => props.isSelected ? '#fff' : '#000'};
   border-style: solid;
+  color: ${props => props.isSelected ? '#fff' : '#000'};
+  flex: 0 0 auto;
+  height: 100%;
   padding: 0 10px;
   text-align: left;
   width: 100%;
