@@ -440,6 +440,7 @@ const StyledKnob = styled.div<KnobCSSProps & ExtendedCSSProps<KnobCSSProps>>`
   pointer-events: ${props => props.isDisabled ? 'none' : 'auto'};
   position: absolute;
   top: ${props => -props.radius - props.hitboxPadding}px;
+  touch-action: none;
   transition-duration: 100ms;
   transition-property: ${props => props.isReleasing ? 'background, opacity, margin, transform' : 'background, opacity, transform'};
   transition-timing-function: ease-out;

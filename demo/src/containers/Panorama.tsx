@@ -50,12 +50,9 @@ export default hot(class extends PureComponent<Props, State> {
             ref={this.nodeRefs.panorama}
             src={$$PanoramaImage}
             defaultAngle={this.props.defaultAngle}
-            onAngleChange={angle => {
-              this.setState({ angle });
-              this.nodeRefs.slider.current?.setAngle(angle);
-            }}
             style={{
               height: '40rem',
+              pointerEvents: 'none',
               transform: 'translate3d(0, 0, 0) rotateX(0deg) rotateY(20deg)',
               width: '40rem',
               maxWidth: '80%',
