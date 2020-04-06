@@ -4,7 +4,7 @@ import { hot } from 'react-hot-loader/root';
 import styled, { css } from 'styled-components';
 import Compass from '../../../src/Compass';
 import DebugConsole from '../../../src/DebugConsole';
-import HRangeSlider from '../../../src/HRangeSlider';
+import RangeSlider from '../../../src/RangeSlider';
 import Slider from '../../../src/Slider';
 
 export interface Props {}
@@ -48,6 +48,7 @@ export default hot(class extends PureComponent<Props, State> {
             breakpoints={Slider.breakpointsFactory(10, (i, p) => `${Math.round(this.getAngleByPosition(p))}°`)}
             knobWidth={60}
             knobHeight={40}
+            isInverted={false}
             orientation='vertical'
             defaultPosition={0.6}
             css={css`
@@ -67,10 +68,11 @@ export default hot(class extends PureComponent<Props, State> {
             }}
           />
         </StyledRoot>
-        <HRangeSlider
+        <RangeSlider
           min={0}
           max={360}
           defaultRange={[0, 360]}
+          orientation='horizontal'
           steps={359}
           tintColor='#fff'
           labelCSS={props => css`
