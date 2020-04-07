@@ -81,6 +81,7 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
           height: this.props.height ?? ((this.props.orientation === 'vertical' && !isNaN(this.minHeight)) ? `${this.minHeight}px` : ''),
           width: this.props.width ?? ((this.props.orientation === 'horizontal' && !isNaN(this.minWidth)) ? `${this.minWidth}px` : ''),
           flex: '0 0 auto',
+          padding: '0',
         }}
       >
         {this.props.children}
@@ -109,20 +110,12 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
     debug('Repositioning children... OK');
 
     const children = rootNode.children;
+    const numSections = this.props.sections;
 
-    const rect = Rect.from(rootNode) ?? new Rect();
-    const computedStyle = window.getComputedStyle(rootNode);
-    const pt = parseFloat(computedStyle.getPropertyValue('padding-top'));
-    const pr = parseFloat(computedStyle.getPropertyValue('padding-right'));
-    const pb = parseFloat(computedStyle.getPropertyValue('padding-bottom'));
-    const pl = parseFloat(computedStyle.getPropertyValue('padding-left'));
-
-    if (this.props.sections <= 0) throw new Error('You must specifiy a minimum of 1 section(s) (a.k.a. row(s) for horizontal orientation, column(s) for vertical orientation) for a MasonryGrid instance');
+    if (numSections <= 0) throw new Error('You must specifiy a minimum of 1 section(s) (a.k.a. row(s) for horizontal orientation, column(s) for vertical orientation) for a MasonryGrid instance');
 
     if (this.props.orientation === 'vertical') {
-      const rowWidth = Math.max(0, rect.width - pr - pl);
-      const colWidth = Math.max(0, (rowWidth - this.props.horizontalSpacing * (this.props.sections - 1)) / this.props.sections);
-      const sectionHeights: Array<number> = [...new Array(this.props.sections)].map(() => 0);
+      const sectionHeights: Array<number> = [...new Array(numSections)].map(() => 0);
 
       for (let i = 0; i < children.length; i++) {
         const child = children[i];
@@ -133,26 +126,26 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
         const [colIdx, y] = this.computeNextAvailableSectionAndLengthByBase(sectionHeights, base);
 
         child.style.position = 'absolute';
-        child.style.width = `${(colWidth * base) + (this.props.horizontalSpacing * (base - 1))}px`;
+        child.style.width = `calc(${100 / numSections * base}% - ${(this.props.horizontalSpacing * (numSections - 1) / numSections) * base}px + ${this.props.horizontalSpacing * (base - 1)}px)`;
         child.style.height = '';
-        child.style.left = `${pl + colIdx * (colWidth + this.props.horizontalSpacing)}px`;
-        child.style.top = `${pt + y + (y === 0 ? 0 : this.props.verticalSpacing)}px`;
+        child.style.left = `calc(${100 / numSections * colIdx}% - ${(this.props.horizontalSpacing * (numSections - 1) / numSections) * colIdx}px + ${this.props.horizontalSpacing * colIdx}px)`;
+        child.style.top = `${y + (y === 0 ? 0 : this.props.verticalSpacing)}px`;
 
         for (let j = 0; j < base; j++) {
           sectionHeights[colIdx + j] = y + (y === 0 ? 0 : this.props.verticalSpacing) + (Rect.from(child)?.height ?? 0);
         }
 
-        if (this.props.areSectionsAligned && ((colIdx + base) === this.props.sections)) {
+        if (this.props.areSectionsAligned && ((colIdx + base) === numSections)) {
           const m = this.computeMaxLength(sectionHeights);
 
-          for (let j = 0; j < this.props.sections; j++) {
+          for (let j = 0; j < numSections; j++) {
             sectionHeights[j] = m;
           }
         }
       }
 
       this.minWidth = this.width;
-      this.minHeight = this.computeMaxLength(sectionHeights, this.props.sections);
+      this.minHeight = this.computeMaxLength(sectionHeights, numSections);
       rootNode.style.height = `${this.minHeight}px`;
 
       if (this.props.isReversed) {
@@ -168,9 +161,7 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
       }
     }
     else {
-      const colHeight = Math.max(0, rect.height - pb - pt);
-      const rowHeight = Math.max(0, (colHeight - this.props.verticalSpacing * (this.props.sections - 1)) / this.props.sections);
-      const sectionWidths: Array<number> = [...new Array(this.props.sections)].map(() => 0);
+      const sectionWidths: Array<number> = [...new Array(numSections)].map(() => 0);
 
       for (let i = 0; i < children.length; i++) {
         const child = children[i];
@@ -182,25 +173,25 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
 
         child.style.position = 'absolute';
         child.style.width = '';
-        child.style.height = `${(rowHeight * base) + (this.props.verticalSpacing * (base - 1))}px`;
-        child.style.top = `${pl + rowIdx * (rowHeight + this.props.verticalSpacing)}px`;
-        child.style.left = `${pt + x + (x === 0 ? 0 : this.props.horizontalSpacing)}px`;
+        child.style.height = `calc(${100 / numSections * base}% - ${(this.props.verticalSpacing * (numSections - 1) / numSections) * base}px + ${this.props.verticalSpacing * (base - 1)}px)`;
+        child.style.top = `calc(${100 / numSections * rowIdx}% - ${(this.props.verticalSpacing * (numSections - 1) / numSections) * rowIdx}px + ${this.props.verticalSpacing * rowIdx}px)`;
+        child.style.left = `${x + (x === 0 ? 0 : this.props.horizontalSpacing)}px`;
 
         for (let j = 0; j < base; j++) {
           sectionWidths[rowIdx + j] = x + (x === 0 ? 0 : this.props.horizontalSpacing) + (Rect.from(child)?.width ?? 0);
         }
 
-        if (this.props.areSectionsAligned && ((rowIdx + base) === this.props.sections)) {
+        if (this.props.areSectionsAligned && ((rowIdx + base) === numSections)) {
           const m = this.computeMaxLength(sectionWidths);
 
-          for (let j = 0; j < this.props.sections; j++) {
+          for (let j = 0; j < numSections; j++) {
             sectionWidths[j] = m;
           }
         }
       }
 
       this.minHeight = this.height;
-      this.minWidth = this.computeMaxLength(sectionWidths, this.props.sections);
+      this.minWidth = this.computeMaxLength(sectionWidths, numSections);
       if (!isNaN(this.minWidth)) rootNode.style.width = `${this.minWidth}px`;
 
       if (this.props.isReversed) {
