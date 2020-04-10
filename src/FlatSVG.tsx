@@ -57,11 +57,11 @@ const StyledRoot = styled.figure<{
       transition-timing-function: inherit;
 
       ${props => props.fillColor !== undefined && css`
-        fill: ${props.fillColor};
-        `}
+        fill: ${props.fillColor} !important;
+      `}
 
       ${props => props.strokeColor !== undefined && css`
-        stroke: ${props.strokeColor};
+        stroke: ${props.strokeColor} !important;
       `}
     }
   }
