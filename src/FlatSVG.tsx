@@ -3,17 +3,17 @@ import styled, { css } from 'styled-components';
 
 interface Props {
   className?: string;
-  markup: string;
+  src: string;
   style?: CSSProperties;
   fillColor?: string;
   strokeColor?: string;
-  isAnimated: boolean;
+  isAnimated?: boolean;
 }
 
-const FlatSVG: SFC<PropsWithChildren<Props>> = ({ className, style, isAnimated, fillColor, strokeColor, markup }) => (
+const FlatSVG: SFC<PropsWithChildren<Props>> = ({ className, style, isAnimated, fillColor, strokeColor, src }) => (
   <StyledRoot
     className={className}
-    dangerouslySetInnerHTML={{ __html: markup }}
+    dangerouslySetInnerHTML={{ __html: src }}
     fillColor={fillColor}
     isAnimated={isAnimated ?? false}
     strokeColor={strokeColor}
