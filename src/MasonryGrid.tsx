@@ -23,8 +23,18 @@ export interface Props {
  * This is a React component that aligns all of its immediate children in a
  * masonry grid. Refrain from assigning CSS styles to it via `className` or
  * `style` property, although they are handled if absolutely necessary.
- * Customize the grid via its supported properties. The grid can be either
- * vertical or horizontal orientation.
+ * Customize the grid via its supported properties. The grid can be in either
+ * vertical or horizontal orientation. The length of every child element
+ * *parallel to the direction of the orientation* is automatically set according
+ * to the number of sections specified for the grid. This means that in an
+ * horizontally oriented grid, the *width* of each child element is
+ * automatically set, whereas in a vertically oriented grid the *height* of each
+ * child element is automatically set. Additionally, the *number of sections*
+ * means maximum the number of child elements present in the direction that is
+ * parallel to the orientation of the grid. This means that in a vertically
+ * oriented grid, *number of secitons* refers to the *number of rows*, whereas
+ * in a horizontally oriented grid, *number of sections* refers to the *number
+ * of columns*.
  */
 class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
   static defaultProps: Props = {
