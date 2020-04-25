@@ -105,6 +105,8 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
     if (dirtySize) {
       if ((this.minWidth !== this.width) || (this.minHeight !== this.height) || (dirtySize.maxSize.width !== this.maxWidth) || dirtySize.maxSize.height !== this.maxHeight) {
         this.repositionChildren();
+        this.maxWidth = dirtySize.maxSize.width;
+        this.maxHeight = dirtySize.maxSize.height;
       }
     }
   }
