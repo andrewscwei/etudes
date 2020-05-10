@@ -36,6 +36,11 @@ jobs:
         with:
           name: build
           path: build/
+      - name: Persist lib dir
+        uses: actions/upload-artifact@v1
+        with:
+          name: lib
+          path: lib/
   test:
     name: Test
     needs: [build]
@@ -56,6 +61,10 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: build
+      - name: Restore lib dir
+        uses: actions/download-artifact@v1
+        with:
+          name: lib
       - name: Test
         run: npm test
   deploy:
@@ -70,6 +79,10 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: build
+      - name: Restore lib dir
+        uses: actions/download-artifact@v1
+        with:
+          name: lib
       - name: Deploy to NPM
         run: .github/workflows/deploy_to_npm.sh
         env:
