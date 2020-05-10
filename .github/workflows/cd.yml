@@ -31,11 +31,6 @@ jobs:
         with:
           name: package
           path: package/
-      - name: Persist build dir
-        uses: actions/upload-artifact@v1
-        with:
-          name: build
-          path: build/
       - name: Persist lib dir
         uses: actions/upload-artifact@v1
         with:
@@ -57,10 +52,6 @@ jobs:
           restore-keys: ${{ runner.os }}-node-modules-
       - name: Install NPM dependencies
         run: npm install
-      - name: Restore build dir
-        uses: actions/download-artifact@v1
-        with:
-          name: build
       - name: Restore lib dir
         uses: actions/download-artifact@v1
         with:
@@ -75,10 +66,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Restore build dir
-        uses: actions/download-artifact@v1
-        with:
-          name: build
       - name: Restore lib dir
         uses: actions/download-artifact@v1
         with:
