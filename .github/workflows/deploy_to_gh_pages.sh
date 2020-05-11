@@ -7,7 +7,10 @@
 
 GH_PAGES_DIR=${GH_PAGES_DIR:-.gh-pages}
 GH_USER=${GH_USER:-$GITHUB_ACTOR}
-ORIGIN_URL= "https://$GH_USER:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+ORIGIN_URL="https://$GH_USER:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+
+echo "FOO"
+echo $ORIGIN_URL
 
 # Checkout new branch.
 if [ `git branch | grep gh-pages` ]; then git branch -D gh-pages; fi
@@ -26,6 +29,4 @@ git add -fA
 git commit --allow-empty -m "[SKIP CI] $(git log -1 --pretty=%B)"
 git push -f $ORIGIN_URL gh-pages
 
-echo "FOO"
-echo $ORIGIN_URL
 echo "Successfully published docs to GitHub Pages"
