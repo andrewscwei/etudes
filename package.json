@@ -1,6 +1,6 @@
 {
   "name": "etudes",
-  "version": "0.22.2",
+  "version": "0.22.3",
   "description": "A study of styled React components",
   "main": "lib",
   "scripts": {

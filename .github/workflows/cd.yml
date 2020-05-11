@@ -11,6 +11,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     container: node:13.12.0
+    if: "!contains(github.event.head_commit.message, 'SKIP CI')"
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -76,3 +77,5 @@ jobs:
           NPM_AUTH: ${{ secrets.NPM_AUTH }}
       - name: Deploy to GitHub pages
         run: .github/workflows/deploy_to_gh_pages.sh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
