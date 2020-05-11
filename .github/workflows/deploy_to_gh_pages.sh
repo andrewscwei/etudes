@@ -9,14 +9,12 @@ GH_PAGES_DIR=${GH_PAGES_DIR:-.gh-pages}
 GH_USER=${GH_USER:-$GITHUB_ACTOR}
 ORIGIN_URL= "https://$GH_USER:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
 
-if [ `git branch | grep gh-pages` ]; then
-  git branch -D gh-pages
-fi
-
+# Checkout new branch.
+if [ `git branch | grep gh-pages` ]; then git branch -D gh-pages; fi
 git checkout -b gh-pages
-npm run pages
 
-# Move generated files to root and delete everything else.
+# Build and move generated files to root, then delete everything else.
+npm run pages
 find . -maxdepth 1 ! -name '.' ! -name '..' ! -name ${GH_PAGES_DIR} ! -name '.git' ! -name '.gitignore' -exec rm -rf {} \;
 mv ${GH_PAGES_DIR}/* .
 rm -R ${GH_PAGES_DIR}/
@@ -28,4 +26,6 @@ git add -fA
 git commit --allow-empty -m "[SKIP CI] $(git log -1 --pretty=%B)"
 git push -f $ORIGIN_URL gh-pages
 
+echo "FOO"
+echo $ORIGIN_URL
 echo "Successfully published docs to GitHub Pages"
