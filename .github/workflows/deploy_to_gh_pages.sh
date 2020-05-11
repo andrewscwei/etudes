@@ -9,9 +9,6 @@ GH_PAGES_DIR=${GH_PAGES_DIR:-.gh-pages}
 GH_USER=${GH_USER:-$GITHUB_ACTOR}
 ORIGIN_URL="https://$GH_USER:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
 
-echo "FOO"
-echo $ORIGIN_URL
-
 # Checkout new branch.
 if [ `git branch | grep gh-pages` ]; then git branch -D gh-pages; fi
 git checkout -b gh-pages
