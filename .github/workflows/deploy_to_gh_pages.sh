@@ -9,8 +9,6 @@ GH_PAGES_DIR=${GH_PAGES_DIR:-.gh-pages}
 GH_USER=${GH_USER:-$GITHUB_ACTOR}
 ORIGIN_URL=`git config --get remote.origin.url`
 
-git remote add github "https://$GITHUB_ACTOR:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
-
 if [ `git branch | grep gh-pages` ]; then
   git branch -D gh-pages
 fi
