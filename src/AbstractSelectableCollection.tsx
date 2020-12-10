@@ -69,7 +69,7 @@ export default class AbstractSelectableCollection<P extends Props = Props, S ext
   }
 
   componentDidMount() {
-    if (this.state.selectedIndex > -1) {
+    if (this.state.selectedIndex !== undefined && this.state.selectedIndex > -1) {
       this.props.onSelectAt?.(this.state.selectedIndex ?? -1);
     }
   }
