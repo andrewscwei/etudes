@@ -1,11 +1,11 @@
-import HTMLPlugin from 'html-webpack-plugin';
-import path from 'path';
-import { Configuration, EnvironmentPlugin } from 'webpack';
+import HTMLPlugin from 'html-webpack-plugin'
+import path from 'path'
+import { Configuration, EnvironmentPlugin } from 'webpack'
 
-const isDev: boolean = process.env.NODE_ENV === 'development';
-const cwd: string = path.join(__dirname, '../');
-const inputDir: string = path.join(cwd, 'src');
-const outputDir: string = path.join(cwd, '../', '.gh-pages');
+const isDev: boolean = process.env.NODE_ENV === 'development'
+const cwd: string = path.join(__dirname, '../')
+const inputDir: string = path.join(cwd, 'src')
+const outputDir: string = path.join(cwd, '../', '.gh-pages')
 
 const config: Configuration = {
   devtool: isDev ? 'eval-source-map' : 'source-map',
@@ -71,6 +71,6 @@ const config: Configuration = {
     extensions: ['.js', '.ts', '.tsx'],
   },
   target: 'web',
-};
+}
 
-export default config;
+export default config

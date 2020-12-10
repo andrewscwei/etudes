@@ -8,7 +8,7 @@
     "build": "npm run clean && tsc -p tsconfig.json",
     "pages": "rimraf .gh-pages && webpack --config demo/config/build.conf.ts --port 8080",
     "demo": "NODE_ENV=development webpack-cli serve --mode development --hot --config demo/config/build.conf.ts",
-    "lint:ts": "eslint --ext .ts --ext .tsx src demo",
+    "lint": "eslint --ext .ts --ext .tsx src demo",
     "lint:fix": "npm run lint -- --fix"
   },
   "repository": {

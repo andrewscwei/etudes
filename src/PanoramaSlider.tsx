@@ -1,38 +1,38 @@
-import { DirtyInfo, DirtyType, EventType, Rect, Size, UpdateDelegate, UpdateDelegator } from 'dirty-dom';
-import React, { createRef, CSSProperties, PureComponent } from 'react';
-import styled, { css, FlattenSimpleInterpolation } from 'styled-components';
-import Panorama from './Panorama';
-import { ExtendedCSSProps } from './types';
+import { DirtyInfo, DirtyType, EventType, Rect, Size, UpdateDelegate, UpdateDelegator } from 'dirty-dom'
+import React, { createRef, CSSProperties, PureComponent } from 'react'
+import styled, { css, FlattenSimpleInterpolation } from 'styled-components'
+import Panorama from './Panorama'
+import { ExtendedCSSProps } from './types'
 
 type IndicatorCSSProps = Readonly<{
-  isDragging: boolean;
-  reticleWidth: number;
-}>;
+  isDragging: boolean
+  reticleWidth: number
+}>
 
 type ReticleCSSProps = Readonly<{
-  isDragging: boolean;
-}>;
+  isDragging: boolean
+}>
 
 type GutterCSSProps = Readonly<{
-  isDragging: boolean;
-}>;
+  isDragging: boolean
+}>
 
 interface Props {
   /**
    * Class attribute of the root element.
    */
-  className?: string;
+  className?: string
 
   /**
    * Inline style attribute of the root element.
    */
-  style: CSSProperties;
+  style: CSSProperties
 
   /**
    * Default angle (0 - 360 degrees, inclusive) of the slider. 0 is the
    * beginning of the image, 360 is the end.
    */
-  defaultAngle: number;
+  defaultAngle: number
 
   /**
    * Field-of-view (0 - 360 degrees, inclusive) that represents the size of the
@@ -40,7 +40,7 @@ interface Props {
    * unspecified, the component will attempt to automatically calculate the FOV
    * using the `targetViewportSize` prop.
    */
-  fov?: number;
+  fov?: number
 
   /**
    * Size of the viewport that this component is controlling. A viewport can be
@@ -48,53 +48,53 @@ interface Props {
    * to automatically calculate the FOV if `fov` prop is not specified. If it
    * is, this prop is ignored.
    */
-  viewportSize?: Size;
+  viewportSize?: Size
 
   /**
    * Sliding speed of the reticle.
    */
-  speed: number;
+  speed: number
 
   /**
    * Image source.
    */
-  src: string;
+  src: string
 
   /**
    * Handler invoked when the sliding angle changes.
    */
-  onAngleChange?: (angle: number) => void;
+  onAngleChange?: (angle: number) => void
 
   /**
    * Handler invoked when the image is loaded.
    */
-  onImageLoad?: (image: HTMLImageElement) => void;
+  onImageLoad?: (image: HTMLImageElement) => void
 
   /**
    * Handler invoked when the sliding position changes.
    */
-  onPositionChange?: (position: number) => void;
+  onPositionChange?: (position: number) => void
 
   /**
    * Additional CSS to be provided to the reticle.
    */
-  reticleCSS?: (props: ReticleCSSProps) => FlattenSimpleInterpolation;
+  reticleCSS?: (props: ReticleCSSProps) => FlattenSimpleInterpolation
 
   /**
    * Additional CSS to be provided to the gutter.
    */
-  gutterCSS?: (props: GutterCSSProps) => FlattenSimpleInterpolation;
+  gutterCSS?: (props: GutterCSSProps) => FlattenSimpleInterpolation
 
   /**
    * Additional CSS to be provided to the indicator.
    */
-  indicatorCSS?: (props: GutterCSSProps) => FlattenSimpleInterpolation;
+  indicatorCSS?: (props: GutterCSSProps) => FlattenSimpleInterpolation
 
 }
 
 interface State {
-  isDragging: boolean;
-  imageSize: Size;
+  isDragging: boolean
+  imageSize: Size
 }
 
 export default class PanoramaSlider extends PureComponent<Props, State> implements UpdateDelegator {
@@ -102,84 +102,84 @@ export default class PanoramaSlider extends PureComponent<Props, State> implemen
     defaultAngle: 0,
     speed: 2,
     style: {},
-  };
+  }
 
-  updateDelegate?: UpdateDelegate = undefined;
+  updateDelegate?: UpdateDelegate = undefined
 
   nodeRefs = {
     root: createRef<HTMLDivElement>(),
     panorama: createRef<Panorama>(),
-  };
+  }
 
-  private lastHeight: number = 0;
+  private lastHeight = 0
 
   constructor(props: Props) {
-    super(props);
+    super(props)
 
     if (this.props.fov === undefined && this.props.viewportSize === undefined) {
-      throw new Error('Either `fov` or `viewportSize` must be specified');
+      throw new Error('Either `fov` or `viewportSize` must be specified')
     }
 
     this.state = {
       imageSize: new Size(),
       isDragging: false,
-    };
+    }
   }
 
   get imageAspectRatio(): number {
-    const { width, height } = this.state.imageSize;
-    if (height === 0) return 0;
-    return width / height;
+    const { width, height } = this.state.imageSize
+    if (height === 0) return 0
+    return width / height
   }
 
   get reticleWidth(): number {
-    let fov = 0;
+    let fov = 0
 
     if (this.props.fov !== undefined) {
-      fov = this.props.fov;
+      fov = this.props.fov
     }
     else if (this.props.viewportSize !== undefined) {
-      fov = (this.props.viewportSize.width / (this.props.viewportSize.height * this.imageAspectRatio)) * 360;
+      fov = (this.props.viewportSize.width / (this.props.viewportSize.height * this.imageAspectRatio)) * 360
     }
 
-    fov = Math.max(0, Math.min(360, fov));
+    fov = Math.max(0, Math.min(360, fov))
 
-    const maxWidth = (Rect.from(this.nodeRefs.root.current)?.height ?? 0) * this.imageAspectRatio;
-    const width = maxWidth * (fov / 360);
-    return Math.min(maxWidth, width);
+    const maxWidth = (Rect.from(this.nodeRefs.root.current)?.height ?? 0) * this.imageAspectRatio
+    const width = maxWidth * (fov / 360)
+    return Math.min(maxWidth, width)
   }
 
   componentDidMount() {
-    this.reconfigureUpdateDelegate();
+    this.reconfigureUpdateDelegate()
   }
 
   componentWillUnmount() {
-    this.updateDelegate?.deinit();
+    this.updateDelegate?.deinit()
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
     if (prevState.imageSize !== this.state.imageSize) {
-      this.nodeRefs.panorama.current?.resetPosition();
+      this.nodeRefs.panorama.current?.resetPosition()
     }
 
-    this.reconfigureUpdateDelegate();
+    this.reconfigureUpdateDelegate()
   }
 
   update(info: DirtyInfo) {
-    const { [DirtyType.SIZE]: dirtySize } = info;
+    const { [DirtyType.SIZE]: dirtySize } = info
 
     if (dirtySize) {
       if (this.lastHeight !== dirtySize.minSize.height) {
-        this.forceUpdate();
-        this.lastHeight = dirtySize.minSize.height;
+        this.forceUpdate()
+        this.lastHeight = dirtySize.minSize.height
       }
     }
   }
 
   render() {
-    const { className, defaultAngle, speed, src } = this.props;
-    const { isDragging } = this.state;
-    const reticleWidth = this.reticleWidth;
+    const { className, defaultAngle, speed, src } = this.props
+    const { isDragging } = this.state
+    const reticleWidth = this.reticleWidth
 
     return (
       <StyledRoot
@@ -230,44 +230,44 @@ export default class PanoramaSlider extends PureComponent<Props, State> implemen
           extendedCSS={this.props.indicatorCSS ?? (() => css``)}
         />
       </StyledRoot>
-    );
+    )
   }
 
   setAngle(angle: number) {
-    this.nodeRefs.panorama.current?.setAngle(angle);
+    this.nodeRefs.panorama.current?.setAngle(angle)
   }
 
   private reconfigureUpdateDelegate() {
-    this.updateDelegate?.deinit();
+    this.updateDelegate?.deinit()
 
     this.updateDelegate = new UpdateDelegate(this, {
       [EventType.RESIZE]: {
         target: this.nodeRefs.root.current,
       },
-    });
+    })
 
-    this.updateDelegate?.init();
+    this.updateDelegate?.init()
   }
 
   private onDragStart = () => {
-    this.setState({ isDragging: true });
+    this.setState({ isDragging: true })
   }
 
   private onDragEnd = () => {
-    this.setState({ isDragging: false });
+    this.setState({ isDragging: false })
   }
 
   private onAngleChange = (angle: number) => {
-    this.props.onAngleChange?.(angle);
+    this.props.onAngleChange?.(angle)
   }
 
   private onPositionChange = (position: number) => {
-    this.props.onPositionChange?.(position);
+    this.props.onPositionChange?.(position)
   }
 
   private onImageLoad = (image: HTMLImageElement) => {
-    this.setState({ imageSize: new Size([image.width, image.height]) });
-    this.props.onImageLoad?.(image);
+    this.setState({ imageSize: new Size([image.width, image.height]) })
+    this.props.onImageLoad?.(image)
   }
 }
 
@@ -280,7 +280,7 @@ const StyledReticle = styled.div<ReticleCSSProps & ExtendedCSSProps<ReticleCSSPr
   transition-timing-function: ease-out;
   will-change: background;
   ${props => props.extendedCSS(props)}
-  `;
+  `
 
 const StyledGutter = styled.div<GutterCSSProps & ExtendedCSSProps<GutterCSSProps>>`
   background: rgba(0, 0, 0, .7);
@@ -289,7 +289,7 @@ const StyledGutter = styled.div<GutterCSSProps & ExtendedCSSProps<GutterCSSProps
   height: 100%;
   pointer-events: none;
   ${props => props.extendedCSS(props)}
-`;
+`
 
 const StyledSlideTrack = styled.div`
   box-sizing: border-box;
@@ -313,7 +313,7 @@ const StyledSlideTrack = styled.div`
     top: 0;
     width: 100%;
   }
-`;
+`
 
 const StyledIndicator = styled.div<IndicatorCSSProps & ExtendedCSSProps<IndicatorCSSProps>>`
   background: #fff;
@@ -328,10 +328,10 @@ const StyledIndicator = styled.div<IndicatorCSSProps & ExtendedCSSProps<Indicato
   opacity: ${props => props.isDragging ? 1 : 0};
   transition: opacity .3s ease-out;
   width: ${props => props.reticleWidth}px;
-`;
+`
 
 const StyledRoot = styled.div`
   box-sizing: border-box;
   display: block;
   flex: 0 0 auto;
-`;
+`

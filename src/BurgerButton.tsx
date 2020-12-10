@@ -1,23 +1,23 @@
-import React, { CSSProperties, Fragment, PureComponent } from 'react';
-import styled from 'styled-components';
+import React, { CSSProperties, Fragment, PureComponent } from 'react'
+import styled from 'styled-components'
 
 interface Props {
-  className?: string;
-  style: CSSProperties;
-  isActiveByDefault: boolean;
-  isDoubleJointed: boolean;
-  isFunky: boolean;
-  height: number;
-  thickness: number;
-  width: number;
-  tintColor: string;
-  transitionDuration: number;
-  onActivate?: () => void;
-  onDeactivate?: () => void;
+  className?: string
+  style: CSSProperties
+  isActiveByDefault: boolean
+  isDoubleJointed: boolean
+  isFunky: boolean
+  height: number
+  thickness: number
+  width: number
+  tintColor: string
+  transitionDuration: number
+  onActivate?: () => void
+  onDeactivate?: () => void
 }
 
 interface State {
-  isActive: boolean;
+  isActive: boolean
 }
 
 class BurgerButton extends PureComponent<Props, State> {
@@ -31,44 +31,44 @@ class BurgerButton extends PureComponent<Props, State> {
     tintColor: '#000',
     transitionDuration: 200,
     width: 20,
-  };
+  }
 
   constructor(props: Props) {
-    super(props);
+    super(props)
 
     this.state = {
       isActive: this.props.isActiveByDefault,
-    };
+    }
   }
 
   toggle() {
     if (this.state.isActive) {
-      this.deactivate();
+      this.deactivate()
     }
     else {
-      this.activate();
+      this.activate()
     }
   }
 
   activate() {
-    if (this.state.isActive) return;
-    this.setState({ isActive: true });
-    if (this.props.onActivate) this.props.onActivate();
+    if (this.state.isActive) return
+    this.setState({ isActive: true })
+    if (this.props.onActivate) this.props.onActivate()
   }
 
   deactivate() {
-    if (!this.state.isActive) return;
-    this.setState({ isActive: false });
-    if (this.props.onDeactivate) this.props.onDeactivate();
+    if (!this.state.isActive) return
+    this.setState({ isActive: false })
+    if (this.props.onDeactivate) this.props.onDeactivate()
   }
 
   render() {
-    const w = this.props.width * 0.5;
-    const h = this.props.height * 0.5;
-    const t = this.props.thickness * 0.5;
-    const d = 45;
-    const r = d * Math.PI / 180;
-    const n = this.props.isDoubleJointed ? 2 : 1;
+    const w = this.props.width * 0.5
+    const h = this.props.height * 0.5
+    const t = this.props.thickness * 0.5
+    const d = 45
+    const r = d * Math.PI / 180
+    const n = this.props.isDoubleJointed ? 2 : 1
 
     return (
       <StyledRoot
@@ -101,26 +101,26 @@ class BurgerButton extends PureComponent<Props, State> {
           </Fragment>
         )}
       </StyledRoot>
-    );
+    )
   }
 }
 
-export default BurgerButton;
+export default BurgerButton
 
 const StyledRoot = styled.button<{
-  isActive: boolean;
-  width: number;
-  height: number;
-  thickness: number;
-  tintColor: string;
-  isDoubleJointed: boolean;
-  isFunky: boolean;
-  transitionDuration: number;
-  w: number;
-  h: number;
-  t: number;
-  d: number;
-  r: number;
+  isActive: boolean
+  width: number
+  height: number
+  thickness: number
+  tintColor: string
+  isDoubleJointed: boolean
+  isFunky: boolean
+  transitionDuration: number
+  w: number
+  h: number
+  t: number
+  d: number
+  r: number
 }>`
   background: transparent;
   border: none;
@@ -251,4 +251,4 @@ const StyledRoot = styled.button<{
       width: ${props => props.width}px;
     }
   }
-`;
+`

@@ -1,28 +1,33 @@
-import $$ExpandIcon from '!!raw-loader!../assets/images/expand-icon.svg';
-import { animations, container, selectors } from 'promptu';
-import React, { Fragment, PureComponent, SFC } from 'react';
-import { hot } from 'react-hot-loader/root';
-import styled, { css } from 'styled-components';
-import Accordion, { ItemComponentProps } from '../../../src/Accordion';
-import DebugConsole from '../../../src/DebugConsole';
-import { Orientation } from '../../../src/types';
+import $$ExpandIcon from '!!raw-loader!../assets/images/expand-icon.svg'
+import { animations, container, selectors } from 'promptu'
+import React, { Fragment, FunctionComponent, PureComponent } from 'react'
+import { hot } from 'react-hot-loader/root'
+import styled, { css } from 'styled-components'
+import Accordion, { ItemComponentProps } from '../../../src/Accordion'
+import DebugConsole from '../../../src/DebugConsole'
+import { Orientation } from '../../../src/types'
 
 export interface Props {}
 
 export interface State {
-  itemIndex: number;
-  sectionIndex: number;
+  itemIndex: number
+  sectionIndex: number
 }
 
-const ItemComponent: SFC<ItemComponentProps<string>> = ({ data, orientation, isSelected, onClick, style }) => (
+const ItemComponent: FunctionComponent<ItemComponentProps<string>> = ({
+  data,
+  orientation,
+  isSelected, onClick,
+  style,
+}: ItemComponentProps<string>) => (
   <StyledItem orientation={orientation} isSelected={isSelected ?? false} onClick={() => onClick?.()} style={style}>{data}</StyledItem>
-);
+)
 
-export default hot(class extends PureComponent<Props, State> {
+export default hot(class Container extends PureComponent<Props, State> {
   state: State = {
     itemIndex: -1,
     sectionIndex: -1,
-  };
+  }
 
   render() {
     return (
@@ -79,13 +84,13 @@ export default hot(class extends PureComponent<Props, State> {
           }}
         />
       </Fragment>
-    );
+    )
   }
-});
+})
 
 const StyledItem = styled.button<{
-  isSelected: boolean;
-  orientation: Orientation;
+  isSelected: boolean
+  orientation: Orientation
 }>`
   ${container.fvcc}
   ${animations.transition(['transform', 'background', 'color'], 100)}
@@ -108,7 +113,7 @@ const StyledItem = styled.button<{
     background: #2b14d4;
     color: #fff;
   }
-`;
+`
 
 const StyledRoot = styled.div`
   ${container.fhcc}
@@ -116,4 +121,4 @@ const StyledRoot = styled.div`
   perspective: 80rem;
   width: 100%;
   height: 100%;
-`;
+`

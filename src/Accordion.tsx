@@ -1,77 +1,77 @@
-import React, { ComponentType, createRef, CSSProperties, PureComponent, RefObject } from 'react';
-import styled, { css } from 'styled-components';
-import List, { ItemComponentProps as ListItemComponentProps } from './List';
-import { ExtendedCSSFunction, ExtendedCSSProps, Orientation } from './types';
+import React, { ComponentType, createRef, CSSProperties, PureComponent, RefObject } from 'react'
+import styled, { css } from 'styled-components'
+import List, { ItemComponentProps as ListItemComponentProps } from './List'
+import { ExtendedCSSFunction, ExtendedCSSProps, Orientation } from './types'
 
-const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:accordion') : () => {};
+const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:accordion') : () => {}
 
 /**
  * Interface defining the props of the item component type to be provided to the
  * component. The data type is generic.
  */
-export type ItemComponentProps<T = {}> = ListItemComponentProps<T>;
+export type ItemComponentProps<T = Record<string, never>> = ListItemComponentProps<T>
 
 type SectionHeaderCSSProps = Readonly<{
-  borderColor: string;
-  borderThickness: number;
-  isCollapsed: boolean;
-  orientation: Orientation;
-}>;
+  borderColor: string
+  borderThickness: number
+  isCollapsed: boolean
+  orientation: Orientation
+}>
 
 type SectionCSSProps = Readonly<{
-  isCollapsed: boolean;
-  orientation: Orientation;
-}>;
+  isCollapsed: boolean
+  orientation: Orientation
+}>
 
-interface SectionProps<T = {}> {
-  label: string;
-  items: Array<T>;
+interface SectionProps<T = Record<string, never>> {
+  label: string
+  items: Array<T>
 }
 
-interface Props<T = {}> {
+interface Props<T = Record<string, never>> {
   /**
    * Class attribute to the root element.
    */
-  className?: string;
+  className?: string
 
   /**
    * Inline style attribute to the element.
    */
-  style?: CSSProperties;
+  style?: CSSProperties
 
   /**
    * Data provided to each section.
    */
-  data: Array<SectionProps<T>>;
+  data: Array<SectionProps<T>>
 
   /**
    * Indicates if sections can be toggled, as in, once a section is expanded,
    * it collapses when being selected again.
    */
-  isTogglable?: boolean;
+  isTogglable?: boolean
 
   /**
    * Index of the section that is selected by default. Any value less than 0
    * indicates that no section is selected by default.
    */
-  defaultSelectedSectionIndex?: number;
+  defaultSelectedSectionIndex?: number
 
   /**
    * Length (in pixels) of each item. This does not apply to the section hedaer
    * itself. Length refers to the height in vertical orientation and width in
    * horizontal orientation.
    */
-  itemLength?: number;
+  itemLength?: number
 
   /**
    * Padding (in pixels) between each item.
    */
-  itemPadding?: number;
+  itemPadding?: number
 
   /**
    * Padding (in pixels) between each section.
    */
-  sectionPadding?: number;
+  sectionPadding?: number
 
   /**
    * Maximum number of items that are viside when a section expands. When a
@@ -80,109 +80,109 @@ interface Props<T = {}> {
    * remaining items. Any value less than 0 indicates that all items will be
    * visible when a section expands.
    */
-  maxVisibleItems?: number;
+  maxVisibleItems?: number
 
   /**
    * Orientation of the component.
    */
-  orientation?: Orientation;
+  orientation?: Orientation
 
   /**
    * Color of the border of every item and the section header itself.
    */
-  borderColor?: string;
+  borderColor?: string
 
   /**
    * Thickness of the border (in pixels) of every item and the section header
    * itself. 0 indicates no borders.
    */
-  borderThickness?: number;
+  borderThickness?: number
 
   /**
    * SVG markup to be put in the section header as the expand icon.
    */
-  expandIconSvg?: string;
+  expandIconSvg?: string
 
   /**
    * React component type to be used for generating items inside the component.
    */
-  itemComponentType: ComponentType<ItemComponentProps<T>>;
+  itemComponentType: ComponentType<ItemComponentProps<T>>
 
   /**
    * Handler invoked when the selected item index of any section changes.
    */
-  onItemIndexChange?: (index: number) => void;
+  onItemIndexChange?: (index: number) => void
 
   /**
    * Handler invoked when the selected section index changes.
    */
-  onSectionIndexChange?: (index: number) => void;
+  onSectionIndexChange?: (index: number) => void
 
   /**
    * Additional CSS to be provided to each section element.
    */
-  sectionCSS?: ExtendedCSSFunction<SectionCSSProps>;
+  sectionCSS?: ExtendedCSSFunction<SectionCSSProps>
 
   /**
    * Additional CSS to be provided to each section header element.
    */
-  sectionHeaderCSS?: ExtendedCSSFunction<SectionHeaderCSSProps>;
+  sectionHeaderCSS?: ExtendedCSSFunction<SectionHeaderCSSProps>
 }
 
 interface State {
   /**
    * Current selected section index.
    */
-  selectedSectionIndex: number;
+  selectedSectionIndex: number
 
   /**
    * Current selected item index of the expanded section.
    */
-  selectedItemIndex: number;
+  selectedItemIndex: number
 }
 
-export default class Accordion<T = {}> extends PureComponent<Props<T>, State> {
+export default class Accordion<T = Record<string, never>> extends PureComponent<Props<T>, State> {
   nodeRefs = {
     lists: [] as Array<RefObject<List<T>>>,
-  };
+  }
 
   constructor(props: Props<T>) {
-    super(props);
+    super(props)
 
     this.state = {
       selectedSectionIndex: props.defaultSelectedSectionIndex ?? -1,
       selectedItemIndex: -1,
-    };
+    }
   }
 
   componentDidMount() {
-    this.props.onSectionIndexChange?.(this.state.selectedSectionIndex);
-    this.props.onItemIndexChange?.(this.state.selectedItemIndex);
+    this.props.onSectionIndexChange?.(this.state.selectedSectionIndex)
+    this.props.onItemIndexChange?.(this.state.selectedItemIndex)
   }
 
   componentDidUpdate(prevProps: Props<T>, prevState: State) {
     if (prevState.selectedSectionIndex !== this.state.selectedSectionIndex) {
-      debug(`Changing section index to ${this.state.selectedSectionIndex}... OK`);
-      this.props.onSectionIndexChange?.(this.state.selectedSectionIndex);
+      debug(`Changing section index to ${this.state.selectedSectionIndex}... OK`)
+      this.props.onSectionIndexChange?.(this.state.selectedSectionIndex)
     }
 
     if (prevState.selectedItemIndex !== this.state.selectedItemIndex) {
-      debug(`Changing item index to ${this.state.selectedItemIndex}... OK`);
-      this.props.onItemIndexChange?.(this.state.selectedItemIndex);
+      debug(`Changing item index to ${this.state.selectedItemIndex}... OK`)
+      this.props.onItemIndexChange?.(this.state.selectedItemIndex)
     }
   }
 
   render() {
-    const borderColor = this.props.borderColor ?? '#000';
-    const borderThickness = this.props.borderThickness ?? 0;
-    const isTogglable = this.props.isTogglable ?? true;
-    const itemLength = this.props.itemLength ?? 50;
-    const itemPadding = this.props.itemPadding ?? 0;
-    const sectionPadding = this.props.sectionPadding ?? 0;
-    const maxVisibleItems = this.props.maxVisibleItems ?? -1;
-    const orientation = this.props.orientation ?? 'vertical';
+    const borderColor = this.props.borderColor ?? '#000'
+    const borderThickness = this.props.borderThickness ?? 0
+    const isTogglable = this.props.isTogglable ?? true
+    const itemLength = this.props.itemLength ?? 50
+    const itemPadding = this.props.itemPadding ?? 0
+    const sectionPadding = this.props.sectionPadding ?? 0
+    const maxVisibleItems = this.props.maxVisibleItems ?? -1
+    const orientation = this.props.orientation ?? 'vertical'
 
-    this.nodeRefs.lists = [];
+    this.nodeRefs.lists = []
 
     return (
       <StyledRoot
@@ -198,13 +198,13 @@ export default class Accordion<T = {}> extends PureComponent<Props<T>, State> {
         }}
       >
         {this.props.data.map((section, i) => {
-          const numItems = section.items.length;
-          const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems);
-          const menuLength = (itemLength - borderThickness) * numVisibleItems + itemPadding * (numVisibleItems - 1) + borderThickness;
-          const isCollapsed = !this.isSectionSelectedAt(i);
-          const ref = createRef<List<T>>();
+          const numItems = section.items.length
+          const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
+          const menuLength = (itemLength - borderThickness) * numVisibleItems + itemPadding * (numVisibleItems - 1) + borderThickness
+          const isCollapsed = !this.isSectionSelectedAt(i)
+          const ref = createRef<List<T>>()
 
-          this.nodeRefs.lists.push(ref);
+          this.nodeRefs.lists.push(ref)
 
           return (
             <StyledSection
@@ -258,83 +258,83 @@ export default class Accordion<T = {}> extends PureComponent<Props<T>, State> {
                 }}
               />
             </StyledSection>
-          );
+          )
         })}
       </StyledRoot>
-    );
+    )
   }
 
   private isSectionSelectedAt(index: number): boolean {
-    return this.state.selectedSectionIndex === index;
+    return this.state.selectedSectionIndex === index
   }
 
   private toggleSectionAt(index: number) {
     if ((this.props.isTogglable ?? true) && this.isSectionSelectedAt(index)) {
-      this.deselectSectionAt(index);
+      this.deselectSectionAt(index)
     }
     else {
-      this.selectSectionAt(index);
+      this.selectSectionAt(index)
     }
   }
 
   private selectSectionAt(index: number) {
-    if (this.isSectionSelectedAt(index)) return;
+    if (this.isSectionSelectedAt(index)) return
 
     for (const ref of this.nodeRefs.lists) {
-      ref.current?.setState({ selectedIndex: -1 });
+      ref.current?.setState({ selectedIndex: -1 })
     }
 
     this.setState({
       selectedSectionIndex: index,
-    });
+    })
   }
 
   private deselectSectionAt(index: number) {
-    if (!this.isSectionSelectedAt(index)) return;
+    if (!this.isSectionSelectedAt(index)) return
 
     for (const ref of this.nodeRefs.lists) {
-      ref.current?.setState({ selectedIndex: -1 });
+      ref.current?.setState({ selectedIndex: -1 })
     }
 
     this.setState({
       selectedSectionIndex: -1,
-    });
+    })
   }
 
   private isItemSelectedAt(index: number): boolean {
-    return (this.state.selectedItemIndex === index);
+    return (this.state.selectedItemIndex === index)
   }
 
   private toggleItemAt(index: number) {
     if ((this.props.isTogglable ?? true) && this.isItemSelectedAt(index)) {
-      this.deselectItemAt(index);
+      this.deselectItemAt(index)
     }
     else {
-      this.selectItemAt(index);
+      this.selectItemAt(index)
     }
   }
 
   private selectItemAt(index: number) {
-    if (this.isItemSelectedAt(index)) return;
+    if (this.isItemSelectedAt(index)) return
 
     this.setState({
       selectedItemIndex: index,
-    });
+    })
   }
 
   private deselectItemAt(index: number) {
-    if (!this.isItemSelectedAt(index)) return;
+    if (!this.isItemSelectedAt(index)) return
 
     this.setState({
       selectedItemIndex: -1,
-    });
+    })
   }
 }
 
 const StyledItemList = styled(List)<{
-  itemPadding: number;
-  borderThickness: number;
-  orientation: Orientation;
+  itemPadding: number
+  borderThickness: number
+  orientation: Orientation
 }>`
   transition-duration: 100ms;
   transition-timing-function: ease-out;
@@ -350,7 +350,7 @@ const StyledItemList = styled(List)<{
     will-change: width, margin;
     left: 100%;
   `}
-`;
+`
 
 const StyledSectionHeader = styled.button<SectionHeaderCSSProps & ExtendedCSSProps<SectionHeaderCSSProps>>`
   align-items: center;
@@ -412,7 +412,7 @@ const StyledSectionHeader = styled.button<SectionHeaderCSSProps & ExtendedCSSPro
   `}
 
   ${props => props.extendedCSS(props)}
-`;
+`
 
 const StyledSection = styled.section<SectionCSSProps & ExtendedCSSProps<SectionCSSProps>>`
   align-items: flex-start;
@@ -433,10 +433,10 @@ const StyledSection = styled.section<SectionCSSProps & ExtendedCSSProps<SectionC
   `}
 
   ${props => props.extendedCSS(props)}
-`;
+`
 
 const StyledRoot = styled.div<{
-  orientation: Orientation;
+  orientation: Orientation
 }>`
   align-items: center;
   box-sizing: border-box;
@@ -451,4 +451,4 @@ const StyledRoot = styled.div<{
     ` : css`
     flex-direction: row;
   `}
-`;
+`

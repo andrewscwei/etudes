@@ -1,79 +1,79 @@
-import { Rect } from 'dirty-dom';
-import React, { ComponentType, createRef, PureComponent } from 'react';
-import styled, { css, CSSProperties } from 'styled-components';
-import List, { ItemComponentProps as ListItemComponentProps } from './List';
-import { ExtendedCSSFunction, ExtendedCSSProps, Orientation } from './types';
+import { Rect } from 'dirty-dom'
+import React, { ComponentType, createRef, PureComponent } from 'react'
+import styled, { css, CSSProperties } from 'styled-components'
+import List, { ItemComponentProps as ListItemComponentProps } from './List'
+import { ExtendedCSSFunction, ExtendedCSSProps, Orientation } from './types'
 
 type ButtonCSSProps = Readonly<{
-  borderColor: string;
-  borderThickness: number;
-  isActive: boolean;
-}>;
+  borderColor: string
+  borderThickness: number
+  isActive: boolean
+}>
 
 /**
  * Type constraint of the data passed to each item in the component.
  */
-export type DataProps<T = {}> = T & {
-  label?: string;
-};
+export type DataProps<T = Record<string, never>> = T & {
+  label?: string
+}
 
 /**
  * Interface defining the props of the item component type to be provided to the
  * component. The data type is generic.
  */
-export type ItemComponentProps<T = {}> = ListItemComponentProps<DataProps<T>>;
+export type ItemComponentProps<T = Record<string, never>> = ListItemComponentProps<DataProps<T>>
 
-export interface Props<T = {}> {
+export interface Props<T = Record<string, never>> {
   /**
    * Class attribute to the root element.
    */
-  className?: string;
+  className?: string
 
   /**
    * Inline style attribute to the element.
    */
-  style?: CSSProperties;
+  style?: CSSProperties
 
   /**
    * Data of every item in the component. This is used to generate individual
    * menu items. Data type is generic.
    */
-  data: Array<DataProps<T>>;
+  data: Array<DataProps<T>>
 
   /**
    * Indicates if the component is inverted (i.e. "dropup" instead of dropdown).
    * Supports all orientations.
    */
-  isInverted?: boolean;
+  isInverted?: boolean
 
   /**
    * Indicates if items can be toggled, i.e. they can be deselected if selected
    * again.
    */
-  isTogglable?: boolean;
+  isTogglable?: boolean
 
   /**
    * Thickness of the border (in pixels) of every item and the dropdown button
    * itself. 0 indicates no borders.
    */
-  borderThickness?: number;
+  borderThickness?: number
 
   /**
    * The index of the default selected item.
    */
-  defaultSelectedItemIndex?: number;
+  defaultSelectedItemIndex?: number
 
   /**
    * Length (in pixels) of each item. This does not apply to the dropdown button
    * itself. Length refers to the height in vertical orientation and width in
    * horizontal orientation.
    */
-  itemLength?: number;
+  itemLength?: number
 
   /**
    * Padding (in pixels) of each item.
    */
-  itemPadding?: number;
+  itemPadding?: number
 
   /**
    * Maximum number of items that are viside when the component expands. When a
@@ -82,42 +82,42 @@ export interface Props<T = {}> {
    * remaining items. Any value less than 0 indicates that all items will be
    * visible when the component expands.
    */
-  maxVisibleItems?: number;
+  maxVisibleItems?: number
 
   /**
    * Orientation of the component.
    */
-  orientation?: Orientation;
+  orientation?: Orientation
 
   /**
    * Color of the border of every item and the dropdown button itself.
    */
-  borderColor?: string;
+  borderColor?: string
 
   /**
    * The label to appear on the dropdown button when no items are selected.
    */
-  defaultLabel?: string;
+  defaultLabel?: string
 
   /**
    * SVG markup to be put in the dropdown button as the expand icon.
    */
-  expandIconSvg?: string;
+  expandIconSvg?: string
 
   /**
    * React component type to be used for generating items inside the component.
    */
-  itemComponentType: ComponentType<ItemComponentProps<T>>;
+  itemComponentType: ComponentType<ItemComponentProps<T>>
 
   /**
    * Handler invoked whenever the selected index changes.
    */
-  onIndexChange?: (index: number) => void;
+  onIndexChange?: (index: number) => void
 
   /**
    * Additional CSS to be provided to the dropdown button.
    */
-  buttonCSS?: ExtendedCSSFunction<ButtonCSSProps>;
+  buttonCSS?: ExtendedCSSFunction<ButtonCSSProps>
 }
 
 export interface State {
@@ -125,12 +125,12 @@ export interface State {
    * Index of the currently selected item. Any value less than 0 indicates that
    * no item is selected.
    */
-  selectedItemIndex: number;
+  selectedItemIndex: number
 
   /**
    * Indicates if the dropdown menu is collapsed.
    */
-  isCollapsed: boolean;
+  isCollapsed: boolean
 }
 
 /**
@@ -138,54 +138,54 @@ export interface State {
  * supports both horizontal and vertical orientations. Provide data and item
  * component type to this component to automatically generate menu items.
  */
-export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
+export default class Dropdown<T = Record<string, never>> extends PureComponent<Props<T>, State> {
   nodeRefs = {
     root: createRef<HTMLDivElement>(),
-  };
+  }
 
   constructor(props: Props<T>) {
-    super(props);
+    super(props)
 
     this.state = {
       selectedItemIndex: this.props.defaultSelectedItemIndex ?? -1,
       isCollapsed: true,
-    };
+    }
   }
 
   get rect(): Rect {
-    return Rect.from(this.nodeRefs.root.current) ?? new Rect();
+    return Rect.from(this.nodeRefs.root.current) ?? new Rect()
   }
 
   componentDidMount() {
-    window.addEventListener('click', this.onClickOutside);
-    this.props.onIndexChange?.(this.state.selectedItemIndex);
+    window.addEventListener('click', this.onClickOutside)
+    this.props.onIndexChange?.(this.state.selectedItemIndex)
   }
 
   componentWillUnmount() {
-    window.removeEventListener('click', this.onClickOutside);
+    window.removeEventListener('click', this.onClickOutside)
   }
 
   componentDidUpdate(prevProps: Props<T>, prevState: State) {
     if (prevState.selectedItemIndex !== this.state.selectedItemIndex) {
-      this.props.onIndexChange?.(this.state.selectedItemIndex);
+      this.props.onIndexChange?.(this.state.selectedItemIndex)
     }
 
     if (prevProps.orientation !== this.props.orientation) {
-      this.forceUpdate();
+      this.forceUpdate()
     }
   }
 
   render() {
-    const borderColor = this.props.borderColor ?? '#000';
-    const borderThickness = this.props.borderThickness ?? 1;
-    const orientation = this.props.orientation ?? 'vertical';
-    const itemLength = this.props.itemLength ?? (orientation === 'vertical' ? this.rect.height : this.rect.width);
-    const maxVisibleItems = this.props.maxVisibleItems ?? -1;
-    const isTogglable = this.props.isTogglable ?? true;
-    const itemPadding = this.props.itemPadding ?? 0;
-    const numItems = this.props.data.length;
-    const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems);
-    const menuLength = (itemLength - borderThickness) * numVisibleItems + itemPadding * (numVisibleItems - 1) + borderThickness;
+    const borderColor = this.props.borderColor ?? '#000'
+    const borderThickness = this.props.borderThickness ?? 1
+    const orientation = this.props.orientation ?? 'vertical'
+    const itemLength = this.props.itemLength ?? (orientation === 'vertical' ? this.rect.height : this.rect.width)
+    const maxVisibleItems = this.props.maxVisibleItems ?? -1
+    const isTogglable = this.props.isTogglable ?? true
+    const itemPadding = this.props.itemPadding ?? 0
+    const numItems = this.props.data.length
+    const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
+    const menuLength = (itemLength - borderThickness) * numVisibleItems + itemPadding * (numVisibleItems - 1) + borderThickness
 
     return (
       <StyledRoot
@@ -234,7 +234,7 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
           }}
         />
       </StyledRoot>
-    );
+    )
   }
 
   /**
@@ -246,7 +246,7 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
    *          otherwise.
    */
   isItemSelectedAt(index: number) {
-    return (this.state.selectedItemIndex === index);
+    return (this.state.selectedItemIndex === index)
   }
 
   /**
@@ -258,23 +258,23 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
     this.setState({
       selectedItemIndex: index,
       isCollapsed: true,
-    });
+    })
   }
 
   /**
    * Expands the menu, revealing its items.
    */
   expand() {
-    if (!this.state.isCollapsed) return;
-    this.setState({ isCollapsed: false });
+    if (!this.state.isCollapsed) return
+    this.setState({ isCollapsed: false })
   }
 
   /**
    * Collapses the menu, concealing its items.
    */
   collapse() {
-    if (this.state.isCollapsed) return;
-    this.setState({ isCollapsed: true });
+    if (this.state.isCollapsed) return
+    this.setState({ isCollapsed: true })
   }
 
   /**
@@ -282,10 +282,10 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
    */
   toggle() {
     if (this.state.isCollapsed) {
-      this.expand();
+      this.expand()
     }
     else {
-      this.collapse();
+      this.collapse()
     }
   }
 
@@ -296,34 +296,34 @@ export default class Dropdown<T = {}> extends PureComponent<Props<T>, State> {
    * @param event - The MouseEvent passed to the handler.
    */
   private onClickOutside = (event: MouseEvent) => {
-    if (this.state.isCollapsed) return;
-    if (!(event.target instanceof Node)) return;
+    if (this.state.isCollapsed) return
+    if (!(event.target instanceof Node)) return
 
-    let isOutside = true;
-    let node = event.target;
+    let isOutside = true
+    let node = event.target
 
     while (node) {
       if (node === this.nodeRefs.root.current) {
-        isOutside = false;
-        break;
+        isOutside = false
+        break
       }
 
-      if (!node.parentNode) break;
+      if (!node.parentNode) break
 
-      node = node.parentNode;
+      node = node.parentNode
     }
 
-    if (!isOutside) return;
+    if (!isOutside) return
 
-    this.collapse();
+    this.collapse()
   }
 }
 
 const StyledItemList = styled(List)<{
-  isInverted: boolean;
-  itemPadding: number;
-  borderThickness: number;
-  orientation: Orientation;
+  isInverted: boolean
+  itemPadding: number
+  borderThickness: number
+  orientation: Orientation
 }>`
   position: absolute;
 
@@ -355,7 +355,7 @@ const StyledItemList = styled(List)<{
       margin-left: ${props.itemPadding - props.borderThickness}px;
     `}
   `}
-`;
+`
 
 const StyledToggle = styled.button<ButtonCSSProps & ExtendedCSSProps<ButtonCSSProps>>`
   > span {
@@ -404,11 +404,11 @@ const StyledToggle = styled.button<ButtonCSSProps & ExtendedCSSProps<ButtonCSSPr
       width: auto;
     }
   }
-`;
+`
 
 const StyledRoot = styled.div<{
-  isInverted: boolean;
-  orientation: Orientation;
+  isInverted: boolean
+  orientation: Orientation
 }>`
   align-items: center;
   box-sizing: border-box;
@@ -427,4 +427,4 @@ const StyledRoot = styled.div<{
     height: 200px;
     width: 50px;
   `}
-`;
+`

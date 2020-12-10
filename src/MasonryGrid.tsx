@@ -1,22 +1,22 @@
-import { DirtyInfo, DirtyType, EventType, Rect, UpdateDelegate, UpdateDelegator } from 'dirty-dom';
-import React, { createRef, CSSProperties, PureComponent, ReactNode } from 'react';
-import styled from 'styled-components';
-import { Orientation } from './types';
+import { DirtyInfo, DirtyType, EventType, Rect, UpdateDelegate, UpdateDelegator } from 'dirty-dom'
+import React, { createRef, CSSProperties, PureComponent, ReactNode } from 'react'
+import styled from 'styled-components'
+import { Orientation } from './types'
 
-const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:masonry-grid') : () => {};
+const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:masonry-grid') : () => {}
 
 export interface Props {
-  className?: string;
-  style: CSSProperties;
-  children?: ReactNode | Array<ReactNode>;
-  areSectionsAligned: boolean;
-  isReversed: boolean;
-  horizontalSpacing: number;
-  orientation: Orientation;
-  sections: number;
-  verticalSpacing: number;
-  height?: string;
-  width?: string;
+  className?: string
+  style: CSSProperties
+  children?: ReactNode | Array<ReactNode>
+  areSectionsAligned: boolean
+  isReversed: boolean
+  horizontalSpacing: number
+  orientation: Orientation
+  sections: number
+  verticalSpacing: number
+  height?: string
+  width?: string
 }
 
 /**
@@ -45,39 +45,39 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
     sections: 3,
     style: {},
     verticalSpacing: 0,
-  };
+  }
 
-  static BASE_MODIFIER_CLASS_PREFIX: string = 'base-';
+  static BASE_MODIFIER_CLASS_PREFIX = 'base-'
 
   private nodeRefs = {
     root: createRef<HTMLDivElement>(),
-  };
+  }
 
-  private minWidth: number = NaN;
-  private maxWidth: number = NaN;
-  private minHeight: number = NaN;
-  private maxHeight: number = NaN;
+  private minWidth = NaN
+  private maxWidth = NaN
+  private minHeight = NaN
+  private maxHeight = NaN
 
-  private updateDelegate?: UpdateDelegate = undefined;
+  private updateDelegate?: UpdateDelegate = undefined
 
   get width(): number {
-    return Rect.from(this.nodeRefs.root.current)?.width ?? 0;
+    return Rect.from(this.nodeRefs.root.current)?.width ?? 0
   }
 
   get height(): number {
-    return Rect.from(this.nodeRefs.root.current)?.height ?? 0;
+    return Rect.from(this.nodeRefs.root.current)?.height ?? 0
   }
 
   componentDidMount() {
-    this.reconfigureUpdateDelegate();
+    this.reconfigureUpdateDelegate()
   }
 
   componentDidUpdate(prevProps: Props) {
-    this.reconfigureUpdateDelegate();
+    this.reconfigureUpdateDelegate()
   }
 
   componentWillUnmount() {
-    this.updateDelegate?.deinit();
+    this.updateDelegate?.deinit()
   }
 
   render() {
@@ -96,17 +96,17 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
       >
         {this.props.children}
       </StyledRoot>
-    );
+    )
   }
 
   update(info: DirtyInfo) {
-    const { [DirtyType.SIZE]: dirtySize } = info;
+    const { [DirtyType.SIZE]: dirtySize } = info
 
     if (dirtySize) {
       if ((this.minWidth !== this.width) || (this.minHeight !== this.height) || (dirtySize.maxSize.width !== this.maxWidth) || dirtySize.maxSize.height !== this.maxHeight) {
-        this.repositionChildren();
-        this.maxWidth = dirtySize.maxSize.width;
-        this.maxHeight = dirtySize.maxSize.height;
+        this.repositionChildren()
+        this.maxWidth = dirtySize.maxSize.width
+        this.maxHeight = dirtySize.maxSize.height
       }
     }
   }
@@ -115,106 +115,106 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
    * Repositions all the child elements of the grid.
    */
   private repositionChildren() {
-    const rootNode = this.nodeRefs.root.current;
+    const rootNode = this.nodeRefs.root.current
 
-    if (!rootNode) return;
+    if (!rootNode) return
 
-    debug('Repositioning children... OK');
+    debug('Repositioning children... OK')
 
-    const children = rootNode.children;
-    const numSections = this.props.sections;
+    const children = rootNode.children
+    const numSections = this.props.sections
 
-    if (numSections <= 0) throw new Error('You must specifiy a minimum of 1 section(s) (a.k.a. row(s) for horizontal orientation, column(s) for vertical orientation) for a MasonryGrid instance');
+    if (numSections <= 0) throw new Error('You must specifiy a minimum of 1 section(s) (a.k.a. row(s) for horizontal orientation, column(s) for vertical orientation) for a MasonryGrid instance')
 
     if (this.props.orientation === 'vertical') {
-      const sectionHeights: Array<number> = [...new Array(numSections)].map(() => 0);
+      const sectionHeights: Array<number> = [...new Array(numSections)].map(() => 0)
 
       for (let i = 0; i < children.length; i++) {
-        const child = children[i];
+        const child = children[i]
 
-        if (!(child instanceof HTMLElement)) continue;
+        if (!(child instanceof HTMLElement)) continue
 
-        const base = this.computeBaseFromElement(child);
-        const [colIdx, y] = this.computeNextAvailableSectionAndLengthByBase(sectionHeights, base);
+        const base = this.computeBaseFromElement(child)
+        const [colIdx, y] = this.computeNextAvailableSectionAndLengthByBase(sectionHeights, base)
 
-        child.style.position = 'absolute';
-        child.style.width = `calc(${100 / numSections * base}% - ${(this.props.horizontalSpacing * (numSections - 1) / numSections) * base}px + ${this.props.horizontalSpacing * (base - 1)}px)`;
-        child.style.height = '';
-        child.style.left = `calc(${100 / numSections * colIdx}% - ${(this.props.horizontalSpacing * (numSections - 1) / numSections) * colIdx}px + ${this.props.horizontalSpacing * colIdx}px)`;
-        child.style.top = `${y + (y === 0 ? 0 : this.props.verticalSpacing)}px`;
+        child.style.position = 'absolute'
+        child.style.width = `calc(${100 / numSections * base}% - ${(this.props.horizontalSpacing * (numSections - 1) / numSections) * base}px + ${this.props.horizontalSpacing * (base - 1)}px)`
+        child.style.height = ''
+        child.style.left = `calc(${100 / numSections * colIdx}% - ${(this.props.horizontalSpacing * (numSections - 1) / numSections) * colIdx}px + ${this.props.horizontalSpacing * colIdx}px)`
+        child.style.top = `${y + (y === 0 ? 0 : this.props.verticalSpacing)}px`
 
         for (let j = 0; j < base; j++) {
-          sectionHeights[colIdx + j] = y + (y === 0 ? 0 : this.props.verticalSpacing) + (Rect.from(child)?.height ?? 0);
+          sectionHeights[colIdx + j] = y + (y === 0 ? 0 : this.props.verticalSpacing) + (Rect.from(child)?.height ?? 0)
         }
 
         if (this.props.areSectionsAligned && ((colIdx + base) === numSections)) {
-          const m = this.computeMaxLength(sectionHeights);
+          const m = this.computeMaxLength(sectionHeights)
 
           for (let j = 0; j < numSections; j++) {
-            sectionHeights[j] = m;
+            sectionHeights[j] = m
           }
         }
       }
 
-      this.minWidth = this.width;
-      this.minHeight = this.computeMaxLength(sectionHeights, numSections);
-      rootNode.style.height = `${this.minHeight}px`;
+      this.minWidth = this.width
+      this.minHeight = this.computeMaxLength(sectionHeights, numSections)
+      rootNode.style.height = `${this.minHeight}px`
 
       if (this.props.isReversed) {
         for (let i = 0; i < children.length; i++) {
-          const child = children[i];
+          const child = children[i]
 
-          if (!(child instanceof HTMLElement)) continue;
+          if (!(child instanceof HTMLElement)) continue
 
-          const x = parseFloat(child.style.left);
+          const x = parseFloat(child.style.left)
 
-          child.style.left = `${this.width - x - parseFloat(child.style.width)}px`;
+          child.style.left = `${this.width - x - parseFloat(child.style.width)}px`
         }
       }
     }
     else {
-      const sectionWidths: Array<number> = [...new Array(numSections)].map(() => 0);
+      const sectionWidths: Array<number> = [...new Array(numSections)].map(() => 0)
 
       for (let i = 0; i < children.length; i++) {
-        const child = children[i];
+        const child = children[i]
 
-        if (!(child instanceof HTMLElement)) continue;
+        if (!(child instanceof HTMLElement)) continue
 
-        const base = this.computeBaseFromElement(child);
-        const [rowIdx, x] = this.computeNextAvailableSectionAndLengthByBase(sectionWidths, base);
+        const base = this.computeBaseFromElement(child)
+        const [rowIdx, x] = this.computeNextAvailableSectionAndLengthByBase(sectionWidths, base)
 
-        child.style.position = 'absolute';
-        child.style.width = '';
-        child.style.height = `calc(${100 / numSections * base}% - ${(this.props.verticalSpacing * (numSections - 1) / numSections) * base}px + ${this.props.verticalSpacing * (base - 1)}px)`;
-        child.style.top = `calc(${100 / numSections * rowIdx}% - ${(this.props.verticalSpacing * (numSections - 1) / numSections) * rowIdx}px + ${this.props.verticalSpacing * rowIdx}px)`;
-        child.style.left = `${x + (x === 0 ? 0 : this.props.horizontalSpacing)}px`;
+        child.style.position = 'absolute'
+        child.style.width = ''
+        child.style.height = `calc(${100 / numSections * base}% - ${(this.props.verticalSpacing * (numSections - 1) / numSections) * base}px + ${this.props.verticalSpacing * (base - 1)}px)`
+        child.style.top = `calc(${100 / numSections * rowIdx}% - ${(this.props.verticalSpacing * (numSections - 1) / numSections) * rowIdx}px + ${this.props.verticalSpacing * rowIdx}px)`
+        child.style.left = `${x + (x === 0 ? 0 : this.props.horizontalSpacing)}px`
 
         for (let j = 0; j < base; j++) {
-          sectionWidths[rowIdx + j] = x + (x === 0 ? 0 : this.props.horizontalSpacing) + (Rect.from(child)?.width ?? 0);
+          sectionWidths[rowIdx + j] = x + (x === 0 ? 0 : this.props.horizontalSpacing) + (Rect.from(child)?.width ?? 0)
         }
 
         if (this.props.areSectionsAligned && ((rowIdx + base) === numSections)) {
-          const m = this.computeMaxLength(sectionWidths);
+          const m = this.computeMaxLength(sectionWidths)
 
           for (let j = 0; j < numSections; j++) {
-            sectionWidths[j] = m;
+            sectionWidths[j] = m
           }
         }
       }
 
-      this.minHeight = this.height;
-      this.minWidth = this.computeMaxLength(sectionWidths, numSections);
-      if (!isNaN(this.minWidth)) rootNode.style.width = `${this.minWidth}px`;
+      this.minHeight = this.height
+      this.minWidth = this.computeMaxLength(sectionWidths, numSections)
+      if (!isNaN(this.minWidth)) rootNode.style.width = `${this.minWidth}px`
 
       if (this.props.isReversed) {
         for (let i = 0; i < children.length; i++) {
-          const child = children[i];
+          const child = children[i]
 
-          if (!(child instanceof HTMLElement)) continue;
+          if (!(child instanceof HTMLElement)) continue
 
-          const y = parseFloat(child.style.top);
+          const y = parseFloat(child.style.top)
 
-          child.style.top = `${this.height - y - parseFloat(child.style.height)}px`;
+          child.style.top = `${this.height - y - parseFloat(child.style.height)}px`
         }
       }
     }
@@ -232,36 +232,36 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
    *          length if a new item were to be placed in it.
    */
   private computeNextAvailableSectionAndLengthByBase(currentSectionLengths: Array<number>, base: number): [number, number] {
-    if (currentSectionLengths.length !== this.props.sections) throw new Error('Unmatched number of provided section lengths');
+    if (currentSectionLengths.length !== this.props.sections) throw new Error('Unmatched number of provided section lengths')
 
-    const numSections = currentSectionLengths.length;
+    const numSections = currentSectionLengths.length
 
-    let sectionIdx = NaN;
-    let minLength = Infinity;
+    let sectionIdx = NaN
+    let minLength = Infinity
 
     for (let i = 0; i < numSections; i++) {
-      const length = currentSectionLengths[i];
-      const isShorter = length < minLength;
-      const isEligibleSection = (i + base) <= numSections;
-      let hasRoomInSubsequentSections = true;
+      const length = currentSectionLengths[i]
+      const isShorter = length < minLength
+      const isEligibleSection = (i + base) <= numSections
+      let hasRoomInSubsequentSections = true
 
       for (let j = 1; j < base; j++) {
         if (currentSectionLengths[i + j] > length) {
-          hasRoomInSubsequentSections = false;
+          hasRoomInSubsequentSections = false
         }
       }
 
       if (isShorter && isEligibleSection && hasRoomInSubsequentSections) {
-        sectionIdx = i;
-        minLength = length;
+        sectionIdx = i
+        minLength = length
       }
     }
 
     if (isNaN(sectionIdx)) {
-      return [0, this.computeMaxLength(currentSectionLengths, base)];
+      return [0, this.computeMaxLength(currentSectionLengths, base)]
     }
     else {
-      return [sectionIdx, minLength];
+      return [sectionIdx, minLength]
     }
   }
 
@@ -279,15 +279,13 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
    * @returns The max section length.
    */
   private computeMaxLength(currentSectionLengths: Array<number>, base?: number): number {
-    let arr = currentSectionLengths;
+    let arr = currentSectionLengths
 
     if (base !== undefined && base !== null && !isNaN(base)) {
-      arr = arr.slice(0, Math.max(1, Math.min(base, currentSectionLengths.length)));
+      arr = arr.slice(0, Math.max(1, Math.min(base, currentSectionLengths.length)))
     }
 
-    return arr.reduce((out, curr, i) => {
-      return (curr > out) ? curr : out;
-    }, 0);
+    return arr.reduce((out, curr, i) => (curr > out) ? curr : out, 0)
   }
 
   /**
@@ -299,41 +297,41 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
    *          of sections.
    */
   private computeBaseFromElement(element: HTMLElement): number {
-    const classList = element.classList;
+    const classList = element.classList
 
     for (let i = 0; i < classList.length; i++) {
-      const c = classList[i];
+      const c = classList[i]
 
       if (c.startsWith(MasonryGrid.BASE_MODIFIER_CLASS_PREFIX)) {
-        const base = parseFloat(c.replace(MasonryGrid.BASE_MODIFIER_CLASS_PREFIX, ''));
-        if (!isNaN(base)) return Math.min(Math.max(base, 1), this.props.sections);
+        const base = parseFloat(c.replace(MasonryGrid.BASE_MODIFIER_CLASS_PREFIX, ''))
+        if (!isNaN(base)) return Math.min(Math.max(base, 1), this.props.sections)
       }
     }
 
-    return 1;
+    return 1
   }
 
   private reconfigureUpdateDelegate() {
-    this.updateDelegate?.deinit();
+    this.updateDelegate?.deinit()
 
     this.updateDelegate = new UpdateDelegate(this, {
       [EventType.RESIZE]: {
         target: this.nodeRefs.root.current,
       },
-    });
+    })
 
-    this.updateDelegate?.init();
+    this.updateDelegate?.init()
   }
 }
 
 const StyledRoot = styled.div<{
-  orientation: Props['orientation'];
+  orientation: Props['orientation']
 }>`
   box-sizing: border-box;
   display: block;
   height: ${props => props.orientation === 'vertical' ? 'auto' : '100%'};
   position: relative;
   width: ${props => props.orientation === 'horizontal' ? 'auto' : '100%'};
-`;
+`
 
-export default MasonryGrid;
+export default MasonryGrid

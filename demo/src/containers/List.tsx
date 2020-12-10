@@ -1,36 +1,47 @@
-import $$ExpandIcon from '!!raw-loader!../assets/images/expand-icon.svg';
-import { animations, container, selectors } from 'promptu';
-import React, { Fragment, PureComponent, SFC } from 'react';
-import { hot } from 'react-hot-loader/root';
-import styled, { css } from 'styled-components';
-import DebugConsole from '../../../src/DebugConsole';
-import Dropdown, { ItemComponentProps as DropdownItemComponentProps } from '../../../src/Dropdown';
-import List, { ItemComponentProps as ListItemComponentProps } from '../../../src/List';
-import { Orientation } from '../../../src/types';
+import $$ExpandIcon from '!!raw-loader!../assets/images/expand-icon.svg'
+import { animations, container, selectors } from 'promptu'
+import React, { Fragment, FunctionComponent, PureComponent } from 'react'
+import { hot } from 'react-hot-loader/root'
+import styled, { css } from 'styled-components'
+import DebugConsole from '../../../src/DebugConsole'
+import Dropdown, { ItemComponentProps as DropdownItemComponentProps } from '../../../src/Dropdown'
+import List, { ItemComponentProps as ListItemComponentProps } from '../../../src/List'
+import { Orientation } from '../../../src/types'
 
 export interface Props {}
 
 export interface State {
-  selectedItemIndex: number;
-  selectedOrientationIndex: number;
+  selectedItemIndex: number
+  selectedOrientationIndex: number
 }
 
-const DropdownItemComponent: SFC<DropdownItemComponentProps<{}>> = ({ data, isSelected, onClick, style }) => (
+const DropdownItemComponent: FunctionComponent<DropdownItemComponentProps> = ({
+  data,
+  isSelected,
+  onClick,
+  style,
+}: DropdownItemComponentProps) => (
   <StyledDropdownItem isSelected={isSelected ?? false} onClick={() => onClick?.()} style={style}>{data.label}</StyledDropdownItem>
-);
+)
 
-const ListItemComponent: SFC<ListItemComponentProps<string>> = ({ data, orientation, isSelected, onClick, style }) => (
+const ListItemComponent: FunctionComponent<ListItemComponentProps<string>> = ({
+  data,
+  orientation,
+  isSelected,
+  onClick,
+  style,
+}: ListItemComponentProps<string>) => (
   <StyledListItem orientation={orientation} isSelected={isSelected ?? false} onClick={() => onClick?.()} style={style}>{data}</StyledListItem>
-);
+)
 
-export default hot(class extends PureComponent<Props, State> {
+export default hot(class Container extends PureComponent<Props, State> {
   state: State = {
     selectedItemIndex: -1,
     selectedOrientationIndex: 0,
-  };
+  }
 
   render() {
-    const orientation = this.state.selectedOrientationIndex === 0 ? 'vertical' : 'horizontal';
+    const orientation = this.state.selectedOrientationIndex === 0 ? 'vertical' : 'horizontal'
 
     return (
       <Fragment>
@@ -110,12 +121,12 @@ export default hot(class extends PureComponent<Props, State> {
           }}
         />
       </Fragment>
-    );
+    )
   }
-});
+})
 
 const StyledDropdownItem = styled.button<{
-  isSelected: boolean;
+  isSelected: boolean
 }>`
   ${container.fvcl}
   ${animations.transition(['background', 'color'], 100)}
@@ -132,11 +143,11 @@ const StyledDropdownItem = styled.button<{
     background: #2b14d4;
     color: #fff;
   }
-`;
+`
 
 const StyledListItem = styled.button<{
-  isSelected: boolean;
-  orientation: Orientation;
+  isSelected: boolean
+  orientation: Orientation
 }>`
   ${container.fvcc}
   ${animations.transition('transform', 100)}
@@ -159,10 +170,10 @@ const StyledListItem = styled.button<{
     transform: translate3d(0, 0, 0) scale(1.1);
     z-index: 1;
   }
-`;
+`
 
 const StyledRoot = styled.div<{
-  orientation: Orientation;
+  orientation: Orientation
 }>`
   padding: 10rem 3rem;
   perspective: 80rem;
@@ -176,4 +187,4 @@ const StyledRoot = styled.div<{
     ${container.fhcl}
     overflow-y: hidden;
   `}
-`;
+`

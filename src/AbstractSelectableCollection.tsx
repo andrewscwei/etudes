@@ -1,17 +1,17 @@
-import React, { CSSProperties, Fragment, PureComponent } from 'react';
+import React, { CSSProperties, Fragment, PureComponent } from 'react'
 
-const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:asc') : () => {};
+const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:asc') : () => {}
 
 export interface Props {
   /**
    * Class attribute of the root element.
    */
-  className?: string;
+  className?: string
 
   /**
    * Inline style attribute of the root element.
    */
-  style?: CSSProperties;
+  style?: CSSProperties
 
   /**
    * Indicates whether selections can be toggled. For example, in the case of
@@ -19,7 +19,7 @@ export interface Props {
    * gets deselected when selected again. Being unable to toggle the row means
    * it does not get deselected when selected again.
    */
-  isTogglable?: boolean;
+  isTogglable?: boolean
 
   /**
    * Indicates whether selections are retained. For example, in the case of
@@ -28,23 +28,23 @@ export interface Props {
    * retain a selection means when the row is clicked, it does not become
    * selected. It is simply clicked and the subsequent event is dispatched.
    */
-  shouldStaySelected?: boolean;
+  shouldStaySelected?: boolean
 
   /**
    * The default selected index. Any value below 0 indicates that nothing is
    * selected.
    */
-  defaultSelectedIndex?: number;
+  defaultSelectedIndex?: number
 
   /**
    * Handler invoked when an index is deselected.
    */
-  onDeselectAt?: (index: number) => void;
+  onDeselectAt?: (index: number) => void
 
   /**
    * Handler invoked when an index is selected.
    */
-  onSelectAt?: (index: number) => void;
+  onSelectAt?: (index: number) => void
 }
 
 export interface State {
@@ -52,7 +52,7 @@ export interface State {
    * The current selected index. Any value less than 0 indicates that no index
    * is selected.
    */
-  selectedIndex?: number;
+  selectedIndex?: number
 }
 
 /**
@@ -61,36 +61,36 @@ export interface State {
  */
 export default class AbstractSelectableCollection<P extends Props = Props, S extends State = State> extends PureComponent<P, S> {
   constructor(props: P) {
-    super(props);
+    super(props)
 
     this.state = {
       selectedIndex: this.props.defaultSelectedIndex ?? -1,
-    } as any;
+    } as any
   }
 
   componentDidMount() {
     if (this.state.selectedIndex !== undefined && this.state.selectedIndex > -1) {
-      this.props.onSelectAt?.(this.state.selectedIndex ?? -1);
+      this.props.onSelectAt?.(this.state.selectedIndex ?? -1)
     }
   }
 
   componentDidUpdate(prevProps: P, prevState: S) {
-    const { shouldStaySelected, onSelectAt, onDeselectAt } = this.props;
-    const prevSelectedIndex = prevState.selectedIndex ?? -1;
-    const selectedIndex = this.state.selectedIndex ?? -1;
+    const { shouldStaySelected, onSelectAt, onDeselectAt } = this.props
+    const prevSelectedIndex = prevState.selectedIndex ?? -1
+    const selectedIndex = this.state.selectedIndex ?? -1
 
     if (prevState.selectedIndex !== selectedIndex) {
-      debug(`Selected index changed: ${selectedIndex}`);
+      debug(`Selected index changed: ${selectedIndex}`)
 
       if (shouldStaySelected === true) {
-        if (!this.isIndexOutOfRange(prevSelectedIndex)) onDeselectAt?.(prevSelectedIndex);
-        if (!this.isIndexOutOfRange(selectedIndex)) onSelectAt?.(selectedIndex);
+        if (!this.isIndexOutOfRange(prevSelectedIndex)) onDeselectAt?.(prevSelectedIndex)
+        if (!this.isIndexOutOfRange(selectedIndex)) onSelectAt?.(selectedIndex)
       }
     }
   }
 
   render() {
-    return <Fragment/>;
+    return <Fragment/>
   }
 
   /**
@@ -101,8 +101,8 @@ export default class AbstractSelectableCollection<P extends Props = Props, S ext
    * @returns `true` if the index is out of range, `false` otherwise.
    */
   isIndexOutOfRange(index: number): boolean {
-    if (index < 0) return true;
-    return false;
+    if (index < 0) return true
+    return false
   }
 
   /**
@@ -113,7 +113,7 @@ export default class AbstractSelectableCollection<P extends Props = Props, S ext
    * @returns `true` if the index is selected, `false` otherwise.
    */
   isSelectedAt(index: number): boolean {
-    return (this.state.selectedIndex === index);
+    return (this.state.selectedIndex === index)
   }
 
   /**
@@ -123,10 +123,10 @@ export default class AbstractSelectableCollection<P extends Props = Props, S ext
    */
   toggleAt(index: number) {
     if (this.props.isTogglable === true && this.isSelectedAt(index)) {
-      this.deselectAt(index);
+      this.deselectAt(index)
     }
     else {
-      this.selectAt(index);
+      this.selectAt(index)
     }
   }
 
@@ -137,11 +137,11 @@ export default class AbstractSelectableCollection<P extends Props = Props, S ext
    */
   selectAt(index: number) {
     if (this.props.shouldStaySelected === true) {
-      if (this.isSelectedAt(index)) return;
-      this.setState({ selectedIndex: index });
+      if (this.isSelectedAt(index)) return
+      this.setState({ selectedIndex: index })
     }
     else if (this.props.onSelectAt) {
-      this.props.onSelectAt(index);
+      this.props.onSelectAt(index)
     }
   }
 
@@ -151,14 +151,14 @@ export default class AbstractSelectableCollection<P extends Props = Props, S ext
    * @param index - The index to deselect.
    */
   deselectAt(index: number) {
-    if (!this.isSelectedAt(index)) return;
-    this.setState({ selectedIndex: -1 });
+    if (!this.isSelectedAt(index)) return
+    this.setState({ selectedIndex: -1 })
   }
 
   /**
    * Deselects the currently selected index.
    */
   deselectCurrent() {
-    this.setState({ selectedIndex: -1 });
+    this.setState({ selectedIndex: -1 })
   }
 }

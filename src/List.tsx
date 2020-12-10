@@ -1,49 +1,49 @@
-import React, { ComponentType, CSSProperties } from 'react';
-import styled, { css } from 'styled-components';
-import AbstractSelectableCollection, { Props as AbstractSelectableCollectionProps } from './AbstractSelectableCollection';
-import { Orientation } from './types';
+import React, { ComponentType, CSSProperties } from 'react'
+import styled, { css } from 'styled-components'
+import AbstractSelectableCollection, { Props as AbstractSelectableCollectionProps } from './AbstractSelectableCollection'
+import { Orientation } from './types'
 
 /**
  * Interface defining the props of the item component type to be provided to the
  * list. The data type is generic.
  */
-export interface ItemComponentProps<T = {}> {
+export interface ItemComponentProps<T = Record<string, never>> {
   /**
    * Class attribute of the root element.
    */
-  className?: string;
+  className?: string
 
   /**
    * Inline style attribute of the root element.
    */
-  style: CSSProperties;
+  style: CSSProperties
 
   /**
    * Data passed to the item component.
    */
-  data: T;
+  data: T
 
   /**
    * Indicates if the item is selected.
    */
-  isSelected?: boolean;
+  isSelected?: boolean
 
   /**
    * Orientation of the list.
    */
-  orientation: Orientation;
+  orientation: Orientation
 
   /**
    * Handler invoked when the item is clicked.
    */
-  onClick?: () => void;
+  onClick?: () => void
 }
 
-export interface Props<T = {}> extends AbstractSelectableCollectionProps {
+export interface Props<T = Record<string, never>> extends AbstractSelectableCollectionProps {
   /**
    * Generically typed data of each item.
    */
-  data: Array<T>;
+  data: Array<T>
 
   /**
    * Maximum length (in pixels) of this component. The definition of length here
@@ -52,48 +52,48 @@ export interface Props<T = {}> extends AbstractSelectableCollectionProps {
    * means height. If specified, the length will be capped at this value and the
    * component becomes scrollable.
    */
-  maxLength?: number;
+  maxLength?: number
 
   /**
    * Padding between every item (in pixels).
    */
-  itemPadding?: number;
+  itemPadding?: number
 
   /**
    * Thickness of item borders (in pixels). 0 indicates no borders.
    */
-  borderThickness?: number;
+  borderThickness?: number
 
   /**
    * Orientation of the list.
    */
-  orientation?: Orientation;
+  orientation?: Orientation
 
   /**
    * Color of item borders.
    */
-  borderColor?: string;
+  borderColor?: string
 
   /**
    * React component type to be used to generate items for this list.
    */
-  itemComponentType: ComponentType<ItemComponentProps<T>>;
+  itemComponentType: ComponentType<ItemComponentProps<T>>
 
   /**
    * Class attribute of the root element of the item component.
    */
-  itemClassName?: string;
+  itemClassName?: string
 
   /**
    * Inline style attribute of the root element of the item component.
    */
-  itemStyle?: CSSProperties;
+  itemStyle?: CSSProperties
 
   /**
    * Padding (in pixels) between the items and the scrollbar. Note that this is
    * unused if there is no scrollbar (i.e. max length is not specified).
    */
-  scrollBarPadding?: number;
+  scrollBarPadding?: number
 }
 
 /**
@@ -101,14 +101,14 @@ export interface Props<T = {}> extends AbstractSelectableCollectionProps {
  * provided React component type. The type of data passed to each item is
  * generic. This component supports both horizontal and vertical orientations.
  */
-export default class List<T = {}> extends AbstractSelectableCollection<Props<T>> {
+export default class List<T = Record<string, never>> extends AbstractSelectableCollection<Props<T>> {
   render() {
-    const ItemComponentType = this.props.itemComponentType;
-    const borderColor = this.props.borderColor ?? '#000';
-    const borderThickness = this.props.borderThickness ?? 0;
-    const maxLength = this.props.maxLength ?? -1;
-    const scrollBarPadding = maxLength < 0 ? 0 : (this.props.scrollBarPadding ?? 0);
-    const orientation = this.props.orientation ?? 'vertical';
+    const ItemComponentType = this.props.itemComponentType
+    const borderColor = this.props.borderColor ?? '#000'
+    const borderThickness = this.props.borderThickness ?? 0
+    const maxLength = this.props.maxLength ?? -1
+    const scrollBarPadding = maxLength < 0 ? 0 : (this.props.scrollBarPadding ?? 0)
+    const orientation = this.props.orientation ?? 'vertical'
 
     return (
       <StyledRoot
@@ -155,18 +155,18 @@ export default class List<T = {}> extends AbstractSelectableCollection<Props<T>>
           />
         ))}
       </StyledRoot>
-    );
+    )
   }
 
   isIndexOutOfRange(index: number): boolean {
-    if (index >= this.props.data.length) return true;
-    return super.isIndexOutOfRange(index);
+    if (index >= this.props.data.length) return true
+    return super.isIndexOutOfRange(index)
   }
 }
 
 const StyledRoot = styled.ol<{
-  itemPadding: number;
-  orientation: Props['orientation'];
+  itemPadding: number
+  orientation: Props['orientation']
 }>`
   counter-reset: item-counter;
   list-style: none;
@@ -192,4 +192,4 @@ const StyledRoot = styled.ol<{
       `}
     }
   }
-`;
+`

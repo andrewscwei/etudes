@@ -1,23 +1,23 @@
-import React, { PureComponent } from 'react';
-import styled, { CSSProperties } from 'styled-components';
+import React, { PureComponent } from 'react'
+import styled, { CSSProperties } from 'styled-components'
 
 interface Props {
   /**
    * Class attribute of the component.
    * @optional
    */
-  className?: string;
+  className?: string
 
   /**
    * Inline style attribute of the root element.
    * @optional
    */
-  style: CSSProperties;
+  style: CSSProperties
 
   /**
    * Current angle reading of the compass, between 0 - 360 (degrees), inclusive.
    */
-  angle: number;
+  angle: number
 
   /**
    * Field of view expressed in angles, must be between 0 and 360, exclusive.
@@ -26,44 +26,44 @@ interface Props {
    *          an image that is 1000 x 500, and the window size is 500 x 500,
    *          that would mean the FOV is 500 / 1000 * 360 = 180 degrees.
    */
-  fov: number;
+  fov: number
 
   /**
    * Radius of the component.
    * @optional
    */
-  radius: number;
+  radius: number
 
   /**
    * The thickness of the highlight indicator.
    * @optional
    */
-  highlightThickness: number;
+  highlightThickness: number
 
   /**
    * Color of the highlight indicator.
    * @optional
    */
-  highlightColor: string;
+  highlightColor: string
 
   /**
    * The color of the circular compass track.
    * @optional
    */
-  trackColor: string;
+  trackColor: string
 
   /**
    * The `stroke-dasharray` attribute provided to the circular compass track.
    * @optional
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray}
    */
-  trackDasharray: string;
+  trackDasharray: string
 
   /**
    * The thickness of the circular compass track.
    * @optional
    */
-  trackThickness: number;
+  trackThickness: number
 }
 
 export default class Compass extends PureComponent<Props> {
@@ -75,11 +75,11 @@ export default class Compass extends PureComponent<Props> {
     trackColor: '#fff',
     trackDasharray: '4',
     trackThickness: 2,
-  };
+  }
 
   render() {
-    const { className, highlightColor, highlightThickness, radius, trackColor, trackDasharray, trackThickness, style } = this.props;
-    const diameter = radius * 2;
+    const { className, highlightColor, highlightThickness, radius, trackColor, trackDasharray, trackThickness, style } = this.props
+    const diameter = radius * 2
 
     return (
       <StyledRoot
@@ -128,28 +128,28 @@ export default class Compass extends PureComponent<Props> {
           </svg>
         </StyledHighlight>
       </StyledRoot>
-    );
+    )
   }
 
   private polarToCartesian(centerX: number, centerY: number, radius: number, angleInDegrees: number) {
-    const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+    const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0
 
     return {
       x: centerX + (radius * Math.cos(angleInRadians)),
       y: centerY + (radius * Math.sin(angleInRadians)),
-    };
+    }
   }
 
   private describeArc(x: number, y: number, radius: number, startAngle: number, endAngle: number) {
-    const start = this.polarToCartesian(x, y, radius, endAngle);
-    const end = this.polarToCartesian(x, y, radius, startAngle);
-    const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
+    const start = this.polarToCartesian(x, y, radius, endAngle)
+    const end = this.polarToCartesian(x, y, radius, startAngle)
+    const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1'
     const d = [
       'M', start.x, start.y,
       'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y,
-    ];
+    ]
 
-    return d.join(' ');
+    return d.join(' ')
   }
 }
 
@@ -160,7 +160,7 @@ const StyledCircle = styled.div`
   height: 100%;
   position: absolute;
   transform-origin: center;
-`;
+`
 
 const StyledHighlight = styled.div`
   top: 0;
@@ -179,9 +179,9 @@ const StyledHighlight = styled.div`
     overflow: visible;
     position: absolute;
   }
-`;
+`
 
 const StyledRoot = styled.div`
   box-sizing: border-box;
   display: block;
-`;
+`

@@ -2,81 +2,81 @@
  * @file Client app root.
  */
 
-import { align, container, selectors } from 'promptu';
-import React, { createRef, Fragment, PureComponent } from 'react';
-import { hot } from 'react-hot-loader/root';
-import styled from 'styled-components';
-import BurgerButton from '../../../src/BurgerButton';
-import $$GithubIcon from '../assets/images/github-icon.svg';
-import Accordion from './Accordion';
-import Compass from './Compass';
-import List from './List';
-import MasonryGrid from './MasonryGrid';
-import Panorama from './Panorama';
-import Video from './Video';
+import { align, container, selectors } from 'promptu'
+import React, { createRef, Fragment, PureComponent } from 'react'
+import { hot } from 'react-hot-loader/root'
+import styled from 'styled-components'
+import BurgerButton from '../../../src/BurgerButton'
+import $$GithubIcon from '../assets/images/github-icon.svg'
+import Accordion from './Accordion'
+import Compass from './Compass'
+import List from './List'
+import MasonryGrid from './MasonryGrid'
+import Panorama from './Panorama'
+import Video from './Video'
 
-const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes') : () => {};
+const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes') : () => {}
 
 interface Props {}
 
 interface State {
-  isNavActive: boolean;
-  featuredComponent?: string;
+  isNavActive: boolean
+  featuredComponent?: string
 }
 
 class App extends PureComponent<Props, State> {
   nodeRefs = {
     burgerButton: createRef<BurgerButton>(),
-  };
+  }
 
   constructor(props: Props) {
-    super(props);
+    super(props)
 
     this.state = {
       isNavActive: false,
-    };
+    }
   }
 
   componentDidMount() {
-    window.addEventListener('hashchange', () => this.mapLocationToState());
-    this.mapLocationToState();
+    window.addEventListener('hashchange', () => this.mapLocationToState())
+    this.mapLocationToState()
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
     if (prevState.featuredComponent !== this.state.featuredComponent) {
-      this.mapStateToLocation();
-      this.nodeRefs.burgerButton.current?.deactivate();
+      this.mapStateToLocation()
+      this.nodeRefs.burgerButton.current?.deactivate()
     }
   }
 
   mapLocationToState() {
-    const hasHash = window.location.hash && window.location.hash !== '';
+    const hasHash = window.location.hash && window.location.hash !== ''
 
     this.setState({
       featuredComponent: hasHash ? window.location.hash.substring(1, window.location.hash.length) : undefined,
-    });
+    })
   }
 
   mapStateToLocation() {
-    window.location.hash = this.state.featuredComponent ?? '';
+    window.location.hash = this.state.featuredComponent ?? ''
   }
 
   renderFeaturedComponent() {
-    debug(`Loading component ID ${this.state.featuredComponent}... OK`);
+    debug(`Loading component ID ${this.state.featuredComponent}... OK`)
 
     switch (this.state.featuredComponent) {
-      case 'masonry-grid': return <MasonryGrid/>;
-      case 'list': return <List/>;
-      case 'accordion': return <Accordion/>;
-      case 'compass': return <Compass/>;
-      case 'video': return <Video/>;
-      case 'panorama': return <Panorama/>;
-      default: return (
-        <StyledIntroduction>
-          <h1>Études</h1>
-          <span>A study of styled React components</span>
-        </StyledIntroduction>
-      );
+    case 'masonry-grid': return <MasonryGrid/>
+    case 'list': return <List/>
+    case 'accordion': return <Accordion/>
+    case 'compass': return <Compass/>
+    case 'video': return <Video/>
+    case 'panorama': return <Panorama/>
+    default: return (
+      <StyledIntroduction>
+        <h1>Études</h1>
+        <span>A study of styled React components</span>
+      </StyledIntroduction>
+    )
     }
   }
 
@@ -123,14 +123,14 @@ class App extends PureComponent<Props, State> {
           <StyledGithubButton href='https://github.com/andrewscwei/etudes'/>
         </aside>
       </Fragment>
-    );
+    )
   }
 }
 
-export default hot(App);
+export default hot(App)
 
 const StyledNavButton = styled.button<{
-  isActive: boolean;
+  isActive: boolean
 }>`
   ${container.box}
   color: ${props => props.isActive ? '#2b14d4' : '#000'};
@@ -145,10 +145,10 @@ const StyledNavButton = styled.button<{
   ${selectors.hwot} {
     color: #2b14d4;
   }
-`;
+`
 
 const StyledNav = styled.nav<{
-  isActive: boolean;
+  isActive: boolean
 }>`
   ${container.fvtr}
   ${align.ftr}
@@ -160,7 +160,7 @@ const StyledNav = styled.nav<{
   transform: ${props => props.isActive ?
     'translate3d(0, 2rem, 5rem) rotateX(0deg) rotateY(-20deg) rotateZ(0deg)' :
     'translate3d(100%, 0, 5rem) rotateX(0deg) rotateY(0deg) rotateZ(0deg)'
-  };
+};
   pointer-events: ${props => props.isActive ? 'auto' : 'none'};
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
@@ -169,7 +169,7 @@ const StyledNav = styled.nav<{
   ${selectors.eblc} {
     margin-bottom: .6rem;
   }
-`;
+`
 
 const StyledIntroduction = styled.div`
   ${container.fvcc}
@@ -199,7 +199,7 @@ const StyledIntroduction = styled.div`
     letter-spacing: .1rem;
     transform: translate3d(0, 0, 10rem) rotateX(10deg) rotateY(-30deg) scale(1);
   }
-`;
+`
 
 const StyledBurgerButton = styled(BurgerButton)`
   ${align.ftr}
@@ -212,7 +212,7 @@ const StyledBurgerButton = styled(BurgerButton)`
   ${selectors.hwot} {
     transform: translate3d(0, 0, 10rem) rotateX(-5deg) rotateY(-20deg) scale(1.2);
   }
-`;
+`
 
 const StyledGithubButton = styled.a`
   ${container.box}
@@ -230,4 +230,4 @@ const StyledGithubButton = styled.a`
   ${selectors.hwot} {
     transform: translate3d(0, 0, 10rem) rotateX(-10deg) rotateY(10deg) scale(1.2);
   }
-`;
+`

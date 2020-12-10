@@ -1,33 +1,33 @@
-import { align, container, selectors } from 'promptu';
-import React, { Fragment, PureComponent } from 'react';
-import { hot } from 'react-hot-loader/root';
-import styled, { css } from 'styled-components';
-import Compass from '../../../src/Compass';
-import DebugConsole from '../../../src/DebugConsole';
-import RangeSlider from '../../../src/RangeSlider';
-import Slider from '../../../src/Slider';
+import { align, container, selectors } from 'promptu'
+import React, { Fragment, PureComponent } from 'react'
+import { hot } from 'react-hot-loader/root'
+import styled, { css } from 'styled-components'
+import Compass from '../../../src/Compass'
+import DebugConsole from '../../../src/DebugConsole'
+import RangeSlider from '../../../src/RangeSlider'
+import Slider from '../../../src/Slider'
 
 export interface Props {}
 
 export interface State {
-  position: number;
-  min: number;
-  max: number;
+  position: number
+  min: number
+  max: number
 }
 
-export default hot(class extends PureComponent<Props, State> {
+export default hot(class Container extends PureComponent<Props, State> {
   state: State = {
     position: 0,
     min: 0,
     max: 360,
-  };
+  }
 
   getAngleByPosition(position: number): number {
-    return position * (this.state.max - this.state.min) + this.state.min;
+    return position * (this.state.max - this.state.min) + this.state.min
   }
 
   render() {
-    const angle = this.getAngleByPosition(this.state.position);
+    const angle = this.getAngleByPosition(this.state.position)
 
     return (
       <Fragment>
@@ -100,9 +100,9 @@ export default hot(class extends PureComponent<Props, State> {
           style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
         />
       </Fragment>
-    );
+    )
   }
-});
+})
 
 const StyledRoot = styled.div`
   ${container.fhcc}
@@ -110,4 +110,4 @@ const StyledRoot = styled.div`
   padding: 10rem 3rem;
   perspective: 80rem;
   width: 100%;
-`;
+`

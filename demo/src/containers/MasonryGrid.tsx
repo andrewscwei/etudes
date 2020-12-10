@@ -2,22 +2,22 @@
  * @file Client app root.
  */
 
-import { container } from 'promptu';
-import React, { Fragment, PureComponent } from 'react';
-import { hot } from 'react-hot-loader/root';
-import styled from 'styled-components';
-import DebugConsole from '../../../src/DebugConsole';
-import MasonryGrid from '../../../src/MasonryGrid';
+import { container } from 'promptu'
+import React, { Fragment, PureComponent } from 'react'
+import { hot } from 'react-hot-loader/root'
+import styled from 'styled-components'
+import DebugConsole from '../../../src/DebugConsole'
+import MasonryGrid from '../../../src/MasonryGrid'
 
 export interface Props {}
 
 export interface State {}
 
-export default hot(class extends PureComponent<Props, State> {
+export default hot(class Container extends PureComponent<Props, State> {
   data = [...new Array(200)].map((v, i) => ({
     h: Math.floor(Math.random() * 6) + 1,
     b: Math.floor(Math.random() * 1) + 1,
-  }));
+  }))
 
   render() {
     return (
@@ -45,9 +45,9 @@ export default hot(class extends PureComponent<Props, State> {
           }}
         />
       </Fragment>
-    );
+    )
   }
-});
+})
 
 const StyledGridItem = styled.div`
   ${container.fvcc}
@@ -63,7 +63,7 @@ const StyledGridItem = styled.div`
   &.h-4 { height: 16rem; }
   &.h-5 { height: 20rem; }
   &.h-6 { height: 24rem; }
-`;
+`
 
 const StyledRoot = styled.div`
   ${container.fvtc}
@@ -71,4 +71,4 @@ const StyledRoot = styled.div`
   overflow-x: hidden;
   perspective: 80rem;
   width: 100%;
-`;
+`
