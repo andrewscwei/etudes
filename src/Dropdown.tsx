@@ -4,7 +4,7 @@ import styled, { css, CSSProperties } from 'styled-components'
 import List, { ItemComponentProps as ListItemComponentProps } from './List'
 import { ExtendedCSSFunction, ExtendedCSSProps, Orientation } from './types'
 
-type ButtonCSSProps = Readonly<{
+export type ButtonCSSProps = Readonly<{
   borderColor: string
   borderThickness: number
   isActive: boolean

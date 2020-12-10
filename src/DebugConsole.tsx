@@ -1,7 +1,7 @@
 import React, { createRef, CSSProperties, PureComponent } from 'react'
 import styled from 'styled-components'
 
-interface Props {
+export interface Props {
   className?: string
   style: CSSProperties
   margin: number
@@ -11,7 +11,7 @@ interface Props {
   title?: string
 }
 
-interface State {
+export interface State {
   messages: Array<string>
 }
 

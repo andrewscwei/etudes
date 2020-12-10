@@ -1,7 +1,7 @@
 import React, { CSSProperties, Fragment, PureComponent } from 'react'
 import styled from 'styled-components'
 
-interface Props {
+export interface Props {
   className?: string
   style: CSSProperties
   isActiveByDefault: boolean
@@ -16,7 +16,7 @@ interface Props {
   onDeactivate?: () => void
 }
 
-interface State {
+export interface State {
   isActive: boolean
 }
 

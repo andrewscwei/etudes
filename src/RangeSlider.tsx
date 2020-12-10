@@ -4,7 +4,7 @@ import React, { createRef, CSSProperties, PureComponent } from 'react'
 import styled, { css } from 'styled-components'
 import { ExtendedCSSFunction, ExtendedCSSProps, Orientation, Range } from './types'
 
-type KnobCSSProps = Readonly<{
+export type KnobCSSProps = Readonly<{
   radius: number
   tintColor: string
   hitboxPadding: number
@@ -13,23 +13,23 @@ type KnobCSSProps = Readonly<{
   isDisabled: boolean
 }>
 
-type GutterCSSProps = Readonly<{
+export type GutterCSSProps = Readonly<{
 }>
 
-type LabelCSSProps = Readonly<{
+export type LabelCSSProps = Readonly<{
   knobRadius: number
   orientation: Orientation
   isDragging: boolean
   isReleasing: boolean
 }>
 
-type HighlightCSSProps = Readonly<{
+export type HighlightCSSProps = Readonly<{
   tintColor: string
   isDragging: boolean
   isReleasing: boolean
 }>
 
-interface Props {
+export interface Props {
   className?: string
   style: CSSProperties
   defaultRange?: Range
@@ -49,7 +49,7 @@ interface Props {
   gutterCSS: ExtendedCSSFunction
 }
 
-interface State {
+export interface State {
   range: Range
   isDraggingStartingKnob: boolean
   isReleasingStartingKnob: boolean

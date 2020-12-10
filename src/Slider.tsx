@@ -146,7 +146,7 @@ export interface Props {
   labelCSS: ExtendedCSSFunction<LabelCSSProps>
 }
 
-interface State {
+export interface State {
   /**
    * Indicates if the knob is being dragged.
    */

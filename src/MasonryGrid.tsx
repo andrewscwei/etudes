@@ -324,6 +324,8 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
   }
 }
 
+export default MasonryGrid
+
 const StyledRoot = styled.div<{
   orientation: Props['orientation']
 }>`
@@ -333,5 +335,3 @@ const StyledRoot = styled.div<{
   position: relative;
   width: ${props => props.orientation === 'horizontal' ? 'auto' : '100%'};
 `
-
-export default MasonryGrid

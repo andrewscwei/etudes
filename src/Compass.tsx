@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import styled, { CSSProperties } from 'styled-components'
 
-interface Props {
+export interface Props {
   /**
    * Class attribute of the component.
    * @optional

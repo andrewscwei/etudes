@@ -11,24 +11,24 @@ const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:
  */
 export type ItemComponentProps<T = Record<string, never>> = ListItemComponentProps<T>
 
-type SectionHeaderCSSProps = Readonly<{
+export type SectionHeaderCSSProps = Readonly<{
   borderColor: string
   borderThickness: number
   isCollapsed: boolean
   orientation: Orientation
 }>
 
-type SectionCSSProps = Readonly<{
+export type SectionCSSProps = Readonly<{
   isCollapsed: boolean
   orientation: Orientation
 }>
 
-interface SectionProps<T = Record<string, never>> {
+export interface SectionProps<T = Record<string, never>> {
   label: string
   items: Array<T>
 }
 
-interface Props<T = Record<string, never>> {
+export interface Props<T = Record<string, never>> {
   /**
    * Class attribute to the root element.
    */
@@ -129,7 +129,7 @@ interface Props<T = Record<string, never>> {
   sectionHeaderCSS?: ExtendedCSSFunction<SectionHeaderCSSProps>
 }
 
-interface State {
+export interface State {
   /**
    * Current selected section index.
    */

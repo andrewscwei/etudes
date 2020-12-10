@@ -4,20 +4,20 @@ import styled, { css, FlattenSimpleInterpolation } from 'styled-components'
 import Panorama from './Panorama'
 import { ExtendedCSSProps } from './types'
 
-type IndicatorCSSProps = Readonly<{
+export type IndicatorCSSProps = Readonly<{
   isDragging: boolean
   reticleWidth: number
 }>
 
-type ReticleCSSProps = Readonly<{
+export type ReticleCSSProps = Readonly<{
   isDragging: boolean
 }>
 
-type GutterCSSProps = Readonly<{
+export type GutterCSSProps = Readonly<{
   isDragging: boolean
 }>
 
-interface Props {
+export interface Props {
   /**
    * Class attribute of the root element.
    */
@@ -92,7 +92,7 @@ interface Props {
 
 }
 
-interface State {
+export interface State {
   isDragging: boolean
   imageSize: Size
 }

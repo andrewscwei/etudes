@@ -3,7 +3,7 @@ import interact from 'interactjs'
 import React, { createRef, CSSProperties, PureComponent } from 'react'
 import styled from 'styled-components'
 
-interface Props {
+export interface Props {
   className?: string
   style: CSSProperties
   defaultAngle: number
@@ -16,7 +16,7 @@ interface Props {
   onPositionChange?: (position: number) => void
 }
 
-interface State {
+export interface State {
   angle: number
   position: number
   isDragging: boolean
