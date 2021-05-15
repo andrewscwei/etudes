@@ -311,16 +311,64 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
     return 1
   }
 
+  /**
+   * Reinitializes the update delegate. If there are images within the body
+   * of the masonry grid, the initialization will be deferred until all images
+   * are loaded.
+   */
   private reconfigureUpdateDelegate() {
     this.updateDelegate?.deinit()
 
     this.updateDelegate = new UpdateDelegate(this, {
-      [EventType.RESIZE]: {
-        target: this.nodeRefs.root.current,
-      },
+      [EventType.RESIZE]: true,
     })
 
-    this.updateDelegate?.init()
+    const imageSources = this.getAllImageSources(this.nodeRefs.root.current?.innerHTML)
+
+    if (imageSources.length > 0) {
+      let loaded = 0
+      let numImages = imageSources.length
+
+      for (let i = 0; i < numImages; i++) {
+        const src = imageSources[i]
+        const image = new Image()
+        image.src = src
+        image.onload = () => {
+          if (++loaded === numImages) this.updateDelegate?.init()
+        }
+      }
+    }
+    else {
+      this.updateDelegate?.init()
+    }
+  }
+
+  /**
+   * Scans an HTML string and returns all the image sources.
+   *
+   * @param htmlString The HTML string.
+   *
+   * @returns The image sources.
+   */
+  private getAllImageSources(htmlString?: string): Array<string> {
+    if (!htmlString) return []
+
+    const regexImg = /<img.*?src=("|')(.*?)("|')/g
+    const regexSrc = /<img.*?src=("|')(.*?)("|')/
+    const imageTags = htmlString.match(regexImg) ?? []
+
+    let out: Array<string> = []
+
+    for (let i = 0; i < imageTags.length; i++) {
+      const tag = imageTags[i]
+      const src = tag.match(regexSrc)?.[2]
+
+      if (!src) continue
+
+      out.push(src)
+    }
+
+    return out
   }
 }
 
