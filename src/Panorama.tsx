@@ -1,6 +1,6 @@
-import { Rect, Size } from 'dirty-dom'
 import interact from 'interactjs'
 import React, { createRef, CSSProperties, PureComponent } from 'react'
+import { Rect, Size } from 'spase'
 import styled from 'styled-components'
 
 export interface Props {

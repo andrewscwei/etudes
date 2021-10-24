@@ -12,7 +12,7 @@ export interface Props {
 }
 
 export interface State {
-  messages: Array<string>
+  messages: string[]
 }
 
 export default class DebugConsole extends PureComponent<Props, State> {

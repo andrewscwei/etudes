@@ -1,11 +1,10 @@
 import { align, container } from 'promptu'
 import React, { PureComponent } from 'react'
-import { hot } from 'react-hot-loader/root'
 import styled from 'styled-components'
 
 export interface Props {}
 
-export default hot(class Container extends PureComponent<Props> {
+export default class Container extends PureComponent<Props> {
   render() {
     return (
       <StyledRoot>
@@ -13,7 +12,7 @@ export default hot(class Container extends PureComponent<Props> {
       </StyledRoot>
     )
   }
-})
+}
 
 const StyledRoot = styled.div`
   ${container.box}

@@ -43,7 +43,7 @@ export interface Props<T = Record<string, never>> extends AbstractSelectableColl
   /**
    * Generically typed data of each item.
    */
-  data: Array<T>
+  data: T[]
 
   /**
    * Maximum length (in pixels) of this component. The definition of length here

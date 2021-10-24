@@ -1,5 +1,6 @@
-import { DirtyInfo, DirtyType, EventType, Rect, UpdateDelegate, UpdateDelegator } from 'dirty-dom'
+import { DirtyInfo, DirtyType, EventType, UpdateDelegate, UpdateDelegator } from 'dirty-dom'
 import React, { createRef, CSSProperties, PureComponent, ReactNode } from 'react'
+import { Rect } from 'spase'
 import styled from 'styled-components'
 import { Orientation } from './types'
 
@@ -8,7 +9,7 @@ const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:
 export interface Props {
   className?: string
   style: CSSProperties
-  children?: ReactNode | Array<ReactNode>
+  children?: ReactNode | ReactNode[]
   areSectionsAligned: boolean
   isReversed: boolean
   horizontalSpacing: number
@@ -127,7 +128,7 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
     if (numSections <= 0) throw new Error('You must specifiy a minimum of 1 section(s) (a.k.a. row(s) for horizontal orientation, column(s) for vertical orientation) for a MasonryGrid instance')
 
     if (this.props.orientation === 'vertical') {
-      const sectionHeights: Array<number> = [...new Array(numSections)].map(() => 0)
+      const sectionHeights: number[] = [...new Array(numSections)].map(() => 0)
 
       for (let i = 0; i < children.length; i++) {
         const child = children[i]
@@ -173,7 +174,7 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
       }
     }
     else {
-      const sectionWidths: Array<number> = [...new Array(numSections)].map(() => 0)
+      const sectionWidths: number[] = [...new Array(numSections)].map(() => 0)
 
       for (let i = 0; i < children.length; i++) {
         const child = children[i]
@@ -231,7 +232,7 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
    * @returns An array consiting of the computed section index and its to-be
    *          length if a new item were to be placed in it.
    */
-  private computeNextAvailableSectionAndLengthByBase(currentSectionLengths: Array<number>, base: number): [number, number] {
+  private computeNextAvailableSectionAndLengthByBase(currentSectionLengths: number[], base: number): [number, number] {
     if (currentSectionLengths.length !== this.props.sections) throw new Error('Unmatched number of provided section lengths')
 
     const numSections = currentSectionLengths.length
@@ -278,7 +279,7 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
    *
    * @returns The max section length.
    */
-  private computeMaxLength(currentSectionLengths: Array<number>, base?: number): number {
+  private computeMaxLength(currentSectionLengths: number[], base?: number): number {
     let arr = currentSectionLengths
 
     if (base !== undefined && base !== null && !isNaN(base)) {
@@ -327,7 +328,7 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
 
     if (imageSources.length > 0) {
       let loaded = 0
-      let numImages = imageSources.length
+      const numImages = imageSources.length
 
       for (let i = 0; i < numImages; i++) {
         const src = imageSources[i]
@@ -350,14 +351,14 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
    *
    * @returns The image sources.
    */
-  private getAllImageSources(htmlString?: string): Array<string> {
+  private getAllImageSources(htmlString?: string): string[] {
     if (!htmlString) return []
 
     const regexImg = /<img.*?src=("|')(.*?)("|')/g
     const regexSrc = /<img.*?src=("|')(.*?)("|')/
     const imageTags = htmlString.match(regexImg) ?? []
 
-    let out: Array<string> = []
+    const out: string[] = []
 
     for (let i = 0; i < imageTags.length; i++) {
       const tag = imageTags[i]

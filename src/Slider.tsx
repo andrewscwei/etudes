@@ -1,6 +1,6 @@
-import { Rect } from 'dirty-dom'
 import interact from 'interactjs'
 import React, { createRef, CSSProperties, PureComponent } from 'react'
+import { Rect } from 'spase'
 import styled, { css } from 'styled-components'
 import { ExtendedCSSFunction, ExtendedCSSProps, Orientation } from './types'
 
@@ -42,7 +42,7 @@ export interface Props {
    * If breakpoints are to be specified, ensure that there are at least two:
    * one for the start of the gutter and one for the end.
    */
-  breakpoints?: ReadonlyArray<BreakpointDescriptor>
+  breakpoints?: readonly BreakpointDescriptor[]
 
   /**
    * Indicates whether the knob automatically snaps to the nearest breakpoint,
@@ -214,32 +214,6 @@ export default class Slider extends PureComponent<Props, State> {
   }
 
   /**
-   * Generates a set of breakpoints compatible with this component.
-   *
-   * @param length - The number of breakpoints. This must be at least 2 because
-   *                 you must include the starting and ending points.
-   * @param labelIterator - Iterator function used for generating the label for
-   *                        each breakpoint.
-   *
-   * @returns An array of breakpoints.
-   */
-  static breakpointsFactory(length: number, labelIterator?: (index: number, position: number) => string): ReadonlyArray<BreakpointDescriptor> {
-    if (length <= 1) throw new Error('`length` value must be greater than or equal to 2')
-    if (Math.round(length) !== length) throw new Error('`length` value must be an integer')
-
-    const interval = 1 / (length - 1)
-
-    return Array(length).fill(null).map((v, i) => {
-      const pos = interval * i
-
-      return {
-        label: labelIterator?.(i, pos) ?? undefined,
-        position: pos,
-      }
-    })
-  }
-
-  /**
    * Computed rect of the root element.
    */
   get rect(): Rect {
@@ -324,6 +298,32 @@ export default class Slider extends PureComponent<Props, State> {
     }
 
     return idx
+  }
+
+  /**
+   * Generates a set of breakpoints compatible with this component.
+   *
+   * @param length - The number of breakpoints. This must be at least 2 because
+   *                 you must include the starting and ending points.
+   * @param labelIterator - Iterator function used for generating the label for
+   *                        each breakpoint.
+   *
+   * @returns An array of breakpoints.
+   */
+  static breakpointsFactory(length: number, labelIterator?: (index: number, position: number) => string): readonly BreakpointDescriptor[] {
+    if (length <= 1) throw new Error('`length` value must be greater than or equal to 2')
+    if (Math.round(length) !== length) throw new Error('`length` value must be an integer')
+
+    const interval = 1 / (length - 1)
+
+    return Array(length).fill(null).map((v, i) => {
+      const pos = interval * i
+
+      return {
+        label: labelIterator?.(i, pos) ?? undefined,
+        position: pos,
+      }
+    })
   }
 
   componentDidMount() {

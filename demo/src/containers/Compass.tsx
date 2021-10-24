@@ -1,6 +1,5 @@
 import { align, container, selectors } from 'promptu'
 import React, { Fragment, PureComponent } from 'react'
-import { hot } from 'react-hot-loader/root'
 import styled, { css } from 'styled-components'
 import Compass from '../../../src/Compass'
 import DebugConsole from '../../../src/DebugConsole'
@@ -15,7 +14,7 @@ export interface State {
   max: number
 }
 
-export default hot(class Container extends PureComponent<Props, State> {
+export default class Container extends PureComponent<Props, State> {
   state: State = {
     position: 0,
     min: 0,
@@ -102,7 +101,7 @@ export default hot(class Container extends PureComponent<Props, State> {
       </Fragment>
     )
   }
-})
+}
 
 const StyledRoot = styled.div`
   ${container.fhcc}

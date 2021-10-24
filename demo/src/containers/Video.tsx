@@ -4,16 +4,16 @@
 
 import { align, container } from 'promptu'
 import React, { Fragment, PureComponent } from 'react'
-import { hot } from 'react-hot-loader/root'
 import styled from 'styled-components'
 import DebugConsole from '../../../src/DebugConsole'
 import Video from '../../../src/Video'
+import $$Video from '../assets/videos/video.mp4'
 
 export interface Props {}
 
 export interface State {}
 
-export default hot(class Container extends PureComponent<Props, State> {
+export default class Container extends PureComponent<Props, State> {
   render() {
     return (
       <Fragment>
@@ -22,7 +22,7 @@ export default hot(class Container extends PureComponent<Props, State> {
             autoPlay={true}
             autoLoop={true}
             isCover={true}
-            src='https://storage.coverr.co/videos/coverr-car-in-desert-1585317576189?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6IjExNDMyN0NEOTRCMUFCMTFERTE3IiwiaWF0IjoxNTg1NzU1MzY4fQ.IHe_7XWcktHp4uGtErCLVac3MsiRKORjMrSmf5GWyuk'
+            src={$$Video}
           />
         </StyledRoot>
         <DebugConsole
@@ -34,7 +34,7 @@ export default hot(class Container extends PureComponent<Props, State> {
       </Fragment>
     )
   }
-})
+}
 
 const StyledVideo = styled(Video)`
   ${align.tl}

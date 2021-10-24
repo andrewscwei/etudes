@@ -1,5 +1,5 @@
-import { Rect } from 'dirty-dom'
 import React, { ComponentType, createRef, PureComponent } from 'react'
+import { Rect } from 'spase'
 import styled, { css, CSSProperties } from 'styled-components'
 import List, { ItemComponentProps as ListItemComponentProps } from './List'
 import { ExtendedCSSFunction, ExtendedCSSProps, Orientation } from './types'
@@ -38,7 +38,7 @@ export interface Props<T = Record<string, never>> {
    * Data of every item in the component. This is used to generate individual
    * menu items. Data type is generic.
    */
-  data: Array<DataProps<T>>
+  data: DataProps<T>[]
 
   /**
    * Indicates if the component is inverted (i.e. "dropup" instead of dropdown).

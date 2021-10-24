@@ -1,6 +1,6 @@
-import { Rect } from 'dirty-dom'
 import interact from 'interactjs'
 import React, { createRef, CSSProperties, PureComponent } from 'react'
+import { Rect } from 'spase'
 import styled, { css } from 'styled-components'
 import { ExtendedCSSFunction, ExtendedCSSProps, Orientation, Range } from './types'
 
@@ -103,7 +103,7 @@ export default class RangeSlider extends PureComponent<Props, State> {
     return (b - a)
   }
 
-  get breakpoints(): ReadonlyArray<number> {
+  get breakpoints(): readonly number[] {
     const { min, max, steps } = this.props
     const breakpoints = [min]
 

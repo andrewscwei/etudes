@@ -2,10 +2,9 @@
  * @file Client app root.
  */
 
-import { Size } from 'dirty-dom'
 import { container } from 'promptu'
 import React, { createRef, Fragment, PureComponent } from 'react'
-import { hot } from 'react-hot-loader/root'
+import { Size } from 'spase'
 import styled from 'styled-components'
 import DebugConsole from '../../../src/DebugConsole'
 import Panorama from '../../../src/Panorama'
@@ -20,7 +19,7 @@ export interface State {
   angle: number
 }
 
-export default hot(class Container extends PureComponent<Props, State> {
+export default class Container extends PureComponent<Props, State> {
   static defaultProps: Partial<Props> = {
     defaultAngle: 0,
   }
@@ -86,7 +85,7 @@ export default hot(class Container extends PureComponent<Props, State> {
       </Fragment>
     )
   }
-})
+}
 
 const StyledRoot = styled.div`
   ${container.fvcc}

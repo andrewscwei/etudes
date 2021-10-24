@@ -4,7 +4,6 @@
 
 import { align, container, selectors } from 'promptu'
 import React, { createRef, Fragment, PureComponent } from 'react'
-import { hot } from 'react-hot-loader/root'
 import styled from 'styled-components'
 import BurgerButton from '../../../src/BurgerButton'
 import $$GithubIcon from '../assets/images/github-icon.svg'
@@ -127,7 +126,7 @@ class App extends PureComponent<Props, State> {
   }
 }
 
-export default hot(App)
+export default App
 
 const StyledNavButton = styled.button<{
   isActive: boolean

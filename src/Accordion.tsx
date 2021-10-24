@@ -25,7 +25,7 @@ export type SectionCSSProps = Readonly<{
 
 export interface SectionProps<T = Record<string, never>> {
   label: string
-  items: Array<T>
+  items: T[]
 }
 
 export interface Props<T = Record<string, never>> {
@@ -42,7 +42,7 @@ export interface Props<T = Record<string, never>> {
   /**
    * Data provided to each section.
    */
-  data: Array<SectionProps<T>>
+  data: SectionProps<T>[]
 
   /**
    * Indicates if sections can be toggled, as in, once a section is expanded,
@@ -143,7 +143,7 @@ export interface State {
 
 export default class Accordion<T = Record<string, never>> extends PureComponent<Props<T>, State> {
   nodeRefs = {
-    lists: [] as Array<RefObject<List<T>>>,
+    lists: [] as RefObject<List<T>>[],
   }
 
   constructor(props: Props<T>) {

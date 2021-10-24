@@ -4,7 +4,6 @@
 
 import { container } from 'promptu'
 import React, { Fragment, PureComponent } from 'react'
-import { hot } from 'react-hot-loader/root'
 import styled from 'styled-components'
 import DebugConsole from '../../../src/DebugConsole'
 import MasonryGrid from '../../../src/MasonryGrid'
@@ -13,7 +12,7 @@ export interface Props {}
 
 export interface State {}
 
-export default hot(class Container extends PureComponent<Props, State> {
+export default class Container extends PureComponent<Props, State> {
   data = [...new Array(200)].map((v, i) => ({
     h: Math.floor(Math.random() * 6) + 1,
     b: Math.floor(Math.random() * 1) + 1,
@@ -47,7 +46,7 @@ export default hot(class Container extends PureComponent<Props, State> {
       </Fragment>
     )
   }
-})
+}
 
 const StyledGridItem = styled.div`
   ${container.fvcc}

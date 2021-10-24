@@ -28,8 +28,19 @@ const config: Configuration = {
       use: [{
         loader: 'url-loader',
         options: {
+          esModule: false,
           limit: 8192,
           name: `assets/images/[name]${isDev ? '' : '.[hash:6]'}.[ext]`,
+        },
+      }],
+    }, {
+      test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
+      use: [{
+        loader: 'url-loader',
+        options: {
+          esModule: false,
+          limit: 8192,
+          name: `assets/videos/[name]${isDev ? '' : '.[hash:6]'}.[ext]`,
         },
       }],
     }],
@@ -64,7 +75,6 @@ const config: Configuration = {
   resolve: {
     alias: {
       ...!isDev ? {} : {
-        'react-dom': '@hot-loader/react-dom',
         'etudes': path.join(cwd, '../lib'),
       },
     },

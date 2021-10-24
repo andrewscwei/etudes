@@ -1,7 +1,6 @@
 import $$ExpandIcon from '!!raw-loader!../assets/images/expand-icon.svg'
 import { animations, container, selectors } from 'promptu'
 import React, { Fragment, FunctionComponent, PureComponent } from 'react'
-import { hot } from 'react-hot-loader/root'
 import styled, { css } from 'styled-components'
 import Accordion, { ItemComponentProps } from '../../../src/Accordion'
 import DebugConsole from '../../../src/DebugConsole'
@@ -23,7 +22,7 @@ const ItemComponent: FunctionComponent<ItemComponentProps<string>> = ({
   <StyledItem orientation={orientation} isSelected={isSelected ?? false} onClick={() => onClick?.()} style={style}>{data}</StyledItem>
 )
 
-export default hot(class Container extends PureComponent<Props, State> {
+export default class Container extends PureComponent<Props, State> {
   state: State = {
     itemIndex: -1,
     sectionIndex: -1,
@@ -86,7 +85,7 @@ export default hot(class Container extends PureComponent<Props, State> {
       </Fragment>
     )
   }
-})
+}
 
 const StyledItem = styled.button<{
   isSelected: boolean

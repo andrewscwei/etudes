@@ -1,7 +1,6 @@
 import $$ExpandIcon from '!!raw-loader!../assets/images/expand-icon.svg'
 import { animations, container, selectors } from 'promptu'
 import React, { Fragment, FunctionComponent, PureComponent } from 'react'
-import { hot } from 'react-hot-loader/root'
 import styled, { css } from 'styled-components'
 import DebugConsole from '../../../src/DebugConsole'
 import Dropdown, { ItemComponentProps as DropdownItemComponentProps } from '../../../src/Dropdown'
@@ -34,7 +33,7 @@ const ListItemComponent: FunctionComponent<ListItemComponentProps<string>> = ({
   <StyledListItem orientation={orientation} isSelected={isSelected ?? false} onClick={() => onClick?.()} style={style}>{data}</StyledListItem>
 )
 
-export default hot(class Container extends PureComponent<Props, State> {
+export default class Container extends PureComponent<Props, State> {
   state: State = {
     selectedItemIndex: -1,
     selectedOrientationIndex: 0,
@@ -123,7 +122,7 @@ export default hot(class Container extends PureComponent<Props, State> {
       </Fragment>
     )
   }
-})
+}
 
 const StyledDropdownItem = styled.button<{
   isSelected: boolean
