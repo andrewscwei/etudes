@@ -1,7 +1,3 @@
-/**
- * @file Client app root.
- */
-
 import { container } from 'promptu'
 import React, { Fragment, PureComponent } from 'react'
 import styled from 'styled-components'

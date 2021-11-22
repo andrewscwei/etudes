@@ -1,7 +1,3 @@
-/**
- * @file Client app root.
- */
-
 import { container } from 'promptu'
 import React, { createRef, Fragment, PureComponent } from 'react'
 import { Size } from 'spase'

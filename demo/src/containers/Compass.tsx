@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components'
 import Compass from '../../../src/Compass'
 import DebugConsole from '../../../src/DebugConsole'
 import RangeSlider from '../../../src/RangeSlider'
-import Slider from '../../../src/Slider'
+import Slider, { sliderBreakpointsFactory } from '../../../src/Slider'
 
 export interface Props {}
 
@@ -44,7 +44,7 @@ export default class Container extends PureComponent<Props, State> {
           <Slider
             gutterPadding={10}
             onPositionChange={position => this.setState({ position })}
-            breakpoints={Slider.breakpointsFactory(10, (i, p) => `${Math.round(this.getAngleByPosition(p))}°`)}
+            breakpoints={sliderBreakpointsFactory(10, (i, p) => `${Math.round(this.getAngleByPosition(p))}°`)}
             knobWidth={60}
             knobHeight={40}
             isInverted={false}

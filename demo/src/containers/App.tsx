@@ -1,7 +1,3 @@
-/**
- * @file Client app root.
- */
-
 import { align, container, selectors } from 'promptu'
 import React, { createRef, Fragment, PureComponent } from 'react'
 import styled from 'styled-components'

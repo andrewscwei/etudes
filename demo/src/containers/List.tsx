@@ -51,7 +51,7 @@ export default class Container extends PureComponent<Props, State> {
             orientation={orientation}
             onDeselectAt={idx => this.setState({ selectedItemIndex: -1 })}
             onSelectAt={idx => this.setState({ selectedItemIndex: idx })}
-            itemComponentType={ListItemComponent as any}
+            itemComponentType={ListItemComponent}
             shouldStaySelected={true}
             itemPadding={20}
             style={{
@@ -75,7 +75,7 @@ export default class Container extends PureComponent<Props, State> {
           defaultSelectedItemIndex={this.state.selectedOrientationIndex}
           expandIconSvg={$$ExpandIcon}
           isInverted={false}
-          itemComponentType={DropdownItemComponent as any}
+          itemComponentType={DropdownItemComponent}
           maxVisibleItems={-1}
           onIndexChange={idx => this.setState({ selectedOrientationIndex: idx })}
           orientation='vertical'
