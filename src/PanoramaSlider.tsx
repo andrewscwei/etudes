@@ -1,4 +1,4 @@
-import { DirtyInfo, DirtyType, EventType, UpdateDelegate, UpdateDelegator } from 'dirty-dom'
+import { DirtyInfo, DirtyType, EventType, UpdateDelegate } from 'dirty-dom'
 import React, { createRef, CSSProperties, PureComponent } from 'react'
 import { Rect, Size } from 'spase'
 import styled, { css, FlattenSimpleInterpolation } from 'styled-components'
@@ -98,7 +98,7 @@ export interface State {
   imageSize: Size
 }
 
-export default class PanoramaSlider extends PureComponent<Props, State> implements UpdateDelegator {
+export default class PanoramaSlider extends PureComponent<Props, State> {
   static defaultProps = {
     defaultAngle: 0,
     speed: 2,
@@ -241,7 +241,7 @@ export default class PanoramaSlider extends PureComponent<Props, State> implemen
   private reconfigureUpdateDelegate() {
     this.updateDelegate?.deinit()
 
-    this.updateDelegate = new UpdateDelegate(this, {
+    this.updateDelegate = new UpdateDelegate(info => this.update(info), {
       [EventType.RESIZE]: {
         target: this.nodeRefs.root.current,
       },

@@ -12,6 +12,9 @@ const config: Configuration = {
   entry: {
     bundle: path.join(inputDir, 'index.tsx'),
   },
+  infrastructureLogging: {
+    level: 'error',
+  },
   mode: isDev ? 'development' : 'production',
   module: {
     rules: [{

@@ -1,4 +1,4 @@
-import { DirtyInfo, DirtyType, EventType, UpdateDelegate, UpdateDelegator } from 'dirty-dom'
+import { DirtyInfo, DirtyType, EventType, UpdateDelegate } from 'dirty-dom'
 import React, { createRef, CSSProperties, PureComponent, ReactNode } from 'react'
 import { Rect } from 'spase'
 import styled from 'styled-components'
@@ -37,7 +37,7 @@ export interface Props {
  * in a horizontally oriented grid, *number of sections* refers to the *number
  * of columns*.
  */
-class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
+class MasonryGrid extends PureComponent<Props> {
   static defaultProps: Props = {
     areSectionsAligned: false,
     horizontalSpacing: 0,
@@ -320,7 +320,7 @@ class MasonryGrid extends PureComponent<Props> implements UpdateDelegator {
   private reconfigureUpdateDelegate() {
     this.updateDelegate?.deinit()
 
-    this.updateDelegate = new UpdateDelegate(this, {
+    this.updateDelegate = new UpdateDelegate(info => this.update(info), {
       [EventType.RESIZE]: true,
     })
 
