@@ -1,5 +1,5 @@
 import interact from 'interactjs'
-import React, { createRef, CSSProperties, PureComponent } from 'react'
+import React, { createRef, CSSProperties, useEffect, useState } from 'react'
 import { Rect } from 'spase'
 import styled, { css } from 'styled-components'
 import { ExtendedCSSFunction, ExtendedCSSProps, Orientation } from './types'
@@ -204,57 +204,43 @@ export function sliderBreakpointsFactory(length: number, labelIterator?: (index:
  * and have it display on the knob when the current position is close to the breakpoint. This
  * component supports both horizontal and vertical orientations.
  */
-export default class Slider extends PureComponent<Props, State> {
-
-  static defaultProps: Partial<Props> = {
-    style: {},
-    breakpoints: sliderBreakpointsFactory(10, (index: number, position: number) => `${index}`),
-    autoSnap: true,
-    isInverted: false,
-    isLabelVisible: true,
-    onlyDispatchesOnDragEnd: false,
-    defaultPosition: 0,
-    gutterPadding: 0,
-    knobHeight: 30,
-    knobWidth: 30,
-    knobCSS: props => css``,
-    labelCSS: props => css``,
-    orientation: 'vertical',
-    endingGutterCSS: props => css``,
-    startingGutterCSS: props => css``,
-  }
-
-  nodeRefs = {
-    root: createRef<HTMLDivElement>(),
-    knob: createRef<HTMLDivElement>(),
-  }
-
-  constructor(props: Props) {
-    super(props)
-
-    this.state = {
-      isDragging: false,
-      isReleasing: false,
-      position: ((this.props.breakpoints !== undefined) && (this.props.defaultIndex !== undefined)) ? this.getPositionByIndex(this.props.defaultIndex) : this.props.defaultPosition,
-    }
-  }
-
+export default function Slider({
+  id,
+  className,
+  style = {},
+  isInverted = false,
+  onlyDispatchesOnDragEnd = false,
+  gutterPadding = 0,
+  knobHeight = 30,
+  knobWidth = 30,
+  orientation = 'vertical',
+  defaultPosition = 0,
+  onDragEnd,
+  onDragStart,
+  onPositionChange,
+  startingGutterCSS = props => css``,
+  endingGutterCSS = props => css``,
+  knobCSS = props => css``,
+  labelCSS = props => css``,
+  breakpoints = sliderBreakpointsFactory(10, (index: number, position: number) => `${index}`),
+  autoSnap = true,
+  isLabelVisible = true,
+  defaultIndex,
+  onIndexChange,
+}: Props) {
   /**
    * Computed rect of the root element.
    */
-  getRect(): Rect {
-    return Rect.from(this.nodeRefs.root.current) ?? new Rect()
+  function getRect(): Rect {
+    return Rect.from(nodeRefs.root.current) ?? new Rect()
   }
 
   /**
    * Length of the gutter before the knob in pixels. If the orientation of the slider is horizontal,
    * this refers to the width, else this refers to the height.
    */
-  getStartingGutterLength(): number {
-    const { isInverted, gutterPadding, knobWidth, knobHeight, orientation } = this.props
-    const { position } = this.state
-    const rect = this.getRect()
-
+  function getStartingGutterLength(): number {
+    console.log(rect, getRect())
     if (orientation === 'vertical') {
       return Math.max(0, (isInverted ? (1 - position) : position) * rect.height - (knobHeight / 2) - gutterPadding)
     }
@@ -267,11 +253,7 @@ export default class Slider extends PureComponent<Props, State> {
    * Length of the gutter after the knob in pixels. If the orientation of the slider is horizontal,
    * this refers to the width, else this refers to the height.
    */
-  getEndingGutterLength(): number {
-    const { isInverted, gutterPadding, knobWidth, knobHeight, orientation } = this.props
-    const { position } = this.state
-    const rect = this.getRect()
-
+  function getEndingGutterLength(): number {
     if (orientation === 'vertical') {
       return Math.max(0, (isInverted ? position : (1 - position)) * rect.height - (knobHeight / 2) - gutterPadding)
     }
@@ -284,11 +266,8 @@ export default class Slider extends PureComponent<Props, State> {
    * Position of the knob ranging from 0 to 1, inclusive. If for whatever reason the position cannot
    * be computed, NaN is returned.
    */
-  getKnobPosition(): number {
-    const { isInverted, orientation } = this.props
-    const { position } = this.state
-    const rootNode = this.nodeRefs.root.current
-    const rect = this.getRect()
+  function getKnobPosition(): number {
+    const rootNode = nodeRefs.root.current
 
     if (!rootNode) return NaN
 
@@ -306,17 +285,14 @@ export default class Slider extends PureComponent<Props, State> {
    * Gets the index of the breakpoint of which the current position is closest to. If for whatever
    * reason the index cannot be computed (i.e. no breakpoints were provided), -1 is returned.
    */
-  getIndex(): number {
-    const { breakpoints } = this.props
-    const { position } = this.state
-
+  function getIndex(): number {
     if (!breakpoints) return -1
 
     let idx = 0
     let delta = NaN
 
     for (let i = 0, n = breakpoints.length; i < n; i++) {
-      const breakpoint = this.getPositionByIndex(i)
+      const breakpoint = getPositionByIndex(i)
       const d = Math.abs(position - breakpoint)
 
       if (isNaN(delta) || (d < delta)) {
@@ -328,127 +304,6 @@ export default class Slider extends PureComponent<Props, State> {
     return idx
   }
 
-  componentDidMount() {
-    this.reconfigureInteractivityIfNeeded()
-
-    if (this.props.breakpoints) {
-      const index = this.getIndex()
-
-      if (this.props.autoSnap) {
-        this.snapToClosestBreakpoint()
-        this.props.onPositionChange?.(this.getPositionByIndex(index))
-      }
-      else {
-        this.props.onPositionChange?.(this.state.position)
-      }
-
-      this.props.onIndexChange?.(index)
-    }
-    else {
-      this.props.onPositionChange?.(this.state.position)
-    }
-
-    this.forceUpdate()
-  }
-
-  componentDidUpdate(prevProps: Props, prevState: State) {
-    this.reconfigureInteractivityIfNeeded()
-
-    if (prevState.position !== this.state.position) {
-      if (!this.props.onlyDispatchesOnDragEnd && this.state.isDragging) {
-        this.props.onPositionChange?.(this.state.position)
-        if (this.props.breakpoints) this.props.onIndexChange?.(this.getIndex())
-      }
-    }
-
-    if (prevState.isDragging !== this.state.isDragging) {
-      if (!this.state.isDragging) {
-        this.props.onPositionChange?.(this.state.position)
-        if (this.props.breakpoints) this.props.onIndexChange?.(this.getIndex())
-        this.props.onDragEnd?.()
-      }
-      else {
-        this.props.onDragStart?.()
-      }
-    }
-
-    if (prevProps.orientation !== this.props.orientation) {
-      this.forceUpdate()
-    }
-  }
-
-  render() {
-    const { id, className, breakpoints, knobHeight, knobWidth, isLabelVisible, isInverted, labelCSS, orientation, startingGutterCSS, endingGutterCSS, knobCSS, style } = this.props
-    const { isDragging, isReleasing, position } = this.state
-    const rect = this.getRect()
-    const startingGutterLength = this.getStartingGutterLength()
-    const endingGutterLength = this.getEndingGutterLength()
-    const index = this.getIndex()
-    const knobPosition = this.getKnobPosition()
-
-    return (
-      <StyledRoot
-        id={id}
-        className={className}
-        ref={this.nodeRefs.root}
-        orientation={orientation}
-        style={style}
-      >
-        <StyledGutter
-          orientation={orientation}
-          style={orientation === 'vertical' ? {
-            top: 0,
-            height: `${startingGutterLength}px`,
-          } : {
-            left: 0,
-            width: `${startingGutterLength}px`,
-          }}
-          extendedCSS={startingGutterCSS}
-        />
-        <StyledKnob
-          isAtEnd={isInverted ? (position === 0) : (position === 1)}
-          isAtBeginning={isInverted ? (position === 1) : (position === 0)}
-          isDragging={isDragging}
-          isReleasing={isReleasing}
-          ref={this.nodeRefs.knob}
-          extendedCSS={knobCSS}
-          style={{
-            height: `${knobHeight}px`,
-            position: 'absolute',
-            width: `${knobWidth}px`,
-            zIndex: 1,
-            ...(orientation === 'vertical' ? {
-              margin: `${-knobHeight / 2 + knobPosition}px 0 0 ${(rect.width - knobWidth) / 2}px`,
-            } : {
-              margin: `${(rect.height - knobHeight) / 2}px 0 0 ${-knobWidth / 2 + knobPosition}px`,
-            }),
-          }}
-        >
-          {breakpoints && isLabelVisible && (
-            <StyledLabel
-              knobHeight={knobHeight}
-              extendedCSS={labelCSS}
-            >
-              {breakpoints[index].label ?? ''}
-            </StyledLabel>
-          )}
-        </StyledKnob>
-        <StyledGutter
-          orientation={orientation}
-          style={orientation === 'vertical' ? {
-            bottom: 0,
-            height: `${endingGutterLength}px`,
-          } : {
-            right: 0,
-            width: `${endingGutterLength}px`,
-          }}
-          extendedCSS={endingGutterCSS}
-        />
-
-      </StyledRoot>
-    )
-  }
-
   /**
    * Gets the position by breakpoint index. This value ranges between 0 - 1, inclusive.
    *
@@ -457,8 +312,7 @@ export default class Slider extends PureComponent<Props, State> {
    * @returns The position. If for whatever reason the position cannot be determined, NaN is
    *          returned.
    */
-  private getPositionByIndex(index: number): number {
-    const { breakpoints } = this.props
+  function getPositionByIndex(index: number): number {
     if (!breakpoints) return NaN
     return breakpoints[index].position ?? (index / (breakpoints.length - 1))
   }
@@ -466,16 +320,16 @@ export default class Slider extends PureComponent<Props, State> {
   /**
    * Reconfigures input interactivity of the knob if needed.
    */
-  private reconfigureInteractivityIfNeeded() {
-    const knobNode = this.nodeRefs.knob.current
+  function reconfigureInteractivityIfNeeded() {
+    const knobNode = nodeRefs.knob.current
 
     if (knobNode) {
       if (!interact.isSet(knobNode)) {
         interact(knobNode).draggable({
           inertia: true,
-          onstart: () => this.onKnobDragStart(),
-          onmove: ({ dx, dy }) => this.onKnobDragMove(this.props.orientation === 'vertical' ? dy : dx),
-          onend: () => this.onKnobDragStop(),
+          onstart: () => onKnobDragStart(),
+          onmove: ({ dx, dy }) => onKnobDragMove(orientation === 'vertical' ? dy : dx),
+          onend: () => onKnobDragStop(),
         })
       }
     }
@@ -484,11 +338,9 @@ export default class Slider extends PureComponent<Props, State> {
   /**
    * Handler invoked when the knob starts dragging.
    */
-  private onKnobDragStart() {
-    this.setState({
-      isDragging: true,
-      isReleasing: false,
-    })
+  function onKnobDragStart() {
+    setIsDragging(true)
+    setIsReleasing(false)
   }
 
   /**
@@ -496,47 +348,161 @@ export default class Slider extends PureComponent<Props, State> {
    *
    * @param delta - The distance traveled (in pixels) since the last invocation of this handler.
    */
-  private onKnobDragMove(delta: number) {
-    const { isInverted, orientation } = this.props
-    const { position } = this.state
-    const rect = this.getRect()
+  function onKnobDragMove(delta: number) {
+    const rect = getRect()
     const p = isInverted ? (1 - position) : position
     const x = p * rect.width + delta
     const y = p * rect.height + delta
     const t = (orientation === 'vertical') ? Math.max(0, Math.min(1, y / rect.height)) : Math.max(0, Math.min(1, x / rect.width))
 
-    this.setState({
-      isDragging: true,
-      isReleasing: false,
-      position: isInverted ? (1 - t) : t,
-    })
+    setIsDragging(true)
+    setIsReleasing(false)
+    setPosition(isInverted ? (1 - t) : t)
   }
 
   /**
    * Handler invoked when the knob stops dragging.
    */
-  private onKnobDragStop() {
-    this.setState({
-      isDragging: false,
-      isReleasing: true,
-    })
-
-    this.snapToClosestBreakpoint()
+  function onKnobDragStop() {
+    setIsDragging(false)
+    setIsReleasing(true)
+    snapToClosestBreakpoint()
   }
 
   /**
    * Snaps the knob to the closest breakpoint. Note that if there are no breakpoints or
    * auto-snapping feature is disabled, this method does nothing.
    */
-  private snapToClosestBreakpoint() {
-    if (!this.props.autoSnap || !this.props.breakpoints) return
+  function snapToClosestBreakpoint() {
+    if (!autoSnap || !breakpoints) return
 
-    const position = this.getPositionByIndex(this.getIndex())
+    const position = getPositionByIndex(getIndex())
 
-    this.setState({
-      position,
-    })
+    setPosition(position)
   }
+
+  const nodeRefs = {
+    root: createRef<HTMLDivElement>(),
+    knob: createRef<HTMLDivElement>(),
+  }
+
+  const [isDragging, setIsDragging] = useState(false)
+  const [isReleasing, setIsReleasing] = useState(false)
+  const [position, setPosition] = useState(((breakpoints !== undefined) && (defaultIndex !== undefined)) ? getPositionByIndex(defaultIndex) : defaultPosition)
+  const [value, setValue] = useState(0)
+  const rect = getRect()
+  const startingGutterLength = getStartingGutterLength()
+  const endingGutterLength = getEndingGutterLength()
+  const index = getIndex()
+  const knobPosition = getKnobPosition()
+
+  console.log(startingGutterLength, endingGutterLength)
+
+  useEffect(() => {
+    reconfigureInteractivityIfNeeded()
+  })
+
+  useEffect(() => {
+    if (breakpoints) {
+      if (autoSnap) {
+        snapToClosestBreakpoint()
+        onPositionChange?.(getPositionByIndex(index))
+      }
+      else {
+        onPositionChange?.(position)
+      }
+
+      onIndexChange?.(index)
+    }
+    else {
+      onPositionChange?.(position)
+    }
+
+    setValue(value + 1)
+  }, [])
+
+  useEffect(() => {
+    if (onlyDispatchesOnDragEnd || !isDragging) return
+    onPositionChange?.(position)
+    if (breakpoints) onIndexChange?.(index)
+  }, [position])
+
+  useEffect(() => {
+    if (isDragging) {
+      onDragStart?.()
+    }
+    else {
+      onPositionChange?.(position)
+      if (breakpoints) onIndexChange?.(index)
+      onDragEnd?.()
+    }
+  }, [isDragging])
+
+  useEffect(() => {
+    setValue(value + 1)
+  }, [orientation])
+
+  return (
+    <StyledRoot
+      id={id}
+      className={className}
+      ref={nodeRefs.root}
+      orientation={orientation}
+      style={style}
+    >
+      <StyledGutter
+        orientation={orientation}
+        style={orientation === 'vertical' ? {
+          top: 0,
+          height: `${startingGutterLength}px`,
+        } : {
+          left: 0,
+          width: `${startingGutterLength}px`,
+        }}
+        extendedCSS={startingGutterCSS}
+      />
+      <StyledKnob
+        isAtEnd={isInverted ? (position === 0) : (position === 1)}
+        isAtBeginning={isInverted ? (position === 1) : (position === 0)}
+        isDragging={isDragging}
+        isReleasing={isReleasing}
+        ref={nodeRefs.knob}
+        extendedCSS={knobCSS}
+        style={{
+          height: `${knobHeight}px`,
+          position: 'absolute',
+          width: `${knobWidth}px`,
+          zIndex: 1,
+          ...(orientation === 'vertical' ? {
+            margin: `${-knobHeight / 2 + knobPosition}px 0 0 ${(rect.width - knobWidth) / 2}px`,
+          } : {
+            margin: `${(rect.height - knobHeight) / 2}px 0 0 ${-knobWidth / 2 + knobPosition}px`,
+          }),
+        }}
+      >
+        {breakpoints && isLabelVisible && (
+          <StyledLabel
+            knobHeight={knobHeight}
+            extendedCSS={labelCSS}
+          >
+            {breakpoints[index].label ?? ''}
+          </StyledLabel>
+        )}
+      </StyledKnob>
+      <StyledGutter
+        orientation={orientation}
+        style={orientation === 'vertical' ? {
+          bottom: 0,
+          height: `${endingGutterLength}px`,
+        } : {
+          right: 0,
+          width: `${endingGutterLength}px`,
+        }}
+        extendedCSS={endingGutterCSS}
+      />
+
+    </StyledRoot>
+  )
 }
 
 const StyledGutter = styled.div<GutterCSSProps & ExtendedCSSProps<GutterCSSProps>>`
