@@ -9,6 +9,7 @@
     "build": "npm run clean && tsc -p tsconfig.json",
     "pages": "rimraf .gh-pages && webpack --config demo/config/build.conf.ts",
     "demo": "cross-env NODE_ENV=development webpack-cli serve --mode development --hot --config demo/config/build.conf.ts",
+    "test": "echo \"No tests yet :)\"",
     "lint": "eslint --ext .ts --ext .tsx src demo",
     "lint:fix": "npm run lint -- --fix"
   },
