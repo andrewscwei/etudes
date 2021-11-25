@@ -1,14 +1,13 @@
 import interact from 'interactjs'
-import React, { createRef, CSSProperties, useEffect, useState } from 'react'
+import React, { CSSProperties, useEffect, useRef, useState } from 'react'
 import { Rect } from 'spase'
 import styled, { css } from 'styled-components'
 import { ExtendedCSSFunction, ExtendedCSSProps, Orientation } from './types'
 
 export type KnobCSSProps = Readonly<{
-  isAtEnd: boolean
   isAtBeginning: boolean
-  isDragging: boolean
-  isReleasing: boolean
+  isAtEnd: boolean
+  isDragging?: boolean
 }>
 
 export type GutterCSSProps = Readonly<{
@@ -19,12 +18,12 @@ export type LabelCSSProps = Readonly<{
   knobHeight: number
 }>
 
-export interface BreakpointDescriptor {
+export type BreakpointDescriptor = {
   label?: string
   position?: number
 }
 
-export interface Props {
+export type Props = {
   /**
    * ID attribute of the root element.
    */
@@ -38,45 +37,45 @@ export interface Props {
   /**
    * Inline style attribute of the root element.
    */
-  style: CSSProperties
+  style?: CSSProperties
 
   /**
    * By default the position is a value from 0 - 1, 0 being the start of the slider and 1 being the
    * end. Switching on this flag inverts this behavior, where 0 becomes the end of the slider and 1
    * being the start.
    */
-  isInverted: boolean
+  isInverted?: boolean
 
   /**
    * Indicates if position/index change events are dispatched only when dragging ends. When
    * disabled, aforementioned events are fired repeatedly while dragging.
    */
-  onlyDispatchesOnDragEnd: boolean
+  onlyDispatchesOnDragEnd?: boolean
 
   /**
    * Padding between the gutter and the knob in pixels.
    */
-  gutterPadding: number
+  gutterPadding?: number
 
   /**
    * Height of the knob in pixels.
    */
-  knobHeight: number
+  knobHeight?: number
 
   /**
    * Width of the knob in pixels.
    */
-  knobWidth: number
+  knobWidth?: number
 
   /**
    * Orientation of the slider.
    */
-  orientation: Orientation
+  orientation?: Orientation
 
   /**
    * The default position. This is ignored if `defaultIndex` and breakpoints are provided.
    */
-  defaultPosition: number
+  defaultPosition?: number
 
   /**
    * Handler invoked when dragging ends.
@@ -96,22 +95,22 @@ export interface Props {
   /**
    * Custom CSS provided to the gutter before the knob.
    */
-  startingGutterCSS: ExtendedCSSFunction<GutterCSSProps>
+  startingGutterCSS?: ExtendedCSSFunction<GutterCSSProps>
 
   /**
    * Custom CSS provided to the gutter after the knob.
    */
-  endingGutterCSS: ExtendedCSSFunction<GutterCSSProps>
+  endingGutterCSS?: ExtendedCSSFunction<GutterCSSProps>
 
   /**
    * Custom CSS provided to the knob.
    */
-  knobCSS: ExtendedCSSFunction<KnobCSSProps>
+  knobCSS?: ExtendedCSSFunction<KnobCSSProps>
 
   /**
    * Custom CSS provided to the label inside the knob.
    */
-  labelCSS: ExtendedCSSFunction<LabelCSSProps>
+  labelCSS?: ExtendedCSSFunction<LabelCSSProps>
 
   // The following props are only used if `breakpoints` are provided.
 
@@ -127,13 +126,13 @@ export interface Props {
    * Indicates whether the knob automatically snaps to the nearest breakpoint, if breakpoints are
    * provided.
    */
-  autoSnap: boolean
+  autoSnap?: boolean
 
   /**
    * Indicates if the breakpoint label is visible by the knob. Note that this is only applicable if
    * breakpoints are provided.
    */
-  isLabelVisible: boolean
+  isLabelVisible?: boolean
 
   /**
    * The default index. This is only used if breakpoints are provided. On the other hand, if
@@ -148,24 +147,6 @@ export interface Props {
    * indexes.
    */
   onIndexChange?: (index: number) => void
-}
-
-export interface State {
-  /**
-   * Indicates if the knob is being dragged.
-   */
-  isDragging: boolean
-
-  /**
-   * Indicates if the knob is being released.
-   */
-  isReleasing: boolean
-
-  /**
-   * Indicates the current position (0 - 1, inclusive) of the knob. 0 being the start of the slider,
-   * 1 being the end.
-   */
-  position: number
 }
 
 /**
@@ -229,63 +210,95 @@ export default function Slider({
   onIndexChange,
 }: Props) {
   /**
-   * Computed rect of the root element.
+   * Updates the calculated rect of this slider. If the root element is not rendered yet, the
+   * calculated rect will be zero.
    */
-  function getRect(): Rect {
-    return Rect.from(nodeRefs.root.current) ?? new Rect()
+  function updateRect() {
+    setRect(Rect.from(rootRef.current) ?? new Rect())
+  }
+
+  /**
+   * Updates the current knob position of the slider.
+   */
+  function updateKnobPosition() {
+    const naturalPosition = getPosition(true)
+
+    if (orientation === 'vertical') {
+      setKnobPosition(naturalPosition * rect.height)
+    }
+    else {
+      setKnobPosition(naturalPosition * rect.width)
+    }
+  }
+
+  /**
+   * Gets the current position. If `natural` is `true`, the uninverted (if `isInverted` is set to
+   * `true`) position will be returned.
+   *
+   * @param natural - Specifies if the natural position should be returned in case `isInverted` is
+   *                  specified.
+   *
+   * @returns The current position.
+   */
+  function getPosition(natural = false): number {
+    if (natural) {
+      return isInverted ? (1 - position.current) : position.current
+    }
+    else {
+      return position.current
+    }
+  }
+
+  /**
+   * Sets the current position. The position should be normalized. That is, inversion should be
+   * taken care of prior to passing the new value to this method if `isInverted` is `true`.
+   *
+   * @param value - The value to set the position to.
+   */
+  function setPosition(value: number) {
+    position.current = value
+    updateKnobPosition()
+
+    if (onlyDispatchesOnDragEnd && isDragging) return
+
+    onPositionChange?.(position.current)
+
+    if (breakpoints) onIndexChange?.(getClosestIndex())
   }
 
   /**
    * Length of the gutter before the knob in pixels. If the orientation of the slider is horizontal,
    * this refers to the width, else this refers to the height.
+   *
+   * @returns The gutter length.
    */
   function getStartingGutterLength(): number {
-    console.log(rect, getRect())
-    if (orientation === 'vertical') {
-      return Math.max(0, (isInverted ? (1 - position) : position) * rect.height - (knobHeight / 2) - gutterPadding)
-    }
-    else {
-      return Math.max(0, (isInverted ? (1 - position) : position) * rect.width - (knobWidth / 2) - gutterPadding)
-    }
+    const naturalPosition = getPosition(true)
+    const knobLength = orientation === 'vertical' ? knobHeight : knobWidth
+    const sliderLength = orientation === 'vertical' ? rect.height : rect.width
+    return Math.max(0, naturalPosition * sliderLength - (knobLength / 2) - gutterPadding)
   }
 
   /**
    * Length of the gutter after the knob in pixels. If the orientation of the slider is horizontal,
    * this refers to the width, else this refers to the height.
+   *
+   * @returns The gutter length.
    */
   function getEndingGutterLength(): number {
-    if (orientation === 'vertical') {
-      return Math.max(0, (isInverted ? position : (1 - position)) * rect.height - (knobHeight / 2) - gutterPadding)
-    }
-    else {
-      return Math.max(0, (isInverted ? position : (1 - position)) * rect.width - (knobWidth / 2) - gutterPadding)
-    }
-  }
-
-  /**
-   * Position of the knob ranging from 0 to 1, inclusive. If for whatever reason the position cannot
-   * be computed, NaN is returned.
-   */
-  function getKnobPosition(): number {
-    const rootNode = nodeRefs.root.current
-
-    if (!rootNode) return NaN
-
-    const p = isInverted ? (1 - position) : position
-
-    if (orientation === 'vertical') {
-      return p * rect.height
-    }
-    else {
-      return p * rect.width
-    }
+    const naturalPosition = getPosition(true)
+    const knobLength = orientation === 'vertical' ? knobHeight : knobWidth
+    const sliderLength = orientation === 'vertical' ? rect.height : rect.width
+    return Math.max(0, (1 - naturalPosition) * sliderLength - (knobLength / 2) - gutterPadding)
   }
 
   /**
    * Gets the index of the breakpoint of which the current position is closest to. If for whatever
    * reason the index cannot be computed (i.e. no breakpoints were provided), -1 is returned.
+   *
+   * @returns The closest index.
    */
-  function getIndex(): number {
+  function getClosestIndex(): number {
     if (!breakpoints) return -1
 
     let idx = 0
@@ -293,7 +306,7 @@ export default function Slider({
 
     for (let i = 0, n = breakpoints.length; i < n; i++) {
       const breakpoint = getPositionByIndex(i)
-      const d = Math.abs(position - breakpoint)
+      const d = Math.abs(getPosition() - breakpoint)
 
       if (isNaN(delta) || (d < delta)) {
         delta = d
@@ -318,21 +331,28 @@ export default function Slider({
   }
 
   /**
-   * Reconfigures input interactivity of the knob if needed.
+   * Initializes input interactivity of the knob.
    */
-  function reconfigureInteractivityIfNeeded() {
-    const knobNode = nodeRefs.knob.current
+  function initInteractivity() {
+    const knob = knobRef.current
+    if (!knob || interact.isSet(knob)) return
 
-    if (knobNode) {
-      if (!interact.isSet(knobNode)) {
-        interact(knobNode).draggable({
-          inertia: true,
-          onstart: () => onKnobDragStart(),
-          onmove: ({ dx, dy }) => onKnobDragMove(orientation === 'vertical' ? dy : dx),
-          onend: () => onKnobDragStop(),
-        })
-      }
-    }
+    interact(knob).draggable({
+      inertia: true,
+      onstart: () => onKnobDragStart(),
+      onmove: ({ dx, dy }) => onKnobDragMove(orientation === 'vertical' ? dy : dx),
+      onend: () => onKnobDragStop(),
+    })
+  }
+
+  /**
+   * Deinitializes input interactivity of the knob.
+   */
+  function deinitInteractivity() {
+    const knob = knobRef.current
+    if (!knob) return
+
+    interact(knob).unset()
   }
 
   /**
@@ -340,7 +360,8 @@ export default function Slider({
    */
   function onKnobDragStart() {
     setIsDragging(true)
-    setIsReleasing(false)
+
+    onDragStart?.()
   }
 
   /**
@@ -349,15 +370,15 @@ export default function Slider({
    * @param delta - The distance traveled (in pixels) since the last invocation of this handler.
    */
   function onKnobDragMove(delta: number) {
-    const rect = getRect()
-    const p = isInverted ? (1 - position) : position
-    const x = p * rect.width + delta
-    const y = p * rect.height + delta
-    const t = (orientation === 'vertical') ? Math.max(0, Math.min(1, y / rect.height)) : Math.max(0, Math.min(1, x / rect.width))
+    const naturalPosition = getPosition(true)
+    const naturalNewPositionX = naturalPosition * rect.width + delta
+    const naturalNewPositionY = naturalPosition * rect.height + delta
+    const naturalNewPosition = (orientation === 'vertical') ? Math.max(0, Math.min(1, naturalNewPositionY / rect.height)) : Math.max(0, Math.min(1, naturalNewPositionX / rect.width))
+    const newPosition = isInverted ? (1 - naturalNewPosition) : naturalNewPosition
 
     setIsDragging(true)
-    setIsReleasing(false)
-    setPosition(isInverted ? (1 - t) : t)
+
+    setPosition(newPosition)
   }
 
   /**
@@ -365,108 +386,61 @@ export default function Slider({
    */
   function onKnobDragStop() {
     setIsDragging(false)
-    setIsReleasing(true)
-    snapToClosestBreakpoint()
+    snapToClosestBreakpointIfNeeded()
+
+    onDragEnd?.()
   }
 
   /**
    * Snaps the knob to the closest breakpoint. Note that if there are no breakpoints or
    * auto-snapping feature is disabled, this method does nothing.
    */
-  function snapToClosestBreakpoint() {
+  function snapToClosestBreakpointIfNeeded() {
     if (!autoSnap || !breakpoints) return
-
-    const position = getPositionByIndex(getIndex())
-
+    const position = getPositionByIndex(getClosestIndex())
     setPosition(position)
   }
 
-  const nodeRefs = {
-    root: createRef<HTMLDivElement>(),
-    knob: createRef<HTMLDivElement>(),
-  }
+  const rootRef = useRef(null)
+  const knobRef = useRef(null)
+  const position = useRef(((breakpoints !== undefined) && (defaultIndex !== undefined)) ? getPositionByIndex(defaultIndex) : defaultPosition)
 
-  const [isDragging, setIsDragging] = useState(false)
-  const [isReleasing, setIsReleasing] = useState(false)
-  const [position, setPosition] = useState(((breakpoints !== undefined) && (defaultIndex !== undefined)) ? getPositionByIndex(defaultIndex) : defaultPosition)
-  const [value, setValue] = useState(0)
-  const rect = getRect()
-  const startingGutterLength = getStartingGutterLength()
-  const endingGutterLength = getEndingGutterLength()
-  const index = getIndex()
-  const knobPosition = getKnobPosition()
-
-  console.log(startingGutterLength, endingGutterLength)
+  const [rect, setRect] = useState(new Rect())
+  const [isDragging, setIsDragging] = useState<boolean | undefined>(undefined)
+  const [knobPosition, setKnobPosition] = useState(NaN)
 
   useEffect(() => {
-    reconfigureInteractivityIfNeeded()
-  })
+    updateRect()
+  }, [orientation, rootRef])
 
   useEffect(() => {
-    if (breakpoints) {
-      if (autoSnap) {
-        snapToClosestBreakpoint()
-        onPositionChange?.(getPositionByIndex(index))
-      }
-      else {
-        onPositionChange?.(position)
-      }
+    initInteractivity()
+    updateKnobPosition()
 
-      onIndexChange?.(index)
+    return () => {
+      deinitInteractivity()
     }
-    else {
-      onPositionChange?.(position)
-    }
-
-    setValue(value + 1)
-  }, [])
+  }, [rect])
 
   useEffect(() => {
-    if (onlyDispatchesOnDragEnd || !isDragging) return
-    onPositionChange?.(position)
-    if (breakpoints) onIndexChange?.(index)
-  }, [position])
-
-  useEffect(() => {
-    if (isDragging) {
-      onDragStart?.()
-    }
-    else {
-      onPositionChange?.(position)
-      if (breakpoints) onIndexChange?.(index)
-      onDragEnd?.()
-    }
-  }, [isDragging])
-
-  useEffect(() => {
-    setValue(value + 1)
-  }, [orientation])
+    snapToClosestBreakpointIfNeeded()
+  }, [autoSnap])
 
   return (
-    <StyledRoot
-      id={id}
-      className={className}
-      ref={nodeRefs.root}
-      orientation={orientation}
-      style={style}
-    >
-      <StyledGutter
-        orientation={orientation}
-        style={orientation === 'vertical' ? {
-          top: 0,
-          height: `${startingGutterLength}px`,
-        } : {
-          left: 0,
-          width: `${startingGutterLength}px`,
-        }}
-        extendedCSS={startingGutterCSS}
+    <StyledRoot ref={rootRef} id={id} className={className} orientation={orientation} style={style}>
+      <StyledGutter orientation={orientation} extendedCSS={startingGutterCSS} style={orientation === 'vertical' ? {
+        top: 0,
+        height: `${getStartingGutterLength()}px`,
+      } : {
+        left: 0,
+        width: `${getStartingGutterLength()}px`,
+      }}
       />
       <StyledKnob
-        isAtEnd={isInverted ? (position === 0) : (position === 1)}
-        isAtBeginning={isInverted ? (position === 1) : (position === 0)}
+        ref={knobRef}
+        isAtEnd={isInverted ? (position.current === 0) : (position.current === 1)}
+        isAtBeginning={isInverted ? (position.current === 1) : (position.current === 0)}
         isDragging={isDragging}
-        isReleasing={isReleasing}
-        ref={nodeRefs.knob}
         extendedCSS={knobCSS}
         style={{
           height: `${knobHeight}px`,
@@ -481,54 +455,46 @@ export default function Slider({
         }}
       >
         {breakpoints && isLabelVisible && (
-          <StyledLabel
-            knobHeight={knobHeight}
-            extendedCSS={labelCSS}
-          >
-            {breakpoints[index].label ?? ''}
-          </StyledLabel>
+          <StyledLabel knobHeight={knobHeight} extendedCSS={labelCSS}>{breakpoints[getClosestIndex()].label ?? ''}</StyledLabel>
         )}
       </StyledKnob>
-      <StyledGutter
-        orientation={orientation}
-        style={orientation === 'vertical' ? {
-          bottom: 0,
-          height: `${endingGutterLength}px`,
-        } : {
-          right: 0,
-          width: `${endingGutterLength}px`,
-        }}
-        extendedCSS={endingGutterCSS}
+      <StyledGutter orientation={orientation} extendedCSS={endingGutterCSS} style={orientation === 'vertical' ? {
+        bottom: 0,
+        height: `${getEndingGutterLength()}px`,
+      } : {
+        right: 0,
+        width: `${getEndingGutterLength()}px`,
+      }}
       />
-
     </StyledRoot>
   )
 }
 
 const StyledGutter = styled.div<GutterCSSProps & ExtendedCSSProps<GutterCSSProps>>`
-  position: absolute;
   background: #fff;
+  position: absolute;
 
   ${props => props.orientation === 'vertical' ? css`
     left: 0;
-    right: 0;
     margin: 0 auto;
+    right: 0;
     width: 100%;
   ` : css`
-    top: 0;
     bottom: 0;
-    margin: auto 0;
     height: 100%;
+    margin: auto 0;
+    top: 0;
   `}
 
   ${props => props.extendedCSS(props)}
 `
 
 const StyledLabel = styled.label<LabelCSSProps & ExtendedCSSProps<LabelCSSProps>>`
+  color: #000;
   font-size: ${props => props.knobHeight * .5}px;
   pointer-events: none;
   user-select: none;
-  color: #000;
+
   ${props => props.extendedCSS(props)}
 `
 
@@ -543,9 +509,9 @@ const StyledKnob = styled.div<KnobCSSProps & ExtendedCSSProps<KnobCSSProps>>`
   opacity: ${props => props.isDragging ? .6 : 1};
   touch-action: none;
   transition-duration: 100ms;
-  transition-property: ${props => props.isReleasing ? 'background, color, opacity, margin, transform' : 'background, color, transform, opacity'};
-  will-change: background, color, opacity, margin, transform;
+  transition-property: ${props => props.isDragging === false ? 'background, color, opacity, margin, transform' : 'background, color, transform, opacity'};
   transition-timing-function: ease-out;
+
   ${props => props.extendedCSS(props)}
 `
 

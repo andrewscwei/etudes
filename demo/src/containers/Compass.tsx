@@ -42,14 +42,14 @@ export default class Container extends PureComponent<Props, State> {
             style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg)' }}
           />
           <Slider
-            gutterPadding={10}
+            gutterPadding={0}
             onPositionChange={position => this.setState({ position })}
             breakpoints={sliderBreakpointsFactory(10, (i, p) => `${Math.round(this.getAngleByPosition(p))}°`)}
             knobWidth={60}
             knobHeight={40}
             isInverted={false}
             orientation='vertical'
-            defaultPosition={0.6}
+            defaultPosition={.5}
             css={css`
               ${align.cc}
             `}
