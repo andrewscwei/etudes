@@ -377,7 +377,7 @@ export default function Slider({
         }}
       />
       <StyledKnobContainer ref={knobRef} style={{
-        transform: `translate3d(-50%, -50%, 0)`,
+        transform: 'translate3d(-50%, -50%, 0)',
         ...(orientation === 'vertical' ? {
           top: `${position.current * 100}%`,
           transition: isDragging === false ? 'top 100ms ease-out' : 'none',
