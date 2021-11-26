@@ -81,9 +81,9 @@ export type Props = {
   orientation?: Orientation
 
   /**
-   * The default position. This is ignored if `defaultIndex` and breakpoints are provided.
+   * The current position. This is ignored if `defaultIndex` and breakpoints are provided.
    */
-  defaultPosition?: number
+  position?: number
 
   /**
    * Handler invoked when dragging ends.
@@ -140,7 +140,7 @@ export type Props = {
   /**
    * The default index. This is only used if breakpoints are provided. On the other hand, if
    * breakpoints are provided, the default position will be calculated based on this value, making
-   * `defaultPosition` irrelevant.
+   * `position` irrelevant.
    */
   defaultIndex?: number
 
@@ -195,7 +195,7 @@ export default function Slider({
   knobHeight = 30,
   knobWidth = 30,
   orientation = 'vertical',
-  defaultPosition = 0,
+  position = 0,
   isLabelVisible = true,
   labelProvider,
   onDragEnd,
@@ -206,21 +206,10 @@ export default function Slider({
   knobCSS,
   labelCSS,
   breakpoints,
-  autoSnap = false,
+  autoSnap = true,
   defaultIndex,
   onIndexChange,
 }: Props) {
-  /**
-   * Sets the current position. The position should be normalized. That is, inversion should be
-   * taken care of prior to passing the new value to this method if `isInverted` is `true`.
-   *
-   * @param value - The value to set the position to.
-   */
-  function setLivePosition(value: number) {
-    livePosition.current = value
-    setPosition(value)
-  }
-
   /**
    * Gets the index of the breakpoint of which the current position is closest to. If for whatever
    * reason the index cannot be computed (i.e. no breakpoints were provided), -1 is returned.
@@ -235,7 +224,7 @@ export default function Slider({
 
     for (let i = 0, n = breakpoints.length; i < n; i++) {
       const breakpoint = getPositionByIndex(i)
-      const delta = Math.abs(position - breakpoint)
+      const delta = Math.abs(livePosition.current - breakpoint)
 
       if (isNaN(minDelta) || (delta < minDelta)) {
         minDelta = delta
@@ -257,6 +246,20 @@ export default function Slider({
   function getPositionByIndex(index: number): number {
     if (!breakpoints) return NaN
     return breakpoints[index]
+  }
+
+  /**
+   * Sets the current live position. The live position is different from the position state value.
+   * Because states are asynchronous by nature, this live position value is used to record position
+   * changes when drag event happens. This position should be normalized. That is, inversion should
+   * be taken care of prior to passing the new value to this method if `isInverted` is `true`.
+   *
+   * @param value - The value to set the position to.
+   */
+  function setLivePosition(value: number) {
+    livePosition.current = value
+    _setPosition(value)
+    if (breakpoints) setIndex(getClosestIndex())
   }
 
   /**
@@ -332,12 +335,13 @@ export default function Slider({
 
   const rootRef = useRef<HTMLDivElement>(null)
   const knobRef = useRef<HTMLButtonElement>(null)
-  const livePosition = useRef(((breakpoints !== undefined) && (defaultIndex !== undefined)) ? getPositionByIndex(defaultIndex) : defaultPosition)
+  const livePosition = useRef(((breakpoints !== undefined) && (defaultIndex !== undefined)) ? getPositionByIndex(defaultIndex) : position)
 
-  const [position, setPosition] = useState(livePosition.current)
+  const [index, setIndex] = useState((breakpoints !== undefined && defaultIndex !== undefined) ? defaultIndex : getClosestIndex())
+  const [_position, _setPosition] = useState(livePosition.current)
   const [isDragging, setIsDragging] = useState<boolean | undefined>(undefined)
 
-  const naturalPosition = isInverted ? 1 - position : position
+  const naturalPosition = isInverted ? 1 - _position : _position
 
   useEffect(() => {
     initInteractivity()
@@ -348,14 +352,25 @@ export default function Slider({
   }, [])
 
   useEffect(() => {
-    snapToClosestBreakpointIfNeeded()
-  }, [autoSnap])
+    if (position === livePosition.current) return
+
+    setIsDragging(undefined)
+    setLivePosition(position)
+  }, [position])
 
   useEffect(() => {
     if (onlyDispatchesOnDragEnd && isDragging) return
-    onPositionChange?.(position)
-    if (breakpoints) onIndexChange?.(getClosestIndex())
-  }, [position])
+    onPositionChange?.(_position)
+  }, [_position])
+
+  useEffect(() => {
+    if (onlyDispatchesOnDragEnd && isDragging) return
+    onIndexChange?.(index)
+  }, [index])
+
+  useEffect(() => {
+    snapToClosestBreakpointIfNeeded()
+  }, [autoSnap])
 
   return (
     <StyledRoot ref={rootRef} id={id} className={className} orientation={orientation} style={style}>
@@ -372,18 +387,18 @@ export default function Slider({
         transform: 'translate3d(-50%, -50%, 0)',
         ...(orientation === 'vertical' ? {
           left: '50%',
-          top: `${position*100}%`,
+          top: `${_position*100}%`,
           transition: isDragging === false ? 'top 100ms ease-out' : 'none',
         } : {
-          left: `${position*100}%`,
+          left: `${_position*100}%`,
           top: '50%',
           transition: isDragging === false ? 'left 100ms ease-out' : 'none',
         }),
       }}>
         <StyledKnob
           className={classNames({
-            'at-end': isInverted ? (position === 0) : (position === 1),
-            'at-start': isInverted ? (position === 1) : (position === 0),
+            'at-end': isInverted ? (_position === 0) : (_position === 1),
+            'at-start': isInverted ? (_position === 1) : (_position === 0),
             'dragging': isDragging === true,
             'idle': isDragging === false,
           })}
@@ -394,7 +409,7 @@ export default function Slider({
           }}
         >
           {breakpoints && isLabelVisible && labelProvider && (
-            <StyledLabel knobHeight={knobHeight} css={labelCSS}>{labelProvider(position, getClosestIndex())}</StyledLabel>
+            <StyledLabel knobHeight={knobHeight} css={labelCSS}>{labelProvider(_position, getClosestIndex())}</StyledLabel>
           )}
         </StyledKnob>
       </StyledKnobContainer>

@@ -9,16 +9,18 @@ import Slider, { generateBreakpoints } from '../../../lib/Slider'
 export interface Props {}
 
 export interface State {
-  position: number
-  min: number
+  index: number,
   max: number
+  min: number
+  position: number
 }
 
 export default class Container extends PureComponent<Props, State> {
   state: State = {
-    position: 0,
-    min: 0,
+    index: 0,
     max: 360,
+    min: 0,
+    position: 0,
   }
 
   getAngleByPosition(position: number): number {
@@ -43,12 +45,13 @@ export default class Container extends PureComponent<Props, State> {
           />
           <Slider
             breakpoints={generateBreakpoints(10)}
-            defaultPosition={.5}
+            position={this.state.position}
             gutterPadding={10}
             isInverted={false}
             knobHeight={40}
             knobWidth={60}
             labelProvider={(p, i) => `${Math.round(this.getAngleByPosition(p))}°`}
+            onIndexChange={index => this.setState({ index })}
             onPositionChange={position => this.setState({ position })}
             orientation='vertical'
             css={css`
@@ -67,6 +70,12 @@ export default class Container extends PureComponent<Props, State> {
               height: `${this.state.max}px`,
               transform: 'translate3d(0, 0, 0) rotateX(20deg) rotateY(-20deg)',
             }}
+          />
+          <Slider
+            css={css`
+              left: 10rem;
+            `}
+            onPositionChange={position => this.setState({ position })}
           />
         </StyledRoot>
         <RangeSlider
@@ -97,7 +106,7 @@ export default class Container extends PureComponent<Props, State> {
         <DebugConsole
           title='?: Compass+Sliders'
           maxEntries={1}
-          message={`Position: ${this.state.position.toFixed(3)}, Angle: ${Math.round(angle)}°, Min: ${Math.round(this.state.min)}, Max: ${Math.round(this.state.max)}`}
+          message={`Position: ${this.state.position.toFixed(3)}, Index: ${this.state.index}, Angle: ${Math.round(angle)}°, Min: ${Math.round(this.state.min)}, Max: ${Math.round(this.state.max)}`}
           style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
         />
       </Fragment>
