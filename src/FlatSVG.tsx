@@ -1,10 +1,7 @@
-import React, { CSSProperties } from 'react'
+import React, { HTMLAttributes } from 'react'
 import styled, { css } from 'styled-components'
 
-export type Props = {
-  id?: string
-  className?: string
-  style?: CSSProperties
+export type Props = HTMLAttributes<HTMLDivElement> & {
   isAnimated?: boolean
   fillColor?: string
   strokeColor?: string
@@ -18,23 +15,19 @@ export type Props = {
  * @requires styled-component
  */
 export default function FlatSVG({
-  id,
-  className,
-  style,
   isAnimated = false,
   fillColor,
   strokeColor,
   svgMarkup,
+  ...props
 }: Props) {
   return (
     <StyledRoot
-      id={id}
-      className={className}
       dangerouslySetInnerHTML={{ __html: svgMarkup }}
       isAnimated={isAnimated}
       fillColor={fillColor}
       strokeColor={strokeColor}
-      style={style}
+      {...props}
     />
   )
 }

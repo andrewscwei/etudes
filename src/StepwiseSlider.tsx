@@ -1,28 +1,13 @@
 import classNames from 'classnames'
 import interact from 'interactjs'
-import React, { CSSProperties, useEffect, useRef, useState } from 'react'
+import React, { HTMLAttributes, useEffect, useRef, useState } from 'react'
 import { Rect } from 'spase'
 import styled, { css, CSSProp } from 'styled-components'
 import { Orientation } from './types'
 
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:stepwise-slider') : () => {}
 
-export type Props = {
-  /**
-   * ID attribute of the root element.
-   */
-  id?: string
-
-  /**
-   * Class attribute of the root element.
-   */
-  className?: string
-
-  /**
-   * Inline style attribute of the root element.
-   */
-  style?: CSSProperties
-
+export type Props = HTMLAttributes<HTMLDivElement> & {
   /**
    * By default the position is a value from 0 - 1, 0 being the start of the slider and 1 being the
    * end. Switching on this flag inverts this behavior, where 0 becomes the end of the slider and 1
@@ -48,9 +33,9 @@ export type Props = {
   labelProvider?: (position: number, index: number) => string
 
   /**
-   * Padding between the gutter and the knob in pixels.
+   * Padding between the track and the knob in pixels.
    */
-  gutterPadding?: number
+  trackPadding?: number
 
   /**
    * Height of the knob in pixels.
@@ -68,9 +53,9 @@ export type Props = {
   orientation?: Orientation
 
   /**
-   * An array of step descriptors. A step is a position (0 - 1 inclusive) on the gutter where the
+   * An array of step descriptors. A step is a position (0 - 1 inclusive) on the track where the
    * knob should snap to if dragging stops near it. Ensure that there are at least two steps: one
-   * for the start of the gutter and one for the end.
+   * for the start of the track and one for the end.
    */
   steps?: readonly number[]
 
@@ -106,14 +91,14 @@ export type Props = {
   onDragStart?: () => void
 
   /**
-   * Custom CSS provided to the gutter before the knob.
+   * Custom CSS provided to the track before the knob.
    */
-  startingGutterCSS?: CSSProp<any>
+  startingTrackCSS?: CSSProp<any>
 
   /**
-   * Custom CSS provided to the gutter after the knob.
+   * Custom CSS provided to the track after the knob.
    */
-  endingGutterCSS?: CSSProp<any>
+  endingTrackCSS?: CSSProp<any>
 
   /**
    * Custom CSS provided to the knob.
@@ -194,7 +179,7 @@ export function getPositionAt(index: number, steps: readonly number[]): number {
  * automatically snaps to a set of predefined points on the slider when dragged. These points are
  * referred to as "steps", indexed by an integer referred to as "index". This index can be two-way
  * binded. The component consists of four customizable elements: a draggable knob, a label on the
- * knob, a scroll gutter before the knob and a scroll gutter after the knob. While the width and
+ * knob, a scroll track before the knob and a scroll track after the knob. While the width and
  * height of the slider is inferred from its CSS rules, the width and height of the knob are set via
  * props (`knobWidth` and `knobHeight`, respectively). The size of the knob does not impact the size
  * of the slider. While dragging, the slider still emits a position change event, where the position
@@ -211,7 +196,7 @@ export default function StepwiseSlider({
   style,
   isInverted = false,
   onlyDispatchesOnDragEnd = false,
-  gutterPadding = 0,
+  trackPadding = 0,
   knobHeight = 30,
   knobWidth = 30,
   orientation = 'vertical',
@@ -219,13 +204,14 @@ export default function StepwiseSlider({
   onDragEnd,
   onDragStart,
   onPositionChange,
-  startingGutterCSS,
-  endingGutterCSS,
+  startingTrackCSS,
+  endingTrackCSS,
   knobCSS,
   labelCSS,
   steps = generateSteps(10),
   index = 0,
   onIndexChange,
+  ...props
 }: Props) {
   /**
    * Initializes input interactivity of the knob.
@@ -376,14 +362,14 @@ export default function StepwiseSlider({
   }, [isDragging])
 
   return (
-    <StyledRoot ref={rootRef} id={id} className={className} orientation={orientation} style={style}>
-      <StyledGutter orientation={orientation} css={startingGutterCSS}
+    <StyledRoot ref={rootRef} orientation={orientation} {...props}>
+      <StyledTrack orientation={orientation} css={startingTrackCSS}
         style={orientation === 'vertical' ? {
           top: 0,
-          height: `calc(${naturalPosition*100}% - ${knobHeight*.5}px - ${gutterPadding}px)`,
+          height: `calc(${naturalPosition*100}% - ${knobHeight*.5}px - ${trackPadding}px)`,
         } : {
           left: 0,
-          width: `calc(${naturalPosition*100}% - ${knobWidth*.5}px - ${gutterPadding}px)`,
+          width: `calc(${naturalPosition*100}% - ${knobWidth*.5}px - ${trackPadding}px)`,
         }}
       />
       <StyledKnobContainer ref={knobRef} style={{
@@ -415,20 +401,20 @@ export default function StepwiseSlider({
           )}
         </StyledKnob>
       </StyledKnobContainer>
-      <StyledGutter orientation={orientation} css={endingGutterCSS}
+      <StyledTrack orientation={orientation} css={endingTrackCSS}
         style={orientation === 'vertical' ? {
           bottom: 0,
-          height: `calc(${(1 - naturalPosition)*100}% - ${knobHeight*.5}px - ${gutterPadding}px)`,
+          height: `calc(${(1 - naturalPosition)*100}% - ${knobHeight*.5}px - ${trackPadding}px)`,
         } : {
           right: 0,
-          width: `calc(${(1 - naturalPosition)*100}% - ${knobWidth*.5}px - ${gutterPadding}px)`,
+          width: `calc(${(1 - naturalPosition)*100}% - ${knobWidth*.5}px - ${trackPadding}px)`,
         }}
       />
     </StyledRoot>
   )
 }
 
-const StyledGutter = styled.div<{ orientation: NonNullable<Props['orientation']> }>`
+const StyledTrack = styled.div<{ orientation: NonNullable<Props['orientation']> }>`
   background: #fff;
   position: absolute;
 

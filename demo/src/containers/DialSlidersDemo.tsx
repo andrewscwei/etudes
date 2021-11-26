@@ -25,19 +25,18 @@ export default function() {
           angle={angle}
           knobLength={50}
           radius={200}
+          css={css`
+            ${align.cc}
+          `}
           knobCSS={css`
             stroke: #fff;
           `}
           trackCSS={css`
             stroke: #666;
           `}
-          css={css`
-            ${align.cc}
-          `}
           style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg)' }}
         />
         <Slider
-          gutterPadding={10}
           isInverted={false}
           knobHeight={40}
           knobWidth={60}
@@ -46,20 +45,21 @@ export default function() {
           onPositionChange={(position, isDragging) => setPosition(position)}
           orientation='vertical'
           position={position}
+          trackPadding={10}
           css={css`
             ${align.cc}
-          `}
-          labelCSS={css`
-            font-size: 1.8rem;
-            font-weight: 700;
-          `}
-          endingGutterCSS={css`
-            background: grey;
           `}
           knobCSS={css`
             ${selectors.hwot} {
               transform: scale(1.2);
             }
+          `}
+          labelCSS={css`
+            font-size: 1.8rem;
+            font-weight: 700;
+          `}
+          endingTrackCSS={css`
+            background: grey;
           `}
           style={{
             height: `${(index + 1) * 30}px`,
@@ -67,7 +67,6 @@ export default function() {
           }}
         />
         <StepwiseSlider
-          gutterPadding={10}
           index={index}
           isInverted={false}
           knobHeight={40}
@@ -76,20 +75,21 @@ export default function() {
           onIndexChange={(index, isDragging) => setIndex(index)}
           onlyDispatchesOnDragEnd={false}
           orientation='vertical'
+          trackPadding={10}
           css={css`
             ${align.cc}
-          `}
-          labelCSS={css`
-            font-size: 1.8rem;
-            font-weight: 700;
-          `}
-          endingGutterCSS={css`
-            background: grey;
           `}
           knobCSS={css`
             ${selectors.hwot} {
               transform: scale(1.2);
             }
+          `}
+          labelCSS={css`
+            font-size: 1.8rem;
+            font-weight: 700;
+          `}
+          endingTrackCSS={css`
+            background: grey;
           `}
           style={{
             transform: 'translate3d(5rem, 0, 0) rotateX(20deg) rotateY(-20deg)',
@@ -97,9 +97,9 @@ export default function() {
         />
       </StyledRoot>
       <RangeSlider
-        min={0}
-        max={360}
         defaultRange={[0, 360]}
+        max={360}
+        min={0}
         orientation='horizontal'
         steps={359}
         tintColor='#fff'
@@ -125,10 +125,10 @@ export default function() {
         }}
       />
       <DebugConsole
-        title='?: Dial+Sliders'
         maxEntries={1}
         message={`Position: ${position.toFixed(3)}, Size: ${index}, Angle: ${Math.round(angle)}°, Min: ${Math.round(min)}°, Max: ${Math.round(max)}°`}
         style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
+        title='?: Dial+Sliders'
       />
     </>
   )

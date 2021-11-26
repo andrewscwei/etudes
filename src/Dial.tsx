@@ -1,22 +1,7 @@
-import React from 'react'
-import styled, { CSSProp, CSSProperties } from 'styled-components'
+import React, { HTMLAttributes } from 'react'
+import styled, { CSSProp } from 'styled-components'
 
-export interface Props {
-  /**
-   * ID attribute of the root element.
-   */
-  id?: string
-
-  /**
-   * Class attribute of the component.
-   */
-  className?: string
-
-  /**
-   * Inline style attribute of the root element.
-   */
-  style?: CSSProperties
-
+export type Props = HTMLAttributes<HTMLDivElement> & {
   /**
    * Current angle reading of the compass, between 0.0 - 360.0 degrees, inclusive.
    */
@@ -83,11 +68,11 @@ function arcPath(x: number, y: number, radius: number, startAngle: number, endAn
 
 /**
  * A circular dial with a knob and a track.
+ *
+ * @requires react
+ * @requires styled-components
  */
 export default function Dial({
-  id,
-  className,
-  style,
   angle = 0,
   radius = 50,
   knobLength = 30,
@@ -95,12 +80,14 @@ export default function Dial({
   knobCSS,
   trackThickness = 2,
   trackCSS,
+  style,
+  ...props
 }: Props) {
   const diameter = radius * 2
   const clampedKnobAngle = Math.max(0, Math.min(360, knobLength))
 
   return (
-    <StyledRoot id={id} className={className} style={{ ...style, width: `${diameter}px`, height: `${diameter}px` }}>
+    <StyledRoot style={{ ...style, width: `${diameter}px`, height: `${diameter}px` }} {...props}>
       <StyledTrack>
         <svg width={diameter} height={diameter} viewBox={`0 0 ${diameter} ${diameter}`}>
           <StyledTrackCircle
