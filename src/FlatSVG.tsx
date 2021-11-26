@@ -1,34 +1,43 @@
-import React, { CSSProperties, FunctionComponent, PropsWithChildren } from 'react'
+import React, { CSSProperties } from 'react'
 import styled, { css } from 'styled-components'
 
-export type Props = PropsWithChildren<{
+export type Props = {
+  id?: string
   className?: string
-  src: string
   style?: CSSProperties
+  isAnimated?: boolean
   fillColor?: string
   strokeColor?: string
-  isAnimated?: boolean
-}>
+  svgMarkup: string
+}
 
-const FlatSVG: FunctionComponent<Props> = ({
+/**
+ * A component whose root element wraps an SVG markup.
+ *
+ * @requires react
+ * @requires styled-component
+ */
+export default function FlatSVG({
+  id,
   className,
   style,
-  isAnimated,
+  isAnimated = false,
   fillColor,
   strokeColor,
-  src,
-}: Props) => (
-  <StyledRoot
-    className={className}
-    dangerouslySetInnerHTML={{ __html: src }}
-    fillColor={fillColor}
-    isAnimated={isAnimated ?? false}
-    strokeColor={strokeColor}
-    style={style ?? {}}
-  />
-)
-
-export default FlatSVG
+  svgMarkup,
+}: Props) {
+  return (
+    <StyledRoot
+      id={id}
+      className={className}
+      dangerouslySetInnerHTML={{ __html: svgMarkup }}
+      isAnimated={isAnimated}
+      fillColor={fillColor}
+      strokeColor={strokeColor}
+      style={style}
+    />
+  )
+}
 
 const StyledRoot = styled.figure<{
   fillColor?: string
@@ -54,7 +63,6 @@ const StyledRoot = styled.figure<{
       transition-property: stroke, fill, transform;
       transition-duration: 100ms;
       transition-timing-function: ease-out;
-      will-change: stroke, fill, transform;
     `}
 
     * {
