@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components'
 import Compass from '../../../src/Compass'
 import DebugConsole from '../../../src/DebugConsole'
 import RangeSlider from '../../../src/RangeSlider'
-import Slider, { sliderBreakpointsFactory } from '../../../src/Slider'
+import Slider, { generateBreakpoints } from '../../../src/Slider'
 
 export interface Props {}
 
@@ -42,29 +42,30 @@ export default class Container extends PureComponent<Props, State> {
             style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg)' }}
           />
           <Slider
-            gutterPadding={0}
+            gutterPadding={10}
             onPositionChange={position => this.setState({ position })}
-            breakpoints={sliderBreakpointsFactory(10, (i, p) => `${Math.round(this.getAngleByPosition(p))}°`)}
+            breakpoints={generateBreakpoints(10)}
+            labelProvider={(p, i) => `${Math.round(this.getAngleByPosition(p))}°`}
             knobWidth={60}
             knobHeight={40}
             isInverted={false}
+            key={this.state.max}
             orientation='vertical'
             defaultPosition={.5}
             css={css`
               ${align.cc}
+              height: ${this.state.max};
             `}
-            labelCSS={props => css`
+            labelCSS={css`
               font-size: 1.8rem;
               font-weight: 700;
             `}
-            knobCSS={props => css`
+            knobCSS={css`
               ${selectors.hwot} {
                 transform: scale(1.2);
               }
             `}
-            style={{
-              transform: 'translate3d(0, 0, 0) rotateX(20deg) rotateY(-20deg)',
-            }}
+            style={{ transform: 'translate3d(0, 0, 0) rotateX(20deg) rotateY(-20deg)' }}
           />
         </StyledRoot>
         <RangeSlider

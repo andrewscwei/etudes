@@ -1,6 +1,6 @@
 {
   "name": "etudes",
-  "version": "0.27.0",
+  "version": "0.28.0",
   "description": "A study of styled React components",
   "main": "lib",
   "scripts": {
@@ -79,5 +79,8 @@
     "dirty-dom": "^7.0.0",
     "interactjs": "1.10.11",
     "spase": "^6.2.0"
+  },
+  "dependencies": {
+    "classnames": "^2.3.1"
   }
 }
