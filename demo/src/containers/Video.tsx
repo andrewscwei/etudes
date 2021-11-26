@@ -1,8 +1,8 @@
 import { align, container } from 'promptu'
 import React, { Fragment, PureComponent } from 'react'
 import styled from 'styled-components'
-import DebugConsole from '../../../src/DebugConsole'
-import Video from '../../../src/Video'
+import DebugConsole from '../../../lib/DebugConsole'
+import Video from '../../../lib/Video'
 import $$Video from '../assets/videos/video.mp4'
 
 export interface Props {}

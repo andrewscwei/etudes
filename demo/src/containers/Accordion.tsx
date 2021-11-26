@@ -2,9 +2,9 @@ import $$ExpandIcon from '!!raw-loader!../assets/images/expand-icon.svg'
 import { animations, container, selectors } from 'promptu'
 import React, { Fragment, FunctionComponent, PureComponent } from 'react'
 import styled, { css } from 'styled-components'
-import Accordion, { ItemComponentProps } from '../../../src/Accordion'
-import DebugConsole from '../../../src/DebugConsole'
-import { Orientation } from '../../../src/types'
+import Accordion, { ItemComponentProps } from '../../../lib/Accordion'
+import DebugConsole from '../../../lib/DebugConsole'
+import { Orientation } from '../../../lib/types'
 
 export interface Props {}
 

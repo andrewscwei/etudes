@@ -2,10 +2,10 @@ import $$ExpandIcon from '!!raw-loader!../assets/images/expand-icon.svg'
 import { animations, container, selectors } from 'promptu'
 import React, { Fragment, FunctionComponent, PureComponent } from 'react'
 import styled, { css } from 'styled-components'
-import DebugConsole from '../../../src/DebugConsole'
-import Dropdown, { ItemComponentProps as DropdownItemComponentProps } from '../../../src/Dropdown'
-import List, { ItemComponentProps as ListItemComponentProps } from '../../../src/List'
-import { Orientation } from '../../../src/types'
+import DebugConsole from '../../../lib/DebugConsole'
+import Dropdown, { ItemComponentProps as DropdownItemComponentProps } from '../../../lib/Dropdown'
+import List, { ItemComponentProps as ListItemComponentProps } from '../../../lib/List'
+import { Orientation } from '../../../lib/types'
 
 export interface Props {}
 

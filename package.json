@@ -1,6 +1,6 @@
 {
   "name": "etudes",
-  "version": "0.28.0",
+  "version": "0.29.0",
   "description": "A study of styled React components",
   "main": "lib",
   "scripts": {
@@ -8,7 +8,7 @@
     "prebuild": "npm run lint",
     "build": "npm run clean && tsc -p tsconfig.json",
     "pages": "rimraf .gh-pages && webpack --config demo/config/build.conf.ts",
-    "demo": "cross-env NODE_ENV=development webpack-cli serve --mode development --hot --config demo/config/build.conf.ts",
+    "demo": "npm run clean && concurrently \"npm run build -- --watch\" \"wait-on lib && cross-env NODE_ENV=development webpack-cli serve --mode development --hot --config demo/config/build.conf.ts\"",
     "test": "echo \"No tests yet :)\"",
     "lint": "eslint --ext .ts --ext .tsx src demo",
     "lint:fix": "npm run lint -- --fix"
@@ -48,6 +48,7 @@
     "@typescript-eslint/parser": "^5.4.0",
     "babel-loader": "^8.2.3",
     "babel-plugin-styled-components": "^2.0.1",
+    "concurrently": "^6.4.0",
     "cross-env": "^7.0.3",
     "debug": "^4.3.2",
     "dirty-dom": "^7.0.0",
@@ -67,6 +68,7 @@
     "ts-node": "^10.4.0",
     "typescript": "^4.5.2",
     "url-loader": "^4.1.1",
+    "wait-on": "^6.0.0",
     "webpack": "^5.64.3",
     "webpack-cli": "^4.9.1",
     "webpack-dev-server": "^4.5.0"

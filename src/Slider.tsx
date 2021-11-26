@@ -206,36 +206,19 @@ export default function Slider({
   knobCSS,
   labelCSS,
   breakpoints,
-  autoSnap = true,
+  autoSnap = false,
   defaultIndex,
   onIndexChange,
 }: Props) {
-  /**
-   * Gets the current position. If `natural` is `true`, the uninverted (if `isInverted` is set to
-   * `true`) position will be returned.
-   *
-   * @param natural - Specifies if the natural position should be returned in case `isInverted` is
-   *                  specified.
-   *
-   * @returns The current position.
-   */
-  function getPosition(natural = false): number {
-    if (natural) return isInverted ? (1 - position.current) : position.current
-    return position.current
-  }
-
   /**
    * Sets the current position. The position should be normalized. That is, inversion should be
    * taken care of prior to passing the new value to this method if `isInverted` is `true`.
    *
    * @param value - The value to set the position to.
    */
-  function setPosition(value: number) {
-    position.current = value
-
-    if (onlyDispatchesOnDragEnd && isDragging) return
-    onPositionChange?.(position.current)
-    if (breakpoints) onIndexChange?.(getClosestIndex())
+  function setLivePosition(value: number) {
+    livePosition.current = value
+    setPosition(value)
   }
 
   /**
@@ -252,7 +235,7 @@ export default function Slider({
 
     for (let i = 0, n = breakpoints.length; i < n; i++) {
       const breakpoint = getPositionByIndex(i)
-      const delta = Math.abs(getPosition() - breakpoint)
+      const delta = Math.abs(position - breakpoint)
 
       if (isNaN(minDelta) || (delta < minDelta)) {
         minDelta = delta
@@ -317,14 +300,14 @@ export default function Slider({
    */
   function onKnobDragMove(delta: number) {
     const rect = Rect.from(rootRef.current) ?? new Rect()
-    const naturalPosition = getPosition(true)
+    const naturalPosition = isInverted ? (1 - livePosition.current) : livePosition.current
     const naturalNewPositionX = naturalPosition * rect.width + delta
     const naturalNewPositionY = naturalPosition * rect.height + delta
     const naturalNewPosition = (orientation === 'vertical') ? Math.max(0, Math.min(1, naturalNewPositionY / rect.height)) : Math.max(0, Math.min(1, naturalNewPositionX / rect.width))
     const newPosition = isInverted ? (1 - naturalNewPosition) : naturalNewPosition
 
     setIsDragging(true)
-    setPosition(newPosition)
+    setLivePosition(newPosition)
   }
 
   /**
@@ -344,14 +327,17 @@ export default function Slider({
   function snapToClosestBreakpointIfNeeded() {
     if (!autoSnap || !breakpoints) return
     const position = getPositionByIndex(getClosestIndex())
-    setPosition(position)
+    setLivePosition(position)
   }
 
   const rootRef = useRef<HTMLDivElement>(null)
   const knobRef = useRef<HTMLButtonElement>(null)
-  const position = useRef(((breakpoints !== undefined) && (defaultIndex !== undefined)) ? getPositionByIndex(defaultIndex) : defaultPosition)
+  const livePosition = useRef(((breakpoints !== undefined) && (defaultIndex !== undefined)) ? getPositionByIndex(defaultIndex) : defaultPosition)
 
+  const [position, setPosition] = useState(livePosition.current)
   const [isDragging, setIsDragging] = useState<boolean | undefined>(undefined)
+
+  const naturalPosition = isInverted ? 1 - position : position
 
   useEffect(() => {
     initInteractivity()
@@ -365,31 +351,39 @@ export default function Slider({
     snapToClosestBreakpointIfNeeded()
   }, [autoSnap])
 
+  useEffect(() => {
+    if (onlyDispatchesOnDragEnd && isDragging) return
+    onPositionChange?.(position)
+    if (breakpoints) onIndexChange?.(getClosestIndex())
+  }, [position])
+
   return (
     <StyledRoot ref={rootRef} id={id} className={className} orientation={orientation} style={style}>
       <StyledGutter orientation={orientation} css={startingGutterCSS}
         style={orientation === 'vertical' ? {
           top: 0,
-          height: `calc(${getPosition(true)*100}% - ${knobHeight*.5}px - ${gutterPadding}px)`,
+          height: `calc(${naturalPosition*100}% - ${knobHeight*.5}px - ${gutterPadding}px)`,
         } : {
           left: 0,
-          width: `calc(${getPosition(true)*100}% - ${knobWidth*.5}px - ${gutterPadding}px)`,
+          width: `calc(${naturalPosition*100}% - ${knobWidth*.5}px - ${gutterPadding}px)`,
         }}
       />
       <StyledKnobContainer ref={knobRef} style={{
         transform: 'translate3d(-50%, -50%, 0)',
         ...(orientation === 'vertical' ? {
-          top: `${position.current * 100}%`,
+          left: '50%',
+          top: `${position*100}%`,
           transition: isDragging === false ? 'top 100ms ease-out' : 'none',
         } : {
-          left: `${position.current * 100}%`,
+          left: `${position*100}%`,
+          top: '50%',
           transition: isDragging === false ? 'left 100ms ease-out' : 'none',
         }),
       }}>
         <StyledKnob
           className={classNames({
-            'at-end': isInverted ? (position.current === 0) : (position.current === 1),
-            'at-start': isInverted ? (position.current === 1) : (position.current === 0),
+            'at-end': isInverted ? (position === 0) : (position === 1),
+            'at-start': isInverted ? (position === 1) : (position === 0),
             'dragging': isDragging === true,
             'idle': isDragging === false,
           })}
@@ -400,17 +394,17 @@ export default function Slider({
           }}
         >
           {breakpoints && isLabelVisible && labelProvider && (
-            <StyledLabel knobHeight={knobHeight} css={labelCSS}>{labelProvider(getPosition(), getClosestIndex())}</StyledLabel>
+            <StyledLabel knobHeight={knobHeight} css={labelCSS}>{labelProvider(position, getClosestIndex())}</StyledLabel>
           )}
         </StyledKnob>
       </StyledKnobContainer>
       <StyledGutter orientation={orientation} css={endingGutterCSS}
         style={orientation === 'vertical' ? {
           bottom: 0,
-          height: `calc(${(1 - getPosition(true))*100}% - ${knobHeight*.5}px - ${gutterPadding}px)`,
+          height: `calc(${(1 - naturalPosition)*100}% - ${knobHeight*.5}px - ${gutterPadding}px)`,
         } : {
           right: 0,
-          width: `calc(${(1 - getPosition(true))*100}% - ${knobWidth*.5}px - ${gutterPadding}px)`,
+          width: `calc(${(1 - naturalPosition)*100}% - ${knobWidth*.5}px - ${gutterPadding}px)`,
         }}
       />
     </StyledRoot>

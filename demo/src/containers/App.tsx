@@ -1,7 +1,7 @@
 import { align, container, selectors } from 'promptu'
 import React, { createRef, Fragment, PureComponent } from 'react'
 import styled from 'styled-components'
-import BurgerButton from '../../../src/BurgerButton'
+import BurgerButton from '../../../lib/BurgerButton'
 import $$GithubIcon from '../assets/images/github-icon.svg'
 import Accordion from './Accordion'
 import Compass from './Compass'
@@ -57,7 +57,7 @@ class App extends PureComponent<Props, State> {
   }
 
   renderFeaturedComponent() {
-    debug(`Loading component ID ${this.state.featuredComponent}... OK`)
+    if (this.state.featuredComponent) debug(`Loading component ID ${this.state.featuredComponent}... OK`)
 
     switch (this.state.featuredComponent) {
     case 'masonry-grid': return <MasonryGrid/>

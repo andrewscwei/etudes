@@ -1,10 +1,10 @@
 import { align, container, selectors } from 'promptu'
 import React, { Fragment, PureComponent } from 'react'
 import styled, { css } from 'styled-components'
-import Compass from '../../../src/Compass'
-import DebugConsole from '../../../src/DebugConsole'
-import RangeSlider from '../../../src/RangeSlider'
-import Slider, { generateBreakpoints } from '../../../src/Slider'
+import Compass from '../../../lib/Compass'
+import DebugConsole from '../../../lib/DebugConsole'
+import RangeSlider from '../../../lib/RangeSlider'
+import Slider, { generateBreakpoints } from '../../../lib/Slider'
 
 export interface Props {}
 

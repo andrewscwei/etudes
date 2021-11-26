@@ -2,9 +2,9 @@ import { container } from 'promptu'
 import React, { createRef, Fragment, PureComponent } from 'react'
 import { Size } from 'spase'
 import styled from 'styled-components'
-import DebugConsole from '../../../src/DebugConsole'
-import Panorama from '../../../src/Panorama'
-import PanoramaSlider from '../../../src/PanoramaSlider'
+import DebugConsole from '../../../lib/DebugConsole'
+import Panorama from '../../../lib/Panorama'
+import PanoramaSlider from '../../../lib/PanoramaSlider'
 import $$PanoramaImage from '../assets/images/panorama.jpg'
 
 export interface Props {
@@ -43,7 +43,7 @@ export default class Container extends PureComponent<Props, State> {
         <StyledRoot>
           <Panorama
             ref={this.nodeRefs.panorama}
-            src={$$PanoramaImage}
+            lib={$$PanoramaImage}
             defaultAngle={this.props.defaultAngle}
             style={{
               height: '40rem',
@@ -55,7 +55,7 @@ export default class Container extends PureComponent<Props, State> {
           />
           <PanoramaSlider
             ref={this.nodeRefs.slider}
-            src={$$PanoramaImage}
+            lib={$$PanoramaImage}
             viewportSize={this.nodeRefs.panorama.current?.rect.size ?? new Size()}
             defaultAngle={this.props.defaultAngle}
             onAngleChange={angle => {

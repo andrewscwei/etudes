@@ -1,8 +1,8 @@
 import { container } from 'promptu'
 import React, { Fragment, PureComponent } from 'react'
 import styled from 'styled-components'
-import DebugConsole from '../../../src/DebugConsole'
-import MasonryGrid from '../../../src/MasonryGrid'
+import DebugConsole from '../../../lib/DebugConsole'
+import MasonryGrid from '../../../lib/MasonryGrid'
 
 export interface Props {}
 
