@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import BurgerButton from '../../../lib/BurgerButton'
 import $$GithubIcon from '../assets/images/github-icon.svg'
 import Accordion from './Accordion'
-import Compass from './Compass'
+import DialSlidersDemo from './DialSlidersDemo'
 import List from './List'
 import MasonryGrid from './MasonryGrid'
 import Panorama from './Panorama'
@@ -63,7 +63,7 @@ class App extends PureComponent<Props, State> {
     case 'masonry-grid': return <MasonryGrid/>
     case 'list': return <List/>
     case 'accordion': return <Accordion/>
-    case 'compass': return <Compass/>
+    case 'dial+sliders': return <DialSlidersDemo/>
     case 'video': return <Video/>
     case 'panorama': return <Panorama/>
     default: return (
@@ -101,7 +101,7 @@ class App extends PureComponent<Props, State> {
             <StyledNavButton isActive={this.state.featuredComponent === 'masonry-grid'} onClick={() => this.setState({ featuredComponent: 'masonry-grid' })}>Masonry Grid</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'list'} onClick={() => this.setState({ featuredComponent: 'list' })}>List+Dropdown</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'accordion'} onClick={() => this.setState({ featuredComponent: 'accordion' })}>Accordion</StyledNavButton>
-            <StyledNavButton isActive={this.state.featuredComponent === 'compass'} onClick={() => this.setState({ featuredComponent: 'compass' })}>Compass+Sliders</StyledNavButton>
+            <StyledNavButton isActive={this.state.featuredComponent === 'dial+sliders'} onClick={() => this.setState({ featuredComponent: 'dial+sliders' })}>Dial+Sliders</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'video'} onClick={() => this.setState({ featuredComponent: 'video' })}>Video</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'panorama'} onClick={() => this.setState({ featuredComponent: 'panorama' })}>Panorama+Slider</StyledNavButton>
           </StyledNav>
