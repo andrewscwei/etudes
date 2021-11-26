@@ -42,19 +42,17 @@ export default class Container extends PureComponent<Props, State> {
             style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg)' }}
           />
           <Slider
-            gutterPadding={10}
-            onPositionChange={position => this.setState({ position })}
             breakpoints={generateBreakpoints(10)}
-            labelProvider={(p, i) => `${Math.round(this.getAngleByPosition(p))}°`}
-            knobWidth={60}
-            knobHeight={40}
-            isInverted={false}
-            key={this.state.max}
-            orientation='vertical'
             defaultPosition={.5}
+            gutterPadding={10}
+            isInverted={false}
+            knobHeight={40}
+            knobWidth={60}
+            labelProvider={(p, i) => `${Math.round(this.getAngleByPosition(p))}°`}
+            onPositionChange={position => this.setState({ position })}
+            orientation='vertical'
             css={css`
               ${align.cc}
-              height: ${this.state.max};
             `}
             labelCSS={css`
               font-size: 1.8rem;
@@ -65,7 +63,10 @@ export default class Container extends PureComponent<Props, State> {
                 transform: scale(1.2);
               }
             `}
-            style={{ transform: 'translate3d(0, 0, 0) rotateX(20deg) rotateY(-20deg)' }}
+            style={{
+              height: `${this.state.max}px`,
+              transform: 'translate3d(0, 0, 0) rotateX(20deg) rotateY(-20deg)',
+            }}
           />
         </StyledRoot>
         <RangeSlider

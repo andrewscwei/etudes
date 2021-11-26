@@ -211,30 +211,6 @@ export default function Slider({
   onIndexChange,
 }: Props) {
   /**
-   * Updates the calculated rect of this slider. If the root element is not rendered yet, the
-   * calculated rect will be zero.
-   */
-  function updateRect() {
-    setRect(Rect.from(rootRef.current) ?? new Rect())
-  }
-
-  /**
-   * Updates the current knob position of the slider.
-   */
-  function updateKnobPosition() {
-    if (!rect) return
-
-    const naturalPosition = getPosition(true)
-
-    if (orientation === 'vertical') {
-      setKnobPosition(naturalPosition * rect.height)
-    }
-    else {
-      setKnobPosition(naturalPosition * rect.width)
-    }
-  }
-
-  /**
    * Gets the current position. If `natural` is `true`, the uninverted (if `isInverted` is set to
    * `true`) position will be returned.
    *
@@ -244,12 +220,8 @@ export default function Slider({
    * @returns The current position.
    */
   function getPosition(natural = false): number {
-    if (natural) {
-      return isInverted ? (1 - position.current) : position.current
-    }
-    else {
-      return position.current
-    }
+    if (natural) return isInverted ? (1 - position.current) : position.current
+    return position.current
   }
 
   /**
@@ -260,43 +232,10 @@ export default function Slider({
    */
   function setPosition(value: number) {
     position.current = value
-    updateKnobPosition()
 
     if (onlyDispatchesOnDragEnd && isDragging) return
-
     onPositionChange?.(position.current)
-
     if (breakpoints) onIndexChange?.(getClosestIndex())
-  }
-
-  /**
-   * Length of the gutter before the knob in pixels. If the orientation of the slider is horizontal,
-   * this refers to the width, else this refers to the height.
-   *
-   * @returns The gutter length.
-   */
-  function getStartingGutterLength(): number {
-    if (!rect) return 0
-
-    const naturalPosition = getPosition(true)
-    const knobLength = orientation === 'vertical' ? knobHeight : knobWidth
-    const sliderLength = orientation === 'vertical' ? rect.height : rect.width
-    return Math.max(0, naturalPosition * sliderLength - (knobLength / 2) - gutterPadding)
-  }
-
-  /**
-   * Length of the gutter after the knob in pixels. If the orientation of the slider is horizontal,
-   * this refers to the width, else this refers to the height.
-   *
-   * @returns The gutter length.
-   */
-  function getEndingGutterLength(): number {
-    if (!rect) return 0
-
-    const naturalPosition = getPosition(true)
-    const knobLength = orientation === 'vertical' ? knobHeight : knobWidth
-    const sliderLength = orientation === 'vertical' ? rect.height : rect.width
-    return Math.max(0, (1 - naturalPosition) * sliderLength - (knobLength / 2) - gutterPadding)
   }
 
   /**
@@ -308,20 +247,20 @@ export default function Slider({
   function getClosestIndex(): number {
     if (!breakpoints) return -1
 
-    let idx = 0
-    let delta = NaN
+    let index = 0
+    let minDelta = NaN
 
     for (let i = 0, n = breakpoints.length; i < n; i++) {
       const breakpoint = getPositionByIndex(i)
-      const d = Math.abs(getPosition() - breakpoint)
+      const delta = Math.abs(getPosition() - breakpoint)
 
-      if (isNaN(delta) || (d < delta)) {
-        delta = d
-        idx = i
+      if (isNaN(minDelta) || (delta < minDelta)) {
+        minDelta = delta
+        index = i
       }
     }
 
-    return idx
+    return index
   }
 
   /**
@@ -334,7 +273,7 @@ export default function Slider({
    */
   function getPositionByIndex(index: number): number {
     if (!breakpoints) return NaN
-    return breakpoints[index] ?? (index / (breakpoints.length - 1))
+    return breakpoints[index]
   }
 
   /**
@@ -377,8 +316,7 @@ export default function Slider({
    * @param delta - The distance traveled (in pixels) since the last invocation of this handler.
    */
   function onKnobDragMove(delta: number) {
-    if (!rect) return
-
+    const rect = Rect.from(rootRef.current) ?? new Rect()
     const naturalPosition = getPosition(true)
     const naturalNewPositionX = naturalPosition * rect.width + delta
     const naturalNewPositionY = naturalPosition * rect.height + delta
@@ -386,7 +324,6 @@ export default function Slider({
     const newPosition = isInverted ? (1 - naturalNewPosition) : naturalNewPosition
 
     setIsDragging(true)
-
     setPosition(newPosition)
   }
 
@@ -411,25 +348,18 @@ export default function Slider({
   }
 
   const rootRef = useRef<HTMLDivElement>(null)
-  const knobRef = useRef<HTMLDivElement>(null)
+  const knobRef = useRef<HTMLButtonElement>(null)
   const position = useRef(((breakpoints !== undefined) && (defaultIndex !== undefined)) ? getPositionByIndex(defaultIndex) : defaultPosition)
 
-  const [rect, setRect] = useState<Rect | undefined>(undefined)
   const [isDragging, setIsDragging] = useState<boolean | undefined>(undefined)
-  const [knobPosition, setKnobPosition] = useState(NaN)
-
-  useEffect(() => {
-    updateRect()
-  }, [rootRef, orientation])
 
   useEffect(() => {
     initInteractivity()
-    updateKnobPosition()
 
     return () => {
       deinitInteractivity()
     }
-  }, [rect])
+  }, [])
 
   useEffect(() => {
     snapToClosestBreakpointIfNeeded()
@@ -437,36 +367,52 @@ export default function Slider({
 
   return (
     <StyledRoot ref={rootRef} id={id} className={className} orientation={orientation} style={style}>
-      <StyledGutter orientation={orientation} css={startingGutterCSS} style={orientation === 'vertical' ? { top: 0, height: `${getStartingGutterLength()}px` } : { left: 0, width: `${getStartingGutterLength()}px` }}/>
-      <StyledKnob
-        ref={knobRef}
-        className={classNames({
-          'at-end': isInverted ? (position.current === 0) : (position.current === 1),
-          'at-start': isInverted ? (position.current === 1) : (position.current === 0),
-          'dragging': isDragging === true,
-          'idle': isDragging === false,
-        })}
-        css={knobCSS}
-        style={{
-          height: `${knobHeight}px`,
-          position: 'absolute',
-          width: `${knobWidth}px`,
-          zIndex: 1,
-          ...(orientation === 'vertical' ? {
-            margin: `${-knobHeight / 2 + knobPosition}px 0 0 ${((rect?.width ?? 0) - knobWidth) / 2}px`,
-          } : {
-            margin: `${((rect?.height ?? 0) - knobHeight) / 2}px 0 0 ${-knobWidth / 2 + knobPosition}px`,
-          }),
-          ...!!rect ? {} : {
-            visibility: 'hidden',
-          },
+      <StyledGutter orientation={orientation} css={startingGutterCSS}
+        style={orientation === 'vertical' ? {
+          top: 0,
+          height: `calc(${getPosition(true)*100}% - ${knobHeight*.5}px - ${gutterPadding}px)`,
+        } : {
+          left: 0,
+          width: `calc(${getPosition(true)*100}% - ${knobWidth*.5}px - ${gutterPadding}px)`,
         }}
-      >
-        {breakpoints && isLabelVisible && labelProvider && (
-          <StyledLabel knobHeight={knobHeight} css={labelCSS}>{labelProvider(getPosition(), getClosestIndex())}</StyledLabel>
-        )}
-      </StyledKnob>
-      <StyledGutter orientation={orientation} css={endingGutterCSS} style={orientation === 'vertical' ? { bottom: 0, height: `${getEndingGutterLength()}px` } : { right: 0, width: `${getEndingGutterLength()}px` }}/>
+      />
+      <StyledKnobContainer ref={knobRef} style={{
+        transform: `translate3d(-50%, -50%, 0)`,
+        ...(orientation === 'vertical' ? {
+          top: `${position.current * 100}%`,
+          transition: isDragging === false ? 'top 100ms ease-out' : 'none',
+        } : {
+          left: `${position.current * 100}%`,
+          transition: isDragging === false ? 'left 100ms ease-out' : 'none',
+        }),
+      }}>
+        <StyledKnob
+          className={classNames({
+            'at-end': isInverted ? (position.current === 0) : (position.current === 1),
+            'at-start': isInverted ? (position.current === 1) : (position.current === 0),
+            'dragging': isDragging === true,
+            'idle': isDragging === false,
+          })}
+          css={knobCSS}
+          style={{
+            height: `${knobHeight}px`,
+            width: `${knobWidth}px`,
+          }}
+        >
+          {breakpoints && isLabelVisible && labelProvider && (
+            <StyledLabel knobHeight={knobHeight} css={labelCSS}>{labelProvider(getPosition(), getClosestIndex())}</StyledLabel>
+          )}
+        </StyledKnob>
+      </StyledKnobContainer>
+      <StyledGutter orientation={orientation} css={endingGutterCSS}
+        style={orientation === 'vertical' ? {
+          bottom: 0,
+          height: `calc(${(1 - getPosition(true))*100}% - ${knobHeight*.5}px - ${gutterPadding}px)`,
+        } : {
+          right: 0,
+          width: `calc(${(1 - getPosition(true))*100}% - ${knobWidth*.5}px - ${gutterPadding}px)`,
+        }}
+      />
     </StyledRoot>
   )
 }
@@ -493,6 +439,14 @@ const StyledLabel = styled.label<LabelCSSProps>`
   font-size: ${props => props.knobHeight * .5}px;
   pointer-events: none;
   user-select: none;
+`
+
+const StyledKnobContainer = styled.button`
+  position: absolute;
+  z-index: 1;
+  transition-duration: 100ms;
+  transition-property: top;
+  transition-timing-function: ease-out;
 `
 
 const StyledKnob = styled.div`
