@@ -9,7 +9,7 @@ import Slider, { generateBreakpoints } from '../../../lib/Slider'
 export interface Props {}
 
 export interface State {
-  index: number,
+  index?: number
   max: number
   min: number
   position: number
@@ -17,10 +17,9 @@ export interface State {
 
 export default class Container extends PureComponent<Props, State> {
   state: State = {
-    index: 0,
     max: 360,
     min: 0,
-    position: 0,
+    position: 0.5,
   }
 
   getAngleByPosition(position: number): number {
@@ -70,12 +69,6 @@ export default class Container extends PureComponent<Props, State> {
               height: `${this.state.max}px`,
               transform: 'translate3d(0, 0, 0) rotateX(20deg) rotateY(-20deg)',
             }}
-          />
-          <Slider
-            css={css`
-              left: 10rem;
-            `}
-            onPositionChange={position => this.setState({ position })}
           />
         </StyledRoot>
         <RangeSlider

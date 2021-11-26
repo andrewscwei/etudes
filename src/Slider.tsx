@@ -81,7 +81,7 @@ export type Props = {
   orientation?: Orientation
 
   /**
-   * The current position. This is ignored if `defaultIndex` and breakpoints are provided.
+   * The current position. This is ignored if `index` and `breakpoints` are provided.
    */
   position?: number
 
@@ -138,11 +138,11 @@ export type Props = {
   autoSnap?: boolean
 
   /**
-   * The default index. This is only used if breakpoints are provided. On the other hand, if
-   * breakpoints are provided, the default position will be calculated based on this value, making
+   * The current index. This is only used if breakpoints are provided. On the other hand, if
+   * breakpoints are provided, the current position will be calculated based on this value, making
    * `position` irrelevant.
    */
-  defaultIndex?: number
+  index?: number
 
   /**
    * Handler invoked when index changes. This happens simultaneously with `onPositionChange`. Note
@@ -207,7 +207,7 @@ export default function Slider({
   labelCSS,
   breakpoints,
   autoSnap = true,
-  defaultIndex,
+  index,
   onIndexChange,
 }: Props) {
   /**
@@ -259,7 +259,7 @@ export default function Slider({
   function setLivePosition(value: number) {
     livePosition.current = value
     _setPosition(value)
-    if (breakpoints) setIndex(getClosestIndex())
+    if (breakpoints) _setIndex(getClosestIndex())
   }
 
   /**
@@ -303,7 +303,7 @@ export default function Slider({
    */
   function onKnobDragMove(delta: number) {
     const rect = Rect.from(rootRef.current) ?? new Rect()
-    const naturalPosition = isInverted ? (1 - livePosition.current) : livePosition.current
+    const naturalPosition = isInverted ? 1 - livePosition.current : livePosition.current
     const naturalNewPositionX = naturalPosition * rect.width + delta
     const naturalNewPositionY = naturalPosition * rect.height + delta
     const naturalNewPosition = (orientation === 'vertical') ? Math.max(0, Math.min(1, naturalNewPositionY / rect.height)) : Math.max(0, Math.min(1, naturalNewPositionX / rect.width))
@@ -335,10 +335,11 @@ export default function Slider({
 
   const rootRef = useRef<HTMLDivElement>(null)
   const knobRef = useRef<HTMLButtonElement>(null)
-  const livePosition = useRef(((breakpoints !== undefined) && (defaultIndex !== undefined)) ? getPositionByIndex(defaultIndex) : position)
 
-  const [index, setIndex] = useState((breakpoints !== undefined && defaultIndex !== undefined) ? defaultIndex : getClosestIndex())
+  const livePosition = useRef((breakpoints !== undefined && index !== undefined) ? getPositionByIndex(index) : position)
+
   const [_position, _setPosition] = useState(livePosition.current)
+  const [_index, _setIndex] = useState(getClosestIndex())
   const [isDragging, setIsDragging] = useState<boolean | undefined>(undefined)
 
   const naturalPosition = isInverted ? 1 - _position : _position
@@ -352,11 +353,23 @@ export default function Slider({
   }, [])
 
   useEffect(() => {
+    if (breakpoints && index !== undefined) return
     if (position === livePosition.current) return
 
     setIsDragging(undefined)
     setLivePosition(position)
   }, [position])
+
+  useEffect(() => {
+    if (!breakpoints || index === undefined) return
+
+    const position = getPositionByIndex(index)
+
+    if (position === livePosition.current) return
+
+    setIsDragging(undefined)
+    setLivePosition(position)
+  }, [index])
 
   useEffect(() => {
     if (onlyDispatchesOnDragEnd && isDragging) return
@@ -365,8 +378,8 @@ export default function Slider({
 
   useEffect(() => {
     if (onlyDispatchesOnDragEnd && isDragging) return
-    onIndexChange?.(index)
-  }, [index])
+    onIndexChange?.(_index)
+  }, [_index])
 
   useEffect(() => {
     snapToClosestBreakpointIfNeeded()
