@@ -60,6 +60,9 @@ export default class Container extends PureComponent<Props, State> {
               font-size: 1.8rem;
               font-weight: 700;
             `}
+            endingGutterCSS={css`
+              background: grey;
+            `}
             knobCSS={css`
               ${selectors.hwot} {
                 transform: scale(1.2);

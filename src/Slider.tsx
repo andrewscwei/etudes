@@ -454,6 +454,8 @@ const StyledGutter = styled.div<GutterCSSProps>`
     margin: auto 0;
     top: 0;
   `}
+
+  ${props => props.css}
 `
 
 const StyledLabel = styled.label<LabelCSSProps>`
@@ -461,6 +463,8 @@ const StyledLabel = styled.label<LabelCSSProps>`
   font-size: ${props => props.knobHeight * .5}px;
   pointer-events: none;
   user-select: none;
+
+  ${props => props.css}
 `
 
 const StyledKnobContainer = styled.button`
@@ -494,6 +498,8 @@ const StyledKnob = styled.div`
     opacity: .6;
     transition-property: background, color, transform, opacity;
   }
+
+  ${props => props.css}
 `
 
 const StyledRoot = styled.div<{
