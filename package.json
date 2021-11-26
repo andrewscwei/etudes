@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "rimraf lib",
     "prebuild": "npm run lint",
-    "build": "npm run clean && tsc -p tsconfig.json",
+    "build": "npm run clean && cross-env NODE_ENV=production tsc -p tsconfig.json",
     "pages": "rimraf .gh-pages && webpack --config demo/config/build.conf.ts",
     "demo": "npm run clean && concurrently \"npm run build -- --watch\" \"wait-on lib && cross-env NODE_ENV=development webpack-cli serve --mode development --hot --config demo/config/build.conf.ts\"",
     "test": "echo \"No tests yet :)\"",
