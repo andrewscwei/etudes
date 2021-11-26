@@ -116,6 +116,11 @@ export type Props = {
  * a scroll gutter after the knob. While the width and height of the slider is inferred from its CSS
  * rules, the width and height of the knob are set via props (`knobWidth` and `knobHeight`,
  * respectively). The size of the knob does not impact the size of the slider.
+ *
+ * @requires react
+ * @requires styled-components
+ * @requires spase
+ * @requires interactjs
  */
 export default function Slider({
   id,
