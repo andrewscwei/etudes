@@ -110,11 +110,12 @@ export type Props = {
 }
 
 /**
- * A slider component that divides the scroll gutter into two different elements—one that is before
- * the knob and one that is after the knob. This allows for individual styling customizations. The
- * width and height of the root element of this component is inferred from CSS. The dimension of the
- * knob itself does not impact that of the root element. This component supports both horizontal and
- * vertical orientations.
+ * A slider component supporting both horizontal and vertical orientations whose sliding position (a
+ * decimal between 0.0 and 1.0, inclusive) can be two-way binded. The component consists of four
+ * customizable elements: a draggable knob, a label on the knob, a scroll gutter before the knob and
+ * a scroll gutter after the knob. While the width and height of the slider is inferred from its CSS
+ * rules, the width and height of the knob are set via props (`knobWidth` and `knobHeight`,
+ * respectively). The size of the knob does not impact the size of the slider.
  */
 export default function Slider({
   id,
