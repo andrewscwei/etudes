@@ -5,7 +5,7 @@ import { Rect } from 'spase'
 import styled, { css, CSSProp } from 'styled-components'
 import { Orientation } from './types'
 
-const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:slider') : () => {}
+const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:stepwise-slider') : () => {}
 
 export type Props = {
   /**
@@ -31,19 +31,21 @@ export type Props = {
   isInverted?: boolean
 
   /**
-   * Indicates if position change events are dispatched only when dragging ends. When disabled,
-   * aforementioned events are fired repeatedly while dragging.
+   * Indicates if position/index change events are dispatched only when dragging ends. When
+   * disabled, aforementioned events are fired repeatedly while dragging.
    */
   onlyDispatchesOnDragEnd?: boolean
 
   /**
-   * A function that returns the label to be displayed at a given slider position.
+   * A function that returns the label to be displayed at a given slider position and closest step
+   * index (if steps are provided).
    *
    * @param position - The current slider position.
+   * @param index - The nearest step index (if steps are provided), or -1 if no steps are provided.
    *
    * @returns The label.
    */
-  labelProvider?: (position: number) => string
+  labelProvider?: (position: number, index: number) => string
 
   /**
    * Padding between the gutter and the knob in pixels.
@@ -66,9 +68,24 @@ export type Props = {
   orientation?: Orientation
 
   /**
-   * The current position.
+   * An array of step descriptors. A step is a position (0 - 1 inclusive) on the gutter where the
+   * knob should snap to if dragging stops near it. Ensure that there are at least two steps: one
+   * for the start of the gutter and one for the end.
    */
-  position?: number
+  steps?: readonly number[]
+
+  /**
+   * The current index.
+   */
+  index?: number
+
+  /**
+   * Handler invoked when index changes. This happens simultaneously with `onPositionChange`.
+   *
+   * @param index - The current step index.
+   * @param isDragging - Indicates if the index change is triggered by dragging the slider..
+   */
+  onIndexChange?: (index: number, isDragging: boolean) => void
 
   /**
    * Handler invoked when position changes.
@@ -110,13 +127,77 @@ export type Props = {
 }
 
 /**
- * A slider component that divides the scroll gutter into two different elements—one that is before
- * the knob and one that is after the knob. This allows for individual styling customizations. The
- * width and height of the root element of this component is inferred from CSS. The dimension of the
+ * Generates a set of steps compatible with this component.
+ *
+ * @param length - The number of steps. This must be at least 2 because you must include the
+ *                 starting and ending points.
+ *
+ * @returns An array of steps.
+ */
+export function generateSteps(length: number): readonly number[] {
+  if (length <= 1) throw new Error('`length` value must be greater than or equal to 2')
+  if (Math.round(length) !== length) throw new Error('`length` value must be an integer')
+
+  const interval = 1 / (length - 1)
+
+  return Array(length).fill(null).map((v, i) => {
+    const position = interval * i
+    return position
+  })
+}
+
+/**
+ * Gets the index of the step of which the specified position is closest to. If for whatever
+ * reason the index cannot be computed, -1 is returned.
+ *
+ * @param position - The position (0 - 1, inclusive).
+ * @param steps - The steps.
+ *
+ * @returns The nearest index.
+ */
+export function getNearestIndexByPosition(position: number, steps: readonly number[]): number {
+  let index = -1
+  let minDelta = NaN
+
+  for (let i = 0, n = steps.length; i < n; i++) {
+    const step = getPositionAt(i, steps)
+
+    if (isNaN(step)) continue
+
+    const delta = Math.abs(position - step)
+
+    if (isNaN(minDelta) || (delta < minDelta)) {
+      minDelta = delta
+      index = i
+    }
+  }
+
+  return index
+}
+
+/**
+ * Gets the position by step index. This value ranges between 0 - 1, inclusive.
+ *
+ * @param index - The step index.
+ * @param steps - The steps.
+ *
+ * @returns The position. If for whatever reason the position cannot be determined, `NaN` is
+ *          returned.
+ */
+export function getPositionAt(index: number, steps: readonly number[]): number {
+  if (index >= steps.length) return NaN
+  return steps[index]
+}
+
+/**
+ * A "stepwise" slider component that automatically snaps to certain points on the slider. The
+ * component divides the scroll gutter into two different elements—one that is before the knob and
+ * one that is after the knob. This allows for individual styling customizations. The width and
+ * height of the root element of this component is inferred from its CSS rules. The dimension of the
  * knob itself does not impact that of the root element. This component supports both horizontal and
  * vertical orientations.
  */
-export default function Slider({
+export default function StepwiseSlider({
   id,
   className,
   style,
@@ -126,7 +207,6 @@ export default function Slider({
   knobHeight = 30,
   knobWidth = 30,
   orientation = 'vertical',
-  position = 0,
   labelProvider,
   onDragEnd,
   onDragStart,
@@ -135,6 +215,9 @@ export default function Slider({
   endingGutterCSS,
   knobCSS,
   labelCSS,
+  steps = generateSteps(10),
+  index = 0,
+  onIndexChange,
 }: Props) {
   /**
    * Initializes input interactivity of the knob.
@@ -188,9 +271,11 @@ export default function Slider({
     const naturalNewPositionY = naturalPosition * rect.height + delta
     const naturalNewPosition = (orientation === 'vertical') ? Math.max(0, Math.min(1, naturalNewPositionY / rect.height)) : Math.max(0, Math.min(1, naturalNewPositionX / rect.width))
     const newPosition = isInverted ? 1 - naturalNewPosition : naturalNewPosition
+    const newIndex = getNearestIndexByPosition(newPosition, steps)
 
     setIsDragging(true)
     setLivePosition(newPosition)
+    setLiveIndex(newIndex)
   }
 
   /**
@@ -218,12 +303,28 @@ export default function Slider({
     _setPosition(position)
   }
 
+  /**
+   * Sets the current live index. The live index is different from the index state value. Because
+   * states are asynchronous by nature, this live index value is used to record index changes when
+   * drag event happens.
+   *
+   * @param index - The value to set the live index to.
+   */
+  function setLiveIndex(index: number) {
+    if (liveIndex.current === index) return
+    liveIndex.current = index
+    // debug('Updating live index...', 'OK', index)
+    _setIndex(index)
+  }
+
   const rootRef = useRef<HTMLDivElement>(null)
   const knobRef = useRef<HTMLButtonElement>(null)
 
-  const livePosition = useRef(position)
+  const livePosition = useRef(getPositionAt(index, steps))
+  const liveIndex = useRef(index)
 
   const [_position, _setPosition] = useState(livePosition.current)
+  const [_index, _setIndex] = useState(liveIndex.current)
   const [isDragging, setIsDragging] = useState<boolean | undefined>(undefined)
 
   const naturalPosition = isInverted ? 1 - _position : _position
@@ -238,19 +339,31 @@ export default function Slider({
 
   useEffect(() => {
     if (isDragging === true) return
-    if (position === _position) return
+    if (index === _index) return
     setIsDragging(undefined)
-    setLivePosition(position)
-  }, [position])
+    setLivePosition(getPositionAt(index, steps))
+    setLiveIndex(index)
+  }, [index])
 
   useEffect(() => {
     if (isDragging === true && onlyDispatchesOnDragEnd) return
-    onPositionChange?.(_position, isDragging === true)
+    onPositionChange?.(_position, isDragging !== undefined)
   }, [_position])
 
   useEffect(() => {
-    if (isDragging === false && onlyDispatchesOnDragEnd) {
-      onPositionChange?.(_position, false)
+    if (isDragging === true && onlyDispatchesOnDragEnd) return
+    onIndexChange?.(_index, isDragging !== undefined)
+  }, [_index])
+
+  useEffect(() => {
+    if (isDragging !== false) return
+
+    const nearestIndex = getNearestIndexByPosition(_position, steps)
+    const nearestPosition = getPositionAt(nearestIndex, steps)
+    setLivePosition(nearestPosition)
+
+    if (onlyDispatchesOnDragEnd) {
+      onIndexChange?.(_index, true)
     }
   }, [isDragging])
 
@@ -289,8 +402,8 @@ export default function Slider({
             width: `${knobWidth}px`,
           }}
         >
-          {labelProvider && (
-            <StyledLabel knobHeight={knobHeight} css={labelCSS}>{labelProvider(_position)}</StyledLabel>
+          {steps && labelProvider && (
+            <StyledLabel knobHeight={knobHeight} css={labelCSS}>{labelProvider(_position, getNearestIndexByPosition(_position, steps))}</StyledLabel>
           )}
         </StyledKnob>
       </StyledKnobContainer>
@@ -347,9 +460,11 @@ const StyledKnob = styled.div`
   align-items: center;
   background: #fff;
   box-sizing: border-box;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  opacity: 1;
   touch-action: none;
   transition-duration: 100ms;
   transition-property: background, color, opacity, transform;

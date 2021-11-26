@@ -4,12 +4,13 @@ import styled, { css } from 'styled-components'
 import Compass from '../../../lib/Compass'
 import DebugConsole from '../../../lib/DebugConsole'
 import RangeSlider from '../../../lib/RangeSlider'
-import Slider, { generateBreakpoints } from '../../../lib/Slider'
+import Slider from '../../../lib/Slider'
+import StepwiseSlider from '../../../lib/StepwiseSlider'
 
 export interface Props {}
 
 export interface State {
-  index?: number
+  index: number
   max: number
   min: number
   position: number
@@ -17,6 +18,7 @@ export interface State {
 
 export default class Container extends PureComponent<Props, State> {
   state: State = {
+    index: 4,
     max: 360,
     min: 0,
     position: 0.5,
@@ -43,17 +45,13 @@ export default class Container extends PureComponent<Props, State> {
             style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg)' }}
           />
           <Slider
-            autoSnap={true}
-            breakpoints={generateBreakpoints(10)}
             gutterPadding={10}
-            index={this.state.index}
             isInverted={false}
             knobHeight={40}
             knobWidth={60}
-            labelProvider={(p, i) => `${Math.round(this.getAngleByPosition(p))}°`}
-            onIndexChange={index => this.setState({ index })}
-            onlyDispatchesOnDragEnd={true}
-            onPositionChange={position => this.setState({ position })}
+            labelProvider={position => `${Math.round(this.getAngleByPosition(position))}°`}
+            onlyDispatchesOnDragEnd={false}
+            onPositionChange={(position, isDragging) => this.setState({ position })}
             orientation='vertical'
             position={this.state.position}
             css={css`
@@ -72,8 +70,37 @@ export default class Container extends PureComponent<Props, State> {
               }
             `}
             style={{
-              height: `${this.state.max}px`,
-              transform: 'translate3d(0, 0, 0) rotateX(20deg) rotateY(-20deg)',
+              height: `${(this.state.index + 1) * 30}px`,
+              transform: 'translate3d(-5rem, 0, 0) rotateX(20deg) rotateY(-20deg)',
+            }}
+          />
+          <StepwiseSlider
+            gutterPadding={10}
+            index={this.state.index}
+            isInverted={false}
+            knobHeight={40}
+            knobWidth={60}
+            labelProvider={(position, index) => index}
+            onIndexChange={(index, isDragging) => this.setState({ index })}
+            onlyDispatchesOnDragEnd={false}
+            orientation='vertical'
+            css={css`
+              ${align.cc}
+            `}
+            labelCSS={css`
+              font-size: 1.8rem;
+              font-weight: 700;
+            `}
+            endingGutterCSS={css`
+              background: grey;
+            `}
+            knobCSS={css`
+              ${selectors.hwot} {
+                transform: scale(1.2);
+              }
+            `}
+            style={{
+              transform: 'translate3d(5rem, 0, 0) rotateX(20deg) rotateY(-20deg)',
             }}
           />
         </StyledRoot>
@@ -105,7 +132,7 @@ export default class Container extends PureComponent<Props, State> {
         <DebugConsole
           title='?: Compass+Sliders'
           maxEntries={1}
-          message={`Position: ${this.state.position.toFixed(3)}, Index: ${this.state.index}, Angle: ${Math.round(angle)}°, Min: ${Math.round(this.state.min)}, Max: ${Math.round(this.state.max)}`}
+          message={`Position: ${this.state.position.toFixed(3)}, Size: ${this.state.index}, Angle: ${Math.round(angle)}°, Min: ${Math.round(this.state.min)}, Max: ${Math.round(this.state.max)}`}
           style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
         />
       </Fragment>
