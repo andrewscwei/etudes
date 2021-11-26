@@ -5,6 +5,8 @@ import { Rect } from 'spase'
 import styled, { css, CSSProp } from 'styled-components'
 import { Orientation } from './types'
 
+const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:slider') : () => {}
+
 export type GutterCSSProps = Readonly<{
   orientation: Orientation
 }>
@@ -175,6 +177,64 @@ export function generateBreakpoints(length: number): readonly number[] {
 }
 
 /**
+ * Gets the index of the breakpoint of which the specified position is closest to. If for whatever
+ * reason the index cannot be computed (i.e. no breakpoints were provided), -1 is returned.
+ *
+ * @param position - The position (0 - 1, inclusive).
+ * @param breakpoints - The breakpoints.
+ *
+ * @returns The nearest index.
+ */
+export function getNearestBreakpointIndexByPosition(position: number, breakpoints: readonly number[]): number {
+  let index = -1
+  let minDelta = NaN
+
+  for (let i = 0, n = breakpoints.length; i < n; i++) {
+    const breakpoint = getBreakpointPositionAt(i, breakpoints)
+
+    if (isNaN(breakpoint)) continue
+
+    const delta = Math.abs(position - breakpoint)
+
+    if (isNaN(minDelta) || (delta < minDelta)) {
+      minDelta = delta
+      index = i
+    }
+  }
+
+  return index
+}
+
+/**
+ * Gets the position of the breakpoint of which the specified position is closest to. If for
+ * whatever reason the position cannot be computed (i.e. no breakpoints were provided), `NaN` is
+ * returned.
+ *
+ * @param position - The position (0 - 1, inclusive).
+ * @param breakpoints - The breakpoints.
+ *
+ * @returns The nearest breakpoint position.
+ */
+export function getNearestBreakpointPositionByPosition(position: number, breakpoints: readonly number[]): number {
+  const nearestIndex = getNearestBreakpointIndexByPosition(position, breakpoints)
+  return getBreakpointPositionAt(nearestIndex, breakpoints)
+}
+
+/**
+ * Gets the position by breakpoint index. This value ranges between 0 - 1, inclusive.
+ *
+ * @param index - The breakpoint index.
+ * @param breakpoints - The breakpoints.
+ *
+ * @returns The position. If for whatever reason the position cannot be determined, `NaN` is
+ *          returned.
+ */
+export function getBreakpointPositionAt(index: number, breakpoints: readonly number[]): number {
+  if (index >= breakpoints.length) return NaN
+  return breakpoints[index]
+}
+
+/**
  * A slider component that divides the scroll gutter into two different elements—one that is before
  * the knob and one that is after the knob. This allows for individual styling customizations. The
  * width and height of the root element of this component is taken from the aggregated rect of both
@@ -207,59 +267,34 @@ export default function Slider({
   labelCSS,
   breakpoints,
   autoSnap = true,
-  index,
+  index = -1,
   onIndexChange,
 }: Props) {
-  /**
-   * Gets the index of the breakpoint of which the current position is closest to. If for whatever
-   * reason the index cannot be computed (i.e. no breakpoints were provided), -1 is returned.
-   *
-   * @returns The closest index.
-   */
-  function getClosestIndex(): number {
-    if (!breakpoints) return -1
-
-    let index = 0
-    let minDelta = NaN
-
-    for (let i = 0, n = breakpoints.length; i < n; i++) {
-      const breakpoint = getPositionByIndex(i)
-      const delta = Math.abs(livePosition.current - breakpoint)
-
-      if (isNaN(minDelta) || (delta < minDelta)) {
-        minDelta = delta
-        index = i
-      }
-    }
-
-    return index
-  }
-
-  /**
-   * Gets the position by breakpoint index. This value ranges between 0 - 1, inclusive.
-   *
-   * @param index - The breakpoint index.
-   *
-   * @returns The position. If for whatever reason the position cannot be determined, NaN is
-   *          returned.
-   */
-  function getPositionByIndex(index: number): number {
-    if (!breakpoints) return NaN
-    return breakpoints[index]
-  }
-
   /**
    * Sets the current live position. The live position is different from the position state value.
    * Because states are asynchronous by nature, this live position value is used to record position
    * changes when drag event happens. This position should be normalized. That is, inversion should
    * be taken care of prior to passing the new value to this method if `isInverted` is `true`.
    *
-   * @param value - The value to set the position to.
+   * @param position - The value to set the live position to.
    */
-  function setLivePosition(value: number) {
-    livePosition.current = value
-    _setPosition(value)
-    if (breakpoints) _setIndex(getClosestIndex())
+  function setLivePosition(position: number) {
+    if (livePosition.current === position) return
+
+    console.log(_position)
+
+    livePosition.current = position
+
+    _setPosition(position)
+
+    if (breakpoints) {
+      const index = getNearestBreakpointIndexByPosition(position, breakpoints)
+      debug('Updating live position and index...', 'OK', position, index)
+      _setIndex(index)
+    }
+    else {
+      debug('Updating live position...', 'OK', position)
+    }
   }
 
   /**
@@ -268,6 +303,8 @@ export default function Slider({
   function initInteractivity() {
     const knob = knobRef.current
     if (!knob || interact.isSet(knob)) return
+
+    debug('Initializing interactivity...', 'OK')
 
     interact(knob).draggable({
       inertia: true,
@@ -282,7 +319,9 @@ export default function Slider({
    */
   function deinitInteractivity() {
     const knob = knobRef.current
-    if (!knob) return
+    if (!knob || !interact.isSet(knob)) return
+
+    debug('Deinitializing interactivity...', 'OK')
 
     interact(knob).unset()
   }
@@ -291,6 +330,8 @@ export default function Slider({
    * Handler invoked when the knob starts dragging.
    */
   function onKnobDragStart() {
+    debug('Handling drag start...', 'OK')
+
     setIsDragging(true)
 
     onDragStart?.()
@@ -317,8 +358,9 @@ export default function Slider({
    * Handler invoked when the knob stops dragging.
    */
   function onKnobDragStop() {
+    debug('Handling drag stop...', 'OK')
+
     setIsDragging(false)
-    snapToClosestBreakpointIfNeeded()
 
     onDragEnd?.()
   }
@@ -327,19 +369,23 @@ export default function Slider({
    * Snaps the knob to the closest breakpoint. Note that if there are no breakpoints or
    * auto-snapping feature is disabled, this method does nothing.
    */
-  function snapToClosestBreakpointIfNeeded() {
-    if (!autoSnap || !breakpoints) return
-    const position = getPositionByIndex(getClosestIndex())
+  function snapToNearestBreakpointIfNeeded() {
+    const position = breakpoints ? getNearestBreakpointPositionByPosition(livePosition.current, breakpoints) : NaN
+
+    if (isNaN(position)) return
+
+    debug('Snapping to nearest breakpoint...', 'OK')
+
     setLivePosition(position)
   }
 
   const rootRef = useRef<HTMLDivElement>(null)
   const knobRef = useRef<HTMLButtonElement>(null)
 
-  const livePosition = useRef((breakpoints !== undefined && index !== undefined) ? getPositionByIndex(index) : position)
+  const livePosition = useRef((breakpoints !== undefined && index > -1) ? getBreakpointPositionAt(index, breakpoints) : position)
 
   const [_position, _setPosition] = useState(livePosition.current)
-  const [_index, _setIndex] = useState(getClosestIndex())
+  const [_index, _setIndex] = useState(breakpoints ? getNearestBreakpointIndexByPosition(livePosition.current, breakpoints) : index)
   const [isDragging, setIsDragging] = useState<boolean | undefined>(undefined)
 
   const naturalPosition = isInverted ? 1 - _position : _position
@@ -353,19 +399,29 @@ export default function Slider({
   }, [])
 
   useEffect(() => {
-    if (breakpoints && index !== undefined) return
-    if (position === livePosition.current) return
+    // If indexes are used, return.
+    if (breakpoints && index > -1) return
+
+    // If currently dragging, return.
+    if (isDragging) return
+
+    debug('Updating position from externally...', 'OK', position)
 
     setIsDragging(undefined)
     setLivePosition(position)
   }, [position])
 
   useEffect(() => {
-    if (!breakpoints || index === undefined) return
+    // If indexes aren't used, return.
+    if (!breakpoints || index < 0) return
 
-    const position = getPositionByIndex(index)
+    // If currently dragging, return.
+    if (isDragging) return
 
-    if (position === livePosition.current) return
+    const position = getBreakpointPositionAt(index, breakpoints)
+    if (isNaN(position)) return
+
+    debug('Updating index from externally...', 'OK', index)
 
     setIsDragging(undefined)
     setLivePosition(position)
@@ -382,7 +438,19 @@ export default function Slider({
   }, [_index])
 
   useEffect(() => {
-    snapToClosestBreakpointIfNeeded()
+    if (isDragging !== false) return
+
+    if (breakpoints && autoSnap) {
+      snapToNearestBreakpointIfNeeded()
+    }
+    else if (onlyDispatchesOnDragEnd) {
+      onPositionChange?.(_position)
+      onIndexChange?.(_index)
+    }
+  }, [isDragging])
+
+  useEffect(() => {
+    snapToNearestBreakpointIfNeeded()
   }, [autoSnap])
 
   return (
@@ -422,7 +490,7 @@ export default function Slider({
           }}
         >
           {breakpoints && isLabelVisible && labelProvider && (
-            <StyledLabel knobHeight={knobHeight} css={labelCSS}>{labelProvider(_position, getClosestIndex())}</StyledLabel>
+            <StyledLabel knobHeight={knobHeight} css={labelCSS}>{labelProvider(_position, getNearestBreakpointIndexByPosition(_position, breakpoints))}</StyledLabel>
           )}
         </StyledKnob>
       </StyledKnobContainer>

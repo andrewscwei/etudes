@@ -43,16 +43,19 @@ export default class Container extends PureComponent<Props, State> {
             style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg)' }}
           />
           <Slider
+            autoSnap={true}
             breakpoints={generateBreakpoints(10)}
-            position={this.state.position}
             gutterPadding={10}
+            index={this.state.index}
             isInverted={false}
             knobHeight={40}
             knobWidth={60}
             labelProvider={(p, i) => `${Math.round(this.getAngleByPosition(p))}°`}
             onIndexChange={index => this.setState({ index })}
+            onlyDispatchesOnDragEnd={true}
             onPositionChange={position => this.setState({ position })}
             orientation='vertical'
+            position={this.state.position}
             css={css`
               ${align.cc}
             `}
