@@ -451,16 +451,12 @@ const StyledLabel = styled.label<{ knobHeight: NonNullable<Props['knobHeight']> 
 const StyledKnobContainer = styled.button`
   position: absolute;
   z-index: 1;
-  transition-duration: 100ms;
-  transition-property: top;
-  transition-timing-function: ease-out;
 `
 
 const StyledKnob = styled.div`
   align-items: center;
   background: #fff;
   box-sizing: border-box;
-  cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: center;
