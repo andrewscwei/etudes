@@ -6,9 +6,9 @@
   "scripts": {
     "clean": "rimraf lib",
     "prebuild": "npm run lint",
-    "build": "npm run clean && cross-env NODE_ENV=production tsc -p tsconfig.json",
+    "build": "npm run clean && cross-env NODE_ENV=production tsc",
     "pages": "rimraf .gh-pages && webpack --config demo/config/build.conf.ts",
-    "demo": "npm run clean && concurrently \"npm run build -- --watch\" \"wait-on lib && cross-env NODE_ENV=development webpack-cli serve --mode development --hot --config demo/config/build.conf.ts\"",
+    "demo": "npm run clean && concurrently \"cross-env NODE_ENV=production tsc -w\" \"wait-on lib && cross-env NODE_ENV=development webpack-cli serve --mode development --hot --config demo/config/build.conf.ts\"",
     "test": "echo \"No tests yet :)\"",
     "lint": "eslint --ext .ts --ext .tsx src demo",
     "lint:fix": "npm run lint -- --fix"
@@ -69,9 +69,9 @@
     "typescript": "^4.5.2",
     "url-loader": "^4.1.1",
     "wait-on": "^6.0.0",
-    "webpack": "^5.64.3",
+    "webpack": "^5.64.4",
     "webpack-cli": "^4.9.1",
-    "webpack-dev-server": "^4.5.0"
+    "webpack-dev-server": "^4.6.0"
   },
   "peerDependencies": {
     "react": "^17.0.2",
