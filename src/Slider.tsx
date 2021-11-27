@@ -216,7 +216,6 @@ export default function Slider({
 
   const naturalPosition = isInverted ? 1 - _position : _position
 
-  console.log('bar')
   useEffect(() => {
     initInteractivity()
 
