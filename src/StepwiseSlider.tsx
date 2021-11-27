@@ -260,7 +260,7 @@ export default function StepwiseSlider({
    */
   function onKnobDragMove(delta: number) {
     const rect = Rect.from(rootRef.current) ?? new Rect()
-    const naturalPosition = isInverted ? 1 - livePosition.current : livePosition.current
+    const naturalPosition = isInverted ? 1 - positionRef.current : positionRef.current
     const naturalNewPositionX = naturalPosition * rect.width + delta
     const naturalNewPositionY = naturalPosition * rect.height + delta
     const naturalNewPosition = (orientation === 'vertical') ? Math.max(0, Math.min(1, naturalNewPositionY / rect.height)) : Math.max(0, Math.min(1, naturalNewPositionX / rect.width))
@@ -268,8 +268,8 @@ export default function StepwiseSlider({
     const newIndex = getNearestIndexByPosition(newPosition, steps)
 
     setIsDragging(true)
-    setLivePosition(newPosition)
-    setLiveIndex(newIndex)
+    setPositionRef(newPosition)
+    setIndexRef(newIndex)
   }
 
   /**
@@ -290,11 +290,11 @@ export default function StepwiseSlider({
    *
    * @param position - The value to set the live position to.
    */
-  function setLivePosition(position: number) {
-    if (livePosition.current === position) return
-    livePosition.current = position
+  function setPositionRef(position: number) {
+    if (positionRef.current === position) return
+    positionRef.current = position
     // debug('Updating live position...', 'OK', position)
-    _setPosition(position)
+    setPosition(position)
   }
 
   /**
@@ -304,21 +304,20 @@ export default function StepwiseSlider({
    *
    * @param index - The value to set the live index to.
    */
-  function setLiveIndex(index: number) {
-    if (liveIndex.current === index) return
-    liveIndex.current = index
+  function setIndexRef(index: number) {
+    if (indexRef.current === index) return
+    indexRef.current = index
     // debug('Updating live index...', 'OK', index)
-    _setIndex(index)
+    setIndex(index)
   }
 
   const rootRef = useRef<HTMLDivElement>(null)
   const knobRef = useRef<HTMLButtonElement>(null)
+  const positionRef = useRef(getPositionAt(index, steps))
+  const indexRef = useRef(index)
 
-  const livePosition = useRef(getPositionAt(index, steps))
-  const liveIndex = useRef(index)
-
-  const [_position, _setPosition] = useState(livePosition.current)
-  const [_index, _setIndex] = useState(liveIndex.current)
+  const [_position, setPosition] = useState(positionRef.current)
+  const [_index, setIndex] = useState(indexRef.current)
   const [isDragging, setIsDragging] = useState<boolean | undefined>(undefined)
 
   const naturalPosition = isInverted ? 1 - _position : _position
@@ -335,8 +334,8 @@ export default function StepwiseSlider({
     if (isDragging === true) return
     if (index === _index) return
     setIsDragging(undefined)
-    setLivePosition(getPositionAt(index, steps))
-    setLiveIndex(index)
+    setPositionRef(getPositionAt(index, steps))
+    setIndexRef(index)
   }, [index])
 
   useEffect(() => {
@@ -354,7 +353,7 @@ export default function StepwiseSlider({
 
     const nearestIndex = getNearestIndexByPosition(_position, steps)
     const nearestPosition = getPositionAt(nearestIndex, steps)
-    setLivePosition(nearestPosition)
+    setPositionRef(nearestPosition)
 
     if (onlyDispatchesOnDragEnd) {
       onIndexChange?.(_index, true)

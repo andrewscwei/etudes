@@ -172,14 +172,14 @@ export default function Slider({
    */
   function onKnobDragMove(delta: number) {
     const rect = Rect.from(rootRef.current) ?? new Rect()
-    const naturalPosition = isInverted ? 1 - livePosition.current : livePosition.current
+    const naturalPosition = isInverted ? 1 - positionRef.current : positionRef.current
     const naturalNewPositionX = naturalPosition * rect.width + delta
     const naturalNewPositionY = naturalPosition * rect.height + delta
     const naturalNewPosition = (orientation === 'vertical') ? Math.max(0, Math.min(1, naturalNewPositionY / rect.height)) : Math.max(0, Math.min(1, naturalNewPositionX / rect.width))
     const newPosition = isInverted ? 1 - naturalNewPosition : naturalNewPosition
 
     setIsDragging(true)
-    setLivePosition(newPosition)
+    setPositionRef(newPosition)
   }
 
   /**
@@ -200,23 +200,23 @@ export default function Slider({
    *
    * @param position - The value to set the live position to.
    */
-  function setLivePosition(position: number) {
-    if (livePosition.current === position) return
-    livePosition.current = position
+  function setPositionRef(position: number) {
+    if (positionRef.current === position) return
+    positionRef.current = position
     // debug('Updating live position...', 'OK', position)
-    _setPosition(position)
+    setPosition(position)
   }
 
   const rootRef = useRef<HTMLDivElement>(null)
   const knobRef = useRef<HTMLButtonElement>(null)
+  const positionRef = useRef(position)
 
-  const livePosition = useRef(position)
-
-  const [_position, _setPosition] = useState(livePosition.current)
+  const [_position, setPosition] = useState(positionRef.current)
   const [isDragging, setIsDragging] = useState<boolean | undefined>(undefined)
 
   const naturalPosition = isInverted ? 1 - _position : _position
 
+  console.log('bar')
   useEffect(() => {
     initInteractivity()
 
@@ -229,7 +229,7 @@ export default function Slider({
     if (isDragging === true) return
     if (position === _position) return
     setIsDragging(undefined)
-    setLivePosition(position)
+    setPositionRef(position)
   }, [position])
 
   useEffect(() => {
