@@ -12,7 +12,7 @@ export default function() {
   const [angle, setAngle] = useState(0)
   const [width, setWidth] = useState(800)
   const [viewportSize, setViewportSize] = useState(new Size())
-  const [zeroAnchor] = useState(0.4)
+  const [zeroAnchor] = useState(0.5)
 
   return (
     <>
@@ -55,8 +55,6 @@ export default function() {
           src={$$PanoramaImage}
           viewportSize={viewportSize}
           zeroAnchor={zeroAnchor}
-          panoramaCSS={css`
-          `}
           style={{
             marginTop: '3rem',
             height: '8rem',

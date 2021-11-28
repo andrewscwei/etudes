@@ -39,9 +39,9 @@ export type Props = HTMLAttributes<HTMLDivElement> & PanoramaProps & {
   reticleCSS?: CSSProp<any>
 
   /**
-   * Additional CSS to be provided to the gutter.
+   * Additional CSS to be provided to the track.
    */
-  gutterCSS?: CSSProp<any>
+  trackCSS?: CSSProp<any>
 
   /**
    * Additional CSS to be provided to the indicator.
@@ -55,7 +55,7 @@ export default function PanoramaSlider({
   viewportSize,
   panoramaCSS,
   reticleCSS,
-  gutterCSS,
+  trackCSS,
   indicatorCSS,
   angle = 0,
   speed = 1,
@@ -132,13 +132,13 @@ export default function PanoramaSlider({
         style={{ height: '100%', width: '100%' }}
         zeroAnchor={adjustedZeroAnchor}
       />
-      <StyledSlideTrack>
+      <StyledTrackContainer>
         <div>
-          <StyledGutter className={classNames({ dragging: isDragging })} css={gutterCSS}/>
+          <StyledTrack className={classNames({ dragging: isDragging })} css={trackCSS}/>
           <StyledReticle className={classNames({ dragging: isDragging })} css={reticleCSS} style={{ width: `${reticleWidth}px` }}/>
-          <StyledGutter className={classNames({ dragging: isDragging })} css={gutterCSS}/>
+          <StyledTrack className={classNames({ dragging: isDragging })} css={trackCSS}/>
         </div>
-      </StyledSlideTrack>
+      </StyledTrackContainer>
       <StyledIndicator className={classNames({ dragging: isDragging })} style={{ width: `${reticleWidth}px` }} css={indicatorCSS}/>
     </StyledRoot>
   )
@@ -159,7 +159,7 @@ const StyledReticle = styled.div`
   ${props => props.css}
   `
 
-const StyledGutter = styled.div`
+const StyledTrack = styled.div`
   background: rgba(0, 0, 0, .7);
   display: block;
   flex: 1 0 auto;
@@ -169,7 +169,7 @@ const StyledGutter = styled.div`
   ${props => props.css}
 `
 
-const StyledSlideTrack = styled.div`
+const StyledTrackContainer = styled.div`
   box-sizing: border-box;
   display: block;
   height: 100%;
