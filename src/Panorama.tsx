@@ -84,6 +84,13 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
    *               `undefined`.
    */
   onImageSizeChange?: (size?: Size) => void
+
+  /**
+   * Handler invoked when the size of this component changes.
+   *
+   * @param size - The size of this component.
+   */
+  onResize?: (size: Size) => void
 }
 
 function getFilledImageSize(originalSize: Size, sizeToFill: Size): Size {
@@ -136,6 +143,7 @@ export default function Panorama({
   onImageLoadComplete,
   onImageLoadError,
   onImageSizeChange,
+  onResize,
   ...props
 }: Props) {
   function transform(currentDisplacement: number, dx: number, dy: number): number {
@@ -145,7 +153,7 @@ export default function Panorama({
 
   const rootRef = useRef<HTMLDivElement>(null)
 
-  const [size] = useResizeEffect(rootRef)
+  const [size] = useResizeEffect(rootRef, { onResize })
   const [angle, setAngle] = useState(externalAngle)
 
   const { isLoading: [isLoading], imageSize: [imageSize] } = useLoadImageEffect(src, {
@@ -159,7 +167,7 @@ export default function Panorama({
     transform,
     onDragStart,
     onDragEnd,
-  }, [speed, zeroAnchor])
+  })
 
   useEffect(() => {
     if (isDragging || isLoading || !imageSize) return
@@ -167,7 +175,7 @@ export default function Panorama({
     const newDisplacement = getDisplacementFromAngle(externalAngle, imageSize, size, zeroAnchor)
 
     if (newDisplacement !== displacement) {
-      debug('Updating drag effect value from angle prop...', 'OK', `old=${displacement} new=${newDisplacement}`)
+      // debug('Updating drag effect value from angle prop...', 'OK', `old=${displacement} new=${newDisplacement}`)
       setDisplacement(newDisplacement)
     }
 
@@ -181,13 +189,12 @@ export default function Panorama({
 
     const newAngle = getAngleFromDisplacement(displacement, imageSize, size, zeroAnchor)
 
-    if (angle !== newAngle) setAngle(newAngle)
+    if (angle !== newAngle) {
+      setAngle(newAngle)
+      onAngleChange?.(angle, isDragging)
+      onPositionChange?.(angle / 360, isDragging)
+    }
   }, [displacement, imageSize, size, zeroAnchor])
-
-  useEffect(() => {
-    onAngleChange?.(angle, isDragging)
-    onPositionChange?.(angle / 360, isDragging)
-  }, [angle])
 
   return (
     <StyledRoot ref={rootRef} {...props}>

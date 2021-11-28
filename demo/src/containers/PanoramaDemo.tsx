@@ -1,14 +1,18 @@
 import { container } from 'promptu'
 import React, { useState } from 'react'
+import { Size } from 'spase'
 import styled, { css } from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
 import Panorama from '../../../lib/Panorama'
+import PanoramaSlider from '../../../lib/PanoramaSlider'
 import Slider from '../../../lib/Slider'
 import $$PanoramaImage from '../assets/images/panorama.jpg'
 
 export default function() {
   const [angle, setAngle] = useState(0)
   const [width, setWidth] = useState(800)
+  const [viewportSize, setViewportSize] = useState(new Size())
+  const [zeroAnchor, setZeroAnchor] = useState(0.4)
 
   return (
     <>
@@ -34,9 +38,10 @@ export default function() {
         />
         <Panorama
           angle={angle}
-          onAngleChange={(angle, isDragging) => setAngle(angle) }
+          onAngleChange={angle => setAngle(angle) }
+          onResize={size => setViewportSize(size)}
           src={$$PanoramaImage}
-          zeroAnchor={1}
+          zeroAnchor={zeroAnchor}
           style={{
             height: '40rem',
             transform: 'translate3d(0, 0, 0) rotateX(0deg) rotateY(-10deg)',
@@ -44,20 +49,20 @@ export default function() {
             maxWidth: '80%',
           }}
         />
-        {/* <PanoramaSlider
+        <PanoramaSlider
+          angle={angle}
+          onAngleChange={angle => setAngle(angle)}
           src={$$PanoramaImage}
-          viewportSize={this.nodeRefs.panorama.current?.rect.size ?? new Size()}
-          defaultAngle={this.props.defaultAngle}
-          onAngleChange={angle => {
-            this.setState({ angle })
-            this.nodeRefs.panorama.current?.setAngle(angle)
-          }}
+          viewportSize={viewportSize}
+          zeroAnchor={zeroAnchor}
+          panoramaCSS={css`
+          `}
           style={{
             marginTop: '3rem',
             height: '8rem',
-            transform: 'translate3d(0, 0, 0) rotateX(0deg) rotateY(20deg)',
+            transform: 'translate3d(0, 0, 0) rotateX(0deg) rotateY(10deg)',
           }}
-        /> */}
+        />
       </StyledRoot>
       <DebugConsole
         title='?: Panorama+Slider'
@@ -73,9 +78,9 @@ export default function() {
 
 const StyledRoot = styled.div`
   ${container.fvcc}
-  width: 100%;
   height: 100%;
+  overflow: hidden;
   padding: 3rem;
   perspective: 80rem;
-  overflow: hidden;
+  width: 100%;
 `

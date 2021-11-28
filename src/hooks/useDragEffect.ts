@@ -79,7 +79,7 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
   }
 
   useEffect(() => {
-    debug(`Using drag effect for element <${targetRef.current?.tagName?.toLowerCase()}>...`, 'OK', `value=${valueRef.current}`)
+    // debug(`Using drag effect for element ${targetRef.current}...`, 'OK', `value=${valueRef.current}`)
 
     if (targetRef.current && !interact.isSet(targetRef.current)) {
       // Do not consume states in these listeners as they will remain their initial values within
@@ -112,7 +112,7 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
     }
 
     return () => {
-      debug(`Removing drag effect for element ${targetRef.current}...`, 'OK', `value=${valueRef.current}`)
+      // debug(`Removing drag effect for element ${targetRef.current}...`, 'OK', `value=${valueRef.current}`)
 
       if (targetRef.current && interact.isSet(targetRef.current)) {
         interact(targetRef.current).unset()

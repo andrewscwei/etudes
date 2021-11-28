@@ -1,287 +1,224 @@
-// import { DirtyType, EventType, UpdateDelegate } from 'dirty-dom'
-// import React, { createRef, HTMLAttributes, useEffect, useState } from 'react'
-// import { Rect, Size } from 'spase'
-// import styled, { css, CSSProp } from 'styled-components'
-// import Panorama, { Props as PanoramaProps } from './Panorama'
-// import { ExtendedCSSProps } from './types'
+import classNames from 'classnames'
+import _ from 'lodash'
+import React, { HTMLAttributes, useRef, useState } from 'react'
+import { Size } from 'spase'
+import styled, { CSSProp } from 'styled-components'
+import useResizeEffect from './hooks/useResizeEffect'
+import Panorama, { Props as PanoramaProps } from './Panorama'
 
-// export type IndicatorCSSProps = Readonly<{
-//   isDragging: boolean
-//   reticleWidth: number
-// }>
+export type Props = HTMLAttributes<HTMLDivElement> & PanoramaProps & {
+  /**
+   * Field-of-view (0.0 - 360.0 degrees, inclusive) that represents the size of the reticle. 360
+   * indicates the reticle covers the entire image. If this is unspecified, the component will
+   * attempt to automatically calculate the FOV using the `viewportSize` prop.
+   */
+  fov?: number
 
-// export type ReticleCSSProps = Readonly<{
-//   isDragging: boolean
-// }>
+  /**
+   * Specifies which length (width or height) should be automatically calculated. The counterpart
+   * must be known (if `width` is specified here, the component's height must be known, i.e. it is
+   * specified in the CSS). Defaults to `width`.
+   */
+  autoDimension?: 'width' | 'height'
 
-// export type GutterCSSProps = Readonly<{
-//   isDragging: boolean
-// }>
+  /**
+   * Size of the viewport that this component is controlling. A viewport can be thought of as a DOM
+   * element containing an aspect-filled image. This is used to automatically calculate the FOV if
+   * `fov` prop is not specified. If it is, this prop is ignored.
+   */
+  viewportSize?: Size
 
-// export type Props = HTMLAttributes<HTMLDivElement> & PanoramaProps & {
-//   /**
-//    * Field-of-view (0.0 - 360.0 degrees, inclusive) that represents the size of the reticle. 360
-//    * indicates the reticle covers the entire image. If this is unspecified, the component will
-//    * attempt to automatically calculate the FOV using the `targetViewportSize` prop.
-//    */
-//   fov?: number
+  /**
+   * Additional CSS to be provided to the internal panorama component.
+   */
+  panoramaCSS?: CSSProp<any>
 
-//   /**
-//    * Size of the viewport that this component is controlling. A viewport can be thought of a DOM
-//    * element containing an aspect-filled image. This is used to automatically calculate the FOV if
-//    * `fov` prop is not specified. If it is, this prop is ignored.
-//    */
-//   viewportSize?: Size
+  /**
+   * Additional CSS to be provided to the reticle.
+   */
+  reticleCSS?: CSSProp<any>
 
-//   /**
-//    * Additional CSS to be provided to the reticle.
-//    */
-//   reticleCSS?: CSSProp<any>
+  /**
+   * Additional CSS to be provided to the gutter.
+   */
+  gutterCSS?: CSSProp<any>
 
-//   /**
-//    * Additional CSS to be provided to the gutter.
-//    */
-//   gutterCSS?: CSSProp<any>
+  /**
+   * Additional CSS to be provided to the indicator.
+   */
+  indicatorCSS?: CSSProp<any>
+}
 
-//   /**
-//    * Additional CSS to be provided to the indicator.
-//    */
-//   indicatorCSS?: CSSProp<any>
-// }
+export default function PanoramaSlider({
+  fov,
+  autoDimension = 'width',
+  viewportSize,
+  panoramaCSS,
+  reticleCSS,
+  gutterCSS,
+  indicatorCSS,
+  angle = 0,
+  speed = 1,
+  src,
+  zeroAnchor = 0,
+  onAngleChange,
+  onPositionChange,
+  onDragStart,
+  onDragEnd,
+  onImageLoadStart,
+  onImageLoadComplete,
+  onImageLoadError,
+  onImageSizeChange,
+  onResize,
+  style,
+  ...props
+}: Props) {
+  function getImageAspectRatio(): number {
+    if (!imageSize) return 0
+    const { width, height } = imageSize
+    if (height === 0) return 0
+    return width / height
+  }
 
-// export default function PanoramaSlider({
-//   angle = 0,
-//   speed = 1,
-//   viewportSize,
-//   reticleCSS,
-//   gutterCSS,
-//   indicatorCSS,
-//   angle = 0,
-//   speed = 1,
-//   src,
-//   zeroAnchor = 0,
-//   onAngleChange,
-//   onPositionChange,
-//   onDragStart,
-//   onDragEnd,
-//   onImageLoadStart,
-//   onImageLoadComplete,
-//   onImageLoadError,
-//   onImageSizeChange,
-//   style,
-//   ...props,
-// }: Props) {
-//   let updateDelegate: UpdateDelegate | undefined
+  function getReticleWidth(): number {
+    const angle = _.clamp(fov ?? (viewportSize ? (viewportSize.width / (viewportSize.height * aspectRatio)) * 360 : 0), 0, 360)
+    return size.width * (angle / 360)
+  }
 
-//   const nodeRefs = {
-//     root: createRef<HTMLDivElement>(),
-//     // panorama: createRef<Panorama>(),
-//   }
+  function getAdjustedZeroAnchor() {
+    if (size.width <= 0) return zeroAnchor
 
-//   let lastHeight = 0
+    return ((size.width - reticleWidth) * 0.5 + (zeroAnchor * reticleWidth)) / size.width
+  }
 
-//   function setAngle(angle: number) {
-//     // this.nodeRefs.panorama.current?.setAngle(angle)
-//   }
+  const rootRef = useRef<HTMLDivElement>(null)
 
-//   function reconfigureUpdateDelegate() {
-//     this.updateDelegate?.deinit()
+  const [imageSize, setImageSize] = useState<Size | undefined>(undefined)
+  const [isDragging, setIsDragging] = useState(false)
+  const [size] = useResizeEffect(rootRef, { onResize })
 
-//     this.updateDelegate = new UpdateDelegate(info => this.update(info), {
-//       [EventType.RESIZE]: {
-//         target: this.nodeRefs.root.current,
-//       },
-//     })
+  const aspectRatio = getImageAspectRatio()
+  const reticleWidth = getReticleWidth()
+  const adjustedZeroAnchor = getAdjustedZeroAnchor()
 
-//     this.updateDelegate?.init()
-//   }
+  return (
+    <StyledRoot ref={rootRef} style={{
+      ...style,
+      ...autoDimension === 'width' ? {
+        width: `${size.height * aspectRatio}px`,
+      } : {
+        height: `${size.width / aspectRatio}px`,
+      },
+    }} {...props}>
+      <StyledPanorama
+        angle={angle}
+        css={panoramaCSS}
+        onAngleChange={onAngleChange}
+        onDragEnd={() => {
+          setIsDragging(false)
+          onDragEnd?.()
+        }}
+        onDragStart={() => {
+          setIsDragging(true)
+          onDragStart?.()
+        }}
+        onImageLoadComplete={onImageLoadComplete}
+        onImageLoadError={onImageLoadError}
+        onImageLoadStart={onImageLoadStart}
+        onImageSizeChange={size => setImageSize(size)}
+        onPositionChange={onPositionChange}
+        speed={speed}
+        src={src}
+        style={{ height: '100%', width: '100%' }}
+        zeroAnchor={adjustedZeroAnchor}
+      />
+      <StyledSlideTrack>
+        <div>
+          <StyledGutter className={classNames({ dragging: isDragging })} css={gutterCSS}/>
+          <StyledReticle className={classNames({ dragging: isDragging })} css={reticleCSS} style={{ width: `${reticleWidth}px` }}/>
+          <StyledGutter className={classNames({ dragging: isDragging })} css={gutterCSS}/>
+        </div>
+      </StyledSlideTrack>
+      <StyledIndicator className={classNames({ dragging: isDragging })} style={{ width: `${reticleWidth}px` }} css={indicatorCSS}/>
+    </StyledRoot>
+  )
+}
 
-//   function onDragStart() {
-//     this.setState({ isDragging: true })
-//   }
+const StyledReticle = styled.div`
+  background: rgba(0, 0, 0, .3);
+  flex: 0 0 auto;
+  height: 100%;
+  transition-duration: 100ms;
+  transition-property: background;
+  transition-timing-function: ease-out;
 
-//   function onDragEnd() {
-//     this.setState({ isDragging: false })
-//   }
+  &.dragging {
+    background: rgba(0, 0, 0, 0);
+  }
 
-//   function onAngleChange(angle: number) {
-//     this.props.onAngleChange?.(angle)
-//   }
+  ${props => props.css}
+  `
 
-//   function onPositionChange = (position: number) => {
-//     this.props.onPositionChange?.(position)
-//   }
+const StyledGutter = styled.div`
+  background: rgba(0, 0, 0, .7);
+  display: block;
+  flex: 1 0 auto;
+  height: 100%;
+  pointer-events: none;
 
-//   function onImageLoad = (image: HTMLImageElement) => {
-//     this.setState({ imageSize: new Size([image.width, image.height]) })
-//     this.props.onImageLoad?.(image)
-//   }
+  ${props => props.css}
+`
 
-//   constructor(props: Props) {
-//     super(props)
+const StyledSlideTrack = styled.div`
+  box-sizing: border-box;
+  display: block;
+  height: 100%;
+  left: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 100%;
 
-//     if (this.props.fov === undefined && this.props.viewportSize === undefined) {
-//       throw new Error('Either `fov` or `viewportSize` must be specified')
-//     }
+  > div {
+    align-items: center;
+    display: flex;
+    height: 100%;
+    justify-content: flex-start;
+    left: 0;
+    overflow: visible;
+    position: absolute;
+    top: 0;
+    width: 100%;
+  }
+`
 
-//     this.state = {
-//       imageSize: new Size(),
-//       isDragging: false,
-//     }
-//   }
+const StyledIndicator = styled.div`
+  background: #fff;
+  border-radius: 2px;
+  bottom: -10px;
+  box-sizing: border-box;
+  display: block;
+  height: 2px;
+  left: 0;
+  margin: 0 auto;
+  opacity: 0;
+  right: 0;
+  transition: opacity .3s ease-out;
 
-//   function getImageAspectRatio(): number {
-//     const { width, height } = this.state.imageSize
-//     if (height === 0) return 0
-//     return width / height
-//   }
+  &.dragging {
+    opacity: 1;
+  }
 
-//   function getReticleWidth(): number {
-//     let fov = 0
+  ${props => props.css}
+`
 
-//     if (this.props.fov !== undefined) {
-//       fov = this.props.fov
-//     }
-//     else if (this.props.viewportSize !== undefined) {
-//       fov = (this.props.viewportSize.width / (this.props.viewportSize.height * this.imageAspectRatio)) * 360
-//     }
+const StyledPanorama = styled(Panorama)`
+  ${(props: any) => props.css}
+`
 
-//     fov = Math.max(0, Math.min(360, fov))
-
-//     const maxWidth = (Rect.from(this.nodeRefs.root.current)?.height ?? 0) * this.imageAspectRatio
-//     const width = maxWidth * (fov / 360)
-//     return Math.min(maxWidth, width)
-//   }
-
-//   useEffect(() => {
-//     reconfigureUpdateDelegate()
-
-//     return () => {
-
-//     }
-//   }, [])
-
-//   componentDidUpdate(prevProps: Props, prevState: State) {
-//     if (prevState.imageSize !== this.state.imageSize) {
-//       // this.nodeRefs.panorama.current?.resetPosition()
-//     }
-//   }
-
-//   update(info: DirtyInfo) {
-//     const { [DirtyType.SIZE]: dirtySize } = info
-
-//     if (dirtySize) {
-//       if (this.lastHeight !== dirtySize.minSize.height) {
-//         this.forceUpdate()
-//         this.lastHeight = dirtySize.minSize.height
-//       }
-//     }
-//   }
-
-//   const [isDragging, setIsDragging] = useState(false)
-//   const reticleWidth = this.reticleWidth
-
-//   function _onImageSizeChange(imageSize?: Size) {
-//     onImageSizeChange?.(imageSize)
-//   }
-
-//   return (
-//     <StyledRoot
-//       ref={this.nodeRefs.root}
-//       style={{
-//         ...style,
-//         width: `${(Rect.from(this.nodeRefs.root.current)?.height ?? 0) * this.imageAspectRatio}px`,
-//       }}
-//       {...props}
-//     >
-//       <Panorama
-//         angle={angle}
-//         onAngleChange={onAngleChange}
-//         onDragEnd={onDragEnd}
-//         onDragStart={onDragStart}
-//         onImageLoadComplete={onImageLoadComplete}
-//         onImageLoadError={onImageLoadError}
-//         onImageLoadStart={onImageLoadStart}
-//         onImageSizeChange={_onImageSizeChange}
-//         onPositionChange={onPositionChange}
-//         speed={speed}
-//         src={src}
-//         zeroAnchor={zeroAnchor}
-//         style={{ height: '100%', width: '100%' }}
-//       />
-//       <StyledSlideTrack>
-//         <div>
-//           <StyledGutter isDragging={isDragging} css={gutterCSS}/>
-//           <StyledReticle isDragging={isDragging} css={reticleCSS} style={{ width: `${reticleWidth}px` }}/>
-//           <StyledGutter isDragging={isDragging} css={gutterCSS}/>
-//         </div>
-//       </StyledSlideTrack>
-//       <StyledIndicator isDragging={isDragging} reticleWidth={reticleWidth} css={indicatorCSS}/>
-//     </StyledRoot>
-//   )
-// }
-
-// const StyledReticle = styled.div<ReticleCSSProps & ExtendedCSSProps<ReticleCSSProps>>`
-//   background: rgba(0, 0, 0, ${props => props.isDragging ? 0 : .3});
-//   flex: 0 0 auto;
-//   height: 100%;
-//   transition-duration: 100ms;
-//   transition-property: background;
-//   transition-timing-function: ease-out;
-//   will-change: background;
-//   ${props => props.extendedCSS(props)}
-//   `
-
-// const StyledGutter = styled.div<GutterCSSProps & ExtendedCSSProps<GutterCSSProps>>`
-//   background: rgba(0, 0, 0, .7);
-//   display: block;
-//   flex: 1 0 auto;
-//   height: 100%;
-//   pointer-events: none;
-//   ${props => props.extendedCSS(props)}
-// `
-
-// const StyledSlideTrack = styled.div`
-//   box-sizing: border-box;
-//   display: block;
-//   height: 100%;
-//   left: 0;
-//   overflow: hidden;
-//   pointer-events: none;
-//   position: absolute;
-//   top: 0;
-//   width: 100%;
-
-//   > div {
-//     align-items: center;
-//     display: flex;
-//     height: 100%;
-//     justify-content: flex-start;
-//     left: 0;
-//     overflow: visible;
-//     position: absolute;
-//     top: 0;
-//     width: 100%;
-//   }
-// `
-
-// const StyledIndicator = styled.div<IndicatorCSSProps & ExtendedCSSProps<IndicatorCSSProps>>`
-//   background: #fff;
-//   border-radius: 2px;
-//   bottom: -10px;
-//   box-sizing: border-box;
-//   display: block;
-//   height: 2px;
-//   left: 0;
-//   margin: 0 auto;
-//   opacity: ${props => props.isDragging ? 1 : 0};
-//   right: 0;
-//   transition: opacity .3s ease-out;
-//   width: ${props => props.reticleWidth}px;
-// `
-
-// const StyledRoot = styled.div`
-//   box-sizing: border-box;
-//   display: block;
-//   flex: 0 0 auto;
-// `
+const StyledRoot = styled.div`
+  box-sizing: border-box;
+  display: block;
+  flex: 0 0 auto;
+`

@@ -13,7 +13,7 @@ export default function useResizeEffect(targetRef: RefObject<Element>, { onResiz
   const observerRef = useRef<ResizeObserver | undefined>(undefined)
 
   useEffect(() => {
-    debug(`Using resize effect for element ${targetRef.current}...`, 'OK')
+    // debug(`Using resize effect for element ${targetRef.current}...`, 'OK')
 
     observerRef.current = new ResizeObserver(() => {
       const rect = Rect.from(targetRef.current)
@@ -22,7 +22,7 @@ export default function useResizeEffect(targetRef: RefObject<Element>, { onResiz
 
       const size = rect.size
 
-      debug(`Observing size change for element ${targetRef.current}...`, 'OK', size)
+      // debug(`Observing size change for element ${targetRef.current}...`, 'OK', size)
 
       setSize(size)
       onResize?.(size)
@@ -33,7 +33,7 @@ export default function useResizeEffect(targetRef: RefObject<Element>, { onResiz
     }
 
     return () => {
-      debug(`Removing resize effect for element ${targetRef.current}...`, 'OK')
+      // debug(`Removing resize effect for element ${targetRef.current}...`, 'OK')
 
       if (observerRef.current && targetRef.current) {
         observerRef.current.unobserve(targetRef.current)

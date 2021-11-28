@@ -146,7 +146,7 @@ export function generateSteps(length: number): readonly number[] {
  *
  * @returns The nearest index.
  */
-export function getNearestIndexByPosition(position: number, steps: readonly number[]): number {
+function getNearestIndexByPosition(position: number, steps: readonly number[]): number {
   let index = -1
   let minDelta = NaN
 
@@ -175,7 +175,7 @@ export function getNearestIndexByPosition(position: number, steps: readonly numb
  * @returns The position. If for whatever reason the position cannot be determined, `NaN` is
  *          returned.
  */
-export function getPositionAt(index: number, steps: readonly number[]): number {
+function getPositionAt(index: number, steps: readonly number[]): number {
   if (index >= steps.length) return NaN
   return steps[index]
 }
