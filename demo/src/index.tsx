@@ -3,7 +3,7 @@ import { hydrate, render } from 'react-dom'
 import App from './containers/App'
 
 if (process.env.NODE_ENV === 'development') {
-  window.localStorage.debug = 'etudes*'
+  window.localStorage.debug = 'demo*,etudes*'
 }
 
 const markup = () => (

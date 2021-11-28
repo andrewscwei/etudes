@@ -1,5 +1,5 @@
 import { align, container, selectors } from 'promptu'
-import React, { createRef, Fragment, PureComponent } from 'react'
+import React, { createRef, PureComponent } from 'react'
 import styled from 'styled-components'
 import BurgerButton from '../../../lib/BurgerButton'
 import $$GithubIcon from '../assets/images/github-icon.svg'
@@ -7,10 +7,10 @@ import Accordion from './Accordion'
 import DialSlidersDemo from './DialSlidersDemo'
 import List from './List'
 import MasonryGrid from './MasonryGrid'
-import Panorama from './Panorama'
+import PanoramaDemo from './PanoramaDemo'
 import Video from './Video'
 
-const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes') : () => {}
+const debug = process.env.NODE_ENV === 'development' ? require('debug')('demo') : () => {}
 
 interface Props {}
 
@@ -65,7 +65,7 @@ class App extends PureComponent<Props, State> {
     case 'accordion': return <Accordion/>
     case 'dial+sliders': return <DialSlidersDemo/>
     case 'video': return <Video/>
-    case 'panorama': return <Panorama/>
+    case 'panorama+slider': return <PanoramaDemo/>
     default: return (
       <StyledIntroduction>
         <h1>Études</h1>
@@ -77,7 +77,7 @@ class App extends PureComponent<Props, State> {
 
   render() {
     return (
-      <Fragment>
+      <>
         <main style={{
           height: '100%',
           left: 0,
@@ -103,7 +103,7 @@ class App extends PureComponent<Props, State> {
             <StyledNavButton isActive={this.state.featuredComponent === 'accordion'} onClick={() => this.setState({ featuredComponent: 'accordion' })}>Accordion</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'dial+sliders'} onClick={() => this.setState({ featuredComponent: 'dial+sliders' })}>Dial+Sliders</StyledNavButton>
             <StyledNavButton isActive={this.state.featuredComponent === 'video'} onClick={() => this.setState({ featuredComponent: 'video' })}>Video</StyledNavButton>
-            <StyledNavButton isActive={this.state.featuredComponent === 'panorama'} onClick={() => this.setState({ featuredComponent: 'panorama' })}>Panorama+Slider</StyledNavButton>
+            <StyledNavButton isActive={this.state.featuredComponent === 'panorama+slider'} onClick={() => this.setState({ featuredComponent: 'panorama+slider' })}>Panorama+Slider</StyledNavButton>
           </StyledNav>
           <StyledBurgerButton
             ref={this.nodeRefs.burgerButton}
@@ -117,7 +117,7 @@ class App extends PureComponent<Props, State> {
           />
           <StyledGithubButton href='https://github.com/andrewscwei/etudes'/>
         </aside>
-      </Fragment>
+      </>
     )
   }
 }

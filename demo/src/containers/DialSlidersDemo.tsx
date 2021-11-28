@@ -2,12 +2,15 @@ import { align, container, selectors } from 'promptu'
 import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
-import Dial from '../../../lib/Dial'
 import RangeSlider from '../../../lib/RangeSlider'
 import Slider from '../../../lib/Slider'
 import StepwiseSlider from '../../../lib/StepwiseSlider'
 
+const debug = process.env.NODE_ENV === 'development' ? require('debug')('demo') : () => {}
+
 export default function() {
+  // debug('Rendering demo "dial+sliders"...', 'OK')
+
   function getAngleByPosition(position: number): number {
     return position * (max - min) + min
   }
@@ -21,7 +24,7 @@ export default function() {
   return (
     <>
       <StyledRoot>
-        <Dial
+        {/* <Dial
           angle={angle}
           knobLength={50}
           radius={200}
@@ -35,14 +38,14 @@ export default function() {
             stroke: #666;
           `}
           style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg)' }}
-        />
+        /> */}
         <Slider
           isInverted={false}
           knobHeight={40}
           knobWidth={60}
           labelProvider={position => `${Math.round(getAngleByPosition(position))}°`}
           onlyDispatchesOnDragEnd={false}
-          onPositionChange={(position, isDragging) => setPosition(position)}
+          onPositionChange={position => setPosition(position)}
           orientation='vertical'
           position={position}
           trackPadding={10}

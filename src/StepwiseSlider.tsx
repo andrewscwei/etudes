@@ -201,16 +201,16 @@ export default function StepwiseSlider({
   knobWidth = 30,
   orientation = 'vertical',
   labelProvider,
+  steps = generateSteps(10),
+  index = 0,
   onDragEnd,
   onDragStart,
   onPositionChange,
+  onIndexChange,
   startingTrackCSS,
   endingTrackCSS,
   knobCSS,
   labelCSS,
-  steps = generateSteps(10),
-  index = 0,
-  onIndexChange,
   ...props
 }: Props) {
   /**

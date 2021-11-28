@@ -1,8 +1,8 @@
 import classNames from 'classnames'
-import interact from 'interactjs'
-import React, { HTMLAttributes, useEffect, useRef, useState } from 'react'
+import React, { HTMLAttributes, useEffect, useRef } from 'react'
 import { Rect } from 'spase'
 import styled, { css, CSSProp } from 'styled-components'
+import useDragEffect from './hooks/useDragEffect'
 import { Orientation } from './types'
 
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:slider') : () => {}
@@ -56,12 +56,11 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
   position?: number
 
   /**
-   * Handler invoked when position changes.
+   * Handler invoked when position changes from dragging.
    *
    * @param position - The current slider position.
-   * @param isDragging - Indicates if the position change is triggered by dragging the slider.
    */
-  onPositionChange?: (position: number, isDragging: boolean) => void
+  onPositionChange?: (position: number) => void
 
   /**
    * Handler invoked when dragging ends.
@@ -125,121 +124,50 @@ export default function Slider({
   labelCSS,
   ...props
 }: Props) {
-  /**
-   * Initializes input interactivity of the knob.
-   */
-  function initInteractivity() {
-    const knob = knobRef.current
-    if (!knob || interact.isSet(knob)) return
-
-    debug('Initializing interactivity...', 'OK')
-
-    interact(knob).draggable({
-      inertia: true,
-      onstart: () => onKnobDragStart(),
-      onmove: ({ dx, dy }) => onKnobDragMove(orientation === 'vertical' ? dy : dx),
-      onend: () => onKnobDragStop(),
-    })
-  }
-
-  /**
-   * Deinitializes input interactivity of the knob.
-   */
-  function deinitInteractivity() {
-    const knob = knobRef.current
-    if (!knob || !interact.isSet(knob)) return
-
-    debug('Deinitializing interactivity...', 'OK')
-
-    interact(knob).unset()
-  }
-
-  /**
-   * Handler invoked when the knob starts dragging. Note that this is an event listener and does not
-   * have read access to component states.
-   */
-  function onKnobDragStart() {
-    debug('Handling drag start...', 'OK')
-    setIsDragging(true)
-    onDragStart?.()
-  }
-
-  /**
-   * Handler invoked when the knob moves. Note that this is an event listener and does not have read
-   * access to component states.
-   *
-   * @param delta - The distance traveled (in pixels) since the last invocation of this handler.
-   */
-  function onKnobDragMove(delta: number) {
+  function transform(currentPosition: number, dx: number, dy: number): number {
     const rect = Rect.from(rootRef.current) ?? new Rect()
-    const naturalPosition = isInverted ? 1 - positionRef.current : positionRef.current
-    const naturalNewPositionX = naturalPosition * rect.width + delta
-    const naturalNewPositionY = naturalPosition * rect.height + delta
+    const naturalPosition = isInverted ? 1 - currentPosition : currentPosition
+    const naturalNewPositionX = naturalPosition * rect.width + dx
+    const naturalNewPositionY = naturalPosition * rect.height + dy
     const naturalNewPosition = (orientation === 'vertical') ? Math.max(0, Math.min(1, naturalNewPositionY / rect.height)) : Math.max(0, Math.min(1, naturalNewPositionX / rect.width))
     const newPosition = isInverted ? 1 - naturalNewPosition : naturalNewPosition
-
-    setIsDragging(true)
-    setPositionRef(newPosition)
-  }
-
-  /**
-   * Handler invoked when the knob stops dragging. Note that this is an event listener and does not
-   * have read access to component states.
-   */
-  function onKnobDragStop() {
-    debug('Handling drag stop...', 'OK')
-    setIsDragging(false)
-    onDragEnd?.()
-  }
-
-  /**
-   * Sets the current live position. The live position is different from the position state value.
-   * Because states are asynchronous by nature, this live position value is used to record position
-   * changes when drag event happens. This position should be normalized. That is, inversion should
-   * be taken care of prior to passing the new value to this method if `isInverted` is `true`.
-   *
-   * @param position - The value to set the live position to.
-   */
-  function setPositionRef(position: number) {
-    if (positionRef.current === position) return
-    positionRef.current = position
-    // debug('Updating live position...', 'OK', position)
-    setPosition(position)
+    return newPosition
   }
 
   const rootRef = useRef<HTMLDivElement>(null)
   const knobRef = useRef<HTMLButtonElement>(null)
-  const positionRef = useRef(position)
 
-  const [_position, setPosition] = useState(positionRef.current)
-  const [isDragging, setIsDragging] = useState<boolean | undefined>(undefined)
+  const { isDragging: [isDragging, setIsDragging], value: [_position, setPosition] } = useDragEffect(knobRef, {
+    initialValue: position,
+    transform,
+    onDragStart,
+    onDragEnd,
+  })
+
+  // debug('Rendering...', 'OK')
 
   const naturalPosition = isInverted ? 1 - _position : _position
 
+  // If position is changed externally, propagate that change to the drag effect state, but do not
+  // interrupt if the slider is currently being dragged.
   useEffect(() => {
-    initInteractivity()
-
-    return () => {
-      deinitInteractivity()
-    }
-  }, [])
-
-  useEffect(() => {
-    if (isDragging === true) return
-    if (position === _position) return
-    setIsDragging(undefined)
-    setPositionRef(position)
+    if (isDragging || position === _position) return
+    debug('Updating drag effect position from position prop...', 'OK', `prop=${position}, effect=${_position}`)
+    setPosition(position)
   }, [position])
 
+  // Emit position change event only if it was changed from internally.
   useEffect(() => {
-    if (isDragging === true && onlyDispatchesOnDragEnd) return
-    onPositionChange?.(_position, isDragging === true)
+    if (!isDragging) return
+    if (onlyDispatchesOnDragEnd) return
+    onPositionChange?.(_position)
   }, [_position])
 
+  // Emit position change event after drag ends, if `onlyDispatchesOnDragEnd` is enabled.
   useEffect(() => {
-    if (isDragging === false && onlyDispatchesOnDragEnd) {
-      onPositionChange?.(_position, false)
-    }
+    if (isDragging) return
+    if (!onlyDispatchesOnDragEnd) return
+    onPositionChange?.(_position)
   }, [isDragging])
 
   return (
