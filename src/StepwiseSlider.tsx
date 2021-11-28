@@ -1,8 +1,8 @@
 import classNames from 'classnames'
-import interact from 'interactjs'
 import React, { HTMLAttributes, useEffect, useRef, useState } from 'react'
 import { Rect } from 'spase'
 import styled, { css, CSSProp } from 'styled-components'
+import useDragEffect from './hooks/useDragEffect'
 import { Orientation } from './types'
 
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:stepwise-slider') : () => {}
@@ -65,20 +65,19 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
   index?: number
 
   /**
-   * Handler invoked when index changes. This happens simultaneously with `onPositionChange`.
+   * Handler invoked when index changes internally. This happens simultaneously with
+   * `onPositionChange`.
    *
    * @param index - The current step index.
-   * @param isDragging - Indicates if the index change is triggered by dragging the slider..
    */
-  onIndexChange?: (index: number, isDragging: boolean) => void
+  onIndexChange?: (index: number) => void
 
   /**
-   * Handler invoked when position changes.
+   * Handler invoked when position changes internally.
    *
    * @param position - The current slider position.
-   * @param isDragging - Indicates if the position change is triggered by dragging the slider.
    */
-  onPositionChange?: (position: number, isDragging: boolean) => void
+  onPositionChange?: (position: number) => void
 
   /**
    * Handler invoked when dragging ends.
@@ -193,7 +192,6 @@ export function getPositionAt(index: number, steps: readonly number[]): number {
 export default function StepwiseSlider({
   id,
   className,
-  style,
   isInverted = false,
   onlyDispatchesOnDragEnd = false,
   trackPadding = 0,
@@ -202,161 +200,74 @@ export default function StepwiseSlider({
   orientation = 'vertical',
   labelProvider,
   steps = generateSteps(10),
-  index = 0,
+  index: externalIndex = 0,
+  onIndexChange,
+  onPositionChange,
   onDragEnd,
   onDragStart,
-  onPositionChange,
-  onIndexChange,
   startingTrackCSS,
   endingTrackCSS,
   knobCSS,
   labelCSS,
   ...props
 }: Props) {
-  /**
-   * Initializes input interactivity of the knob.
-   */
-  function initInteractivity() {
-    const knob = knobRef.current
-    if (!knob || interact.isSet(knob)) return
-
-    debug('Initializing interactivity...', 'OK')
-
-    interact(knob).draggable({
-      inertia: true,
-      onstart: () => onKnobDragStart(),
-      onmove: ({ dx, dy }) => onKnobDragMove(orientation === 'vertical' ? dy : dx),
-      onend: () => onKnobDragStop(),
-    })
-  }
-
-  /**
-   * Deinitializes input interactivity of the knob.
-   */
-  function deinitInteractivity() {
-    const knob = knobRef.current
-    if (!knob || !interact.isSet(knob)) return
-
-    debug('Deinitializing interactivity...', 'OK')
-
-    interact(knob).unset()
-  }
-
-  /**
-   * Handler invoked when the knob starts dragging. Note that this is an event listener and does not
-   * have read access to component states.
-   */
-  function onKnobDragStart() {
-    debug('Handling drag start...', 'OK')
-    setIsDragging(true)
-    onDragStart?.()
-  }
-
-  /**
-   * Handler invoked when the knob moves. Note that this is an event listener and does not have read
-   * access to component states.
-   *
-   * @param delta - The distance traveled (in pixels) since the last invocation of this handler.
-   */
-  function onKnobDragMove(delta: number) {
+  function transform(currentPosition: number, dx: number, dy: number) {
     const rect = Rect.from(rootRef.current) ?? new Rect()
-    const naturalPosition = isInverted ? 1 - positionRef.current : positionRef.current
-    const naturalNewPositionX = naturalPosition * rect.width + delta
-    const naturalNewPositionY = naturalPosition * rect.height + delta
+    const naturalPosition = isInverted ? 1 - currentPosition : currentPosition
+    const naturalNewPositionX = naturalPosition * rect.width + dx
+    const naturalNewPositionY = naturalPosition * rect.height + dy
     const naturalNewPosition = (orientation === 'vertical') ? Math.max(0, Math.min(1, naturalNewPositionY / rect.height)) : Math.max(0, Math.min(1, naturalNewPositionX / rect.width))
     const newPosition = isInverted ? 1 - naturalNewPosition : naturalNewPosition
-    const newIndex = getNearestIndexByPosition(newPosition, steps)
-
-    setIsDragging(true)
-    setPositionRef(newPosition)
-    setIndexRef(newIndex)
-  }
-
-  /**
-   * Handler invoked when the knob stops dragging. Note that this is an event listener and does not
-   * have read access to component states.
-   */
-  function onKnobDragStop() {
-    debug('Handling drag stop...', 'OK')
-    setIsDragging(false)
-    onDragEnd?.()
-  }
-
-  /**
-   * Sets the current live position. The live position is different from the position state value.
-   * Because states are asynchronous by nature, this live position value is used to record position
-   * changes when drag event happens. This position should be normalized. That is, inversion should
-   * be taken care of prior to passing the new value to this method if `isInverted` is `true`.
-   *
-   * @param position - The value to set the live position to.
-   */
-  function setPositionRef(position: number) {
-    if (positionRef.current === position) return
-    positionRef.current = position
-    // debug('Updating live position...', 'OK', position)
-    setPosition(position)
-  }
-
-  /**
-   * Sets the current live index. The live index is different from the index state value. Because
-   * states are asynchronous by nature, this live index value is used to record index changes when
-   * drag event happens.
-   *
-   * @param index - The value to set the live index to.
-   */
-  function setIndexRef(index: number) {
-    if (indexRef.current === index) return
-    indexRef.current = index
-    // debug('Updating live index...', 'OK', index)
-    setIndex(index)
+    return newPosition
   }
 
   const rootRef = useRef<HTMLDivElement>(null)
   const knobRef = useRef<HTMLButtonElement>(null)
-  const positionRef = useRef(getPositionAt(index, steps))
-  const indexRef = useRef(index)
 
-  const [_position, setPosition] = useState(positionRef.current)
-  const [_index, setIndex] = useState(indexRef.current)
-  const [isDragging, setIsDragging] = useState<boolean | undefined>(undefined)
+  const [index, setIndex] = useState(externalIndex)
 
-  const naturalPosition = isInverted ? 1 - _position : _position
+  const { isDragging: [isDragging], value: [position, setPosition] } = useDragEffect(knobRef, {
+    initialValue: getPositionAt(externalIndex, steps),
+    transform,
+    onDragStart,
+    onDragEnd,
+  })
 
+  const naturalPosition = isInverted ? 1 - position : position
+
+  // If index is changed externally, propagate that change to the drag effect state, but do not
+  // interrupt if the slider is currently being dragged.
   useEffect(() => {
-    initInteractivity()
+    if (isDragging || externalIndex === index) return
+    const newPosition = getPositionAt(externalIndex, steps)
+    debug('Updating drag effect position from index prop...', 'OK', `prop=${newPosition}, effect=${position}`)
+    setPosition(newPosition)
+    setIndex(externalIndex)
+  }, [externalIndex])
 
-    return () => {
-      deinitInteractivity()
-    }
-  }, [])
-
+  // Emit position change event only if it was changed from internally.
   useEffect(() => {
-    if (isDragging === true) return
-    if (index === _index) return
-    setIsDragging(undefined)
-    setPositionRef(getPositionAt(index, steps))
-    setIndexRef(index)
-  }, [index])
+    if (!isDragging || onlyDispatchesOnDragEnd) return
+    const newIndex = getNearestIndexByPosition(position, steps)
+    onPositionChange?.(position)
+    if (index !== newIndex) onIndexChange?.(newIndex)
+  }, [position])
 
+  // Automatically snap to nearest step when drag ends.
   useEffect(() => {
-    if (isDragging === true && onlyDispatchesOnDragEnd) return
-    onPositionChange?.(_position, isDragging !== undefined)
-  }, [_position])
+    if (isDragging) return
 
-  useEffect(() => {
-    if (isDragging === true && onlyDispatchesOnDragEnd) return
-    onIndexChange?.(_index, isDragging !== undefined)
-  }, [_index])
-
-  useEffect(() => {
-    if (isDragging !== false) return
-
-    const nearestIndex = getNearestIndexByPosition(_position, steps)
+    const nearestIndex = getNearestIndexByPosition(position, steps)
     const nearestPosition = getPositionAt(nearestIndex, steps)
-    setPositionRef(nearestPosition)
 
-    if (onlyDispatchesOnDragEnd) {
-      onIndexChange?.(_index, true)
+    if (nearestPosition !== position || onlyDispatchesOnDragEnd) {
+      setPosition(nearestPosition)
+      onPositionChange?.(nearestPosition)
+    }
+
+    if (nearestIndex !== index || onlyDispatchesOnDragEnd) {
+      setIndex(nearestIndex)
+      onIndexChange?.(nearestIndex)
     }
   }, [isDragging])
 
@@ -385,8 +296,8 @@ export default function StepwiseSlider({
       }}>
         <StyledKnob
           className={classNames({
-            'at-end': isInverted ? (_position === 0) : (_position === 1),
-            'at-start': isInverted ? (_position === 1) : (_position === 0),
+            'at-end': isInverted ? (position === 0) : (position === 1),
+            'at-start': isInverted ? (position === 1) : (position === 0),
             'dragging': isDragging === true,
           })}
           css={knobCSS}
@@ -396,7 +307,7 @@ export default function StepwiseSlider({
           }}
         >
           {steps && labelProvider && (
-            <StyledLabel knobHeight={knobHeight} css={labelCSS}>{labelProvider(_position, getNearestIndexByPosition(_position, steps))}</StyledLabel>
+            <StyledLabel knobHeight={knobHeight} css={labelCSS}>{labelProvider(position, getNearestIndexByPosition(position, steps))}</StyledLabel>
           )}
         </StyledKnob>
       </StyledKnobContainer>

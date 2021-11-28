@@ -2,6 +2,7 @@ import { align, container, selectors } from 'promptu'
 import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
+import Dial from '../../../lib/Dial'
 import RangeSlider from '../../../lib/RangeSlider'
 import Slider from '../../../lib/Slider'
 import StepwiseSlider from '../../../lib/StepwiseSlider'
@@ -24,7 +25,7 @@ export default function() {
   return (
     <>
       <StyledRoot>
-        {/* <Dial
+        <Dial
           angle={angle}
           knobLength={50}
           radius={200}
@@ -38,7 +39,7 @@ export default function() {
             stroke: #666;
           `}
           style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg)' }}
-        /> */}
+        />
         <Slider
           isInverted={false}
           knobHeight={40}
@@ -71,11 +72,11 @@ export default function() {
         />
         <StepwiseSlider
           index={index}
-          isInverted={false}
+          isInverted={true}
           knobHeight={40}
           knobWidth={60}
           labelProvider={(position, index) => `${index}`}
-          onIndexChange={(index, isDragging) => setIndex(index)}
+          onIndexChange={index => setIndex(index)}
           onlyDispatchesOnDragEnd={false}
           orientation='vertical'
           trackPadding={10}

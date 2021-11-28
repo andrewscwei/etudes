@@ -113,7 +113,7 @@ export default function Slider({
   knobHeight = 30,
   knobWidth = 30,
   orientation = 'vertical',
-  position = 0,
+  position: externalPosition = 0,
   labelProvider,
   onDragEnd,
   onDragStart,
@@ -137,8 +137,8 @@ export default function Slider({
   const rootRef = useRef<HTMLDivElement>(null)
   const knobRef = useRef<HTMLButtonElement>(null)
 
-  const { isDragging: [isDragging, setIsDragging], value: [_position, setPosition] } = useDragEffect(knobRef, {
-    initialValue: position,
+  const { isDragging: [isDragging], value: [position, setPosition] } = useDragEffect(knobRef, {
+    initialValue: externalPosition,
     transform,
     onDragStart,
     onDragEnd,
@@ -146,28 +146,28 @@ export default function Slider({
 
   // debug('Rendering...', 'OK')
 
-  const naturalPosition = isInverted ? 1 - _position : _position
+  const naturalPosition = isInverted ? 1 - position : position
 
   // If position is changed externally, propagate that change to the drag effect state, but do not
   // interrupt if the slider is currently being dragged.
   useEffect(() => {
-    if (isDragging || position === _position) return
-    debug('Updating drag effect position from position prop...', 'OK', `prop=${position}, effect=${_position}`)
-    setPosition(position)
-  }, [position])
+    if (isDragging || externalPosition === position) return
+    debug('Updating drag effect position from position prop...', 'OK', `prop=${externalPosition}, effect=${position}`)
+    setPosition(externalPosition)
+  }, [externalPosition])
 
   // Emit position change event only if it was changed from internally.
   useEffect(() => {
     if (!isDragging) return
     if (onlyDispatchesOnDragEnd) return
-    onPositionChange?.(_position)
-  }, [_position])
+    onPositionChange?.(position)
+  }, [position])
 
   // Emit position change event after drag ends, if `onlyDispatchesOnDragEnd` is enabled.
   useEffect(() => {
     if (isDragging) return
     if (!onlyDispatchesOnDragEnd) return
-    onPositionChange?.(_position)
+    onPositionChange?.(position)
   }, [isDragging])
 
   return (
@@ -195,8 +195,8 @@ export default function Slider({
       }}>
         <StyledKnob
           className={classNames({
-            'at-end': isInverted ? (_position === 0) : (_position === 1),
-            'at-start': isInverted ? (_position === 1) : (_position === 0),
+            'at-end': isInverted ? (position === 0) : (position === 1),
+            'at-start': isInverted ? (position === 1) : (position === 0),
             'dragging': isDragging === true,
           })}
           css={knobCSS}
@@ -206,7 +206,7 @@ export default function Slider({
           }}
         >
           {labelProvider && (
-            <StyledLabel knobHeight={knobHeight} css={labelCSS}>{labelProvider(_position)}</StyledLabel>
+            <StyledLabel knobHeight={knobHeight} css={labelCSS}>{labelProvider(position)}</StyledLabel>
           )}
         </StyledKnob>
       </StyledKnobContainer>
