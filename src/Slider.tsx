@@ -56,11 +56,15 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
   position?: number
 
   /**
-   * Handler invoked when position changes from dragging.
+   * Handler invoked when position changes. This can either be invoked from the `position` prop
+   * being changed or from the slider being dragged. Note that if the event is emitted at the end of
+   * dragging due to `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here is
+   * still `true`.
    *
    * @param position - The current slider position.
+   * @param isDragging - Specifies if the position change is due to dragging.
    */
-  onPositionChange?: (position: number) => void
+  onPositionChange?: (position: number, isDragging: boolean) => void
 
   /**
    * Handler invoked when dragging ends.
@@ -148,26 +152,24 @@ export default function Slider({
 
   const naturalPosition = isInverted ? 1 - position : position
 
-  // If position is changed externally, propagate that change to the drag effect state, but do not
-  // interrupt if the slider is currently being dragged.
   useEffect(() => {
     if (isDragging || externalPosition === position) return
-    debug('Updating drag effect position from position prop...', 'OK', `prop=${externalPosition}, effect=${position}`)
+
+    debug('Updating drag effect value from position prop...', 'OK', `prop=${externalPosition}, effect=${position}`)
+
     setPosition(externalPosition)
   }, [externalPosition])
 
-  // Emit position change event only if it was changed from internally.
   useEffect(() => {
-    if (!isDragging) return
-    if (onlyDispatchesOnDragEnd) return
-    onPositionChange?.(position)
+    if (isDragging && onlyDispatchesOnDragEnd) return
+
+    onPositionChange?.(position, isDragging)
   }, [position])
 
-  // Emit position change event after drag ends, if `onlyDispatchesOnDragEnd` is enabled.
   useEffect(() => {
-    if (isDragging) return
-    if (!onlyDispatchesOnDragEnd) return
-    onPositionChange?.(position)
+    if (isDragging || !onlyDispatchesOnDragEnd) return
+
+    onPositionChange?.(position, true)
   }, [isDragging])
 
   return (

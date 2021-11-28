@@ -65,19 +65,26 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
   index?: number
 
   /**
-   * Handler invoked when index changes internally. This happens simultaneously with
-   * `onPositionChange`.
+   * Handler invoked when index changes. This can either be invoked from the `index` prop
+   * being changed or from the slider being dragged. Note that if the event is emitted at the end of
+   * dragging due to `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here is
+   * still `true`. This event is emitted right after `onPositionChange`.
    *
-   * @param index - The current step index.
+   * @param index - The current slider index.
+   * @param isDragging - Specifies if the index change is due to dragging.
    */
-  onIndexChange?: (index: number) => void
+  onIndexChange?: (index: number, isDragging: boolean) => void
 
   /**
-   * Handler invoked when position changes internally.
+   * Handler invoked when position changes. This can either be invoked from the `index` prop
+   * being changed or from the slider being dragged. Note that if the event is emitted at the end of
+   * dragging due to `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here is
+   * still `true`. This event is emitted right before `onIndexChange`.
    *
    * @param position - The current slider position.
+   * @param isDragging - Specifies if the position change is due to dragging.
    */
-  onPositionChange?: (position: number) => void
+  onPositionChange?: (position: number, isDragging: boolean) => void
 
   /**
    * Handler invoked when dragging ends.
@@ -235,25 +242,34 @@ export default function StepwiseSlider({
 
   const naturalPosition = isInverted ? 1 - position : position
 
-  // If index is changed externally, propagate that change to the drag effect state, but do not
-  // interrupt if the slider is currently being dragged.
   useEffect(() => {
-    if (isDragging || externalIndex === index) return
+    if (isDragging) return
+
     const newPosition = getPositionAt(externalIndex, steps)
-    debug('Updating drag effect position from index prop...', 'OK', `prop=${newPosition}, effect=${position}`)
-    setPosition(newPosition)
-    setIndex(externalIndex)
+
+    if (position !== newPosition) {
+      debug('Updating drag effect value from index prop...', 'OK', `prop=${newPosition}, effect=${position}`)
+      setPosition(newPosition)
+    }
+
+    if (externalIndex !== index) {
+      setIndex(externalIndex)
+    }
   }, [externalIndex])
 
-  // Emit position change event only if it was changed from internally.
   useEffect(() => {
-    if (!isDragging || onlyDispatchesOnDragEnd) return
+    if (isDragging && onlyDispatchesOnDragEnd) return
+
+    onPositionChange?.(position, isDragging)
+
     const newIndex = getNearestIndexByPosition(position, steps)
-    onPositionChange?.(position)
-    if (index !== newIndex) onIndexChange?.(newIndex)
+    if (index !== newIndex) setIndex(newIndex)
   }, [position])
 
-  // Automatically snap to nearest step when drag ends.
+  useEffect(() => {
+    onIndexChange?.(index, isDragging)
+  }, [index])
+
   useEffect(() => {
     if (isDragging) return
 
@@ -262,12 +278,7 @@ export default function StepwiseSlider({
 
     if (nearestPosition !== position || onlyDispatchesOnDragEnd) {
       setPosition(nearestPosition)
-      onPositionChange?.(nearestPosition)
-    }
-
-    if (nearestIndex !== index || onlyDispatchesOnDragEnd) {
-      setIndex(nearestIndex)
-      onIndexChange?.(nearestIndex)
+      onPositionChange?.(nearestPosition, true)
     }
   }, [isDragging])
 
@@ -298,7 +309,7 @@ export default function StepwiseSlider({
           className={classNames({
             'at-end': isInverted ? (position === 0) : (position === 1),
             'at-start': isInverted ? (position === 1) : (position === 0),
-            'dragging': isDragging === true,
+            'dragging': isDragging,
           })}
           css={knobCSS}
           style={{

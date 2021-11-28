@@ -18,7 +18,7 @@ export default function() {
 
   const [min, setMin] = useState(0)
   const [max, setMax] = useState(360)
-  const [index, setIndex] = useState(9)
+  const [index, setIndex] = useState(4)
   const [position, setPosition] = useState(0.5)
   const angle = getAngleByPosition(position)
 

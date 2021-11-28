@@ -1,8 +1,11 @@
 import React, { HTMLAttributes, useEffect, useRef, useState } from 'react'
-import { Rect, Size } from 'spase'
+import { Size } from 'spase'
 import styled from 'styled-components'
 import useDragEffect from './hooks/useDragEffect'
+import useLoadImageEffect from './hooks/useLoadImageEffect'
 import useResizeEffect from './hooks/useResizeEffect'
+
+const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:panorama') : () => {}
 
 export type Props = HTMLAttributes<HTMLDivElement> & {
   /**
@@ -30,12 +33,19 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
   zeroAnchor?: number
 
   /**
-   * Handler invoked when the position (0.0 - 1.0, inclusive) is changed.
+   * Handler invoked when the changes. This can either be invoked from the `angle` prop being
+   * changed or from the image being dragged.
+   *
+   * @param position - The current position.
+   * @param isDragging - Specifies if the position change is due to dragging.
    */
-  onPositionChange?: (displacement: number, isDragging: boolean) => void
+  onPositionChange?: (position: number, isDragging: boolean) => void
 
   /**
-   * Handler invoked when the angle is changed.
+   * Handler invoked when the angle changes.
+   *
+   * @param angle - The current angle.
+   * @param isDragging - Specifies if the angle change is due to dragging.
    */
   onAngleChange?: (angle: number, isDragging: boolean) => void
 
@@ -76,10 +86,6 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
   onImageSizeChange?: (size?: Size) => void
 }
 
-function getImageSize(imageElement: HTMLImageElement): Size {
-  return new Size([imageElement.width, imageElement.height])
-}
-
 function getFilledImageSize(originalSize: Size, sizeToFill: Size): Size {
   const { width: originalWidth, height: originalHeight } = originalSize
   const { height: filledHeignt } = sizeToFill
@@ -118,7 +124,7 @@ function getAngleFromDisplacement(displacement: number, originalImageSize: Size,
  * @requires interactjs
  */
 export default function Panorama({
-  angle = 0,
+  angle: externalAngle = 0,
   speed = 1,
   src,
   zeroAnchor = 0,
@@ -132,99 +138,59 @@ export default function Panorama({
   onImageSizeChange,
   ...props
 }: Props) {
-  function setAngleRef(angle: number) {
-    if (angleRef.current === angle) return
-    angleRef.current = angle
-    setAngle(angle)
+  function transform(currentDisplacement: number, dx: number, dy: number): number {
+    const newDisplacement = currentDisplacement - (dx * speed)
+    return newDisplacement
   }
 
-  function setDisplacementRef(displacement: number) {
-    if (displacementRef.current === displacement) return
-    displacementRef.current = displacement
-    setDisplacement(displacement)
-  }
+  const rootRef = useRef<HTMLDivElement>(null)
 
-  const containerRef = useRef<HTMLDivElement>(null)
-  const imageRef = useRef<HTMLImageElement | undefined>(undefined)
-  const angleRef = useRef(angle)
-  const displacementRef = useRef(containerRef.current && imageRef.current ? getDisplacementFromAngle(angle, getImageSize(imageRef.current), (Rect.from(containerRef.current) ?? new Rect()).size, zeroAnchor) : 0)
+  const [size] = useResizeEffect(rootRef)
+  const [angle, setAngle] = useState(externalAngle)
 
-  const [_angle, setAngle] = useState(angleRef.current)
-  const [displacement, setDisplacement] = useState(displacementRef.current)
-  const [isLoading, setIsLoading] = useState(true)
-  const [imageSize, setImageSize] = useState<Size | undefined>(undefined)
-  const { isDragging: [isDragging, setIsDragging] } = useDragEffect(containerRef, { initialValue: NaN, onDragStart, onDragMove, onDragEnd }, [speed, zeroAnchor])
-  const [size, setSize] = useResizeEffect(containerRef)
+  const { isLoading: [isLoading], imageSize: [imageSize] } = useLoadImageEffect(src, {
+    onImageLoadComplete,
+    onImageLoadError,
+    onImageSizeChange,
+  })
 
-  function _onImageLoadComplete(event: Event) {
-    const imageElement = event.currentTarget as HTMLImageElement
-    const imageSize = getImageSize(imageElement)
-
-    setIsLoading(false)
-
-    const displacement = getDisplacementFromAngle(angle, imageSize, (Rect.from(containerRef.current) ?? new Rect()).size, zeroAnchor)
-    setDisplacementRef(displacement)
-
-    setImageSize(imageSize)
-
-    onImageLoadComplete?.(imageElement)
-  }
-
-  function _onImageLoadError(event: Event) {
-    setIsLoading(false)
-
-    setImageSize(undefined)
-
-    onImageLoadError?.()
-  }
-
-  function onDragMove(dx: number, dy: number) {
-    if (!imageRef.current || !containerRef.current) return
-
-    const newDisplacement = displacementRef.current - (dx * speed)
-    const newAngle = getAngleFromDisplacement(newDisplacement, getImageSize(imageRef.current), (Rect.from(containerRef.current) ?? new Rect()).size, zeroAnchor)
-
-    setDisplacementRef(newDisplacement)
-    setAngleRef(newAngle)
-  }
+  const { isDragging: [isDragging], value: [displacement, setDisplacement] } = useDragEffect(rootRef, {
+    initialValue: 0,
+    transform,
+    onDragStart,
+    onDragEnd,
+  }, [speed, zeroAnchor])
 
   useEffect(() => {
-    setIsLoading(true)
+    if (isDragging || isLoading || !imageSize) return
 
-    imageRef.current = new Image()
-    imageRef.current.src = src
-    imageRef.current.addEventListener('load', _onImageLoadComplete)
-    imageRef.current.addEventListener('error', _onImageLoadError)
+    const newDisplacement = getDisplacementFromAngle(externalAngle, imageSize, size, zeroAnchor)
 
-    return () => {
-      imageRef.current?.removeEventListener('load', _onImageLoadComplete)
-      imageRef.current?.removeEventListener('error', _onImageLoadError)
-      imageRef.current = undefined
+    if (newDisplacement !== displacement) {
+      debug('Updating drag effect value from angle prop...', 'OK', `old=${displacement} new=${newDisplacement}`)
+      setDisplacement(newDisplacement)
     }
-  }, [src])
+
+    if (externalAngle !== angle) {
+      setAngle(externalAngle)
+    }
+  }, [externalAngle, isLoading, imageSize, size, zeroAnchor])
 
   useEffect(() => {
-    console.log('FOO', size)
-  }, [size])
+    if (!isDragging || !imageSize) return
+
+    const newAngle = getAngleFromDisplacement(displacement, imageSize, size, zeroAnchor)
+
+    if (angle !== newAngle) setAngle(newAngle)
+  }, [displacement, imageSize, size, zeroAnchor])
 
   useEffect(() => {
-    onImageSizeChange?.(imageSize)
-  }, [imageSize])
-
-  useEffect(() => {
-    onAngleChange?.(_angle, isDragging)
-    onPositionChange?.(_angle / 360, isDragging)
-  }, [_angle])
-
-  useEffect(() => {
-    if (isDragging || isLoading) return
-    if (angle === _angle) return
-    setIsDragging(false)
-    setAngleRef(angle)
+    onAngleChange?.(angle, isDragging)
+    onPositionChange?.(angle / 360, isDragging)
   }, [angle])
 
   return (
-    <StyledRoot ref={containerRef} {...props}>
+    <StyledRoot ref={rootRef} {...props}>
       <StyledImageContainer
         style={{
           backgroundImage: `url(${src})`,

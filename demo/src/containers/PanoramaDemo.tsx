@@ -14,11 +14,11 @@ export default function() {
     <>
       <StyledRoot>
         <Slider
+          knobHeight={20}
+          knobWidth={20}
+          onPositionChange={position => setWidth(400 + position * 400)}
           orientation='horizontal'
           position={(width - 400) / 400}
-          onPositionChange={position => setWidth(400 + position * 400)}
-          knobWidth={20}
-          knobHeight={20}
           knobCSS={css`
             border-radius: 10px;
           `}
@@ -33,18 +33,10 @@ export default function() {
           }}
         />
         <Panorama
+          angle={angle}
+          onAngleChange={(angle, isDragging) => setAngle(angle) }
           src={$$PanoramaImage}
-          // angle={angle}
-          zeroAnchor={0}
-          onAngleChange={(angle, isDragging) => {
-            setAngle(angle)
-          }}
-          onImageSizeChange={size => {
-            // console.log('SIZE', size)
-          }}
-          onPositionChange={(position, isDragging) => {
-            // console.log(`position=${position}, dragging=${isDragging}`)
-          }}
+          zeroAnchor={1}
           style={{
             height: '40rem',
             transform: 'translate3d(0, 0, 0) rotateX(0deg) rotateY(-10deg)',
