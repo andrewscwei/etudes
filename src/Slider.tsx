@@ -167,7 +167,6 @@ export default function Slider({
 
   useEffect(() => {
     if (isDragging || !onlyDispatchesOnDragEnd) return
-
     onPositionChange?.(position, true)
   }, [isDragging])
 

@@ -88,7 +88,6 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
         inertia: true,
         ...options,
         onstart: () => {
-          console.log('started')
           setIsDragging(true)
           onDragStart?.()
         },
@@ -103,7 +102,6 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
           onDragMove?.(dx, dy)
         },
         onend: () => {
-          console.log('stopped')
           setIsDragging(false)
           onDragEnd?.()
         },

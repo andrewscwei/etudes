@@ -20,7 +20,7 @@ export default function() {
         <Slider
           knobHeight={20}
           knobWidth={20}
-          onPositionChange={position => setWidth(400 + position * 400)}
+          onPositionChange={(position, isDragging) => { if (isDragging) setWidth(400 + position * 400) }}
           orientation='horizontal'
           position={(width - 400) / 400}
           knobCSS={css`
@@ -38,7 +38,7 @@ export default function() {
         />
         <Panorama
           angle={angle}
-          onAngleChange={angle => setAngle(angle) }
+          onAngleChange={(angle, isDragging) => { if (isDragging) setAngle(angle) }}
           onResize={size => setViewportSize(size)}
           src={$$PanoramaImage}
           zeroAnchor={zeroAnchor}
@@ -51,7 +51,7 @@ export default function() {
         />
         <PanoramaSlider
           angle={angle}
-          onAngleChange={angle => setAngle(angle)}
+          onAngleChange={(angle, isDragging) => { if (isDragging) setAngle(angle) }}
           src={$$PanoramaImage}
           viewportSize={viewportSize}
           zeroAnchor={zeroAnchor}

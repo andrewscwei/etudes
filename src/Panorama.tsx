@@ -33,8 +33,8 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
   zeroAnchor?: number
 
   /**
-   * Handler invoked when the changes. This can either be invoked from the `angle` prop being
-   * changed or from the image being dragged.
+   * Handler invoked when the positionchanges. This can either be invoked from the `angle` prop
+   * being changed or from the image being dragged.
    *
    * @param position - The current position.
    * @param isDragging - Specifies if the position change is due to dragging.
@@ -42,7 +42,10 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
   onPositionChange?: (position: number, isDragging: boolean) => void
 
   /**
-   * Handler invoked when the angle changes.
+   * Handler invoked when the angle changes. This can either be invoked from the `angle` prop being
+   * changed or from the image being dragged. When `angle` is being double-binded, ensure that the
+   * value is only being set by this handler when `isDragging` is `true` to avoid potential update
+   * overflow.
    *
    * @param angle - The current angle.
    * @param isDragging - Specifies if the angle change is due to dragging.
@@ -191,10 +194,13 @@ export default function Panorama({
 
     if (angle !== newAngle) {
       setAngle(newAngle)
-      onAngleChange?.(angle, isDragging)
-      onPositionChange?.(angle / 360, isDragging)
     }
   }, [displacement, imageSize, size, zeroAnchor])
+
+  useEffect(() => {
+    onAngleChange?.(angle, isDragging)
+    onPositionChange?.(angle / 360, isDragging)
+  }, [angle])
 
   return (
     <StyledRoot ref={rootRef} {...props}>
