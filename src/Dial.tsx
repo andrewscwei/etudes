@@ -68,9 +68,6 @@ function arcPath(x: number, y: number, radius: number, startAngle: number, endAn
 
 /**
  * A circular dial with a knob and a track.
- *
- * @requires react
- * @requires styled-components
  */
 export default function Dial({
   angle = 0,

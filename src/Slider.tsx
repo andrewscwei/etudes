@@ -3,7 +3,6 @@ import React, { HTMLAttributes, useEffect, useRef } from 'react'
 import { Rect } from 'spase'
 import styled, { css, CSSProp } from 'styled-components'
 import useDragEffect from './hooks/useDragEffect'
-import { Orientation } from './types'
 
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:slider') : () => {}
 
@@ -48,7 +47,7 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
   /**
    * Orientation of the slider.
    */
-  orientation?: Orientation
+  orientation?: 'horizontal' | 'vertical'
 
   /**
    * The current position.
@@ -104,11 +103,6 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
  * a scroll track after the knob. While the width and height of the slider is inferred from its CSS
  * rules, the width and height of the knob are set via props (`knobWidth` and `knobHeight`,
  * respectively). The size of the knob does not impact the size of the slider.
- *
- * @requires react
- * @requires styled-components
- * @requires spase
- * @requires interactjs
  */
 export default function Slider({
   isInverted = false,
@@ -272,7 +266,7 @@ const StyledKnob = styled.div`
 `
 
 const StyledRoot = styled.div<{
-  orientation: Orientation
+  orientation: Props['orientation']
 }>`
   box-sizing: border-box;
   display: block;

@@ -1,8 +1,9 @@
+import $$GithubIcon from '!!raw-loader!../assets/images/github-icon.svg'
 import { align, container, selectors } from 'promptu'
 import React, { createRef, PureComponent } from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import BurgerButton from '../../../lib/BurgerButton'
-import $$GithubIcon from '../assets/images/github-icon.svg'
+import FlatSVG from '../../../lib/FlatSVG'
 import Accordion from './Accordion'
 import DialSlidersDemo from './DialSlidersDemo'
 import List from './List'
@@ -115,7 +116,16 @@ class App extends PureComponent<Props, State> {
             onActivate={() => this.setState({ isNavActive: true })}
             onDeactivate={() => this.setState({ isNavActive: false })}
           />
-          <StyledGithubButton href='https://github.com/andrewscwei/etudes'/>
+          <StyledGithubButton href='https://github.com/andrewscwei/etudes'>
+            <FlatSVG
+              markup={$$GithubIcon}
+              svgCSS={css`
+                * {
+                  fill: #fff;
+                }
+              `}
+            />
+          </StyledGithubButton>
         </aside>
       </>
     )
@@ -212,7 +222,6 @@ const StyledBurgerButton = styled(BurgerButton)`
 const StyledGithubButton = styled.a`
   ${container.box}
   ${align.fbl}
-  background: url(${$$GithubIcon}) center / 100% no-repeat;
   cursor: pointer;
   height: 4rem;
   margin: 8vh 8vw;

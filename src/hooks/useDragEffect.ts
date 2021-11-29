@@ -53,10 +53,6 @@ type Options<T> = Omit<Interact.DraggableOptions, 'onstart' | 'onmove' | 'onend'
  * @param deps - Dependencies that trigger this effect.
  *
  * @returns The states created for this effect.
- *
- * @requires react
- * @requires spase
- * @requires interactjs
  */
 export default function useDragEffect<T = [number, number]>(targetRef: RefObject<HTMLElement>, { onDragStart, onDragMove, onDragEnd, initialValue, transform, ...options }: Options<T>, deps?: DependencyList): ReturnedStates<T> {
   const valueRef = useRef<T>(initialValue)

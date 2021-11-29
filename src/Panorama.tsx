@@ -127,11 +127,6 @@ function getAngleFromDisplacement(displacement: number, originalImageSize: Size,
 
 /**
  * A component containing a pannable 360° panorama image. The angle supports two-way binding.
- *
- * @requires react
- * @requires styled-component
- * @requires spase
- * @requires interactjs
  */
 export default function Panorama({
   angle: externalAngle = 0,

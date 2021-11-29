@@ -3,7 +3,6 @@ import React, { HTMLAttributes, useEffect, useRef, useState } from 'react'
 import { Rect } from 'spase'
 import styled, { css, CSSProp } from 'styled-components'
 import useDragEffect from './hooks/useDragEffect'
-import { Orientation } from './types'
 
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:stepwise-slider') : () => {}
 
@@ -50,7 +49,7 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
   /**
    * Orientation of the slider.
    */
-  orientation?: Orientation
+  orientation?: 'horizontal' | 'vertical'
 
   /**
    * An array of step descriptors. A step is a position (0 - 1 inclusive) on the track where the
@@ -190,11 +189,6 @@ function getPositionAt(index: number, steps: readonly number[]): number {
  * props (`knobWidth` and `knobHeight`, respectively). The size of the knob does not impact the size
  * of the slider. While dragging, the slider still emits a position change event, where the position
  * is a decimal ranging between 0.0 and 1.0, inclusive.
- *
- * @requires react
- * @requires styled-components
- * @requires spase
- * @requires interactjs
  */
 export default function StepwiseSlider({
   id,
@@ -385,7 +379,7 @@ const StyledKnob = styled.div`
 `
 
 const StyledRoot = styled.div<{
-  orientation: Orientation
+  orientation: Props['orientation']
 }>`
   box-sizing: border-box;
   display: block;
