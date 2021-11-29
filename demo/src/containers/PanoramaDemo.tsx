@@ -23,10 +23,10 @@ export default function() {
           onPositionChange={(position, isDragging) => { if (isDragging) setWidth(400 + position * 400) }}
           orientation='horizontal'
           position={(width - 400) / 400}
-          knobCSS={css`
+          cssKnob={css`
             border-radius: 10px;
           `}
-          endingTrackCSS={css`
+          cssEndingTrack={css`
             opacity: .6;
           `}
           style={{

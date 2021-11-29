@@ -31,32 +31,32 @@ export type Props = HTMLAttributes<HTMLDivElement> & PanoramaProps & {
   /**
    * Additional CSS to be provided to the internal panorama component.
    */
-  panoramaCSS?: CSSProp<any>
+  cssPanorama?: CSSProp<any>
 
   /**
    * Additional CSS to be provided to the reticle.
    */
-  reticleCSS?: CSSProp<any>
+  cssReticle?: CSSProp<any>
 
   /**
    * Additional CSS to be provided to the track.
    */
-  trackCSS?: CSSProp<any>
+  cssTrack?: CSSProp<any>
 
   /**
    * Additional CSS to be provided to the indicator.
    */
-  indicatorCSS?: CSSProp<any>
+  cssIndicator?: CSSProp<any>
 }
 
 export default function PanoramaSlider({
   fov,
   autoDimension = 'width',
   viewportSize,
-  panoramaCSS,
-  reticleCSS,
-  trackCSS,
-  indicatorCSS,
+  cssPanorama,
+  cssReticle,
+  cssTrack,
+  cssIndicator,
   angle = 0,
   speed = 1,
   src,
@@ -112,7 +112,7 @@ export default function PanoramaSlider({
     }} {...props}>
       <StyledPanorama
         angle={angle}
-        css={panoramaCSS}
+        css={cssPanorama}
         onAngleChange={onAngleChange}
         onDragEnd={() => {
           setIsDragging(false)
@@ -134,12 +134,12 @@ export default function PanoramaSlider({
       />
       <StyledTrackContainer>
         <div>
-          <StyledTrack className={classNames({ dragging: isDragging })} css={trackCSS}/>
-          <StyledReticle className={classNames({ dragging: isDragging })} css={reticleCSS} style={{ width: `${reticleWidth}px` }}/>
-          <StyledTrack className={classNames({ dragging: isDragging })} css={trackCSS}/>
+          <StyledTrack className={classNames({ dragging: isDragging })} css={cssTrack}/>
+          <StyledReticle className={classNames({ dragging: isDragging })} css={cssReticle} style={{ width: `${reticleWidth}px` }}/>
+          <StyledTrack className={classNames({ dragging: isDragging })} css={cssTrack}/>
         </div>
       </StyledTrackContainer>
-      <StyledIndicator className={classNames({ dragging: isDragging })} style={{ width: `${reticleWidth}px` }} css={indicatorCSS}/>
+      <StyledIndicator className={classNames({ dragging: isDragging })} style={{ width: `${reticleWidth}px` }} css={cssIndicator}/>
     </StyledRoot>
   )
 }

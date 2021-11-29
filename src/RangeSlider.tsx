@@ -43,10 +43,10 @@ export interface Props {
   orientation: Orientation
   tintColor: string
   onRangeChange: (range: Range) => void
-  knobCSS: ExtendedCSSFunction<KnobCSSProps>
-  highlightCSS: ExtendedCSSFunction<HighlightCSSProps>
-  labelCSS: ExtendedCSSFunction<LabelCSSProps>
-  gutterCSS: ExtendedCSSFunction
+  cssKnob: ExtendedCSSFunction<KnobCSSProps>
+  cssHighlight: ExtendedCSSFunction<HighlightCSSProps>
+  cssLabel: ExtendedCSSFunction<LabelCSSProps>
+  cssGutter: ExtendedCSSFunction
 }
 
 export interface State {
@@ -68,10 +68,10 @@ export default class RangeSlider extends PureComponent<Props, State> {
     tintColor: '#fff',
     orientation: 'vertical',
     onRangeChange: () => {},
-    gutterCSS: () => css``,
-    highlightCSS: () => css``,
-    knobCSS: () => css``,
-    labelCSS: () => css``,
+    cssGutter: () => css``,
+    cssHighlight: () => css``,
+    cssKnob: () => css``,
+    cssLabel: () => css``,
   }
 
   nodeRefs = {
@@ -150,7 +150,7 @@ export default class RangeSlider extends PureComponent<Props, State> {
         style={this.props.style}
       >
         <StyledGutter
-          extendedCSS={this.props.gutterCSS}
+          extendedCSS={this.props.cssGutter}
         />
         <StyledKnob
           ref={this.nodeRefs.knobA}
@@ -165,7 +165,7 @@ export default class RangeSlider extends PureComponent<Props, State> {
           } : {
             marginTop: `${this.getDisplacementByValue(this.state.range[0])}px`,
           }}
-          extendedCSS={this.props.knobCSS}
+          extendedCSS={this.props.cssKnob}
         />
         {this.props.areLabelsVisible && (
           <StyledLabel
@@ -178,7 +178,7 @@ export default class RangeSlider extends PureComponent<Props, State> {
             } : {
               transform: `translate3d(0, calc(-50% + ${this.getDisplacementByValue(this.state.range[0])}px), 0)`,
             }}
-            extendedCSS={this.props.labelCSS}
+            extendedCSS={this.props.cssLabel}
           >
             {Number(this.state.range[0].toFixed(this.props.decimalPlaces)).toLocaleString()}
           </StyledLabel>
@@ -194,7 +194,7 @@ export default class RangeSlider extends PureComponent<Props, State> {
             height: `${this.highlightLength}px`,
             transform: `translate3d(0, ${this.getDisplacementByValue(this.state.range[0])}px, 0)`,
           }}
-          extendedCSS={this.props.highlightCSS}
+          extendedCSS={this.props.cssHighlight}
         />
         <StyledKnob
           ref={this.nodeRefs.knobB}
@@ -209,7 +209,7 @@ export default class RangeSlider extends PureComponent<Props, State> {
           } : {
             marginTop: `${this.getDisplacementByValue(this.state.range[1])}px`,
           }}
-          extendedCSS={this.props.knobCSS}
+          extendedCSS={this.props.cssKnob}
         />
         {this.props.areLabelsVisible && (
           <StyledLabel
@@ -222,7 +222,7 @@ export default class RangeSlider extends PureComponent<Props, State> {
             } : {
               transform: `translate3d(0, calc(-50% + ${this.getDisplacementByValue(this.state.range[1])}px), 0)`,
             }}
-            extendedCSS={this.props.labelCSS}
+            extendedCSS={this.props.cssLabel}
           >
             {Number(this.state.range[1].toFixed(this.props.decimalPlaces)).toLocaleString()}
           </StyledLabel>

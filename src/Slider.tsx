@@ -78,22 +78,22 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
   /**
    * Custom CSS provided to the track before the knob.
    */
-  startingTrackCSS?: CSSProp<any>
+  cssStartingTrack?: CSSProp<any>
 
   /**
    * Custom CSS provided to the track after the knob.
    */
-  endingTrackCSS?: CSSProp<any>
+  cssEndingTrack?: CSSProp<any>
 
   /**
    * Custom CSS provided to the knob.
    */
-  knobCSS?: CSSProp<any>
+  cssKnob?: CSSProp<any>
 
   /**
    * Custom CSS provided to the label inside the knob.
    */
-  labelCSS?: CSSProp<any>
+  cssLabel?: CSSProp<any>
 }
 
 /**
@@ -116,10 +116,10 @@ export default function Slider({
   onDragEnd,
   onDragStart,
   onPositionChange,
-  startingTrackCSS,
-  endingTrackCSS,
-  knobCSS,
-  labelCSS,
+  cssStartingTrack,
+  cssEndingTrack,
+  cssKnob,
+  cssLabel,
   ...props
 }: Props) {
   function transform(currentPosition: number, dx: number, dy: number): number {
@@ -166,7 +166,7 @@ export default function Slider({
 
   return (
     <StyledRoot ref={rootRef} orientation={orientation} {...props}>
-      <StyledTrack orientation={orientation} css={startingTrackCSS}
+      <StyledTrack orientation={orientation} css={cssStartingTrack}
         style={orientation === 'vertical' ? {
           top: 0,
           height: `calc(${naturalPosition*100}% - ${knobHeight*.5}px - ${trackPadding}px)`,
@@ -193,18 +193,18 @@ export default function Slider({
             'at-start': isInverted ? (position === 1) : (position === 0),
             'dragging': isDragging === true,
           })}
-          css={knobCSS}
+          css={cssKnob}
           style={{
             height: `${knobHeight}px`,
             width: `${knobWidth}px`,
           }}
         >
           {labelProvider && (
-            <StyledLabel knobHeight={knobHeight} css={labelCSS}>{labelProvider(position)}</StyledLabel>
+            <StyledLabel knobHeight={knobHeight} css={cssLabel}>{labelProvider(position)}</StyledLabel>
           )}
         </StyledKnob>
       </StyledKnobContainer>
-      <StyledTrack orientation={orientation} css={endingTrackCSS}
+      <StyledTrack orientation={orientation} css={cssEndingTrack}
         style={orientation === 'vertical' ? {
           bottom: 0,
           height: `calc(${(1 - naturalPosition)*100}% - ${knobHeight*.5}px - ${trackPadding}px)`,

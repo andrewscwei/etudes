@@ -17,7 +17,8 @@ type Props = HTMLAttributes<HTMLDivElement> & {
 
   /**
    * The duration of one rotation in milliseconds (how long one image stays before transitioning to
-   * the next).
+   * the next). Specifying `NaN` or a negative number will prevent the component from automatically
+   * rotating.
    */
   rotationDuration?: number
 
@@ -29,31 +30,31 @@ type Props = HTMLAttributes<HTMLDivElement> & {
   /**
    * The default CSS of the image container.
    */
-  defaultCSS?: CSSProp<any>
+  cssDefault?: CSSProp<any>
 
   /**
    * The CSS of the image container (a `<div>` element containing the image) when the image is
    * entering into view. This CSS lasts for `transitionDuration` milliseconds.
    */
-  enteringCSS?: CSSProp<any>
+  cssEntering?: CSSProp<any>
 
   /**
    * The CSS of the image container (a `<div>` element containing the image) after the image has
    * entered into view.
    */
-  enteredCSS?: CSSProp<any>
+  cssEntered?: CSSProp<any>
 
   /**
    * The CSS of the image container (a `<div>` element containing the image) when the image is
    * exiting out of view. This CSS lasts for `transitionDuration` milliseconds.
    */
-  exitingCSS?: CSSProp<any>
+  cssExiting?: CSSProp<any>
 
   /**
    * The CSS of the image container (a `<div>` element containing the image) after the image has
    * exited out of view.
    */
-  exitedCSS?: CSSProp<any>
+  cssExited?: CSSProp<any>
 
   /**
    * Handler invoked when the image index changes.
@@ -66,21 +67,21 @@ type Props = HTMLAttributes<HTMLDivElement> & {
 export default function RotatingGallery({
   index: externalIndex = 0,
   onIndexChange,
-  rotationDuration = 1000,
+  rotationDuration,
   transitionDuration = 500,
   srcs = [],
-  defaultCSS = css`
+  cssDefault = css`
     transition-property: opacity;
     transition-timing-function: ease-out;
   `,
-  enteringCSS = css`
+  cssEntering = css`
     opacity: 1;
   `,
-  enteredCSS,
-  exitingCSS = css`
+  cssEntered,
+  cssExiting = css`
     opacity: 0;
   `,
-  exitedCSS,
+  cssExited,
   ...props
 }: Props) {
   const [index, setIndex] = useState(externalIndex)
@@ -105,11 +106,11 @@ export default function RotatingGallery({
           {state => (
             <StyledImage
               className={state}
-              css={defaultCSS}
-              enteringCSS={enteringCSS ?? enteredCSS}
-              enteredCSS={enteredCSS ?? enteringCSS}
-              exitingCSS={exitingCSS ?? exitedCSS}
-              exitedCSS={exitedCSS ?? exitingCSS}
+              css={cssDefault}
+              cssEntering={cssEntering ?? cssEntered}
+              cssEntered={cssEntered ?? cssEntering}
+              cssExiting={cssExiting ?? cssExited}
+              cssExited={cssExited ?? cssExiting}
               style={{
                 transitionDuration: `${transitionDuration}ms`,
                 backgroundImage: `url(${src})`,
@@ -123,10 +124,10 @@ export default function RotatingGallery({
 }
 
 const StyledImage = styled.div<{
-  enteringCSS: Props['enteringCSS']
-  enteredCSS: Props['enteredCSS']
-  exitingCSS: Props['exitingCSS']
-  exitedCSS: Props['exitedCSS']
+  cssEntering: Props['cssEntering']
+  cssEntered: Props['cssEntered']
+  cssExiting: Props['cssExiting']
+  cssExited: Props['cssExited']
 }>`
   background-repeat: no-repeat;
   background-size: cover;
@@ -139,19 +140,19 @@ const StyledImage = styled.div<{
   ${props => props.css}
 
   &.entering {
-    ${props => props.enteringCSS}
+    ${props => props.cssEntering}
   }
 
   &.entered {
-    ${props => props.enteredCSS}
+    ${props => props.cssEntered}
   }
 
   &.exiting {
-    ${props => props.exitingCSS}
+    ${props => props.cssExiting}
   }
 
   &.exited {
-    ${props => props.exitedCSS}
+    ${props => props.cssExited}
   }
 `
 

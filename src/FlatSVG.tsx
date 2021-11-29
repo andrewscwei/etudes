@@ -34,7 +34,7 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
   /**
    * Extended CSS to be provided to the SVG root node.
    */
-  svgCSS?: CSSProp<any>
+  cssSVG?: CSSProp<any>
 
   /**
    * Specifies attribute names to exclude from being stripped if `stripExtraneousAttributes` is
@@ -90,7 +90,7 @@ export default function FlatSVG({
   stripExtraneousAttributes = true,
   stripIds = true,
   stripStyles = true,
-  svgCSS,
+  cssSVG,
   whitelistedAttributes = ['viewBox'],
   ...props
 }: Props) {
@@ -115,13 +115,13 @@ export default function FlatSVG({
   return (
     <StyledRoot
       dangerouslySetInnerHTML={{ __html: sanitizedMarkup() }}
-      svgCSS={svgCSS}
+      cssSVG={cssSVG}
       {...props}
     />
   )
 }
 
-const StyledRoot = styled.figure<{ svgCSS: Props['svgCSS'] }>`
+const StyledRoot = styled.figure<{ cssSVG: Props['cssSVG'] }>`
   box-sizing: border-box;
   display: inline-block;
   flex: 0 0 auto;
@@ -144,6 +144,6 @@ const StyledRoot = styled.figure<{ svgCSS: Props['svgCSS'] }>`
       transition-timing-function: inherit;
     }
 
-    ${props => props.svgCSS}
+    ${props => props.cssSVG}
   }
 `

@@ -119,7 +119,7 @@ class App extends PureComponent<Props, State> {
           <StyledGithubButton href='https://github.com/andrewscwei/etudes'>
             <FlatSVG
               markup={$$GithubIcon}
-              svgCSS={css`
+              cssSVG={css`
                 * {
                   fill: #fff;
                 }

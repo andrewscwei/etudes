@@ -32,10 +32,10 @@ export default function() {
           css={css`
             ${align.cc}
           `}
-          knobCSS={css`
+          cssKnob={css`
             stroke: #fff;
           `}
-          trackCSS={css`
+          cssTrack={css`
             stroke: #666;
           `}
           style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg)' }}
@@ -53,16 +53,16 @@ export default function() {
           css={css`
             ${align.cc}
           `}
-          knobCSS={css`
+          cssKnob={css`
             ${selectors.hwot} {
               transform: scale(1.2);
             }
           `}
-          labelCSS={css`
+          cssLabel={css`
             font-size: 1.8rem;
             font-weight: 700;
           `}
-          endingTrackCSS={css`
+          cssEndingTrack={css`
             background: grey;
           `}
           style={{
@@ -83,16 +83,16 @@ export default function() {
           css={css`
             ${align.cc}
           `}
-          knobCSS={css`
+          cssKnob={css`
             ${selectors.hwot} {
               transform: scale(1.2);
             }
           `}
-          labelCSS={css`
+          cssLabel={css`
             font-size: 1.8rem;
             font-weight: 700;
           `}
-          endingTrackCSS={css`
+          cssEndingTrack={css`
             background: grey;
           `}
           style={{
@@ -107,11 +107,11 @@ export default function() {
         orientation='horizontal'
         steps={359}
         tintColor='#fff'
-        labelCSS={props => css`
+        cssLabel={props => css`
           font-weight: 700;
           font-size: 2rem;
         `}
-        knobCSS={props => css`
+        cssKnob={props => css`
           ${selectors.hwot} {
             transform: scale(1.2);
           }

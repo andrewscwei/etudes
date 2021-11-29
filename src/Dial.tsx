@@ -24,25 +24,25 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
 
   /**
    * The thickness of the knob, which is equivalent to the `stroke-width` of the `<path>` element.
-   * Note that this overwrites the `stroke-width` set inside `knobCSS`.
+   * Note that this overwrites the `stroke-width` set inside `cssKnob`.
    */
   knobThickness?: number
 
   /**
    * CSS of the knob, which is a `<path>` element.
    */
-  knobCSS?: CSSProp<any>
+  cssKnob?: CSSProp<any>
 
   /**
    * The thickness of the circular track, which is equivalent to the `stroke-width` of the
-   * `<circle>` element. Note that this overwrites the `stroke-width` set inside `trackCSS`.
+   * `<circle>` element. Note that this overwrites the `stroke-width` set inside `cssTrack`.
    */
   trackThickness?: number
 
   /**
    * CSS of the track, which is a `<circle>` element.
    */
-  trackCSS?: CSSProp<any>
+  cssTrack?: CSSProp<any>
 }
 
 function polarToCartesian(centerX: number, centerY: number, radius: number, angleInDegrees: number) {
@@ -74,9 +74,9 @@ export default function Dial({
   radius = 50,
   knobLength = 30,
   knobThickness = 10,
-  knobCSS,
+  cssKnob,
   trackThickness = 2,
-  trackCSS,
+  cssTrack,
   style,
   ...props
 }: Props) {
@@ -91,14 +91,14 @@ export default function Dial({
             cx={radius}
             cy={radius}
             r={radius - trackThickness / 2}
-            css={trackCSS}
+            css={cssTrack}
             strokeWidth={trackThickness}
           />
         </svg>
       </StyledTrack>
       <StyledKnob style={{ transform: `rotate(${(angle + 360) % 360}deg)` }}>
         <svg viewBox={`0 0 ${diameter} ${diameter}`} xmlns='http://www.w3.org/2000/svg'>
-          <StyledKnobPath css={knobCSS} strokeWidth={knobThickness} d={arcPath(radius, radius, radius - knobThickness / 2 - (trackThickness - knobThickness) / 2, -clampedKnobAngle / 2, clampedKnobAngle / 2)}/>
+          <StyledKnobPath css={cssKnob} strokeWidth={knobThickness} d={arcPath(radius, radius, radius - knobThickness / 2 - (trackThickness - knobThickness) / 2, -clampedKnobAngle / 2, clampedKnobAngle / 2)}/>
         </svg>
       </StyledKnob>
     </StyledRoot>
