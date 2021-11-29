@@ -1,6 +1,6 @@
 {
   "name": "etudes",
-  "version": "0.39.0",
+  "version": "0.40.0",
   "description": "A study of styled React components",
   "main": "lib",
   "scripts": {
@@ -42,6 +42,7 @@
     "@types/lodash": "^4.14.177",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
+    "@types/react-transition-group": "^4.4.4",
     "@types/styled-components": "^5.1.15",
     "@types/webpack": "^5.28.0",
     "@types/webpack-env": "^1.16.3",
@@ -80,6 +81,7 @@
     "dirty-dom": "^7.0.0",
     "interactjs": "^1.10.11",
     "lodash": "^4.17.21",
+    "react-transition-group": "^4.4.2",
     "resize-observer-polyfill": "^1.5.1",
     "spase": "^6.2.0"
   }
