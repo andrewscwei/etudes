@@ -75,7 +75,7 @@ function removeAttributes(element: Element, attributes: string[] | undefined = u
     const numChildren = element.children.length
 
     for (let i = 0; i < numChildren; i++) {
-      removeAttributes(element.children[i])
+      removeAttributes(element.children[i], attributes, recursive, whitelist)
     }
   }
 }
