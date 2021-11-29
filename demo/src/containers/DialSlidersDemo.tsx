@@ -7,11 +7,7 @@ import RangeSlider from '../../../lib/RangeSlider'
 import Slider from '../../../lib/Slider'
 import StepwiseSlider from '../../../lib/StepwiseSlider'
 
-const debug = process.env.NODE_ENV === 'development' ? require('debug')('demo') : () => {}
-
 export default function() {
-  // debug('Rendering demo "dial+sliders"...', 'OK')
-
   function getAngleByPosition(position: number): number {
     return position * (max - min) + min
   }

@@ -1,126 +1,204 @@
-import React, { CSSProperties, Fragment, PureComponent } from 'react'
-import styled from 'styled-components'
+import classNames from 'classnames'
+import React, { HTMLAttributes, useEffect, useState } from 'react'
+import styled, { CSSProp } from 'styled-components'
+import Group from './Group'
 
-export interface Props {
-  className?: string
-  style: CSSProperties
-  isActiveByDefault: boolean
-  isDoubleJointed: boolean
-  isFunky: boolean
-  height: number
-  thickness: number
-  width: number
-  tintColor: string
-  transitionDuration: number
+export type Props = HTMLAttributes<HTMLButtonElement> & {
+  isActive?: boolean
+  isDoubleJointed?: boolean
+  isLastBarHalfWidth?: boolean
+  height?: number
+  thickness?: number
+  width?: number
+  tintColor?: string
+  transitionDuration?: number
   onActivate?: () => void
   onDeactivate?: () => void
+  cssBar?: CSSProp<any>
 }
 
-export interface State {
-  isActive: boolean
-}
+export default function BurgerButton({
+  isActive: externalIsActive = false,
+  isDoubleJointed = false,
+  isLastBarHalfWidth = false,
+  height = 20,
+  thickness = 2,
+  width = 20,
+  tintColor = '#000',
+  transitionDuration = 200,
+  onActivate,
+  onDeactivate,
+  cssBar,
+  ...props
+}: Props) {
+  const [isActive, setIsActive] = useState(externalIsActive)
 
-class BurgerButton extends PureComponent<Props, State> {
-  static defaultProps = {
-    height: 20,
-    isActiveByDefault: false,
-    isDoubleJointed: true,
-    isFunky: false,
-    style: {},
-    thickness: 2,
-    tintColor: '#000',
-    transitionDuration: 200,
-    width: 20,
-  }
-
-  constructor(props: Props) {
-    super(props)
-
-    this.state = {
-      isActive: this.props.isActiveByDefault,
+  useEffect(() => {
+    if (isActive !== externalIsActive) {
+      setIsActive(externalIsActive)
     }
-  }
+  }, [externalIsActive])
 
-  toggle() {
-    if (this.state.isActive) {
-      this.deactivate()
+  useEffect(() => {
+    if (isActive) {
+      onActivate?.()
     }
     else {
-      this.activate()
+      onDeactivate?.()
+    }
+  }, [isActive])
+
+  return (
+    <StyledRoot width={width} height={height} thickness={thickness} onClick={() => setIsActive(!isActive)} {...props}>
+      <Group count={isDoubleJointed ? 2 : 1}>
+        <StyledJoint
+          className={classNames({ active: isActive, half: isDoubleJointed })}
+          height={height}
+          isLastBarHalfWidth={isLastBarHalfWidth}
+          thickness={thickness}
+          width={width}
+        >
+          <Group count={3}>
+            <StyledBar className={classNames({ active: isActive, half: isDoubleJointed })} style={{ height: `${thickness}px` }} css={cssBar}/>
+          </Group>
+        </StyledJoint>
+      </Group>
+    </StyledRoot>
+  )
+}
+
+const StyledBar = styled.span`
+  background: #fff;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  transition-duration: 100ms;
+  transition-property: width, height, transform, opacity, background;
+  transition-timing-function: ease-out;
+  width: 100%;
+
+  ${props => props.css}
+`
+
+const StyledJoint = styled.div<{
+  height: number
+  isLastBarHalfWidth: boolean
+  thickness: number
+  width: number
+}>`
+  height: 100%;
+  position: absolute;
+  width: 100%;
+
+  &.half {
+    width: 50%;
+  }
+
+  &:nth-of-type(1) {
+    left: 0;
+    top: 0;
+
+    ${StyledBar}:nth-child(1) {
+      left: 0;
+      top: 0;
+      transform-origin: center;
+      transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+
+    ${StyledBar}:nth-child(2) {
+      left: 0;
+      top: ${props => props.height*.5 - props.thickness*.5}px;
+      transform-origin: center;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    ${StyledBar}:nth-child(3) {
+      left: 0;
+      top: ${props => props.height - props.thickness}px;
+      transform-origin: center;
+      transform: translate3d(0, 0, 0) rotate(0deg);
+      width: ${props => props.isLastBarHalfWidth ? '50%' : '100%'};
+    }
+
+    &.active {
+      ${StyledBar}:nth-child(1) {
+        transform: ${props => `translate3d(0, ${props.height*.5 - props.thickness*.5}px, 0) rotate(45deg)`};
+      }
+
+      ${StyledBar}:nth-child(2) {
+        transform: ${props => 'translate3d(0, 0, 0) scale(0)'};
+      }
+
+      ${StyledBar}:nth-child(3) {
+        transform: ${props => `translate3d(0, ${props.thickness*.5 - props.height*.5}px, 0) rotate(-45deg)`};
+        width: 100%;
+      }
+    }
+
+    &.half {
+      ${StyledBar}:nth-child(1) {
+        transform-origin: right center;
+      }
+
+      ${StyledBar}:nth-child(2) {
+        transform-origin: right center;
+      }
+
+      ${StyledBar}:nth-child(3) {
+        transform-origin: right center;
+        width: 100%;
+      }
     }
   }
 
-  activate() {
-    if (this.state.isActive) return
-    this.setState({ isActive: true })
-    if (this.props.onActivate) this.props.onActivate()
+  &:nth-of-type(2) {
+    right: 0;
+    top: 0;
+
+    span:nth-child(1) {
+      left: 0;
+      top: 0;
+      transform-origin: left center;
+      transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+
+    span:nth-child(2) {
+      left: 0;
+      top: ${props => props.height*.5 - props.thickness*.5}px;
+      transform-origin: left center;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    span:nth-child(3) {
+      left: 0;
+      top: ${props => props.height - props.thickness}px;
+      transform-origin: left center;
+      transform: translate3d(0, 0, 0) rotate(0deg);
+      width: ${props => props.isLastBarHalfWidth ? 0 : '100%'};
+    }
+
+    &.active {
+      span:nth-child(1) {
+        transform: ${props => `translate3d(0, ${props.height*.5 - props.thickness*.5}px, 0) rotate(-45deg)`};
+      }
+
+      span:nth-child(2) {
+        transform: translate3d(0, 0, 0) scale(0);
+      }
+
+      span:nth-child(3) {
+        transform: ${props => `translate3d(0, ${props.thickness*.5 - props.height*.5}px, 0) rotate(45deg)`};
+        width: 100%;
+      }
+    }
   }
-
-  deactivate() {
-    if (!this.state.isActive) return
-    this.setState({ isActive: false })
-    if (this.props.onDeactivate) this.props.onDeactivate()
-  }
-
-  render() {
-    const w = this.props.width * 0.5
-    const h = this.props.height * 0.5
-    const t = this.props.thickness * 0.5
-    const d = 45
-    const r = d * Math.PI / 180
-    const n = this.props.isDoubleJointed ? 2 : 1
-
-    return (
-      <StyledRoot
-        className={this.props.className}
-        height={this.props.height}
-        isActive={this.state.isActive}
-        isDoubleJointed={this.props.isDoubleJointed}
-        isFunky={this.props.isFunky}
-        onClick={() => this.toggle()}
-        style={this.props.style}
-        thickness={this.props.thickness}
-        tintColor={this.props.tintColor}
-        transitionDuration={this.props.transitionDuration}
-        width={this.props.width}
-        w={w}
-        h={h}
-        t={t}
-        d={d}
-        r={r}
-      >
-        {this.props.isDoubleJointed && (
-          <Fragment>
-            {[...new Array(n)].map((v, i) => (
-              <div key={`joint-${i}`}>
-                <span/>
-                <span/>
-                <span/>
-              </div>
-            ))}
-          </Fragment>
-        )}
-      </StyledRoot>
-    )
-  }
-}
-
-export default BurgerButton
+`
 
 const StyledRoot = styled.button<{
-  isActive: boolean
-  width: number
   height: number
   thickness: number
-  tintColor: string
-  isDoubleJointed: boolean
-  isFunky: boolean
-  transitionDuration: number
-  w: number
-  h: number
-  t: number
-  d: number
-  r: number
+  width: number
 }>`
   background: transparent;
   border: none;
@@ -136,119 +214,17 @@ const StyledRoot = styled.button<{
   position: relative;
   width: ${props => props.width}px;
 
-  > div:only-of-type {
-    width: 100%;
-    height: 100%;
-
-    span:nth-child(1) {
-      left: 0;
-      position: absolute;
-      top: 0;
-      transform-origin: center;
-      transform: ${props => props.isActive ? `translate3d(0, ${props.h - props.t}px, 0) rotate(${props.d}deg)` : 'translate3d(0, 0, 0) rotate(0deg)'};
-    }
-
-    span:nth-child(2) {
-      left: 0;
-      position: absolute;
-      top: ${props => props.h - props.t}px;
-      transform-origin: center;
-      transform: ${props => props.isActive ? 'translate3d(0, 0, 0) scale(0)' : 'translate3d(0, 0, 0) scale(1)'};
-    }
-
-    span:nth-child(3) {
-      top: ${props => props.height - props.thickness};
-      left: 0;
-      position: absolute;
-      transform-origin: center;
-      transform: ${props => props.isActive ? `translate3d(0, ${props.t - props.h}px, 0) rotate(${-props.d}deg)` : 'translate3d(0, 0, 0) rotate(0deg)'};
-      width: ${props => props.isActive ? '100%' : (props.isFunky ? '50%' : '100%')};
-    }
-  }
-
-  > div:not(:only-of-type) {
-    height: 100%;
-    width: 50%;
-
-    &:nth-of-type(1) {
-      left: 0;
-      top: 0;
-      position: absolute;
-
-      span:nth-child(1) {
-        top: 0;
-        left: 0;
-        transform-origin: right center;
-        transform: ${props => props.isActive ? `translate3d(0, ${props.h - props.t}px, 0) rotate(${props.d}deg)` : 'translate3d(0, 0, 0) rotate(0deg)'};
-      }
-
-      span:nth-child(2) {
-        left: 0;
-        top: ${props => props.h - props.t}px;
-        transform: ${props => props.isActive ? 'translate3d(0, 0, 0) scale(0)' : 'translate3d(0, 0, 0) scale(1)'};
-        transform-origin: right center;
-      }
-
+  html:not(.touch) &:hover {
+    ${StyledJoint}:not(.half) {
       span:nth-child(3) {
-        top: ${props => props.height - props.thickness}px;
-        left: 0;
-        width: 100%;
-        transform-origin: right center;
-        transform: ${props => props.isActive ? `translate3d(0, ${props.t - props.h}px, 0) rotate(${-props.d}deg)` : 'translate3d(0, 0, 0) rotate(0deg)'};
+        width: ${props => props.width}px;
       }
     }
 
-    &:nth-of-type(2) {
-      right: 0;
-      top: 0;
-      position: absolute;
-
-      span:nth-child(1) {
-        top: 0;
-        left: 0;
-        transform-origin: left center;
-        transform: ${props => props.isActive ? `translate3d(${0}px, ${props.h - props.t}px, 0) rotate(${-props.d}deg)` : 'translate3d(0, 0, 0) rotate(0deg)'};
-      }
-
-      span:nth-child(2) {
-        left: 0;
-        top: ${props => props.h - props.t}px;
-        transform: ${props => props.isActive ? 'translate3d(0, 0, 0) scale(0)' : 'translate3d(0, 0, 0) scale(1)'};
-        transform-origin: left center;
-      }
-
+    ${StyledJoint}.half:nth-of-type(2) {
       span:nth-child(3) {
-        transform-origin: left center;
-        transform: ${props => props.isActive ? `translate3d(0, ${props.t - props.h}px, 0) rotate(${props.d}deg)` : 'translate3d(0, 0, 0) rotate(0deg)'};
-        width: ${props => props.isActive ? '100%' : (props.isFunky ? 0 : '100%')};
-        left: 0;
-        top: ${props => props.height - props.thickness}px;
+        width: ${props => props.width*.5}px;
       }
-    }
-  }
-
-  span {
-    background: ${props => props.tintColor};
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    position: absolute;
-    width: 100%;
-    height: ${props => props.thickness}px;
-    transition-duration: ${props => props.transitionDuration}ms;
-    transition-property: width, height, transform, opacity, background;
-    transition-timing-function: ease-out;
-  }
-
-  &:hover {
-    div:not(:only-of-type):nth-of-type(2)::after {
-      height: ${props => props.thickness}px;
-      width: ${props => props.w}px;
-    }
-
-    div:only-of-type span:nth-child(3) {
-      height: ${props => props.thickness}px;
-      width: ${props => props.width}px;
     }
   }
 `

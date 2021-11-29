@@ -2,7 +2,7 @@ import interact from 'interactjs'
 import _ from 'lodash'
 import { DependencyList, Dispatch, RefObject, SetStateAction, useEffect, useRef, useState } from 'react'
 
-const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:hooks') : () => {}
+// const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:hooks') : () => {}
 
 type ReturnedStates<T> = {
   isDragging: [boolean, Dispatch<SetStateAction<boolean>>]

@@ -2,7 +2,7 @@ import { DependencyList, Dispatch, RefObject, SetStateAction, useEffect, useRef,
 import ResizeObserver from 'resize-observer-polyfill'
 import { Rect, Size } from 'spase'
 
-const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:hooks') : () => {}
+// const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:hooks') : () => {}
 
 type Options = {
   onResize?: (size: Size) => void

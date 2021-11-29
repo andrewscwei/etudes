@@ -5,8 +5,6 @@ import useDragEffect from './hooks/useDragEffect'
 import useLoadImageEffect from './hooks/useLoadImageEffect'
 import useResizeEffect from './hooks/useResizeEffect'
 
-const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:panorama') : () => {}
-
 export type Props = HTMLAttributes<HTMLDivElement> & {
   /**
    * The current angle in degrees, 0.0 - 360.0, inclusive. When angle is 0 or 360, the left bound of
@@ -173,7 +171,6 @@ export default function Panorama({
     const newDisplacement = getDisplacementFromAngle(externalAngle, imageSize, size, zeroAnchor)
 
     if (newDisplacement !== displacement) {
-      // debug('Updating drag effect value from angle prop...', 'OK', `old=${displacement} new=${newDisplacement}`)
       setDisplacement(newDisplacement)
     }
 

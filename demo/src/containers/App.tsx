@@ -1,6 +1,6 @@
 import $$GithubIcon from '!!raw-loader!../assets/images/github-icon.svg'
 import { align, container, selectors } from 'promptu'
-import React, { createRef, PureComponent } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 import BurgerButton from '../../../lib/BurgerButton'
 import FlatSVG from '../../../lib/FlatSVG'
@@ -11,56 +11,37 @@ import MasonryGrid from './MasonryGrid'
 import PanoramaDemo from './PanoramaDemo'
 import Video from './Video'
 
-const debug = process.env.NODE_ENV === 'development' ? require('debug')('demo') : () => {}
-
-interface Props {}
-
-interface State {
-  isNavActive: boolean
-  featuredComponent?: string
-}
-
-class App extends PureComponent<Props, State> {
-  nodeRefs = {
-    burgerButton: createRef<BurgerButton>(),
-  }
-
-  constructor(props: Props) {
-    super(props)
-
-    this.state = {
-      isNavActive: false,
-    }
-  }
-
-  componentDidMount() {
-    window.addEventListener('hashchange', () => this.mapLocationToState())
-    this.mapLocationToState()
-  }
-
-  componentDidUpdate(prevProps: Props, prevState: State) {
-    if (prevState.featuredComponent !== this.state.featuredComponent) {
-      this.mapStateToLocation()
-      this.nodeRefs.burgerButton.current?.deactivate()
-    }
-  }
-
-  mapLocationToState() {
+export default function App() {
+  function mapLocationToHash() {
     const hasHash = window.location.hash && window.location.hash !== ''
-
-    this.setState({
-      featuredComponent: hasHash ? window.location.hash.substring(1, window.location.hash.length) : undefined,
-    })
+    setHash(hasHash ? window.location.hash.substring(1, window.location.hash.length) : undefined)
   }
 
-  mapStateToLocation() {
-    window.location.hash = this.state.featuredComponent ?? ''
+  function mapHashToLocation() {
+    window.location.hash = hash ?? ''
   }
 
-  renderFeaturedComponent() {
-    if (this.state.featuredComponent) debug(`Loading component ID ${this.state.featuredComponent}... OK`)
+  const [isNavActive, setIsNavActive] = useState(false)
+  const [hash, setHash] = useState<string | undefined>(undefined)
 
-    switch (this.state.featuredComponent) {
+  useEffect(() => {
+    mapLocationToHash()
+
+    function onHashChange() {
+      mapLocationToHash()
+    }
+
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+
+  useEffect(() => {
+    mapHashToLocation()
+    setIsNavActive(false)
+  }, [hash])
+
+  function renderFeaturedComponent() {
+    switch (hash) {
     case 'masonry-grid': return <MasonryGrid/>
     case 'list': return <List/>
     case 'accordion': return <Accordion/>
@@ -76,63 +57,63 @@ class App extends PureComponent<Props, State> {
     }
   }
 
-  render() {
-    return (
-      <>
-        <main style={{
-          height: '100%',
-          left: 0,
-          position: 'absolute',
-          top: 0,
-          width: '100%',
-        }}>
-          {this.renderFeaturedComponent()}
-        </main>
-        <aside style={{
-          height: '100%',
-          left: 0,
-          perspective: '80rem',
-          pointerEvents: 'none',
-          position: 'fixed',
-          top: 0,
-          transform: 'translate3d(0, 0, 0)',
-          width: '100%',
-        }}>
-          <StyledNav isActive={this.state.isNavActive}>
-            <StyledNavButton isActive={this.state.featuredComponent === 'masonry-grid'} onClick={() => this.setState({ featuredComponent: 'masonry-grid' })}>Masonry Grid</StyledNavButton>
-            <StyledNavButton isActive={this.state.featuredComponent === 'list'} onClick={() => this.setState({ featuredComponent: 'list' })}>List+Dropdown</StyledNavButton>
-            <StyledNavButton isActive={this.state.featuredComponent === 'accordion'} onClick={() => this.setState({ featuredComponent: 'accordion' })}>Accordion</StyledNavButton>
-            <StyledNavButton isActive={this.state.featuredComponent === 'dial+sliders'} onClick={() => this.setState({ featuredComponent: 'dial+sliders' })}>Dial+Sliders</StyledNavButton>
-            <StyledNavButton isActive={this.state.featuredComponent === 'video'} onClick={() => this.setState({ featuredComponent: 'video' })}>Video</StyledNavButton>
-            <StyledNavButton isActive={this.state.featuredComponent === 'panorama+slider'} onClick={() => this.setState({ featuredComponent: 'panorama+slider' })}>Panorama+Slider</StyledNavButton>
-          </StyledNav>
-          <StyledBurgerButton
-            ref={this.nodeRefs.burgerButton}
-            height={32}
-            isFunky={true}
-            thickness={6}
-            tintColor={this.state.isNavActive ? '#000' : '#fff'}
-            width={36}
-            onActivate={() => this.setState({ isNavActive: true })}
-            onDeactivate={() => this.setState({ isNavActive: false })}
-          />
-          <StyledGithubButton href='https://github.com/andrewscwei/etudes'>
-            <FlatSVG
-              markup={$$GithubIcon}
-              cssSVG={css`
-                * {
-                  fill: #fff;
-                }
-              `}
-            />
-          </StyledGithubButton>
-        </aside>
-      </>
-    )
-  }
-}
+  return (
+    <>
+      <main style={{
+        height: '100%',
+        left: 0,
+        position: 'absolute',
+        top: 0,
+        width: '100%',
+      }}>
+        {renderFeaturedComponent()}
+      </main>
+      <aside style={{
+        height: '100%',
+        left: 0,
+        perspective: '80rem',
+        pointerEvents: 'none',
+        position: 'fixed',
+        top: 0,
+        transform: 'translate3d(0, 0, 0)',
+        width: '100%',
+      }}>
+        <StyledNav isActive={isNavActive}>
+          <StyledNavButton isActive={hash === 'masonry-grid'} onClick={() => setHash('masonry-grid')}>Masonry Grid</StyledNavButton>
+          <StyledNavButton isActive={hash === 'list'} onClick={() => setHash('list')}>List+Dropdown</StyledNavButton>
+          <StyledNavButton isActive={hash === 'accordion'} onClick={() => setHash('accordion')}>Accordion</StyledNavButton>
+          <StyledNavButton isActive={hash === 'dial+sliders'} onClick={() => setHash('dial+sliders')}>Dial+Sliders</StyledNavButton>
+          <StyledNavButton isActive={hash === 'video'} onClick={() => setHash('video')}>Video</StyledNavButton>
+          <StyledNavButton isActive={hash === 'panorama+slider'} onClick={() => setHash('panorama+slider')}>Panorama+Slider</StyledNavButton>
+        </StyledNav>
+        <StyledBurgerButton
+          isActive={isNavActive}
+          height={32}
+          isDoubleJointed={true}
+          isLastBarHalfWidth={true}
+          thickness={6}
+          tintColor={isNavActive ? '#000' : '#fff'}
+          width={36}
+          onActivate={() => setIsNavActive(true)}
+          onDeactivate={() => setIsNavActive(false)}
+          cssBar={css`
+            background: #fff;
 
-export default App
+            &.active {
+              background: #000;
+            }
+          `}
+        />
+        <StyledGithubButton href='https://github.com/andrewscwei/etudes'>
+          <FlatSVG
+            markup={$$GithubIcon}
+            cssSVG={css`* { fill: #fff; }`}
+          />
+        </StyledGithubButton>
+      </aside>
+    </>
+  )
+}
 
 const StyledNavButton = styled.button<{
   isActive: boolean
