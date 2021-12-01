@@ -1,4 +1,4 @@
-import React, { HTMLAttributes } from 'react'
+import React, { forwardRef, HTMLAttributes } from 'react'
 import styled, { CSSProp } from 'styled-components'
 
 export type Props = HTMLAttributes<HTMLDivElement> & {
@@ -84,7 +84,7 @@ function removeAttributes(element: Element, attributes: string[] | undefined = u
  * A component whose root element wraps an SVG markup. When wrapping the SVG, it will attempt to
  * sanitize the markup (i.e. stripping useless attributes) according to the props specified.
  */
-export default function FlatSVG({
+export default forwardRef<HTMLDivElement, Props>(({
   markup,
   stripClasses = true,
   stripExtraneousAttributes = true,
@@ -93,7 +93,7 @@ export default function FlatSVG({
   cssSVG,
   whitelistedAttributes = ['viewBox'],
   ...props
-}: Props) {
+}, ref) => {
   function sanitizedMarkup(): string {
     const mockContainer = document.createElement('div')
     mockContainer.innerHTML = markup
@@ -114,12 +114,13 @@ export default function FlatSVG({
 
   return (
     <StyledRoot
+      ref={ref}
       dangerouslySetInnerHTML={{ __html: sanitizedMarkup() }}
       cssSVG={cssSVG}
       {...props}
     />
   )
-}
+})
 
 const StyledRoot = styled.figure<{ cssSVG: Props['cssSVG'] }>`
   box-sizing: border-box;
