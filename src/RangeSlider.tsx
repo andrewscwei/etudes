@@ -13,9 +13,6 @@ export type KnobCSSProps = Readonly<{
   isDisabled: boolean
 }>
 
-export type GutterCSSProps = Readonly<{
-}>
-
 export type LabelCSSProps = Readonly<{
   knobRadius: number
   orientation: Orientation
@@ -465,7 +462,7 @@ const StyledKnob = styled.div<KnobCSSProps & ExtendedCSSProps<KnobCSSProps>>`
   ${props => props.extendedCSS(props)}
 `
 
-const StyledGutter = styled.div<GutterCSSProps & ExtendedCSSProps<GutterCSSProps>>`
+const StyledGutter = styled.div<ExtendedCSSProps<any>>`
   display: block;
   top: 0;
   left: 0;

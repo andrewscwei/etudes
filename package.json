@@ -1,6 +1,6 @@
 {
   "name": "etudes",
-  "version": "0.42.0",
+  "version": "0.43.0",
   "description": "A study of styled React components",
   "main": "lib",
   "scripts": {
@@ -43,16 +43,16 @@
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
     "@types/react-transition-group": "^4.4.4",
-    "@types/styled-components": "^5.1.15",
+    "@types/styled-components": "^5.1.16",
     "@types/webpack": "^5.28.0",
     "@types/webpack-env": "^1.16.3",
-    "@typescript-eslint/eslint-plugin": "^5.4.0",
-    "@typescript-eslint/parser": "^5.4.0",
+    "@typescript-eslint/eslint-plugin": "^5.5.0",
+    "@typescript-eslint/parser": "^5.5.0",
     "babel-loader": "^8.2.3",
-    "babel-plugin-styled-components": "^2.0.1",
+    "babel-plugin-styled-components": "^2.0.2",
     "concurrently": "^6.4.0",
     "cross-env": "^7.0.3",
-    "debug": "^4.3.2",
+    "debug": "^4.3.3",
     "eslint": "^8.3.0",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.5.0",
@@ -61,6 +61,8 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-is": "^17.0.2",
+    "react-router": "^6.0.2",
+    "react-router-dom": "^6.0.2",
     "rimraf": "^3.0.2",
     "styled-components": "^5.3.3",
     "ts-loader": "^9.2.6",
@@ -72,10 +74,6 @@
     "webpack-cli": "^4.9.1",
     "webpack-dev-server": "^4.6.0"
   },
-  "peerDependencies": {
-    "react": "^17.0.2",
-    "styled-components": "^5.3.3"
-  },
   "dependencies": {
     "classnames": "^2.3.1",
     "dirty-dom": "^7.0.0",
@@ -84,5 +82,13 @@
     "react-transition-group": "^4.4.2",
     "resize-observer-polyfill": "^1.5.1",
     "spase": "^6.2.0"
+  },
+  "peerDependencies": {
+    "react": "^17.0.2",
+    "styled-components": "^5.3.3"
+  },
+  "optionalDependencies": {
+    "react-router": "^6.0.2",
+    "react-router-dom": "^6.0.2"
   }
 }

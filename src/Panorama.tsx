@@ -21,7 +21,7 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
   /**
    * The source URL of the image.
    */
-  src: string
+  src?: string
 
   /**
    * A decimal percentage of the component width indicating where 0° should be, i.e. if `zeroAnchor`
@@ -224,10 +224,12 @@ const StyledRoot = styled.div`
   display: flex;
   flex-direction: column;
   flex: 0 0 auto;
+  height: 100%;
   justify-content: center;
   padding: 0;
   position: relative;
   touch-action: none;
+  width: 100%;
 
   > div {
     height: 100%;

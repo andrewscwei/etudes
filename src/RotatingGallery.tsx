@@ -157,5 +157,7 @@ const StyledImage = styled.div<{
 `
 
 const StyledRoot = styled.div`
+  height: 100%;
   position: relative;
+  width: 100%;
 `

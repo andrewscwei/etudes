@@ -221,4 +221,6 @@ const StyledRoot = styled.div`
   box-sizing: border-box;
   display: block;
   flex: 0 0 auto;
+  height: 100%;
+  width: 100%;
 `

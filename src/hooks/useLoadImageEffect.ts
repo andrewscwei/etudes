@@ -33,7 +33,7 @@ function getImageSize(imageElement: HTMLImageElement): Size {
   return new Size([imageElement.width, imageElement.height])
 }
 
-export default function useLoadImageEffect(src: string, { onImageLoadComplete, onImageLoadError, onImageSizeChange }: Options = {}, deps?: DependencyList): ReturnedStates {
+export default function useLoadImageEffect(src?: string, { onImageLoadComplete, onImageLoadError, onImageSizeChange }: Options = {}, deps?: DependencyList): ReturnedStates {
   const imageLoadCompleteHandler = (event: Event) => {
     const imageElement = event.currentTarget as HTMLImageElement
     const imageSize = getImageSize(imageElement)
@@ -56,6 +56,8 @@ export default function useLoadImageEffect(src: string, { onImageLoadComplete, o
   const [imageSize, setImageSize] = useState<Size | undefined>(undefined)
 
   useEffect(() => {
+    if (!src) return
+
     setIsLoading(true)
 
     imageRef.current = new Image()
