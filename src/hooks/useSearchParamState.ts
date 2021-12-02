@@ -4,12 +4,11 @@ import { useSearchParams } from 'react-router-dom'
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:hooks') : () => {}
 
 export type Options<T> = {
-  initialState?: T | null
-  mapSearchParamToState?: (param: string | null) => NonNullable<T> | null
+  mapSearchParamToState?: (value: string | null) => NonNullable<T> | null
   mapStateToSearchParam?: (state: T | null) => string | null
 }
 
-export default function useSearchParamState<T>(param: string, { initialState, mapSearchParamToState, mapStateToSearchParam }: Options<T> = {}): [NonNullable<T> | null, Dispatch<SetStateAction<NonNullable<T> | null>>] {
+export default function useSearchParamState<T>(param: string, initialState?: T | null, { mapSearchParamToState, mapStateToSearchParam }: Options<T> = {}): [NonNullable<T> | null, Dispatch<SetStateAction<NonNullable<T> | null>>] {
   function _mapSearchParamToState(value: string | null, initialState?: T | null): NonNullable<T> | null {
     if (mapSearchParamToState) {
       return mapSearchParamToState(value)
