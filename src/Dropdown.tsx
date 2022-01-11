@@ -13,7 +13,7 @@ export type ButtonCSSProps = Readonly<{
 /**
  * Type constraint of the data passed to each item in the component.
  */
-export type DataProps<T = Record<string, never>> = T & {
+export type DataProps<T = Record<string, any>> = T & {
   label?: string
 }
 
@@ -21,9 +21,9 @@ export type DataProps<T = Record<string, never>> = T & {
  * Interface defining the props of the item component type to be provided to the
  * component. The data type is generic.
  */
-export type ItemComponentProps<T = Record<string, never>> = ListItemComponentProps<DataProps<T>>
+export type ItemComponentProps<T = Record<string, any>> = ListItemComponentProps<DataProps<T>>
 
-export interface Props<T = Record<string, never>> {
+export type Props<T = Record<string, any>> = {
   /**
    * Class attribute to the root element.
    */
@@ -138,7 +138,7 @@ export interface State {
  * supports both horizontal and vertical orientations. Provide data and item
  * component type to this component to automatically generate menu items.
  */
-export default class Dropdown<T = Record<string, never>> extends PureComponent<Props<T>, State> {
+export default class Dropdown<T = Record<string, any>> extends PureComponent<Props<T>, State> {
   nodeRefs = {
     root: createRef<HTMLDivElement>(),
   }

@@ -4,12 +4,12 @@ import React, { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 import BurgerButton from '../../../lib/BurgerButton'
 import FlatSVG from '../../../lib/FlatSVG'
-import Accordion from './Accordion'
+import AccordionDemo from './AccordionDemo'
 import DialSlidersDemo from './DialSlidersDemo'
-import List from './List'
-import MasonryGrid from './MasonryGrid'
+import ListDemo from './ListDemo'
+import MasonryGridDemo from './MasonryGridDemo'
 import PanoramaDemo from './PanoramaDemo'
-import Video from './Video'
+import VideoDemo from './VideoDemo'
 
 export default function App() {
   function mapLocationToHash() {
@@ -40,17 +40,19 @@ export default function App() {
     setIsNavActive(false)
   }, [hash])
 
-  function renderFeaturedComponent() {
+  function renderDemo() {
     switch (hash) {
-    case 'masonry-grid': return <MasonryGrid/>
-    case 'list': return <List/>
-    case 'accordion': return <Accordion/>
+    case 'masonry-grid': return <MasonryGridDemo/>
+    case 'list': return <ListDemo/>
+    case 'accordion': return <AccordionDemo/>
     case 'dial+sliders': return <DialSlidersDemo/>
-    case 'video': return <Video/>
+    case 'video': return <VideoDemo/>
     case 'panorama+slider': return <PanoramaDemo/>
     default: return (
       <StyledIntroduction>
-        <h1>Études</h1>
+        <div>
+          <h1>Études</h1>
+        </div>
         <span>A study of styled React components</span>
       </StyledIntroduction>
     )
@@ -59,25 +61,8 @@ export default function App() {
 
   return (
     <>
-      <main style={{
-        height: '100%',
-        left: 0,
-        position: 'absolute',
-        top: 0,
-        width: '100%',
-      }}>
-        {renderFeaturedComponent()}
-      </main>
-      <aside style={{
-        height: '100%',
-        left: 0,
-        perspective: '80rem',
-        pointerEvents: 'none',
-        position: 'fixed',
-        top: 0,
-        transform: 'translate3d(0, 0, 0)',
-        width: '100%',
-      }}>
+      <StyledDemo>{renderDemo()}</StyledDemo>
+      <StyledHUDs>
         <StyledNav isActive={isNavActive}>
           <StyledNavButton isActive={hash === 'masonry-grid'} onClick={() => setHash('masonry-grid')}>Masonry Grid</StyledNavButton>
           <StyledNavButton isActive={hash === 'list'} onClick={() => setHash('list')}>List+Dropdown</StyledNavButton>
@@ -98,10 +83,7 @@ export default function App() {
           onDeactivate={() => setIsNavActive(false)}
           cssBar={css`
             background: #fff;
-
-            &.active {
-              background: #000;
-            }
+            &.active { background: #000; }
           `}
         />
         <StyledGithubButton href='https://github.com/andrewscwei/etudes'>
@@ -110,17 +92,36 @@ export default function App() {
             cssSVG={css`* { fill: #fff; }`}
           />
         </StyledGithubButton>
-      </aside>
+      </StyledHUDs>
     </>
   )
 }
+
+const StyledHUDs = styled.aside`
+  height: 100%;
+  left: 0;
+  perspective: 80rem;
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  transform: translate3d(0, 0, 0);
+  width: 100%;
+`
+
+const StyledDemo = styled.main`
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+`
 
 const StyledNavButton = styled.button<{
   isActive: boolean
 }>`
   ${container.box}
   color: ${props => props.isActive ? '#2b14d4' : '#000'};
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 700;
   pointer-events: ${props => props.isActive ? 'none' : 'auto'};
   text-align: right;
