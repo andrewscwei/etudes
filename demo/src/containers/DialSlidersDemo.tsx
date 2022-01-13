@@ -37,7 +37,7 @@ export default function() {
           style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg)' }}
         />
         <Slider
-          isInverted={false}
+          isInverted={true}
           knobHeight={40}
           knobWidth={60}
           labelProvider={position => `${Math.round(getAngleByPosition(position))}°`}
@@ -50,16 +50,18 @@ export default function() {
             ${align.cc}
           `}
           cssKnob={css`
-            ${selectors.hwot} {
-              transform: scale(1.2);
-            }
+            ${selectors.hwot} { transform: scale(1.2); }
           `}
           cssLabel={css`
             font-size: 1.8rem;
             font-weight: 700;
           `}
+          cssStartingTrack={css`
+            ${selectors.hwot} { transform: scale(1.1); }
+          `}
           cssEndingTrack={css`
             background: grey;
+            ${selectors.hwot} { transform: scale(1.1); }
           `}
           style={{
             height: `${(index + 1) * 30}px`,
@@ -69,6 +71,7 @@ export default function() {
         <StepwiseSlider
           index={index}
           isInverted={true}
+          isTrackInteractive={false}
           knobHeight={40}
           knobWidth={60}
           labelProvider={(position, index) => `${index}`}
@@ -90,6 +93,7 @@ export default function() {
           `}
           cssEndingTrack={css`
             background: grey;
+            ${selectors.hwot} { transform: scale(1.1); }
           `}
           style={{
             transform: 'translate3d(5rem, 0, 0) rotateX(20deg) rotateY(-20deg)',

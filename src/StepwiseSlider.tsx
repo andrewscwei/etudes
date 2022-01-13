@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React, { HTMLAttributes, useEffect, useRef, useState } from 'react'
+import React, { HTMLAttributes, MouseEvent, useEffect, useRef, useState } from 'react'
 import { Rect } from 'spase'
 import styled, { css, CSSProp } from 'styled-components'
 import useDragEffect from './hooks/useDragEffect'
@@ -13,6 +13,11 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
    * being the start.
    */
   isInverted?: boolean
+
+  /**
+   * Specifies if the track is clickable to set the position of the knob.
+   */
+  isTrackInteractive?: boolean
 
   /**
    * Indicates if position/index change events are dispatched only when dragging ends. When
@@ -194,6 +199,7 @@ export default function StepwiseSlider({
   id,
   className,
   isInverted = false,
+  isTrackInteractive = true,
   onlyDispatchesOnDragEnd = false,
   trackPadding = 0,
   knobHeight = 30,
@@ -222,6 +228,27 @@ export default function StepwiseSlider({
     return newPosition
   }
 
+  function onTrackClick(event: MouseEvent) {
+    if (!isTrackInteractive) return
+
+    const rect = Rect.from(rootRef.current) ?? new Rect()
+
+    switch (orientation) {
+    case 'horizontal': {
+      const position = (event.clientX - rect.left) / rect.width
+      const naturalPosition = isInverted ? 1 - position : position
+      setPosition(naturalPosition)
+      break
+    }
+    case 'vertical': {
+      const position = (event.clientY - rect.top) / rect.height
+      const naturalPosition = isInverted ? 1 - position : position
+      setPosition(naturalPosition)
+      break
+    }
+    }
+  }
+
   const rootRef = useRef<HTMLDivElement>(null)
   const knobRef = useRef<HTMLButtonElement>(null)
 
@@ -234,6 +261,7 @@ export default function StepwiseSlider({
     onDragEnd,
   })
 
+  // Natural position is the position after taking `isInverted` into account.
   const naturalPosition = isInverted ? 1 - position : position
 
   useEffect(() => {
@@ -278,7 +306,7 @@ export default function StepwiseSlider({
 
   return (
     <StyledRoot ref={rootRef} orientation={orientation} {...props}>
-      <StyledTrack orientation={orientation} css={cssStartingTrack}
+      <StyledStartingTrack orientation={orientation} isClickable={isTrackInteractive} css={cssStartingTrack} onClick={event => onTrackClick(event)}
         style={orientation === 'vertical' ? {
           top: 0,
           height: `calc(${naturalPosition*100}% - ${knobHeight*.5}px - ${trackPadding}px)`,
@@ -316,7 +344,7 @@ export default function StepwiseSlider({
           )}
         </StyledKnob>
       </StyledKnobContainer>
-      <StyledTrack orientation={orientation} css={cssEndingTrack}
+      <StyledEndingTrack orientation={orientation} isClickable={isTrackInteractive} css={cssEndingTrack} onClick={event => onTrackClick(event)}
         style={orientation === 'vertical' ? {
           bottom: 0,
           height: `calc(${(1 - naturalPosition)*100}% - ${knobHeight*.5}px - ${trackPadding}px)`,
@@ -329,9 +357,64 @@ export default function StepwiseSlider({
   )
 }
 
-const StyledTrack = styled.div<{ orientation: NonNullable<Props['orientation']> }>`
+const StyledStartingTrack = styled.div<{
+  orientation: NonNullable<Props['orientation']>
+  isClickable: boolean
+}>`
   background: #fff;
+  cursor: ${props => props.isClickable ? 'pointer' : 'auto' };
+  pointer-events: ${props => props.isClickable ? 'auto' : 'none' };
   position: absolute;
+  transition-duration: 100ms;
+  transition-property: background, color, opacity, transform;
+  transition-timing-function: ease-out;
+
+  &::after {
+    content: '';
+    height: 100%;
+    min-height: 20px;
+    min-width: 20px;
+    position: absolute;
+    transform: ${props => props.orientation === 'horizontal' ? 'translate3d(0, -50%, 0)' : 'translate3d(-50%, 0, 0)'};
+    width: 100%;
+  }
+
+  ${props => props.orientation === 'vertical' ? css`
+    left: 0;
+    margin: 0 auto;
+    right: 0;
+    width: 100%;
+  ` : css`
+    bottom: 0;
+    height: 100%;
+    margin: auto 0;
+    top: 0;
+  `}
+
+  ${props => props.css}
+`
+
+const StyledEndingTrack = styled.div<{
+  orientation: NonNullable<Props['orientation']>
+  isClickable: boolean
+}>`
+  background: #fff;
+  cursor: ${props => props.isClickable ? 'pointer' : 'auto' };
+  pointer-events: ${props => props.isClickable ? 'auto' : 'none' };
+  position: absolute;
+  transition-duration: 100ms;
+  transition-property: background, color, opacity, transform;
+  transition-timing-function: ease-out;
+
+  &::after {
+    content: '';
+    height: 100%;
+    min-height: 20px;
+    min-width: 20px;
+    position: absolute;
+    transform: ${props => props.orientation === 'horizontal' ? 'translate3d(0, -50%, 0)' : 'translate3d(-50%, 0, 0)'};
+    width: 100%;
+  }
 
   ${props => props.orientation === 'vertical' ? css`
     left: 0;
