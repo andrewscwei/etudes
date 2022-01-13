@@ -65,10 +65,10 @@ export default function WithTooltip({
     const rect = Rect.intersecting(target)
 
     if (rect) {
-      const leftBound = (rect.center.x - vrect.left) < threshold
-      const rightBound = (vrect.right - rect.center.x) < threshold
-      const topBound = (rect.center.y - vrect.top) < threshold
-      const bottomBound = (vrect.bottom - rect.center.y) < threshold
+      const leftBound = (rect.left - vrect.left) < threshold
+      const rightBound = (vrect.right - rect.right) < threshold
+      const topBound = (rect.top - vrect.top) < threshold
+      const bottomBound = (vrect.bottom - rect.bottom) < threshold
 
       if (leftBound && topBound) return 'br'
       if (leftBound && bottomBound) return 'tr'
