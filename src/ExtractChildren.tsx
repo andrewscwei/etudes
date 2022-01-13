@@ -6,7 +6,7 @@ export default function ExtractChildren({ children, ...props }: PropsWithChildre
       {Children.map(children, child => {
         if (isValidElement(child)) return cloneElement(child, { ...props })
         return child
-      })})
+      })}
     </>
   )
 }

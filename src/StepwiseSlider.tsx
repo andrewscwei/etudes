@@ -309,10 +309,10 @@ export default function StepwiseSlider({
       <StyledStartingTrack orientation={orientation} isClickable={isTrackInteractive} css={cssStartingTrack} onClick={event => onTrackClick(event)}
         style={orientation === 'vertical' ? {
           top: 0,
-          height: `calc(${naturalPosition*100}% - ${knobHeight*.5}px - ${trackPadding}px)`,
+          height: `calc(${naturalPosition*100}% - ${trackPadding <= 0 ? 0 : knobHeight*.5}px - ${trackPadding}px)`,
         } : {
           left: 0,
-          width: `calc(${naturalPosition*100}% - ${knobWidth*.5}px - ${trackPadding}px)`,
+          width: `calc(${naturalPosition*100}% - ${trackPadding <= 0 ? 0 : knobWidth*.5}px - ${trackPadding}px)`,
         }}
       />
       <StyledKnobContainer ref={knobRef} style={{
@@ -347,10 +347,10 @@ export default function StepwiseSlider({
       <StyledEndingTrack orientation={orientation} isClickable={isTrackInteractive} css={cssEndingTrack} onClick={event => onTrackClick(event)}
         style={orientation === 'vertical' ? {
           bottom: 0,
-          height: `calc(${(1 - naturalPosition)*100}% - ${knobHeight*.5}px - ${trackPadding}px)`,
+          height: `calc(${(1 - naturalPosition)*100}% - ${trackPadding <= 0 ? 0 : knobHeight*.5}px - ${trackPadding}px)`,
         } : {
           right: 0,
-          width: `calc(${(1 - naturalPosition)*100}% - ${knobWidth*.5}px - ${trackPadding}px)`,
+          width: `calc(${(1 - naturalPosition)*100}% - ${trackPadding <= 0 ? 0 : knobWidth*.5}px - ${trackPadding}px)`,
         }}
       />
     </StyledRoot>
