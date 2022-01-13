@@ -20,14 +20,19 @@ type Props = PropsWithChildren<HTMLAttributes<HTMLElement>> & {
   disabledOnTouch?: boolean
 
   /**
-   * The offset (in pixels) between the target element and the tooltip, defaults to zero.
-   */
-  offset?: number
-
-  /**
    * The hint string to display in the tooltip.
    */
   hint: string
+
+  /**
+   * Specifies if the arrow is visible.
+   */
+  isArrowVisible?: boolean
+
+  /**
+   * The offset (in pixels) between the target element and the tooltip, defaults to zero.
+   */
+  offset?: number
 
   /**
    * Color of the dialog text, same format as a CSS color string (i.e. '#000').
@@ -55,6 +60,7 @@ export default function WithTooltip({
   cssDialog,
   disabledOnTouch = true,
   hint,
+  isArrowVisible = true,
   offset = 5,
   textColor = '#fff',
   threshold = 100,
@@ -69,9 +75,9 @@ export default function WithTooltip({
 
     if (rect) {
       const leftBound = (rect.center.x - vrect.left) < threshold
-      const rightBound = (vrect.center.x - rect.right) < threshold
+      const rightBound = (vrect.right - rect.center.x) < threshold
       const topBound = (rect.center.y - vrect.top) < threshold
-      const bottomBound = (vrect.center.y - rect.bottom) < threshold
+      const bottomBound = (vrect.bottom - rect.center.y) < threshold
 
       if (leftBound && topBound) return 'br'
       if (leftBound && bottomBound) return 'tr'
@@ -117,14 +123,15 @@ export default function WithTooltip({
 
   return (
     <StyledRoot
-      position={position}
       arrowHeight={arrowHeight}
       backgroundColor={backgroundColor}
       cssDialog={cssDialog}
       disabledOnTouch={disabledOnTouch}
       hint={hint}
+      isArrowVisible={isArrowVisible}
       offset={offset}
       onMouseOver={event => onMouseOver(event)}
+      position={position}
       textColor={textColor}
       textSize={textSize}
       {...props}
@@ -193,6 +200,7 @@ const StyledRoot = styled(ExtractChildren)<{
   cssDialog?: CSSProp
   disabledOnTouch: boolean
   hint: string
+  isArrowVisible: boolean
   offset: number
   position: Position
   textColor: string
@@ -201,22 +209,24 @@ const StyledRoot = styled(ExtractChildren)<{
   cursor: pointer;
   position: relative;
 
-  &::before {
-    border-style: solid;
-    border-width: ${props => props.arrowHeight}px;
-    content: '';
-    height: 0;
-    opacity: 0;
-    pointer-events: none;
-    position: absolute;
-    transition: opacity 200ms ease-out;
-    width: 0;
-    z-index: 10001;
+  ${props => props.isArrowVisible ? css`
+    &::before {
+      border-style: solid;
+      border-width: ${props.arrowHeight}px;
+      content: '';
+      height: 0;
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      transition: opacity 200ms ease-out;
+      width: 0;
+      z-index: 10001;
 
-    ${props => _cssDisplacement(props.position, props.arrowHeight, props.offset)}
-    ${props => _cssArrow(props.position, props.arrowHeight, props.offset, props.backgroundColor)}
-    ${props => props.disabledOnTouch ? 'html.touch & { display: none; }' : ''}
-  }
+      ${_cssDisplacement(props.position, props.arrowHeight, props.offset)}
+      ${_cssArrow(props.position, props.arrowHeight, props.offset, props.backgroundColor)}
+      ${props.disabledOnTouch ? 'html.touch & { display: none; }' : ''}
+    }
+  ` : undefined}
 
   &::after {
     box-sizing: content-box;
