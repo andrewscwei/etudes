@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 import BurgerButton from '../../../lib/BurgerButton'
 import FlatSVG from '../../../lib/FlatSVG'
+import WithTooltip from '../../../lib/WithTooltip'
 import AccordionDemo from './AccordionDemo'
 import DialSlidersDemo from './DialSlidersDemo'
 import ListDemo from './ListDemo'
@@ -86,12 +87,14 @@ export default function App() {
             &.active { background: #000; }
           `}
         />
-        <StyledGithubButton href='https://github.com/andrewscwei/etudes'>
-          <FlatSVG
-            markup={$$GithubIcon}
-            cssSVG={css`* { fill: #fff; }`}
-          />
-        </StyledGithubButton>
+        <WithTooltip
+          hint='This is a tooltip!'
+          cssDialog={css`border-radius: .8rem;`}
+        >
+          <StyledGithubButton href='https://github.com/andrewscwei/etudes'>
+            <FlatSVG markup={$$GithubIcon} cssSVG={css`* { fill: #fff; }`}/>
+          </StyledGithubButton>
+        </WithTooltip>
       </StyledHUDs>
     </>
   )
@@ -208,12 +211,12 @@ const StyledGithubButton = styled.a`
   height: 4rem;
   margin: 8vh 8vw;
   pointer-events: auto;
-  transform: translate3d(0, 0, 10rem) rotateX(-10deg) rotateY(-5deg) scale(1);
+  /* transform: translate3d(0, 0, 10rem) rotateX(-10deg) rotateY(-5deg) scale(1); */
   transition: all .1s ease-out;
   width: 4rem;
   z-index: 1000;
 
   ${selectors.hwot} {
-    transform: translate3d(0, 0, 10rem) rotateX(-10deg) rotateY(10deg) scale(1.2);
+    /* transform: translate3d(0, 0, 10rem) rotateX(-10deg) rotateY(10deg) scale(1.2); */
   }
 `
