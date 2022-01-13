@@ -102,8 +102,9 @@ export default function WithTooltip({
     div.style.whiteSpace = 'no-wrap'
 
     document.body.appendChild(div)
-    const width = div.clientWidth
-    const height = div.clientHeight
+    // Add 1px as buffer to mitigate precision discrepancies.
+    const width = div.clientWidth + 1
+    const height = div.clientHeight + 1
     document.body.removeChild(div)
 
     return new Size([width, height])
@@ -235,7 +236,7 @@ const StyledRoot = styled(ExtractChildren)<{
     position: absolute;
     transform: translate3d(0, 0, 0);
     transition: opacity 200ms ease-out;
-    width: ${props => props.textSize.width > 0 ? props.textSize.width : 'auto'};
+    width: ${props => props.textSize.width > 0 ? `${props.textSize.width}px` : 'auto'};
     z-index: 10000;
 
     ${props => _cssDisplacement(props.position, props.arrowHeight, props.offset)}
