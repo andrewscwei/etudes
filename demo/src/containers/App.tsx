@@ -89,7 +89,8 @@ export default function App() {
         />
         <WithTooltip
           hint='This is a tooltip!'
-          cssDialog={css`border-radius: .8rem;`}
+          backgroundColor='#fff'
+          textColor='#000'
         >
           <StyledGithubButton href='https://github.com/andrewscwei/etudes'>
             <FlatSVG markup={$$GithubIcon} cssSVG={css`* { fill: #fff; }`}/>

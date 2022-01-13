@@ -134,14 +134,14 @@ export default function WithTooltip({
 
 function makeDisplacementCSS(position: Position, arrowHeight: number, gap: number): CSSProp {
   switch (position) {
-  case 'tl': return css`top: ${-arrowHeight}px; left: 100%;`
+  case 'tl': return css`top: ${-arrowHeight}px; left: calc(50% + ${arrowHeight*2.5}px);`
   case 'tc': return css`top: ${-arrowHeight}px; left: 50%;`
-  case 'tr': return css`top: ${-arrowHeight}px; right: 100%;`
+  case 'tr': return css`top: ${-arrowHeight}px; right: calc(50% + ${arrowHeight*2.5}px);`
   case 'cl': return css`top: 50%; left: ${-arrowHeight}px;`
   case 'cr': return css`top: 50%; right: ${-arrowHeight}px;`
-  case 'bl': return css`bottom: ${-arrowHeight}px; left: 100%;`
+  case 'bl': return css`bottom: ${-arrowHeight}px; left: calc(50% + ${arrowHeight*2.5}px);`
   case 'bc': return css`bottom: ${-arrowHeight}px; left: 50%;`
-  case 'br': return css`bottom: ${-arrowHeight}px; right: 100%;`
+  case 'br': return css`bottom: ${-arrowHeight}px; right: calc(50% + ${arrowHeight*2.5}px);`
   }
 }
 
