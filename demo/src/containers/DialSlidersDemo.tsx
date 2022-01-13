@@ -8,7 +8,7 @@ import Slider from '../../../lib/Slider'
 import StepwiseSlider from '../../../lib/StepwiseSlider'
 
 export default function() {
-  function getAngleByPosition(position: number): number {
+  const getAngleByPosition = (position: number): number => {
     return position * (max - min) + min
   }
 

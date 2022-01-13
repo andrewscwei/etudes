@@ -13,12 +13,12 @@ import PanoramaDemo from './PanoramaDemo'
 import VideoDemo from './VideoDemo'
 
 export default function App() {
-  function mapLocationToHash() {
+  const mapLocationToHash = () => {
     const hasHash = window.location.hash && window.location.hash !== ''
     setHash(hasHash ? window.location.hash.substring(1, window.location.hash.length) : undefined)
   }
 
-  function mapHashToLocation() {
+  const mapHashToLocation = () => {
     window.location.hash = hash ?? ''
   }
 
