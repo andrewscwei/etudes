@@ -4,7 +4,7 @@ import React, { Children, cloneElement, HTMLAttributes, isValidElement, PropsWit
 export default function ExtractChildren({ children, className, ...props }: PropsWithChildren<HTMLAttributes<HTMLElement>>) {
   return (
     <>
-      {Children.map(children, child => {
+      {Children.map(children, (child, idx) => {
         if (isValidElement(child)) {
           return cloneElement(child, { className: classNames(className, child.props.className), ...props })
         }

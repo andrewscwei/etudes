@@ -1,7 +1,7 @@
-import React, { HTMLAttributes, MouseEvent, PropsWithChildren, useState } from 'react'
+import React, { HTMLAttributes, MouseEvent, PropsWithChildren, RefObject, useEffect, useRef, useState } from 'react'
 import { Rect, Size } from 'spase'
 import styled, { css, CSSProp } from 'styled-components'
-import ExtractChildren from './ExtractChildren'
+import ExtractChild from './ExtractChild'
 
 type Props = PropsWithChildren<HTMLAttributes<HTMLElement>> & {
   /**
@@ -82,7 +82,7 @@ export default function WithTooltip({
     return 'bc'
   }
 
-  const computeTextSize = (target: Element): Size => {
+  const computeTextSize = (target: Element, threshold: number): Size => {
     const computedStyle = window.getComputedStyle(target, '::after')
     const div = document.createElement('div')
     div.innerHTML = hint
@@ -91,34 +91,45 @@ export default function WithTooltip({
     div.style.fontStyle = computedStyle.getPropertyValue('font-style')
     div.style.fontVariant = computedStyle.getPropertyValue('font-variant')
     div.style.fontWeight = computedStyle.getPropertyValue('font-weight')
-    div.style.height = '30px'
     div.style.left = '0'
     div.style.position = 'absolute'
     div.style.top = '0'
     div.style.visibility = 'hidden'
-    div.style.whiteSpace = 'no-wrap'
+    div.style.whiteSpace = 'pre'
 
     document.body.appendChild(div)
+
     // Add 1px as buffer to mitigate precision discrepancies.
     const width = div.clientWidth + 1
     const height = div.clientHeight + 1
+
     document.body.removeChild(div)
 
     return new Size([width, height])
   }
 
   const onMouseOver = (event: MouseEvent) => {
-    setTextSize(computeTextSize(event.currentTarget))
     setPosition(computePosition(event.currentTarget, threshold))
+    setTextSize(computeTextSize(event.currentTarget, threshold))
   }
 
-  const [textSize, setTextSize] = useState<Size>(new Size())
-  const [position, setPosition] = useState<Position>('bc')
+  const [textSize, setTextSize] = useState<Size | undefined>(new Size())
+  const [position, setPosition] = useState<Position | undefined>(undefined)
+
+  const childRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const childNode = childRef.current
+    if (!childNode) return
+    setPosition(computePosition(childNode, threshold))
+    setTextSize(computeTextSize(childNode, threshold))
+  }, [])
 
   return (
     <StyledRoot
       arrowHeight={arrowHeight}
       backgroundColor={backgroundColor}
+      ref={childRef}
       cssDialog={cssDialog}
       disabledOnTouch={disabledOnTouch}
       hint={hint}
@@ -145,7 +156,7 @@ function makeDisplacementCSS(position: Position, arrowHeight: number, gap: numbe
   }
 }
 
-function makeDialogCSS(position: Position, arrowHeight: number, gap: number): CSSProp {
+function makeDialogPositionCSS(position: Position, arrowHeight: number, gap: number): CSSProp {
   switch (position) {
   case 'tl': return css`transform: translate3d(calc(-100% - ${gap}px), calc(-100% - ${gap}px), 0);`
   case 'tc': return css`transform: translate3d(-50%, calc(-100% - ${gap}px), 0);`
@@ -158,7 +169,7 @@ function makeDialogCSS(position: Position, arrowHeight: number, gap: number): CS
   }
 }
 
-function makeArrowCSS(position: Position, arrowHeight: number, gap: number, color: string): CSSProp {
+function makeArrowPositionCSS(position: Position, arrowHeight: number, gap: number, color: string): CSSProp {
   return css`
     ${() => {
     switch (position) {
@@ -172,6 +183,7 @@ function makeArrowCSS(position: Position, arrowHeight: number, gap: number, colo
     case 'br': return css`border-color: transparent transparent ${color} transparent;`
     }
   }}
+
     ${() => {
     switch (position) {
     case 'tl': return css`transform: translate3d(calc(0% - ${gap}px - ${arrowHeight*3}px), calc(0% - ${gap}px), 0);`
@@ -187,16 +199,17 @@ function makeArrowCSS(position: Position, arrowHeight: number, gap: number, colo
   `
 }
 
-const StyledRoot = styled(ExtractChildren)<{
+const StyledRoot = styled(ExtractChild)<{
   arrowHeight: number
   backgroundColor: string
+  ref: RefObject<HTMLElement>
   cssDialog?: CSSProp
   disabledOnTouch: boolean
   hint: string
   gap: number
-  position: Position
+  position?: Position
   textColor: string
-  textSize: Size
+  textSize?: Size
 }>`
   cursor: pointer;
   position: relative;
@@ -213,15 +226,17 @@ const StyledRoot = styled(ExtractChildren)<{
     width: 0;
     z-index: 10001;
 
-    ${props => makeDisplacementCSS(props.position, props.arrowHeight, props.gap)}
-    ${props => makeArrowCSS(props.position, props.arrowHeight, props.gap, props.backgroundColor)}
-    ${props => props.disabledOnTouch ? 'html.touch & { display: none; }' : ''}
+    ${props => props.position && props.textSize && css`
+      ${makeDisplacementCSS(props.position, props.arrowHeight, props.gap)}
+      ${makeArrowPositionCSS(props.position, props.arrowHeight, props.gap, props.backgroundColor)}
+      ${props.disabledOnTouch ? 'html.touch & { display: none; }' : ''}
+    `}
   }
 
   &::after {
     box-sizing: content-box;
     font-size: 12px;
-    max-width: 240px;
+    max-width: 200px;
     padding: 10px 14px;
     text-align: left;
 
@@ -236,19 +251,18 @@ const StyledRoot = styled(ExtractChildren)<{
     position: absolute;
     transform: translate3d(0, 0, 0);
     transition: opacity 200ms ease-out;
-    width: ${props => props.textSize.width > 0 ? `${props.textSize.width}px` : 'auto'};
     z-index: 10000;
 
-    ${props => makeDisplacementCSS(props.position, props.arrowHeight, props.gap)}
-    ${props => makeDialogCSS(props.position, props.arrowHeight, props.gap)}
-    ${props => props.disabledOnTouch ? 'html.touch & { display: none; }' : ''}
+    ${props => props.position && props.textSize && css`
+      width: ${props.textSize.width > 0 ? `${props.textSize.width}px` : 'auto'};
+      ${makeDisplacementCSS(props.position, props.arrowHeight, props.gap)}
+      ${makeDialogPositionCSS(props.position, props.arrowHeight, props.gap)}
+      ${props.disabledOnTouch ? 'html.touch & { display: none; }' : ''}
+    `}
   }
 
-  ${props => props.disabledOnTouch ? 'html:not(.touch) &:hover::before' : '&:hover::before'} {
-    opacity: 1;
-  }
-
-  ${props => props.disabledOnTouch ? 'html:not(.touch) &:hover::after' : '&:hover::after'} {
-    opacity: 1;
+  ${props => props.disabledOnTouch ? 'html:not(.touch) &:hover' : '&:hover'} {
+    &::before { opacity: 1; }
+    &::after { opacity: 1; }
   }
 `

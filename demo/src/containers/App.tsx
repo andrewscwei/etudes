@@ -88,7 +88,7 @@ export default function App() {
           `}
         />
         <WithTooltip
-          hint='This is a tooltip!'
+          hint='This is wrapped with WithTooltip!'
           backgroundColor='#fff'
           textColor='#000'
         >
