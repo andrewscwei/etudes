@@ -25,14 +25,9 @@ type Props = PropsWithChildren<HTMLAttributes<HTMLElement>> & {
   hint: string
 
   /**
-   * Specifies if the arrow is visible.
+   * The gap (in pixels) between the target element and the tooltip, defaults to zero.
    */
-  isArrowVisible?: boolean
-
-  /**
-   * The offset (in pixels) between the target element and the tooltip, defaults to zero.
-   */
-  offset?: number
+  gap?: number
 
   /**
    * Color of the dialog text, same format as a CSS color string (i.e. '#000').
@@ -60,8 +55,7 @@ export default function WithTooltip({
   cssDialog,
   disabledOnTouch = true,
   hint,
-  isArrowVisible = true,
-  offset = 5,
+  gap = 5,
   textColor = '#fff',
   threshold = 100,
   ...props
@@ -128,8 +122,7 @@ export default function WithTooltip({
       cssDialog={cssDialog}
       disabledOnTouch={disabledOnTouch}
       hint={hint}
-      isArrowVisible={isArrowVisible}
-      offset={offset}
+      gap={gap}
       onMouseOver={event => onMouseOver(event)}
       position={position}
       textColor={textColor}
@@ -139,7 +132,7 @@ export default function WithTooltip({
   )
 }
 
-function _cssDisplacement(position: Position, arrowHeight: number, offset: number): CSSProp {
+function _cssDisplacement(position: Position, arrowHeight: number, gap: number): CSSProp {
   switch (position) {
   case 'tl': return css`top: ${-arrowHeight}px; left: 100%;`
   case 'tc': return css`top: ${-arrowHeight}px; left: 50%;`
@@ -152,20 +145,20 @@ function _cssDisplacement(position: Position, arrowHeight: number, offset: numbe
   }
 }
 
-function _cssDialog(position: Position, arrowHeight: number, offset: number): CSSProp {
+function _cssDialog(position: Position, arrowHeight: number, gap: number): CSSProp {
   switch (position) {
-  case 'tl': return css`transform: translate3d(calc(-100% - ${offset}px), calc(-100% - ${offset}px), 0);`
-  case 'tc': return css`transform: translate3d(-50%, calc(-100% - ${offset}px), 0);`
-  case 'tr': return css`transform: translate3d(calc(100% + ${offset}px), calc(-100% - ${offset}px), 0);`
-  case 'cl': return css`transform: translate3d(calc(-100% - ${offset}px), -50%, 0);`
-  case 'cr': return css`transform: translate3d(calc(100% + ${offset}px), -50%, 0);`
-  case 'bl': return css`transform: translate3d(calc(-100% - ${offset}px), calc(100% + ${offset}px), 0);`
-  case 'bc': return css`transform: translate3d(-50%, calc(100% + ${offset}px), 0);`
-  case 'br': return css`transform: translate3d(calc(100% + ${offset}px), calc(100% + ${offset}px), 0);`
+  case 'tl': return css`transform: translate3d(calc(-100% - ${gap}px), calc(-100% - ${gap}px), 0);`
+  case 'tc': return css`transform: translate3d(-50%, calc(-100% - ${gap}px), 0);`
+  case 'tr': return css`transform: translate3d(calc(100% + ${gap}px), calc(-100% - ${gap}px), 0);`
+  case 'cl': return css`transform: translate3d(calc(-100% - ${gap}px), -50%, 0);`
+  case 'cr': return css`transform: translate3d(calc(100% + ${gap}px), -50%, 0);`
+  case 'bl': return css`transform: translate3d(calc(-100% - ${gap}px), calc(100% + ${gap}px), 0);`
+  case 'bc': return css`transform: translate3d(-50%, calc(100% + ${gap}px), 0);`
+  case 'br': return css`transform: translate3d(calc(100% + ${gap}px), calc(100% + ${gap}px), 0);`
   }
 }
 
-function _cssArrow(position: Position, arrowHeight: number, offset: number, color: string): CSSProp {
+function _cssArrow(position: Position, arrowHeight: number, gap: number, color: string): CSSProp {
   return css`
     ${() => {
     switch (position) {
@@ -181,14 +174,14 @@ function _cssArrow(position: Position, arrowHeight: number, offset: number, colo
   }}
     ${() => {
     switch (position) {
-    case 'tl': return css`transform: translate3d(calc(0% - ${offset}px - ${arrowHeight*3}px), calc(0% - ${offset}px), 0);`
-    case 'tc': return css`transform: translate3d(-50%, calc(0% - ${offset}px), 0);`
-    case 'tr': return css`transform: translate3d(calc(100% + ${offset}px + ${arrowHeight}px), calc(0% - ${offset}px), 0);`
-    case 'cl': return css`transform: translate3d(calc(0% - ${offset}px), -50%, 0);`
-    case 'cr': return css`transform: translate3d(calc(0% + ${offset}px), -50%, 0);`
-    case 'bl': return css`transform: translate3d(calc(0% - ${offset}px - ${arrowHeight*3}px), calc(0% + ${offset}px), 0);`
-    case 'bc': return css`transform: translate3d(-50%, calc(0% + ${offset}px), 0);`
-    case 'br': return css`transform: translate3d(calc(100% + ${offset}px + ${arrowHeight}px), calc(0% + ${offset}px), 0);`
+    case 'tl': return css`transform: translate3d(calc(0% - ${gap}px - ${arrowHeight*3}px), calc(0% - ${gap}px), 0);`
+    case 'tc': return css`transform: translate3d(-50%, calc(0% - ${gap}px), 0);`
+    case 'tr': return css`transform: translate3d(calc(100% + ${gap}px + ${arrowHeight}px), calc(0% - ${gap}px), 0);`
+    case 'cl': return css`transform: translate3d(calc(0% - ${gap}px), -50%, 0);`
+    case 'cr': return css`transform: translate3d(calc(0% + ${gap}px), -50%, 0);`
+    case 'bl': return css`transform: translate3d(calc(0% - ${gap}px - ${arrowHeight*3}px), calc(0% + ${gap}px), 0);`
+    case 'bc': return css`transform: translate3d(-50%, calc(0% + ${gap}px), 0);`
+    case 'br': return css`transform: translate3d(calc(100% + ${gap}px + ${arrowHeight}px), calc(0% + ${gap}px), 0);`
     }
   }}
   `
@@ -200,8 +193,7 @@ const StyledRoot = styled(ExtractChildren)<{
   cssDialog?: CSSProp
   disabledOnTouch: boolean
   hint: string
-  isArrowVisible: boolean
-  offset: number
+  gap: number
   position: Position
   textColor: string
   textSize: Size
@@ -209,24 +201,22 @@ const StyledRoot = styled(ExtractChildren)<{
   cursor: pointer;
   position: relative;
 
-  ${props => props.isArrowVisible ? css`
-    &::before {
-      border-style: solid;
-      border-width: ${props.arrowHeight}px;
-      content: '';
-      height: 0;
-      opacity: 0;
-      pointer-events: none;
-      position: absolute;
-      transition: opacity 200ms ease-out;
-      width: 0;
-      z-index: 10001;
+  &::before {
+    border-style: solid;
+    border-width: ${props => props.arrowHeight}px;
+    content: '';
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    transition: opacity 200ms ease-out;
+    width: 0;
+    z-index: 10001;
 
-      ${_cssDisplacement(props.position, props.arrowHeight, props.offset)}
-      ${_cssArrow(props.position, props.arrowHeight, props.offset, props.backgroundColor)}
-      ${props.disabledOnTouch ? 'html.touch & { display: none; }' : ''}
-    }
-  ` : undefined}
+    ${props => _cssDisplacement(props.position, props.arrowHeight, props.gap)}
+    ${props => _cssArrow(props.position, props.arrowHeight, props.gap, props.backgroundColor)}
+    ${props => props.disabledOnTouch ? 'html.touch & { display: none; }' : ''}
+  }
 
   &::after {
     box-sizing: content-box;
@@ -249,8 +239,8 @@ const StyledRoot = styled(ExtractChildren)<{
     width: ${props => props.textSize.width > 0 ? `${props.textSize.width}px` : 'auto'};
     z-index: 10000;
 
-    ${props => _cssDisplacement(props.position, props.arrowHeight, props.offset)}
-    ${props => _cssDialog(props.position, props.arrowHeight, props.offset)}
+    ${props => _cssDisplacement(props.position, props.arrowHeight, props.gap)}
+    ${props => _cssDialog(props.position, props.arrowHeight, props.gap)}
     ${props => props.disabledOnTouch ? 'html.touch & { display: none; }' : ''}
   }
 
