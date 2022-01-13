@@ -73,31 +73,28 @@ export default function PanoramaSlider({
   style,
   ...props
 }: Props) {
-  function getImageAspectRatio(): number {
+  const getAspectRatio = (): number => {
     if (!imageSize) return 0
     const { width, height } = imageSize
     if (height === 0) return 0
     return width / height
   }
 
-  function getReticleWidth(): number {
+  const getReticleWidth = (): number => {
     const angle = _.clamp(fov ?? (viewportSize ? (viewportSize.width / (viewportSize.height * aspectRatio)) * 360 : 0), 0, 360)
     return size.width * (angle / 360)
   }
 
-  function getAdjustedZeroAnchor() {
+  const getAdjustedZeroAnchor = () => {
     if (size.width <= 0) return zeroAnchor
-
     return ((size.width - reticleWidth) * 0.5 + (zeroAnchor * reticleWidth)) / size.width
   }
 
   const rootRef = useRef<HTMLDivElement>(null)
-
   const [imageSize, setImageSize] = useState<Size | undefined>(undefined)
   const [isDragging, setIsDragging] = useState(false)
   const [size] = useResizeEffect(rootRef, { onResize })
-
-  const aspectRatio = getImageAspectRatio()
+  const aspectRatio = getAspectRatio()
   const reticleWidth = getReticleWidth()
   const adjustedZeroAnchor = getAdjustedZeroAnchor()
 

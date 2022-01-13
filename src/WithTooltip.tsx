@@ -60,10 +60,7 @@ export default function WithTooltip({
   threshold = 100,
   ...props
 }: Props) {
-  const [textSize, setTextSize] = useState<Size>(new Size())
-  const [position, setPosition] = useState<Position>('bc')
-
-  function computePosition(target: Element, threshold: number): Position {
+  const computePosition = (target: Element, threshold: number): Position => {
     const vrect = Rect.fromViewport()
     const rect = Rect.intersecting(target)
 
@@ -85,7 +82,7 @@ export default function WithTooltip({
     return 'bc'
   }
 
-  function computeTextSize(target: Element): Size {
+  const computeTextSize = (target: Element): Size => {
     const computedStyle = window.getComputedStyle(target, '::after')
     const div = document.createElement('div')
     div.innerHTML = hint
@@ -110,10 +107,13 @@ export default function WithTooltip({
     return new Size([width, height])
   }
 
-  function onMouseOver(event: MouseEvent) {
+  const onMouseOver = (event: MouseEvent) => {
     setTextSize(computeTextSize(event.currentTarget))
     setPosition(computePosition(event.currentTarget, threshold))
   }
+
+  const [textSize, setTextSize] = useState<Size>(new Size())
+  const [position, setPosition] = useState<Position>('bc')
 
   return (
     <StyledRoot
@@ -132,7 +132,7 @@ export default function WithTooltip({
   )
 }
 
-function _cssDisplacement(position: Position, arrowHeight: number, gap: number): CSSProp {
+function makeDisplacementCSS(position: Position, arrowHeight: number, gap: number): CSSProp {
   switch (position) {
   case 'tl': return css`top: ${-arrowHeight}px; left: 100%;`
   case 'tc': return css`top: ${-arrowHeight}px; left: 50%;`
@@ -145,7 +145,7 @@ function _cssDisplacement(position: Position, arrowHeight: number, gap: number):
   }
 }
 
-function _cssDialog(position: Position, arrowHeight: number, gap: number): CSSProp {
+function makeDialogCSS(position: Position, arrowHeight: number, gap: number): CSSProp {
   switch (position) {
   case 'tl': return css`transform: translate3d(calc(-100% - ${gap}px), calc(-100% - ${gap}px), 0);`
   case 'tc': return css`transform: translate3d(-50%, calc(-100% - ${gap}px), 0);`
@@ -158,7 +158,7 @@ function _cssDialog(position: Position, arrowHeight: number, gap: number): CSSPr
   }
 }
 
-function _cssArrow(position: Position, arrowHeight: number, gap: number, color: string): CSSProp {
+function makeArrowCSS(position: Position, arrowHeight: number, gap: number, color: string): CSSProp {
   return css`
     ${() => {
     switch (position) {
@@ -213,8 +213,8 @@ const StyledRoot = styled(ExtractChildren)<{
     width: 0;
     z-index: 10001;
 
-    ${props => _cssDisplacement(props.position, props.arrowHeight, props.gap)}
-    ${props => _cssArrow(props.position, props.arrowHeight, props.gap, props.backgroundColor)}
+    ${props => makeDisplacementCSS(props.position, props.arrowHeight, props.gap)}
+    ${props => makeArrowCSS(props.position, props.arrowHeight, props.gap, props.backgroundColor)}
     ${props => props.disabledOnTouch ? 'html.touch & { display: none; }' : ''}
   }
 
@@ -239,8 +239,8 @@ const StyledRoot = styled(ExtractChildren)<{
     width: ${props => props.textSize.width > 0 ? `${props.textSize.width}px` : 'auto'};
     z-index: 10000;
 
-    ${props => _cssDisplacement(props.position, props.arrowHeight, props.gap)}
-    ${props => _cssDialog(props.position, props.arrowHeight, props.gap)}
+    ${props => makeDisplacementCSS(props.position, props.arrowHeight, props.gap)}
+    ${props => makeDialogCSS(props.position, props.arrowHeight, props.gap)}
     ${props => props.disabledOnTouch ? 'html.touch & { display: none; }' : ''}
   }
 

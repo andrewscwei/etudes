@@ -218,7 +218,7 @@ export default function StepwiseSlider({
   cssLabel,
   ...props
 }: Props) {
-  function transform(currentPosition: number, dx: number, dy: number) {
+  const mapDragPositionToPosition = (currentPosition: number, dx: number, dy: number) => {
     const rect = Rect.from(rootRef.current) ?? new Rect()
     const naturalPosition = isInverted ? 1 - currentPosition : currentPosition
     const naturalNewPositionX = naturalPosition * rect.width + dx
@@ -228,7 +228,7 @@ export default function StepwiseSlider({
     return newPosition
   }
 
-  function onTrackClick(event: MouseEvent) {
+  const onTrackClick = (event: MouseEvent) => {
     if (!isTrackInteractive) return
 
     const rect = Rect.from(rootRef.current) ?? new Rect()
@@ -251,12 +251,11 @@ export default function StepwiseSlider({
 
   const rootRef = useRef<HTMLDivElement>(null)
   const knobRef = useRef<HTMLButtonElement>(null)
-
   const [index, setIndex] = useState(externalIndex)
 
   const { isDragging: [isDragging], value: [position, setPosition] } = useDragEffect(knobRef, {
     initialValue: getPositionAt(externalIndex, steps),
-    transform,
+    transform: mapDragPositionToPosition,
     onDragStart,
     onDragEnd,
   })

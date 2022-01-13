@@ -142,13 +142,12 @@ export default function Panorama({
   onResize,
   ...props
 }: Props) {
-  function transform(currentDisplacement: number, dx: number, dy: number): number {
-    const newDisplacement = currentDisplacement - (dx * speed)
+  const mapDragPositionToDisplacement = (currentPosition: number, dx: number, dy: number): number => {
+    const newDisplacement = currentPosition - (dx * speed)
     return newDisplacement
   }
 
   const rootRef = useRef<HTMLDivElement>(null)
-
   const [size] = useResizeEffect(rootRef, { onResize })
   const [angle, setAngle] = useState(externalAngle)
 
@@ -160,7 +159,7 @@ export default function Panorama({
 
   const { isDragging: [isDragging], value: [displacement, setDisplacement] } = useDragEffect(rootRef, {
     initialValue: 0,
-    transform,
+    transform: mapDragPositionToDisplacement,
     onDragStart,
     onDragEnd,
   })

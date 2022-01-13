@@ -9,7 +9,7 @@ export type Options<T> = {
 }
 
 export default function useSearchParamState<T>(param: string, initialState?: T | null, { mapSearchParamToState, mapStateToSearchParam }: Options<T> = {}): [NonNullable<T> | null, Dispatch<SetStateAction<NonNullable<T> | null>>] {
-  function _mapSearchParamToState(value: string | null, initialState?: T | null): NonNullable<T> | null {
+  const _mapSearchParamToState = (value: string | null, initialState?: T | null): NonNullable<T> | null => {
     if (mapSearchParamToState) {
       return mapSearchParamToState(value)
     }
@@ -21,7 +21,7 @@ export default function useSearchParamState<T>(param: string, initialState?: T |
     }
   }
 
-  function _mapStateToSearchParam(state: T | null): string | null {
+  const _mapStateToSearchParam = (state: T | null): string | null => {
     if (mapStateToSearchParam) {
       return mapStateToSearchParam(state)
     }

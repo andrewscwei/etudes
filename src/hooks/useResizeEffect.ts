@@ -9,8 +9,8 @@ type Options = {
 }
 
 export default function useResizeEffect(targetRef: RefObject<Element>, { onResize }: Options = {}, deps?: DependencyList): [Size, Dispatch<SetStateAction<Size>>] {
-  const [size, setSize] = useState<Size>(new Size())
   const observerRef = useRef<ResizeObserver | undefined>(undefined)
+  const [size, setSize] = useState<Size>(new Size())
 
   useEffect(() => {
     // debug(`Using resize effect for element ${targetRef.current}...`, 'OK')

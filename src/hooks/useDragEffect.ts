@@ -55,10 +55,6 @@ type Options<T> = Omit<Interact.DraggableOptions, 'onstart' | 'onmove' | 'onend'
  * @returns The states created for this effect.
  */
 export default function useDragEffect<T = [number, number]>(targetRef: RefObject<HTMLElement>, { onDragStart, onDragMove, onDragEnd, initialValue, transform, ...options }: Options<T>, deps?: DependencyList): ReturnedStates<T> {
-  const valueRef = useRef<T>(initialValue)
-  const [isDragging, setIsDragging] = useState<boolean>(false)
-  const [value, setValue] = useState(valueRef.current)
-
   /**
    * Sets the current associated value reference. This reference object is equal to the `value`
    * state but differs slightly in how they are set. Because states are asynchronous by nature, this
@@ -68,11 +64,15 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
    *
    * @returns `true` if the value was set, `false` otherwise.
    */
-  function setValueRef(value: T): boolean {
+  const setValueRef = (value: T): boolean => {
     if (_.isEqual(valueRef.current, value)) return false
     valueRef.current = value
     return true
   }
+
+  const valueRef = useRef<T>(initialValue)
+  const [isDragging, setIsDragging] = useState<boolean>(false)
+  const [value, setValue] = useState(valueRef.current)
 
   useEffect(() => {
     // debug(`Using drag effect for element ${targetRef.current}...`, 'OK', `value=${valueRef.current}`)
