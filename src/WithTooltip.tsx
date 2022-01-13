@@ -89,11 +89,11 @@ export default function WithTooltip({
     const computedStyle = window.getComputedStyle(target, '::after')
     const div = document.createElement('div')
     div.innerHTML = hint
-    div.style.fontFamily = computedStyle.getPropertyValue('font-family');
-    div.style.fontSize = computedStyle.getPropertyValue('font-size');
-    div.style.fontStyle = computedStyle.getPropertyValue('font-style');
-    div.style.fontVariant = computedStyle.getPropertyValue('font-variant');
-    div.style.fontWeight = computedStyle.getPropertyValue('font-weight');
+    div.style.fontFamily = computedStyle.getPropertyValue('font-family')
+    div.style.fontSize = computedStyle.getPropertyValue('font-size')
+    div.style.fontStyle = computedStyle.getPropertyValue('font-style')
+    div.style.fontVariant = computedStyle.getPropertyValue('font-variant')
+    div.style.fontWeight = computedStyle.getPropertyValue('font-weight')
     div.style.height = '30px'
     div.style.left = '0'
     div.style.position = 'absolute'
@@ -133,56 +133,56 @@ export default function WithTooltip({
 
 function _cssDisplacement(position: Position, arrowHeight: number, offset: number): CSSProp {
   switch (position) {
-    case 'tl': return css`top: ${-arrowHeight}px; left: 100%;`
-    case 'tc': return css`top: ${-arrowHeight}px; left: 50%;`
-    case 'tr': return css`top: ${-arrowHeight}px; right: 100%;`
-    case 'cl': return css`top: 50%; left: ${-arrowHeight}px;`
-    case 'cr': return css`top: 50%; right: ${-arrowHeight}px;`
-    case 'bl': return css`bottom: ${-arrowHeight}px; left: 100%;`
-    case 'bc': return css`bottom: ${-arrowHeight}px; left: 50%;`
-    case 'br': return css`bottom: ${-arrowHeight}px; right: 100%;`
+  case 'tl': return css`top: ${-arrowHeight}px; left: 100%;`
+  case 'tc': return css`top: ${-arrowHeight}px; left: 50%;`
+  case 'tr': return css`top: ${-arrowHeight}px; right: 100%;`
+  case 'cl': return css`top: 50%; left: ${-arrowHeight}px;`
+  case 'cr': return css`top: 50%; right: ${-arrowHeight}px;`
+  case 'bl': return css`bottom: ${-arrowHeight}px; left: 100%;`
+  case 'bc': return css`bottom: ${-arrowHeight}px; left: 50%;`
+  case 'br': return css`bottom: ${-arrowHeight}px; right: 100%;`
   }
 }
 
 function _cssDialog(position: Position, arrowHeight: number, offset: number): CSSProp {
   switch (position) {
-    case 'tl': return css`transform: translate3d(calc(-100% - ${offset}px), calc(-100% - ${offset}px), 0);`
-    case 'tc': return css`transform: translate3d(-50%, calc(-100% - ${offset}px), 0);`
-    case 'tr': return css`transform: translate3d(calc(100% + ${offset}px), calc(-100% - ${offset}px), 0);`
-    case 'cl': return css`transform: translate3d(calc(-100% - ${offset}px), -50%, 0);`
-    case 'cr': return css`transform: translate3d(calc(100% + ${offset}px), -50%, 0);`
-    case 'bl': return css`transform: translate3d(calc(-100% - ${offset}px), calc(100% + ${offset}px), 0);`
-    case 'bc': return css`transform: translate3d(-50%, calc(100% + ${offset}px), 0);`
-    case 'br': return css`transform: translate3d(calc(100% + ${offset}px), calc(100% + ${offset}px), 0);`
+  case 'tl': return css`transform: translate3d(calc(-100% - ${offset}px), calc(-100% - ${offset}px), 0);`
+  case 'tc': return css`transform: translate3d(-50%, calc(-100% - ${offset}px), 0);`
+  case 'tr': return css`transform: translate3d(calc(100% + ${offset}px), calc(-100% - ${offset}px), 0);`
+  case 'cl': return css`transform: translate3d(calc(-100% - ${offset}px), -50%, 0);`
+  case 'cr': return css`transform: translate3d(calc(100% + ${offset}px), -50%, 0);`
+  case 'bl': return css`transform: translate3d(calc(-100% - ${offset}px), calc(100% + ${offset}px), 0);`
+  case 'bc': return css`transform: translate3d(-50%, calc(100% + ${offset}px), 0);`
+  case 'br': return css`transform: translate3d(calc(100% + ${offset}px), calc(100% + ${offset}px), 0);`
   }
 }
 
 function _cssArrow(position: Position, arrowHeight: number, offset: number, color: string): CSSProp {
   return css`
     ${() => {
-      switch (position) {
-        case 'tl': return css`border-color: ${color} transparent transparent transparent;`
-        case 'tc': return css`border-color: ${color} transparent transparent transparent;`
-        case 'tr': return css`border-color: ${color} transparent transparent transparent;`
-        case 'cl': return css`border-color: transparent transparent transparent ${color};`
-        case 'cr': return css`border-color: transparent ${color} transparent transparent;`
-        case 'bl': return css`border-color: transparent transparent ${color} transparent;`
-        case 'bc': return css`border-color: transparent transparent ${color} transparent;`
-        case 'br': return css`border-color: transparent transparent ${color} transparent;`
-      }
-    }}
+    switch (position) {
+    case 'tl': return css`border-color: ${color} transparent transparent transparent;`
+    case 'tc': return css`border-color: ${color} transparent transparent transparent;`
+    case 'tr': return css`border-color: ${color} transparent transparent transparent;`
+    case 'cl': return css`border-color: transparent transparent transparent ${color};`
+    case 'cr': return css`border-color: transparent ${color} transparent transparent;`
+    case 'bl': return css`border-color: transparent transparent ${color} transparent;`
+    case 'bc': return css`border-color: transparent transparent ${color} transparent;`
+    case 'br': return css`border-color: transparent transparent ${color} transparent;`
+    }
+  }}
     ${() => {
-      switch (position) {
-        case 'tl': return css`transform: translate3d(calc(0% - ${offset}px - ${arrowHeight*3}px), calc(0% - ${offset}px), 0);`
-        case 'tc': return css`transform: translate3d(-50%, calc(0% - ${offset}px), 0);`
-        case 'tr': return css`transform: translate3d(calc(100% + ${offset}px + ${arrowHeight}px), calc(0% - ${offset}px), 0);`
-        case 'cl': return css`transform: translate3d(calc(0% - ${offset}px), -50%, 0);`
-        case 'cr': return css`transform: translate3d(calc(0% + ${offset}px), -50%, 0);`
-        case 'bl': return css`transform: translate3d(calc(0% - ${offset}px - ${arrowHeight*3}px), calc(0% + ${offset}px), 0);`
-        case 'bc': return css`transform: translate3d(-50%, calc(0% + ${offset}px), 0);`
-        case 'br': return css`transform: translate3d(calc(100% + ${offset}px + ${arrowHeight}px), calc(0% + ${offset}px), 0);`
-      }
-    }}
+    switch (position) {
+    case 'tl': return css`transform: translate3d(calc(0% - ${offset}px - ${arrowHeight*3}px), calc(0% - ${offset}px), 0);`
+    case 'tc': return css`transform: translate3d(-50%, calc(0% - ${offset}px), 0);`
+    case 'tr': return css`transform: translate3d(calc(100% + ${offset}px + ${arrowHeight}px), calc(0% - ${offset}px), 0);`
+    case 'cl': return css`transform: translate3d(calc(0% - ${offset}px), -50%, 0);`
+    case 'cr': return css`transform: translate3d(calc(0% + ${offset}px), -50%, 0);`
+    case 'bl': return css`transform: translate3d(calc(0% - ${offset}px - ${arrowHeight*3}px), calc(0% + ${offset}px), 0);`
+    case 'bc': return css`transform: translate3d(-50%, calc(0% + ${offset}px), 0);`
+    case 'br': return css`transform: translate3d(calc(100% + ${offset}px + ${arrowHeight}px), calc(0% + ${offset}px), 0);`
+    }
+  }}
   `
 }
 
