@@ -1,5 +1,5 @@
 import React, { HTMLAttributes, MouseEvent, PropsWithChildren, useState } from 'react'
-import { Rect } from 'spase'
+import { Rect, Size } from 'spase'
 import styled, { css, CSSProp } from 'styled-components'
 import ExtractChildren from './ExtractChildren'
 
@@ -60,6 +60,7 @@ export default function WithTooltip({
   threshold = 100,
   ...props
 }: Props) {
+  const [textSize, setTextSize] = useState<Size>(new Size())
   const [position, setPosition] = useState<Position>('bc')
 
   function computePosition(target: Element, threshold: number): Position {
@@ -84,7 +85,32 @@ export default function WithTooltip({
     return 'bc'
   }
 
+  function computeTextSize(target: Element): Size {
+    const computedStyle = window.getComputedStyle(target, '::after')
+    const div = document.createElement('div')
+    div.innerHTML = hint
+    div.style.fontFamily = computedStyle.getPropertyValue('font-family');
+    div.style.fontSize = computedStyle.getPropertyValue('font-size');
+    div.style.fontStyle = computedStyle.getPropertyValue('font-style');
+    div.style.fontVariant = computedStyle.getPropertyValue('font-variant');
+    div.style.fontWeight = computedStyle.getPropertyValue('font-weight');
+    div.style.height = '30px'
+    div.style.left = '0'
+    div.style.position = 'absolute'
+    div.style.top = '0'
+    div.style.visibility = 'hidden'
+    div.style.whiteSpace = 'no-wrap'
+
+    document.body.appendChild(div)
+    const width = div.clientWidth
+    const height = div.clientHeight
+    document.body.removeChild(div)
+
+    return new Size([width, height])
+  }
+
   function onMouseOver(event: MouseEvent) {
+    setTextSize(computeTextSize(event.currentTarget))
     setPosition(computePosition(event.currentTarget, threshold))
   }
 
@@ -99,6 +125,7 @@ export default function WithTooltip({
       offset={offset}
       onMouseOver={event => onMouseOver(event)}
       textColor={textColor}
+      textSize={textSize}
       {...props}
     />
   )
@@ -168,6 +195,7 @@ const StyledRoot = styled(ExtractChildren)<{
   offset: number
   position: Position
   textColor: string
+  textSize: Size
 }>`
   cursor: pointer;
   position: relative;
@@ -178,6 +206,7 @@ const StyledRoot = styled(ExtractChildren)<{
     content: '';
     height: 0;
     opacity: 0;
+    pointer-events: none;
     position: absolute;
     transition: opacity 200ms ease-out;
     width: 0;
@@ -189,6 +218,7 @@ const StyledRoot = styled(ExtractChildren)<{
   }
 
   &::after {
+    box-sizing: content-box;
     font-size: 12px;
     max-width: 240px;
     padding: 10px 14px;
@@ -205,6 +235,7 @@ const StyledRoot = styled(ExtractChildren)<{
     position: absolute;
     transform: translate3d(0, 0, 0);
     transition: opacity 200ms ease-out;
+    width: ${props => props.textSize.width > 0 ? props.textSize.width : 'auto'};
     z-index: 10000;
 
     ${props => _cssDisplacement(props.position, props.arrowHeight, props.offset)}

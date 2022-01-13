@@ -211,12 +211,12 @@ const StyledGithubButton = styled.a`
   height: 4rem;
   margin: 8vh 8vw;
   pointer-events: auto;
-  /* transform: translate3d(0, 0, 10rem) rotateX(-10deg) rotateY(-5deg) scale(1); */
+  transform: translate3d(0, 0, 10rem) rotateX(-10deg) rotateY(-5deg) scale(1);
   transition: all .1s ease-out;
   width: 4rem;
   z-index: 1000;
 
   ${selectors.hwot} {
-    /* transform: translate3d(0, 0, 10rem) rotateX(-10deg) rotateY(10deg) scale(1.2); */
+    transform: translate3d(0, 0, 10rem) rotateX(-10deg) rotateY(10deg) scale(1.2);
   }
 `
