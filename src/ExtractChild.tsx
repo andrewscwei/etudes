@@ -4,6 +4,10 @@ import React, { Children, cloneElement, forwardRef, HTMLAttributes, isValidEleme
 
 type Props = PropsWithChildren<HTMLAttributes<HTMLElement>>
 
+/**
+ * Extracts a single child of a parent component into its own component. If the parent component has
+ * multiple children, only the first one will be extracted, the rest will be ignored.
+ */
 export default forwardRef<HTMLElement, Props>(({
   children,
   className,

@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import React, { HTMLAttributes, useEffect, useState } from 'react'
 import styled, { CSSProp } from 'styled-components'
-import Group from './Group'
+import Repeat from './Repeat'
 
 export type Props = HTMLAttributes<HTMLButtonElement> & {
   isActive?: boolean
@@ -50,7 +50,7 @@ export default function BurgerButton({
 
   return (
     <StyledRoot width={width} height={height} thickness={thickness} onClick={() => setIsActive(!isActive)} {...props}>
-      <Group count={isDoubleJointed ? 2 : 1}>
+      <Repeat count={isDoubleJointed ? 2 : 1}>
         <StyledJoint
           className={classNames({ active: isActive, half: isDoubleJointed })}
           height={height}
@@ -58,11 +58,11 @@ export default function BurgerButton({
           thickness={thickness}
           width={width}
         >
-          <Group count={3}>
+          <Repeat count={3}>
             <StyledBar className={classNames({ active: isActive, half: isDoubleJointed })} style={{ height: `${thickness}px` }} css={cssBar}/>
-          </Group>
+          </Repeat>
         </StyledJoint>
-      </Group>
+      </Repeat>
     </StyledRoot>
   )
 }

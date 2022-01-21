@@ -5,7 +5,10 @@ type Props = {
   count?: number
 }
 
-export default function Group({
+/**
+ * A tag-less component that repeats its children, automatically assigning each a unique key.
+ */
+export default function Repeat({
   count = 1,
   children,
 }: Props) {
