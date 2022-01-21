@@ -5,9 +5,24 @@ import { Rect, Size } from 'spase'
 // const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:hooks') : () => {}
 
 type Options = {
+  /**
+   * Handler invoked when the target element resizes.
+   *
+   * @param size - The current size of the target element.
+   */
   onResize?: (size: Size) => void
 }
 
+/**
+ * Hook for monitoring the resizing event of the target element.
+ *
+ * @param targetRef - Reference to the target element.
+ * @param options - See {@link Options}.
+ * @param deps - Additional dependencies.
+ *
+ * @returns A tuple consisting of a stateful value indicating the size of the target ref, and a
+ *          function that sets its size.
+ */
 export default function useResizeEffect(targetRef: RefObject<Element>, { onResize }: Options = {}, deps?: DependencyList): [Size, Dispatch<SetStateAction<Size>>] {
   const observerRef = useRef<ResizeObserver | undefined>(undefined)
   const [size, setSize] = useState<Size>(new Size())

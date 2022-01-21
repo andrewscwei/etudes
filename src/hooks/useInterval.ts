@@ -1,6 +1,21 @@
 import { useEffect, useRef } from 'react'
 
-export default function useInterval(handler: () => void, timeout?: number) {
+type Options = {
+  /**
+   * Specifies if the handler should be invoked initially (as opposed to waiting for the specified
+   * interval for the initial invocation).
+   */
+  shouldInvokeInitially?: boolean
+}
+
+/**
+ * Hoook for invoking a method repeatedly on every set interval.
+ *
+ * @param handler - The method to invoke on every interval.
+ * @param timeout - Time (in milliseconds) between each invocation.
+ * @param options - See {@link Options}.
+ */
+export default function useInterval(handler: () => void, timeout?: number, { shouldInvokeInitially = false }: Options = {}) {
   const handlerRef = useRef<(() => void) | undefined>(undefined)
 
   useEffect(() => {
@@ -10,6 +25,7 @@ export default function useInterval(handler: () => void, timeout?: number) {
   useEffect(() => {
     if (timeout === undefined) return
 
+    if (shouldInvokeInitially === true) handlerRef.current?.()
     const timer = window.setInterval(() => handlerRef.current?.(), timeout)
     return () => clearInterval(timer)
   }, [timeout])

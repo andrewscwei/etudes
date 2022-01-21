@@ -14,6 +14,7 @@ export default forwardRef<HTMLElement, Props>(({
   ...props
 }, ref) => {
   if (_.isArray(children)) {
+    /* eslint-disable-next-line no-console */
     console.error(`[etudes::ExtractChild] Only one child is expected, but found ${children.length}. Only the first child is extracted while the rest are discarded.`)
   }
 

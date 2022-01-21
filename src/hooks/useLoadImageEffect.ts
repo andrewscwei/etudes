@@ -2,12 +2,20 @@ import { DependencyList, Dispatch, SetStateAction, useEffect, useRef, useState }
 import { Size } from 'spase'
 
 type ReturnedStates = {
+  /**
+   * A tuple consisting of a stateful value indicating if the image is loading, and a function that
+   * updates the loading state.
+   */
   isLoading: [boolean, Dispatch<SetStateAction<boolean>>]
+
+  /**
+   * A tuple consisting of a stateful value representing the size of the image, and a function that
+   * updates the size.
+   */
   imageSize: [Size | undefined, Dispatch<SetStateAction<Size | undefined>>]
 }
 
 type Options = {
-
   /**
    * Handler invoked when the image is done loading.
    *
@@ -33,6 +41,15 @@ function getImageSize(imageElement: HTMLImageElement): Size {
   return new Size([imageElement.width, imageElement.height])
 }
 
+/**
+ * Hook for preloading an image.
+ *
+ * @param src - The image source.
+ * @param options - See {@link Options}.
+ * @param deps - Additional dependencies.
+ *
+ * @returns See {@link ReturnedStates}.
+ */
 export default function useLoadImageEffect(src?: string, { onImageLoadComplete, onImageLoadError, onImageSizeChange }: Options = {}, deps?: DependencyList): ReturnedStates {
   const imageLoadCompleteHandler = (event: Event) => {
     const imageElement = event.currentTarget as HTMLImageElement
@@ -70,7 +87,7 @@ export default function useLoadImageEffect(src?: string, { onImageLoadComplete, 
       imageRef.current?.removeEventListener('error', imageLoadErrorHandler)
       imageRef.current = undefined
     }
-  }, [src])
+  }, [src, ...deps ? deps : []])
 
   useEffect(() => {
     onImageSizeChange?.(imageSize)
