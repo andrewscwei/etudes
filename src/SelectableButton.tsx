@@ -29,24 +29,17 @@ export default function SelectableButton({
     if (isSelected) {
       if (!isDeselectable) return
       setIsSelected(false)
+      onDeselect?.()
     }
     else {
       setIsSelected(true)
+      onSelect?.()
     }
   }
 
   useEffect(() => {
     setIsSelected(externalIsSelected)
   }, [externalIsSelected])
-
-  useEffect(() => {
-    if (isSelected) {
-      onSelect?.()
-    }
-    else {
-      onDeselect?.()
-    }
-  }, [isSelected])
 
   return (
     <StyledRoot {...props} onClick={() => toggleSelection()} disabled={isDisabled || (isSelected && !isDeselectable)}>
