@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
 import Panorama from '../../../lib/Panorama'
 import PanoramaSlider from '../../../lib/PanoramaSlider'
-import Slider from '../../../lib/Slider'
+import Slider, { SliderEndingTrack, SliderKnob } from '../../../lib/Slider'
 import $$PanoramaImage from '../assets/images/panorama.jpg'
 
 export default function() {
@@ -20,14 +20,16 @@ export default function() {
         <Slider
           knobHeight={20}
           knobWidth={20}
-          onPositionChange={(position, isDragging) => { if (isDragging) setWidth(400 + position * 400) }}
+          onPositionChange={position => { setWidth(400 + position * 400) }}
           orientation='horizontal'
           position={(width - 400) / 400}
-          cssKnob={css`
-            border-radius: 10px;
-          `}
-          cssEndingTrack={css`
-            opacity: .6;
+          css={css`
+            ${SliderKnob} {
+              border-radius: 10px;
+            }
+            ${SliderEndingTrack} {
+              opacity: .6;
+            }
           `}
           style={{
             transform: 'translate3d(0, 0, 0) rotateX(0deg) rotateY(-10deg)',

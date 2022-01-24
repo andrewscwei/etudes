@@ -2,10 +2,10 @@ import { align, container, selectors } from 'promptu'
 import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
-import Dial from '../../../lib/Dial'
+import Dial, { DialKnob, DialTrack } from '../../../lib/Dial'
 import RangeSlider from '../../../lib/RangeSlider'
-import Slider from '../../../lib/Slider'
-import StepwiseSlider from '../../../lib/StepwiseSlider'
+import Slider, { SliderEndingTrack, SliderKnob, SliderKnobLabel, SliderStartingTrack } from '../../../lib/Slider'
+import StepwiseSlider, { StepwiseSliderEndingTrack, StepwiseSliderKnob, StepwiseSliderKnobLabel } from '../../../lib/StepwiseSlider'
 
 export default function() {
   const getAngleByPosition = (position: number): number => position * (max - min) + min
@@ -25,12 +25,12 @@ export default function() {
           radius={200}
           css={css`
             ${align.cc}
-          `}
-          cssKnob={css`
-            stroke: #fff;
-          `}
-          cssTrack={css`
-            stroke: #666;
+            ${DialKnob} {
+              stroke: #fff;
+            }
+            ${DialTrack} {
+              stroke: #666;
+            }
           `}
           style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg)' }}
         />
@@ -46,20 +46,20 @@ export default function() {
           trackPadding={10}
           css={css`
             ${align.cc}
-          `}
-          cssKnob={css`
-            ${selectors.hwot} { transform: scale(1.2); }
-          `}
-          cssLabel={css`
-            font-size: 1.8rem;
-            font-weight: 700;
-          `}
-          cssStartingTrack={css`
-            ${selectors.hwot} { transform: scale(1.1); }
-          `}
-          cssEndingTrack={css`
-            background: grey;
-            ${selectors.hwot} { transform: scale(1.1); }
+            ${SliderKnob} {
+              ${selectors.hwot} { transform: scale(1.2); }
+            }
+            ${SliderKnobLabel} {
+              font-size: 1.8rem;
+              font-weight: 700;
+            }
+            ${SliderStartingTrack} {
+              ${selectors.hwot} { transform: scale(1.1); }
+            }
+            ${SliderEndingTrack} {
+              background: grey;
+              ${selectors.hwot} { transform: scale(1.1); }
+            }
           `}
           style={{
             height: `${(index + 1) * 30}px`,
@@ -79,19 +79,17 @@ export default function() {
           trackPadding={10}
           css={css`
             ${align.cc}
-          `}
-          cssKnob={css`
-            ${selectors.hwot} {
-              transform: scale(1.2);
+            ${StepwiseSliderKnob} {
+              ${selectors.hwot} { transform: scale(1.2); }
             }
-          `}
-          cssLabel={css`
-            font-size: 1.8rem;
-            font-weight: 700;
-          `}
-          cssEndingTrack={css`
-            background: grey;
-            ${selectors.hwot} { transform: scale(1.1); }
+            ${StepwiseSliderKnobLabel} {
+              font-size: 1.8rem;
+              font-weight: 700;
+            }
+            ${StepwiseSliderEndingTrack} {
+              background: grey;
+              ${selectors.hwot} { transform: scale(1.1); }
+            }
           `}
           style={{
             transform: 'translate3d(5rem, 0, 0) rotateX(20deg) rotateY(-20deg)',

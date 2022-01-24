@@ -1,34 +1,37 @@
 import classNames from 'classnames'
 import React, { HTMLAttributes, useEffect, useState } from 'react'
-import styled, { CSSProp } from 'styled-components'
+import styled from 'styled-components'
 import Repeat from './Repeat'
 
 export type Props = HTMLAttributes<HTMLButtonElement> & {
+  height?: number
   isActive?: boolean
   isDoubleJointed?: boolean
   isLastBarHalfWidth?: boolean
-  height?: number
   thickness?: number
-  width?: number
   tintColor?: string
   transitionDuration?: number
+  width?: number
   onActivate?: () => void
   onDeactivate?: () => void
-  cssBar?: CSSProp<any>
 }
 
+/**
+ * Three-striped burger button component that transforms into an "X" when selected.
+ *
+ * @exports BurgerButtonBar - Component for each line on the burger button.
+ */
 export default function BurgerButton({
+  height = 20,
   isActive: externalIsActive = false,
   isDoubleJointed = false,
   isLastBarHalfWidth = false,
-  height = 20,
   thickness = 2,
-  width = 20,
   tintColor = '#000',
   transitionDuration = 200,
+  width = 20,
   onActivate,
   onDeactivate,
-  cssBar,
   ...props
 }: Props) {
   const [isActive, setIsActive] = useState(externalIsActive)
@@ -49,7 +52,7 @@ export default function BurgerButton({
   }, [isActive])
 
   return (
-    <StyledRoot width={width} height={height} thickness={thickness} onClick={() => setIsActive(!isActive)} {...props}>
+    <StyledRoot {...props} width={width} height={height} thickness={thickness} onClick={() => setIsActive(!isActive)}>
       <Repeat count={isDoubleJointed ? 2 : 1}>
         <StyledJoint
           className={classNames({ active: isActive, half: isDoubleJointed })}
@@ -59,7 +62,7 @@ export default function BurgerButton({
           width={width}
         >
           <Repeat count={3}>
-            <StyledBar className={classNames({ active: isActive, half: isDoubleJointed })} style={{ height: `${thickness}px` }} css={cssBar}/>
+            <BurgerButtonBar className={classNames({ active: isActive, half: isDoubleJointed })} style={{ height: `${thickness}px` }}/>
           </Repeat>
         </StyledJoint>
       </Repeat>
@@ -67,7 +70,7 @@ export default function BurgerButton({
   )
 }
 
-const StyledBar = styled.span`
+export const BurgerButtonBar = styled.span`
   background: #fff;
   box-sizing: border-box;
   margin: 0;
@@ -77,8 +80,6 @@ const StyledBar = styled.span`
   transition-property: width, height, transform, opacity, background;
   transition-timing-function: ease-out;
   width: 100%;
-
-  ${props => props.css}
 `
 
 const StyledJoint = styled.div<{
@@ -99,21 +100,21 @@ const StyledJoint = styled.div<{
     left: 0;
     top: 0;
 
-    ${StyledBar}:nth-child(1) {
+    ${BurgerButtonBar}:nth-child(1) {
       left: 0;
       top: 0;
       transform-origin: center;
       transform: translate3d(0, 0, 0) rotate(0deg);
     }
 
-    ${StyledBar}:nth-child(2) {
+    ${BurgerButtonBar}:nth-child(2) {
       left: 0;
       top: ${props => props.height*.5 - props.thickness*.5}px;
       transform-origin: center;
       transform: translate3d(0, 0, 0) scale(1);
     }
 
-    ${StyledBar}:nth-child(3) {
+    ${BurgerButtonBar}:nth-child(3) {
       left: 0;
       top: ${props => props.height - props.thickness}px;
       transform-origin: center;
@@ -122,30 +123,30 @@ const StyledJoint = styled.div<{
     }
 
     &.active {
-      ${StyledBar}:nth-child(1) {
+      ${BurgerButtonBar}:nth-child(1) {
         transform: ${props => `translate3d(0, ${props.height*.5 - props.thickness*.5}px, 0) rotate(45deg)`};
       }
 
-      ${StyledBar}:nth-child(2) {
+      ${BurgerButtonBar}:nth-child(2) {
         transform: ${props => 'translate3d(0, 0, 0) scale(0)'};
       }
 
-      ${StyledBar}:nth-child(3) {
+      ${BurgerButtonBar}:nth-child(3) {
         transform: ${props => `translate3d(0, ${props.thickness*.5 - props.height*.5}px, 0) rotate(-45deg)`};
         width: 100%;
       }
     }
 
     &.half {
-      ${StyledBar}:nth-child(1) {
+      ${BurgerButtonBar}:nth-child(1) {
         transform-origin: right center;
       }
 
-      ${StyledBar}:nth-child(2) {
+      ${BurgerButtonBar}:nth-child(2) {
         transform-origin: right center;
       }
 
-      ${StyledBar}:nth-child(3) {
+      ${BurgerButtonBar}:nth-child(3) {
         transform-origin: right center;
         width: 100%;
       }

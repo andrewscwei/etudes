@@ -2,7 +2,7 @@ import $$GithubIcon from '!!raw-loader!../assets/images/github-icon.svg'
 import { align, container, selectors } from 'promptu'
 import React, { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
-import BurgerButton from '../../../lib/BurgerButton'
+import BurgerButton, { BurgerButtonBar } from '../../../lib/BurgerButton'
 import FlatSVG from '../../../lib/FlatSVG'
 import WithTooltip from '../../../lib/WithTooltip'
 import AccordionDemo from './AccordionDemo'
@@ -82,18 +82,10 @@ export default function App() {
           width={36}
           onActivate={() => setIsNavActive(true)}
           onDeactivate={() => setIsNavActive(false)}
-          cssBar={css`
-            background: #fff;
-            &.active { background: #000; }
-          `}
         />
-        <WithTooltip
-          hint='This is wrapped with WithTooltip!'
-          backgroundColor='#fff'
-          textColor='#000'
-        >
+        <WithTooltip hint='This is wrapped with WithTooltip!' backgroundColor='#fff' textColor='#000'>
           <StyledGithubButton href='https://github.com/andrewscwei/etudes'>
-            <FlatSVG markup={$$GithubIcon} cssSVG={css`* { fill: #fff; }`}/>
+            <FlatSVG markup={$$GithubIcon} css={css`svg * { fill: #fff; }`}/>
           </StyledGithubButton>
         </WithTooltip>
       </StyledHUDs>
@@ -202,6 +194,11 @@ const StyledBurgerButton = styled(BurgerButton)`
 
   ${selectors.hwot} {
     transform: translate3d(0, 0, 10rem) rotateX(-5deg) rotateY(-20deg) scale(1.2);
+  }
+
+  ${BurgerButtonBar} {
+    background: #fff;
+    &.active { background: #000; }
   }
 `
 

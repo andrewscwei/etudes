@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import _ from 'lodash'
 import React, { HTMLAttributes, useRef, useState } from 'react'
 import { Size } from 'spase'
-import styled, { CSSProp } from 'styled-components'
+import styled from 'styled-components'
 import useResizeEffect from './hooks/useResizeEffect'
 import Panorama, { Props as PanoramaProps } from './Panorama'
 
@@ -27,36 +27,20 @@ export type Props = HTMLAttributes<HTMLDivElement> & PanoramaProps & {
    * `fov` prop is not specified. If it is, this prop is ignored.
    */
   viewportSize?: Size
-
-  /**
-   * Additional CSS to be provided to the internal panorama component.
-   */
-  cssPanorama?: CSSProp<any>
-
-  /**
-   * Additional CSS to be provided to the reticle.
-   */
-  cssReticle?: CSSProp<any>
-
-  /**
-   * Additional CSS to be provided to the track.
-   */
-  cssTrack?: CSSProp<any>
-
-  /**
-   * Additional CSS to be provided to the indicator.
-   */
-  cssIndicator?: CSSProp<any>
 }
 
+/**
+ * A slider for {@link Panorama} components.
+ *
+ * @exports PanoramaSliderImage
+ * @exports PanoramaSliderIndicator
+ * @exports PanoramaSliderTrack
+ * @exports PanoramaSliderReticle
+ */
 export default function PanoramaSlider({
   fov,
   autoDimension = 'width',
   viewportSize,
-  cssPanorama,
-  cssReticle,
-  cssTrack,
-  cssIndicator,
   angle = 0,
   speed = 1,
   src,
@@ -107,9 +91,8 @@ export default function PanoramaSlider({
         height: `${size.width / aspectRatio}px`,
       },
     }} {...props}>
-      <StyledPanorama
+      <PanoramaSliderImage
         angle={angle}
-        css={cssPanorama}
         onAngleChange={onAngleChange}
         onDragEnd={() => {
           setIsDragging(false)
@@ -131,17 +114,17 @@ export default function PanoramaSlider({
       />
       <StyledTrackContainer>
         <div>
-          <StyledTrack className={classNames({ dragging: isDragging })} css={cssTrack}/>
-          <StyledReticle className={classNames({ dragging: isDragging })} css={cssReticle} style={{ width: `${reticleWidth}px` }}/>
-          <StyledTrack className={classNames({ dragging: isDragging })} css={cssTrack}/>
+          <PanoramaSliderTrack className={classNames({ dragging: isDragging })}/>
+          <PanoramaSliderReticle className={classNames({ dragging: isDragging })} style={{ width: `${reticleWidth}px` }}/>
+          <PanoramaSliderTrack className={classNames({ dragging: isDragging })}/>
         </div>
       </StyledTrackContainer>
-      <StyledIndicator className={classNames({ dragging: isDragging })} style={{ width: `${reticleWidth}px` }} css={cssIndicator}/>
+      <PanoramaSliderIndicator className={classNames({ dragging: isDragging })} style={{ width: `${reticleWidth}px` }}/>
     </StyledRoot>
   )
 }
 
-const StyledReticle = styled.div`
+export const PanoramaSliderReticle = styled.div`
   background: rgba(0, 0, 0, .3);
   flex: 0 0 auto;
   height: 100%;
@@ -152,18 +135,36 @@ const StyledReticle = styled.div`
   &.dragging {
     background: rgba(0, 0, 0, 0);
   }
+`
 
-  ${props => props.css}
-  `
-
-const StyledTrack = styled.div`
+export const PanoramaSliderTrack = styled.div`
   background: rgba(0, 0, 0, .7);
   display: block;
   flex: 1 0 auto;
   height: 100%;
   pointer-events: none;
+`
 
-  ${props => props.css}
+export const PanoramaSliderIndicator = styled.div`
+  background: #fff;
+  border-radius: 2px;
+  bottom: -10px;
+  box-sizing: border-box;
+  display: block;
+  height: 2px;
+  left: 0;
+  margin: 0 auto;
+  opacity: 0;
+  right: 0;
+  transition: opacity .3s ease-out;
+
+  &.dragging {
+    opacity: 1;
+  }
+`
+
+export const PanoramaSliderImage = styled(Panorama)`
+
 `
 
 const StyledTrackContainer = styled.div`
@@ -188,30 +189,6 @@ const StyledTrackContainer = styled.div`
     top: 0;
     width: 100%;
   }
-`
-
-const StyledIndicator = styled.div`
-  background: #fff;
-  border-radius: 2px;
-  bottom: -10px;
-  box-sizing: border-box;
-  display: block;
-  height: 2px;
-  left: 0;
-  margin: 0 auto;
-  opacity: 0;
-  right: 0;
-  transition: opacity .3s ease-out;
-
-  &.dragging {
-    opacity: 1;
-  }
-
-  ${props => props.css}
-`
-
-const StyledPanorama = styled(Panorama)`
-  ${(props: any) => props.css}
 `
 
 const StyledRoot = styled.div`

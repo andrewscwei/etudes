@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import React, { HTMLAttributes, MouseEvent, useEffect, useRef } from 'react'
 import { Rect } from 'spase'
-import styled, { css, CSSProp } from 'styled-components'
+import styled, { css } from 'styled-components'
 import useDragEffect from './hooks/useDragEffect'
 
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:slider') : () => {}
@@ -79,26 +79,6 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
    * Handler invoked when dragging begins.
    */
   onDragStart?: () => void
-
-  /**
-   * Custom CSS provided to the track before the knob.
-   */
-  cssStartingTrack?: CSSProp
-
-  /**
-   * Custom CSS provided to the track after the knob.
-   */
-  cssEndingTrack?: CSSProp
-
-  /**
-   * Custom CSS provided to the knob.
-   */
-  cssKnob?: CSSProp
-
-  /**
-   * Custom CSS provided to the label inside the knob.
-   */
-  cssLabel?: CSSProp
 }
 
 /**
@@ -108,6 +88,11 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
  * a scroll track after the knob. While the width and height of the slider is inferred from its CSS
  * rules, the width and height of the knob are set via props (`knobWidth` and `knobHeight`,
  * respectively). The size of the knob does not impact the size of the slider.
+ *
+ * @exports SliderKnob - The component for the knob.
+ * @exports SliderKnobLabel - The component for the label on the knob.
+ * @exports SliderStartingTrack - The component for the slide track before the knob.
+ * @exports SliderEndingTrack - The component for the slide track after the knob.
  */
 export default function Slider({
   isInverted = false,
@@ -122,13 +107,9 @@ export default function Slider({
   onDragEnd,
   onDragStart,
   onPositionChange,
-  cssStartingTrack,
-  cssEndingTrack,
-  cssKnob,
-  cssLabel,
   ...props
 }: Props) {
-  const mapDragPositionToPosition = (currentPosition: number, dx: number, dy: number): number => {
+  const mapDragPositionToSliderPosition = (currentPosition: number, dx: number, dy: number): number => {
     const rect = Rect.from(rootRef.current) ?? new Rect()
     const naturalPosition = isInverted ? 1 - currentPosition : currentPosition
     const naturalNewPositionX = naturalPosition * rect.width + dx
@@ -164,7 +145,7 @@ export default function Slider({
 
   const { isDragging: [isDragging], value: [position, setPosition] } = useDragEffect(knobRef, {
     initialValue: externalPosition,
-    transform: mapDragPositionToPosition,
+    transform: mapDragPositionToSliderPosition,
     onDragStart,
     onDragEnd,
   })
@@ -193,8 +174,8 @@ export default function Slider({
   }, [isDragging])
 
   return (
-    <StyledRoot ref={rootRef} orientation={orientation} {...props}>
-      <StyledStartingTrack orientation={orientation} isClickable={isTrackInteractive} css={cssStartingTrack} onClick={event => onTrackClick(event)}
+    <StyledRoot {...props} ref={rootRef} orientation={orientation}>
+      <SliderStartingTrack orientation={orientation} isClickable={isTrackInteractive} onClick={event => onTrackClick(event)}
         style={orientation === 'vertical' ? {
           top: 0,
           height: `calc(${naturalPosition*100}% - ${trackPadding <= 0 ? 0 : knobHeight*.5}px - ${trackPadding}px)`,
@@ -215,24 +196,23 @@ export default function Slider({
           transition: isDragging === false ? 'left 100ms ease-out' : 'none',
         }),
       }}>
-        <StyledKnob
+        <SliderKnob
           className={classNames({
             'at-end': isInverted ? (position === 0) : (position === 1),
             'at-start': isInverted ? (position === 1) : (position === 0),
             'dragging': isDragging === true,
           })}
-          css={cssKnob}
           style={{
             height: `${knobHeight}px`,
             width: `${knobWidth}px`,
           }}
         >
           {labelProvider && (
-            <StyledLabel knobHeight={knobHeight} css={cssLabel}>{labelProvider(position)}</StyledLabel>
+            <SliderKnobLabel knobHeight={knobHeight}>{labelProvider(position)}</SliderKnobLabel>
           )}
-        </StyledKnob>
+        </SliderKnob>
       </StyledKnobContainer>
-      <StyledEndingTrack orientation={orientation} isClickable={isTrackInteractive} css={cssEndingTrack} onClick={event => onTrackClick(event)}
+      <SliderEndingTrack orientation={orientation} isClickable={isTrackInteractive} onClick={event => onTrackClick(event)}
         style={orientation === 'vertical' ? {
           bottom: 0,
           height: `calc(${(1 - naturalPosition)*100}% - ${trackPadding <= 0 ? 0 : knobHeight*.5}px - ${trackPadding}px)`,
@@ -245,7 +225,7 @@ export default function Slider({
   )
 }
 
-const StyledStartingTrack = styled.div<{
+export const SliderStartingTrack = styled.div<{
   orientation: NonNullable<Props['orientation']>
   isClickable: boolean
 }>`
@@ -278,11 +258,9 @@ const StyledStartingTrack = styled.div<{
     margin: auto 0;
     top: 0;
   `}
-
-  ${props => props.css}
 `
 
-const StyledEndingTrack = styled.div<{
+export const SliderEndingTrack = styled.div<{
   orientation: NonNullable<Props['orientation']>
   isClickable: boolean
 }>`
@@ -315,25 +293,9 @@ const StyledEndingTrack = styled.div<{
     margin: auto 0;
     top: 0;
   `}
-
-  ${props => props.css}
 `
 
-const StyledLabel = styled.label<{ knobHeight: NonNullable<Props['knobHeight']> }>`
-  color: #000;
-  font-size: ${props => props.knobHeight * .5}px;
-  pointer-events: none;
-  user-select: none;
-
-  ${props => props.css}
-`
-
-const StyledKnobContainer = styled.button`
-  position: absolute;
-  z-index: 1;
-`
-
-const StyledKnob = styled.div`
+export const SliderKnob = styled.div`
   align-items: center;
   background: #fff;
   box-sizing: border-box;
@@ -344,8 +306,18 @@ const StyledKnob = styled.div`
   transition-duration: 100ms;
   transition-property: background, color, opacity, transform;
   transition-timing-function: ease-out;
+`
 
-  ${props => props.css}
+export const SliderKnobLabel = styled.label<{ knobHeight: NonNullable<Props['knobHeight']> }>`
+  color: #000;
+  font-size: ${props => props.knobHeight * .5}px;
+  pointer-events: none;
+  user-select: none;
+`
+
+const StyledKnobContainer = styled.button`
+  position: absolute;
+  z-index: 1;
 `
 
 const StyledRoot = styled.div<{

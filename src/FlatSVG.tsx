@@ -1,5 +1,5 @@
 import React, { forwardRef, HTMLAttributes } from 'react'
-import styled, { CSSProp } from 'styled-components'
+import styled from 'styled-components'
 
 export type Props = HTMLAttributes<HTMLDivElement> & {
   /**
@@ -30,11 +30,6 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
    * node and all of its child nodes.
    */
   stripStyles?: boolean
-
-  /**
-   * Extended CSS to be provided to the SVG root node.
-   */
-  cssSVG?: CSSProp<any>
 
   /**
    * Specifies attribute names to exclude from being stripped if `stripExtraneousAttributes` is
@@ -90,7 +85,6 @@ export default forwardRef<HTMLDivElement, Props>(({
   stripExtraneousAttributes = true,
   stripIds = true,
   stripStyles = true,
-  cssSVG,
   whitelistedAttributes = ['viewBox'],
   ...props
 }, ref) => {
@@ -116,13 +110,12 @@ export default forwardRef<HTMLDivElement, Props>(({
     <StyledRoot
       ref={ref}
       dangerouslySetInnerHTML={{ __html: sanitizedMarkup() }}
-      cssSVG={cssSVG}
       {...props}
     />
   )
 })
 
-const StyledRoot = styled.figure<{ cssSVG: Props['cssSVG'] }>`
+const StyledRoot = styled.figure`
   box-sizing: border-box;
   display: inline-block;
   flex: 0 0 auto;
@@ -130,7 +123,7 @@ const StyledRoot = styled.figure<{ cssSVG: Props['cssSVG'] }>`
   position: relative;
   width: auto;
 
-  > svg {
+  svg {
     height: auto;
     transition-delay: inherit;
     transition-duration: inherit;
@@ -144,7 +137,5 @@ const StyledRoot = styled.figure<{ cssSVG: Props['cssSVG'] }>`
       transition-property: inherit;
       transition-timing-function: inherit;
     }
-
-    ${props => props.cssSVG}
   }
 `

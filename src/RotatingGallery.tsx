@@ -64,6 +64,11 @@ type Props = HTMLAttributes<HTMLDivElement> & {
   onIndexChange?: (index: number) => void
 }
 
+/**
+ * A component displaying rotating images.
+ *
+ * @exports RotatingGalleryImage - Component for each rotating image.
+ */
 export default function RotatingGallery({
   index: externalIndex = 0,
   onIndexChange,
@@ -104,7 +109,7 @@ export default function RotatingGallery({
       {srcs.map((src, idx) => (
         <Transition key={src} in={idx === index} timeout={transitionDuration}>
           {state => (
-            <StyledImage
+            <RotatingGalleryImage
               className={state}
               css={cssDefault}
               cssEntering={cssEntering ?? cssEntered}
@@ -123,7 +128,7 @@ export default function RotatingGallery({
   )
 }
 
-const StyledImage = styled.div<{
+export const RotatingGalleryImage = styled.div<{
   cssEntering: Props['cssEntering']
   cssEntered: Props['cssEntered']
   cssExiting: Props['cssExiting']

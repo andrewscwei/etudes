@@ -1,5 +1,5 @@
 import React, { HTMLAttributes } from 'react'
-import styled, { CSSProp } from 'styled-components'
+import styled from 'styled-components'
 
 export type Props = HTMLAttributes<HTMLDivElement> & {
   /**
@@ -29,20 +29,10 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
   knobThickness?: number
 
   /**
-   * CSS of the knob, which is a `<path>` element.
-   */
-  cssKnob?: CSSProp<any>
-
-  /**
    * The thickness of the circular track, which is equivalent to the `stroke-width` of the
    * `<circle>` element. Note that this overwrites the `stroke-width` set inside `cssTrack`.
    */
   trackThickness?: number
-
-  /**
-   * CSS of the track, which is a `<circle>` element.
-   */
-  cssTrack?: CSSProp<any>
 }
 
 function polarToCartesian(centerX: number, centerY: number, radius: number, angleInDegrees: number) {
@@ -68,15 +58,16 @@ function arcPath(x: number, y: number, radius: number, startAngle: number, endAn
 
 /**
  * A circular dial with a knob and a track.
+ *
+ * @exports DialKnob
+ * @exports DialTrack
  */
 export default function Dial({
   angle = 0,
   radius = 50,
   knobLength = 30,
   knobThickness = 10,
-  cssKnob,
   trackThickness = 2,
-  cssTrack,
   style,
   ...props
 }: Props) {
@@ -85,27 +76,35 @@ export default function Dial({
 
   return (
     <StyledRoot style={{ ...style, width: `${diameter}px`, height: `${diameter}px` }} {...props}>
-      <StyledTrack>
+      <StyledTrackContainer>
         <svg width={diameter} height={diameter} viewBox={`0 0 ${diameter} ${diameter}`}>
-          <StyledTrackCircle
+          <DialTrack
             cx={radius}
             cy={radius}
             r={radius - trackThickness / 2}
-            css={cssTrack}
             strokeWidth={trackThickness}
           />
         </svg>
-      </StyledTrack>
-      <StyledKnob style={{ transform: `rotate(${(angle + 360) % 360}deg)` }}>
+      </StyledTrackContainer>
+      <StyledKnobContainer style={{ transform: `rotate(${(angle + 360) % 360}deg)` }}>
         <svg viewBox={`0 0 ${diameter} ${diameter}`} xmlns='http://www.w3.org/2000/svg'>
-          <StyledKnobPath css={cssKnob} strokeWidth={knobThickness} d={arcPath(radius, radius, radius - knobThickness / 2 - (trackThickness - knobThickness) / 2, -clampedKnobAngle / 2, clampedKnobAngle / 2)}/>
+          <DialKnob strokeWidth={knobThickness} d={arcPath(radius, radius, radius - knobThickness / 2 - (trackThickness - knobThickness) / 2, -clampedKnobAngle / 2, clampedKnobAngle / 2)}/>
         </svg>
-      </StyledKnob>
+      </StyledKnobContainer>
     </StyledRoot>
   )
 }
 
-const StyledTrack = styled.div`
+export const DialTrack = styled.circle`
+  stroke-dasharray: 4;
+  stroke: #fff;
+`
+
+export const DialKnob = styled.path`
+  stroke: #fff;
+`
+
+const StyledTrackContainer = styled.div`
   height: 100%;
   left: 0;
   position: absolute;
@@ -114,13 +113,7 @@ const StyledTrack = styled.div`
   width: 100%;
 `
 
-const StyledTrackCircle = styled.circle`
-  stroke-dasharray: 4;
-  stroke: #fff;
-  ${props => props.css}
-`
-
-const StyledKnob = styled.div`
+const StyledKnobContainer = styled.div`
   background-position: center;
   background-repeat: no-repeat;
   background-size: 100%;
@@ -137,11 +130,6 @@ const StyledKnob = styled.div`
     right: 0;
     top: 0;
   }
-`
-
-const StyledKnobPath = styled.path`
-  stroke: #fff;
-  ${props => props.css}
 `
 
 const StyledRoot = styled.div`
