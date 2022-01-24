@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import _ from 'lodash'
 import React, { Children, cloneElement, forwardRef, HTMLAttributes, isValidElement, PropsWithChildren } from 'react'
 
-type Props = PropsWithChildren<HTMLAttributes<HTMLElement>>
+export type Props = PropsWithChildren<HTMLAttributes<HTMLElement>>
 
 /**
  * Extracts a single child of a parent component into its own component. If the parent component has

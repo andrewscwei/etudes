@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 
-type Props<T> = {
+export type Props<T> = {
   children: JSX.Element | ((value: T, index: number) => JSX.Element)
   array?: T[]
 }

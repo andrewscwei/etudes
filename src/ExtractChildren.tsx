@@ -1,10 +1,16 @@
 import classNames from 'classnames'
 import React, { Children, cloneElement, HTMLAttributes, isValidElement, PropsWithChildren } from 'react'
 
+export type Props = PropsWithChildren<HTMLAttributes<HTMLElement>>
+
 /**
  * Extracts all children of a parent component into its own component.
  */
-export default function ExtractChildren({ children, className, ...props }: PropsWithChildren<HTMLAttributes<HTMLElement>>) {
+export default function ExtractChildren({
+  children,
+  className,
+  ...props
+}: Props) {
   return (
     <>
       {Children.map(children, (child, idx) => {

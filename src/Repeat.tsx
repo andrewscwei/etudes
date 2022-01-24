@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 
-type Props = {
+export type Props = {
   children: JSX.Element | ((index: number) => JSX.Element)
   count?: number
 }

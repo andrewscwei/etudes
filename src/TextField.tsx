@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FocusEvent, forwardRef, HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-type Props = HTMLAttributes<HTMLInputElement> & {
+export type Props = HTMLAttributes<HTMLInputElement> & {
   value?: string
   onFocus?: (value: string) => void
   onUnfocus?: (value: string) => void

@@ -3,7 +3,7 @@ import { Transition } from 'react-transition-group'
 import styled, { css, CSSProp } from 'styled-components'
 import useInterval from './hooks/useInterval'
 
-type Props = HTMLAttributes<HTMLDivElement> & {
+export type Props = HTMLAttributes<HTMLDivElement> & {
   /**
    * Current image index. An error is thrown if the index is invalid (must be between 0 and length
    * of `srcs` - 1, inclusive). This prop supports two-way binding.
