@@ -93,7 +93,7 @@ export default function RotatingGallery({
 
   useInterval(() => {
     setIndex((index + 1) % srcs.length)
-  }, rotationDuration)
+  }, rotationDuration, undefined, [index])
 
   useEffect(() => {
     if (externalIndex === index) return
