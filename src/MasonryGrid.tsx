@@ -1,23 +1,135 @@
-import { DirtyInfo, DirtyType, EventType, UpdateDelegate } from 'dirty-dom'
-import React, { createRef, CSSProperties, PureComponent, ReactNode } from 'react'
+import React, { HTMLAttributes, PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { Rect } from 'spase'
 import styled from 'styled-components'
+import useResizeEffect from './hooks/useResizeEffect'
 import { Orientation } from './types'
 
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:masonry-grid') : () => {}
 
-export interface Props {
-  className?: string
-  style: CSSProperties
-  children?: ReactNode | ReactNode[]
-  areSectionsAligned: boolean
-  isReversed: boolean
-  horizontalSpacing: number
-  orientation: Orientation
-  sections: number
-  verticalSpacing: number
-  height?: string
-  width?: string
+export type Props = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
+  areSectionsAligned?: boolean
+  horizontalSpacing?: number
+  isReversed?: boolean
+  orientation?: Orientation
+  sections?: number
+  verticalSpacing?: number
+}>
+
+const BASE_MODIFIER_CLASS_PREFIX = 'base-'
+
+/**
+ * Computes the index and current length of the next available section for a specific base value,
+ * based on a provided array of existing section lengths.
+ *
+ * @param currentSectionLengths - An array of the current section lengths.
+ * @param base - The base value of the item to be inserted into the grid, and to be used to evaluate
+ *               the next available section.
+ *
+ * @returns An array consiting of the computed section index and its to-be length if a new item were
+ *          to be placed in it.
+ */
+function computeNextAvailableSectionAndLengthByBase(currentSectionLengths: number[], base: number): [number, number] {
+  const numSections = currentSectionLengths.length
+
+  let sectionIdx = NaN
+  let minLength = Infinity
+
+  for (let i = 0; i < numSections; i++) {
+    const length = currentSectionLengths[i]
+    const isShorter = length < minLength
+    const isEligibleSection = (i + base) <= numSections
+    let hasRoomInSubsequentSections = true
+
+    for (let j = 1; j < base; j++) {
+      if (currentSectionLengths[i + j] > length) {
+        hasRoomInSubsequentSections = false
+      }
+    }
+
+    if (isShorter && isEligibleSection && hasRoomInSubsequentSections) {
+      sectionIdx = i
+      minLength = length
+    }
+  }
+
+  if (isNaN(sectionIdx)) {
+    return [0, computeMaxLength(currentSectionLengths, base)]
+  }
+  else {
+    return [sectionIdx, minLength]
+  }
+}
+
+/**
+ * A helper function that computes the max section length of an array of section lengths. Only the
+ * first n = `base` sections are inspected.
+ *
+ * @param currentSectionLengths - An array of section lengths.
+ * @param base - The number representing the first n sections to inspect. Any non-numerical values
+ *               will be ignored and return value will be based on all sections. A `base` value will
+ *               be clamped between 1 and the maximum length of the array of section lengths.
+ *
+ * @returns The max section length.
+ */
+function computeMaxLength(currentSectionLengths: number[], base?: number): number {
+  let arr = currentSectionLengths
+
+  if (base !== undefined && base !== null && !isNaN(base)) {
+    arr = arr.slice(0, Math.max(1, Math.min(base, currentSectionLengths.length)))
+  }
+
+  return arr.reduce((out, curr, i) => (curr > out) ? curr : out, 0)
+}
+
+/**
+ * Computes the base value of an element from its classes.
+ *
+ * @param element - The HTML element.
+ * @param numSections - Total number of sections.
+ *
+ * @returns The computed base value that is clamped between 1 and max number of sections.
+ */
+function computeBaseFromElement(element: HTMLElement, numSections: number): number {
+  const classList = element.classList
+
+  for (let i = 0; i < classList.length; i++) {
+    const c = classList[i]
+
+    if (c.startsWith(BASE_MODIFIER_CLASS_PREFIX)) {
+      const base = parseFloat(c.replace(BASE_MODIFIER_CLASS_PREFIX, ''))
+      if (!isNaN(base)) return Math.min(Math.max(base, 1), numSections)
+    }
+  }
+
+  return 1
+}
+
+/**
+ * Scans an HTML string and returns all the image sources.
+ *
+ * @param htmlString The HTML string.
+ *
+ * @returns The image sources.
+ */
+function getAllImageSources(htmlString?: string): string[] {
+  if (!htmlString) return []
+
+  const regexImg = /<img.*?src=("|')(.*?)("|')/g
+  const regexSrc = /<img.*?src=("|')(.*?)("|')/
+  const imageTags = htmlString.match(regexImg) ?? []
+
+  const out: string[] = []
+
+  for (let i = 0; i < imageTags.length; i++) {
+    const tag = imageTags[i]
+    const src = tag.match(regexSrc)?.[2]
+
+    if (!src) continue
+
+    out.push(src)
+  }
+
+  return out
 }
 
 /**
@@ -33,97 +145,41 @@ export interface Props {
  * Hence, in a vertically oriented grid, *number of secitons* refers to the *number of rows*,
  * whereas in a horizontally oriented grid, *number of sections* refers to the *number of columns*.
  */
-class MasonryGrid extends PureComponent<Props> {
-  static defaultProps: Props = {
-    areSectionsAligned: false,
-    horizontalSpacing: 0,
-    isReversed: false,
-    orientation: 'vertical',
-    sections: 3,
-    style: {},
-    verticalSpacing: 0,
-  }
+export default function MasonryGrid({
+  areSectionsAligned = false,
+  children,
+  horizontalSpacing= 0,
+  isReversed = false,
+  orientation = 'vertical',
+  sections = 3,
+  style = {},
+  verticalSpacing = 0,
+  ...props
+}: Props) {
+  const rootRef = useRef<HTMLDivElement>(null)
 
-  static BASE_MODIFIER_CLASS_PREFIX = 'base-'
+  const [minWidth, setMinWidth] = useState(NaN)
+  const [minHeight, setMinHeight] = useState(NaN)
+  const [maxWidth, setMaxWidth] = useState(NaN)
+  const [maxHeight, setMaxHeight] = useState(NaN)
 
-  private nodeRefs = {
-    root: createRef<HTMLDivElement>(),
-  }
+  const getCurrentWidth = () => Rect.from(rootRef.current)?.width ?? 0
 
-  private minWidth = NaN
-  private maxWidth = NaN
-  private minHeight = NaN
-  private maxHeight = NaN
+  const getCurrentHeight = () => Rect.from(rootRef.current)?.height ?? 0
 
-  private updateDelegate?: UpdateDelegate = undefined
-
-  get width(): number {
-    return Rect.from(this.nodeRefs.root.current)?.width ?? 0
-  }
-
-  get height(): number {
-    return Rect.from(this.nodeRefs.root.current)?.height ?? 0
-  }
-
-  componentDidMount() {
-    this.reconfigureUpdateDelegate()
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    this.reconfigureUpdateDelegate()
-  }
-
-  componentWillUnmount() {
-    this.updateDelegate?.deinit()
-  }
-
-  render() {
-    return (
-      <StyledRoot
-        ref={this.nodeRefs.root}
-        className={this.props.className}
-        orientation={this.props.orientation}
-        style={{
-          ...this.props.style,
-          height: this.props.height ?? ((this.props.orientation === 'vertical' && !isNaN(this.minHeight)) ? `${this.minHeight}px` : ''),
-          width: this.props.width ?? ((this.props.orientation === 'horizontal' && !isNaN(this.minWidth)) ? `${this.minWidth}px` : ''),
-          flex: '0 0 auto',
-          padding: '0',
-        }}
-      >
-        {this.props.children}
-      </StyledRoot>
-    )
-  }
-
-  update(info: DirtyInfo) {
-    const { [DirtyType.SIZE]: dirtySize } = info
-
-    if (dirtySize) {
-      if ((this.minWidth !== this.width) || (this.minHeight !== this.height) || (dirtySize.maxSize.width !== this.maxWidth) || dirtySize.maxSize.height !== this.maxHeight) {
-        this.repositionChildren()
-        this.maxWidth = dirtySize.maxSize.width
-        this.maxHeight = dirtySize.maxSize.height
-      }
-    }
-  }
-
-  /**
-   * Repositions all the child elements of the grid.
-   */
-  private repositionChildren() {
-    const rootNode = this.nodeRefs.root.current
+  const repositionChildren = () => {
+    const rootNode = rootRef.current
 
     if (!rootNode) return
 
     debug('Repositioning children... OK')
 
     const children = rootNode.children
-    const numSections = this.props.sections
+    const numSections = sections
 
     if (numSections <= 0) throw new Error('You must specifiy a minimum of 1 section(s) (a.k.a. row(s) for horizontal orientation, column(s) for vertical orientation) for a MasonryGrid instance')
 
-    if (this.props.orientation === 'vertical') {
+    if (orientation === 'vertical') {
       const sectionHeights: number[] = [...new Array(numSections)].map(() => 0)
 
       for (let i = 0; i < children.length; i++) {
@@ -131,21 +187,21 @@ class MasonryGrid extends PureComponent<Props> {
 
         if (!(child instanceof HTMLElement)) continue
 
-        const base = this.computeBaseFromElement(child)
-        const [colIdx, y] = this.computeNextAvailableSectionAndLengthByBase(sectionHeights, base)
+        const base = computeBaseFromElement(child, sections)
+        const [colIdx, y] = computeNextAvailableSectionAndLengthByBase(sectionHeights, base)
 
         child.style.position = 'absolute'
-        child.style.width = `calc(${100 / numSections * base}% - ${(this.props.horizontalSpacing * (numSections - 1) / numSections) * base}px + ${this.props.horizontalSpacing * (base - 1)}px)`
+        child.style.width = `calc(${100 / numSections * base}% - ${(horizontalSpacing * (numSections - 1) / numSections) * base}px + ${horizontalSpacing * (base - 1)}px)`
         child.style.height = ''
-        child.style.left = `calc(${100 / numSections * colIdx}% - ${(this.props.horizontalSpacing * (numSections - 1) / numSections) * colIdx}px + ${this.props.horizontalSpacing * colIdx}px)`
-        child.style.top = `${y + (y === 0 ? 0 : this.props.verticalSpacing)}px`
+        child.style.left = `calc(${100 / numSections * colIdx}% - ${(horizontalSpacing * (numSections - 1) / numSections) * colIdx}px + ${horizontalSpacing * colIdx}px)`
+        child.style.top = `${y + (y === 0 ? 0 : verticalSpacing)}px`
 
         for (let j = 0; j < base; j++) {
-          sectionHeights[colIdx + j] = y + (y === 0 ? 0 : this.props.verticalSpacing) + (Rect.from(child)?.height ?? 0)
+          sectionHeights[colIdx + j] = y + (y === 0 ? 0 : verticalSpacing) + (Rect.from(child)?.height ?? 0)
         }
 
-        if (this.props.areSectionsAligned && ((colIdx + base) === numSections)) {
-          const m = this.computeMaxLength(sectionHeights)
+        if (areSectionsAligned && ((colIdx + base) === numSections)) {
+          const m = computeMaxLength(sectionHeights)
 
           for (let j = 0; j < numSections; j++) {
             sectionHeights[j] = m
@@ -153,11 +209,13 @@ class MasonryGrid extends PureComponent<Props> {
         }
       }
 
-      this.minWidth = this.width
-      this.minHeight = this.computeMaxLength(sectionHeights, numSections)
-      rootNode.style.height = `${this.minHeight}px`
+      const currWidth = getCurrentWidth()
 
-      if (this.props.isReversed) {
+      setMinWidth(currWidth)
+      setMinHeight(computeMaxLength(sectionHeights, numSections))
+      rootNode.style.height = `${minHeight}px`
+
+      if (isReversed) {
         for (let i = 0; i < children.length; i++) {
           const child = children[i]
 
@@ -165,7 +223,7 @@ class MasonryGrid extends PureComponent<Props> {
 
           const x = parseFloat(child.style.left)
 
-          child.style.left = `${this.width - x - parseFloat(child.style.width)}px`
+          child.style.left = `${currWidth - x - parseFloat(child.style.width)}px`
         }
       }
     }
@@ -177,21 +235,21 @@ class MasonryGrid extends PureComponent<Props> {
 
         if (!(child instanceof HTMLElement)) continue
 
-        const base = this.computeBaseFromElement(child)
-        const [rowIdx, x] = this.computeNextAvailableSectionAndLengthByBase(sectionWidths, base)
+        const base = computeBaseFromElement(child, sections)
+        const [rowIdx, x] = computeNextAvailableSectionAndLengthByBase(sectionWidths, base)
 
         child.style.position = 'absolute'
         child.style.width = ''
-        child.style.height = `calc(${100 / numSections * base}% - ${(this.props.verticalSpacing * (numSections - 1) / numSections) * base}px + ${this.props.verticalSpacing * (base - 1)}px)`
-        child.style.top = `calc(${100 / numSections * rowIdx}% - ${(this.props.verticalSpacing * (numSections - 1) / numSections) * rowIdx}px + ${this.props.verticalSpacing * rowIdx}px)`
-        child.style.left = `${x + (x === 0 ? 0 : this.props.horizontalSpacing)}px`
+        child.style.height = `calc(${100 / numSections * base}% - ${(verticalSpacing * (numSections - 1) / numSections) * base}px + ${verticalSpacing * (base - 1)}px)`
+        child.style.top = `calc(${100 / numSections * rowIdx}% - ${(verticalSpacing * (numSections - 1) / numSections) * rowIdx}px + ${verticalSpacing * rowIdx}px)`
+        child.style.left = `${x + (x === 0 ? 0 : horizontalSpacing)}px`
 
         for (let j = 0; j < base; j++) {
-          sectionWidths[rowIdx + j] = x + (x === 0 ? 0 : this.props.horizontalSpacing) + (Rect.from(child)?.width ?? 0)
+          sectionWidths[rowIdx + j] = x + (x === 0 ? 0 : horizontalSpacing) + (Rect.from(child)?.width ?? 0)
         }
 
-        if (this.props.areSectionsAligned && ((rowIdx + base) === numSections)) {
-          const m = this.computeMaxLength(sectionWidths)
+        if (areSectionsAligned && ((rowIdx + base) === numSections)) {
+          const m = computeMaxLength(sectionWidths)
 
           for (let j = 0; j < numSections; j++) {
             sectionWidths[j] = m
@@ -199,11 +257,13 @@ class MasonryGrid extends PureComponent<Props> {
         }
       }
 
-      this.minHeight = this.height
-      this.minWidth = this.computeMaxLength(sectionWidths, numSections)
-      if (!isNaN(this.minWidth)) rootNode.style.width = `${this.minWidth}px`
+      const currHeight = getCurrentHeight()
+      setMinHeight(currHeight)
+      setMinWidth(computeMaxLength(sectionWidths, numSections))
 
-      if (this.props.isReversed) {
+      if (!isNaN(minWidth)) rootNode.style.width = `${minWidth}px`
+
+      if (isReversed) {
         for (let i = 0; i < children.length; i++) {
           const child = children[i]
 
@@ -211,161 +271,57 @@ class MasonryGrid extends PureComponent<Props> {
 
           const y = parseFloat(child.style.top)
 
-          child.style.top = `${this.height - y - parseFloat(child.style.height)}px`
+          child.style.top = `${currHeight - y - parseFloat(child.style.height)}px`
         }
       }
     }
   }
 
-  /**
-   * Computes the index and current length of the next available section for a specific base value,
-   * based on a provided array of existing section lengths.
-   *
-   * @param currentSectionLengths - An array of the current section lengths.
-   * @param base - The base value of the item to be inserted into the grid, and to be used to
-   *               evaluate the next available section.
-   *
-   * @returns An array consiting of the computed section index and its to-be length if a new item
-   *          were to be placed in it.
-   */
-  private computeNextAvailableSectionAndLengthByBase(currentSectionLengths: number[], base: number): [number, number] {
-    if (currentSectionLengths.length !== this.props.sections) throw new Error('Unmatched number of provided section lengths')
+  useResizeEffect(rootRef, {
+    onResize: maxSize => {
+      const currWidth = getCurrentWidth()
+      const currHeight = getCurrentHeight()
 
-    const numSections = currentSectionLengths.length
-
-    let sectionIdx = NaN
-    let minLength = Infinity
-
-    for (let i = 0; i < numSections; i++) {
-      const length = currentSectionLengths[i]
-      const isShorter = length < minLength
-      const isEligibleSection = (i + base) <= numSections
-      let hasRoomInSubsequentSections = true
-
-      for (let j = 1; j < base; j++) {
-        if (currentSectionLengths[i + j] > length) {
-          hasRoomInSubsequentSections = false
-        }
+      if ((minWidth !== currWidth) || (minHeight !== currHeight) || (maxSize.width !== maxWidth) || maxSize.height !== maxHeight) {
+        repositionChildren()
+        setMaxWidth(maxSize.width)
+        setMaxHeight(maxSize.height)
       }
+    },
+  })
 
-      if (isShorter && isEligibleSection && hasRoomInSubsequentSections) {
-        sectionIdx = i
-        minLength = length
-      }
+  useEffect(() => {
+    const imageSources = getAllImageSources(rootRef.current?.innerHTML)
+
+    if (imageSources.length === 0) return
+
+    const numImages = imageSources.length
+
+    for (let i = 0; i < numImages; i++) {
+      const src = imageSources[i]
+      const image = new Image()
+      image.src = src
+      image.onload = () => repositionChildren()
     }
+  }, [])
 
-    if (isNaN(sectionIdx)) {
-      return [0, this.computeMaxLength(currentSectionLengths, base)]
-    }
-    else {
-      return [sectionIdx, minLength]
-    }
-  }
-
-  /**
-   * A helper function that computes the max section length of an array of section lengths. Only the
-   * first n = `base` sections are inspected.
-   *
-   * @param currentSectionLengths - An array of section lengths.
-   * @param base - The number representing the first n sections to inspect. Any non-numerical values
-   *               will be ignored and return value will be based on all sections. A `base` value
-   *               will be clamped between 1 and the maximum length of the array of section lengths.
-   *
-   * @returns The max section length.
-   */
-  private computeMaxLength(currentSectionLengths: number[], base?: number): number {
-    let arr = currentSectionLengths
-
-    if (base !== undefined && base !== null && !isNaN(base)) {
-      arr = arr.slice(0, Math.max(1, Math.min(base, currentSectionLengths.length)))
-    }
-
-    return arr.reduce((out, curr, i) => (curr > out) ? curr : out, 0)
-  }
-
-  /**
-   * Computes the base value of an element from its classes.
-   *
-   * @param element - The HTML element.
-   *
-   * @returns The computed base value that is clamped between 1 and max number of sections.
-   */
-  private computeBaseFromElement(element: HTMLElement): number {
-    const classList = element.classList
-
-    for (let i = 0; i < classList.length; i++) {
-      const c = classList[i]
-
-      if (c.startsWith(MasonryGrid.BASE_MODIFIER_CLASS_PREFIX)) {
-        const base = parseFloat(c.replace(MasonryGrid.BASE_MODIFIER_CLASS_PREFIX, ''))
-        if (!isNaN(base)) return Math.min(Math.max(base, 1), this.props.sections)
-      }
-    }
-
-    return 1
-  }
-
-  /**
-   * Reinitializes the update delegate. If there are images within the body of the masonry grid, the
-   * initialization will be deferred until all images are loaded.
-   */
-  private reconfigureUpdateDelegate() {
-    this.updateDelegate?.deinit()
-
-    this.updateDelegate = new UpdateDelegate(info => this.update(info), {
-      [EventType.RESIZE]: true,
-    })
-
-    const imageSources = this.getAllImageSources(this.nodeRefs.root.current?.innerHTML)
-
-    if (imageSources.length > 0) {
-      let loaded = 0
-      const numImages = imageSources.length
-
-      for (let i = 0; i < numImages; i++) {
-        const src = imageSources[i]
-        const image = new Image()
-        image.src = src
-        image.onload = () => {
-          if (++loaded === numImages) this.updateDelegate?.init()
-        }
-      }
-    }
-    else {
-      this.updateDelegate?.init()
-    }
-  }
-
-  /**
-   * Scans an HTML string and returns all the image sources.
-   *
-   * @param htmlString The HTML string.
-   *
-   * @returns The image sources.
-   */
-  private getAllImageSources(htmlString?: string): string[] {
-    if (!htmlString) return []
-
-    const regexImg = /<img.*?src=("|')(.*?)("|')/g
-    const regexSrc = /<img.*?src=("|')(.*?)("|')/
-    const imageTags = htmlString.match(regexImg) ?? []
-
-    const out: string[] = []
-
-    for (let i = 0; i < imageTags.length; i++) {
-      const tag = imageTags[i]
-      const src = tag.match(regexSrc)?.[2]
-
-      if (!src) continue
-
-      out.push(src)
-    }
-
-    return out
-  }
+  return (
+    <StyledRoot
+      {...props}
+      ref={rootRef}
+      orientation={orientation}
+      style={{
+        ...style,
+        flex: '0 0 auto',
+        minHeight: ((orientation === 'vertical' && !isNaN(minHeight)) ? `${minHeight}px` : ''),
+        minWidth: ((orientation === 'horizontal' && !isNaN(minWidth)) ? `${minWidth}px` : ''),
+        padding: '0',
+      }}
+    >
+      {children}
+    </StyledRoot>
+  )
 }
-
-export default MasonryGrid
 
 const StyledRoot = styled.div<{
   orientation: Props['orientation']
