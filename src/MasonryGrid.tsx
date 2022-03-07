@@ -21,21 +21,17 @@ export interface Props {
 }
 
 /**
- * This is a React component that aligns all of its immediate children in a
- * masonry grid. Refrain from assigning CSS styles to it via `className` or
- * `style` property, although they are handled if absolutely necessary.
- * Customize the grid via its supported properties. The grid can be in either
- * vertical or horizontal orientation. The length of every child element
- * *parallel to the direction of the orientation* is automatically set according
- * to the number of sections specified for the grid. This means that in an
- * horizontally oriented grid, the *width* of each child element is
- * automatically set, whereas in a vertically oriented grid the *height* of each
- * child element is automatically set. Additionally, the *number of sections*
- * means maximum the number of child elements present in the direction that is
- * parallel to the orientation of the grid. This means that in a vertically
- * oriented grid, *number of secitons* refers to the *number of rows*, whereas
- * in a horizontally oriented grid, *number of sections* refers to the *number
- * of columns*.
+ * This is a React component that arranges all of its immediate children in a masonry grid. Refrain
+ * from assigning CSS styles to it via `className` or `style` property, though they are still
+ * handled if absolutely necessary. Customize the grid via its supported properties. The grid can be
+ * in either vertical or horizontal orientation. The length of every child element *parallel to the
+ * direction of the orientation* is automatically set according to the number of sections specified
+ * for the grid. This means that in an horizontally oriented grid, the *width* of each child element
+ * is automatically set, whereas in a vertically oriented grid the *height* of each child element is
+ * automatically set. Additionally, the *number of sections* corresponds to the maximum the number
+ * of child elements present in the direction that is parallel to the orientation of the grid.
+ * Hence, in a vertically oriented grid, *number of secitons* refers to the *number of rows*,
+ * whereas in a horizontally oriented grid, *number of sections* refers to the *number of columns*.
  */
 class MasonryGrid extends PureComponent<Props> {
   static defaultProps: Props = {
@@ -222,15 +218,15 @@ class MasonryGrid extends PureComponent<Props> {
   }
 
   /**
-   * Computes the index and current length of the next available section for a
-   * specific base value, based on a provided array of existing section lengths.
+   * Computes the index and current length of the next available section for a specific base value,
+   * based on a provided array of existing section lengths.
    *
    * @param currentSectionLengths - An array of the current section lengths.
-   * @param base - The base value of the item to be inserted into the grid, and
-   *               to be used to evaluate the next available section.
+   * @param base - The base value of the item to be inserted into the grid, and to be used to
+   *               evaluate the next available section.
    *
-   * @returns An array consiting of the computed section index and its to-be
-   *          length if a new item were to be placed in it.
+   * @returns An array consiting of the computed section index and its to-be length if a new item
+   *          were to be placed in it.
    */
   private computeNextAvailableSectionAndLengthByBase(currentSectionLengths: number[], base: number): [number, number] {
     if (currentSectionLengths.length !== this.props.sections) throw new Error('Unmatched number of provided section lengths')
@@ -267,15 +263,13 @@ class MasonryGrid extends PureComponent<Props> {
   }
 
   /**
-   * A helper function that computes the max section length of an array of
-   * section lengths. Only the first n = `base` sections are inspected.
+   * A helper function that computes the max section length of an array of section lengths. Only the
+   * first n = `base` sections are inspected.
    *
    * @param currentSectionLengths - An array of section lengths.
-   * @param base - The number representing the first n sections to inspect.
-   *               Any non-numerical values will be ignored and return value
-   *               will be based on all sections. A `base` value will be clamped
-   *               between 1 and the maximum length of the array of section
-   *               lengths.
+   * @param base - The number representing the first n sections to inspect. Any non-numerical values
+   *               will be ignored and return value will be based on all sections. A `base` value
+   *               will be clamped between 1 and the maximum length of the array of section lengths.
    *
    * @returns The max section length.
    */
@@ -294,8 +288,7 @@ class MasonryGrid extends PureComponent<Props> {
    *
    * @param element - The HTML element.
    *
-   * @returns The computed base value that is clamped between 1 and max number
-   *          of sections.
+   * @returns The computed base value that is clamped between 1 and max number of sections.
    */
   private computeBaseFromElement(element: HTMLElement): number {
     const classList = element.classList
@@ -313,9 +306,8 @@ class MasonryGrid extends PureComponent<Props> {
   }
 
   /**
-   * Reinitializes the update delegate. If there are images within the body
-   * of the masonry grid, the initialization will be deferred until all images
-   * are loaded.
+   * Reinitializes the update delegate. If there are images within the body of the masonry grid, the
+   * initialization will be deferred until all images are loaded.
    */
   private reconfigureUpdateDelegate() {
     this.updateDelegate?.deinit()
