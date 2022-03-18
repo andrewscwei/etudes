@@ -6,13 +6,21 @@ const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:
 export type Options<T> = {
   /**
    * Function for transforming the search param value to the value of the mapped state.
+   *
+   * @param value - The search param value. `undefined` means the value is unavailable.
+   *
+   * @returns The equivalent state value.
    */
-  mapSearchParamToState?: (value: string | null) => NonNullable<T> | null
+  mapSearchParamToState?: (value?: string) => T
 
   /**
    * Function for transforming the value of the mapped state to the search param value.
+   *
+   * @param state - The state value.
+   *
+   * @returns The equivalent search param value.
    */
-  mapStateToSearchParam?: (state: T | null) => string | null
+  mapStateToSearchParam?: (state: T) => string | undefined
 }
 
 /**
@@ -20,31 +28,31 @@ export type Options<T> = {
  * changes, the mapped state will change as well, and vice versa.
  *
  * @param param - The search param key.
- * @param initialState - The initial value of the state.
+ * @param defaultValue - The default value of the state.
  * @param options - See {@link Options}.
  *
  * @returns A tuple consisting of a stateful value representing the current value of the mapped
  *          state and a function that updates it.
  */
-export default function useSearchParamState<T>(param: string, initialState?: T | null, { mapSearchParamToState, mapStateToSearchParam }: Options<T> = {}): [NonNullable<T> | null, Dispatch<SetStateAction<NonNullable<T> | null>>] {
-  const _mapSearchParamToState = (value: string | null, initialState?: T | null): NonNullable<T> | null => {
+export default function useSearchParamState<T>(param: string, defaultValue: T, { mapSearchParamToState, mapStateToSearchParam }: Options<T> = {}): [T, Dispatch<SetStateAction<T>>] {
+  const _mapSearchParamToState = (value: string | undefined, defaultValue: T): T => {
     if (mapSearchParamToState) {
       return mapSearchParamToState(value)
     }
-    else if (value === null) {
-      return initialState ?? null
+    else if (!value) {
+      return defaultValue
     }
     else {
       return value as unknown as NonNullable<T>
     }
   }
 
-  const _mapStateToSearchParam = (state: T | null): string | null => {
+  const _mapStateToSearchParam = (state: T): string | undefined => {
     if (mapStateToSearchParam) {
       return mapStateToSearchParam(state)
     }
-    else if (state === null) {
-      return null
+    else if (state === defaultValue) {
+      return undefined
     }
     else {
       return `${state}`
@@ -52,10 +60,10 @@ export default function useSearchParamState<T>(param: string, initialState?: T |
   }
 
   const [searchParams, setSearchParams] = useSearchParams()
-  const currentState = _mapSearchParamToState(searchParams.get(param), initialState)
+  const currentState = _mapSearchParamToState(searchParams.get(param) ?? undefined, defaultValue)
   const [state, setState] = useState(currentState)
 
-  debug('Using search param state...', 'OK', `param=${param}, initialState=${currentState}`)
+  debug('Using search param state...', 'OK', `param=${param}, defaultValue=${currentState}`)
 
   useEffect(() => {
     const value = searchParams.get(param)
@@ -63,7 +71,7 @@ export default function useSearchParamState<T>(param: string, initialState?: T |
 
     if (newValue === value) return
 
-    if (newValue === null) {
+    if (!newValue) {
       searchParams.delete(param)
     }
     else {

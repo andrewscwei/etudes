@@ -288,7 +288,7 @@ export default function MasonryGrid({
         setMaxHeight(maxSize.height)
       }
     },
-  })
+  }, [areSectionsAligned, horizontalSpacing, isReversed, sections, verticalSpacing])
 
   useEffect(() => {
     const imageSources = getAllImageSources(rootRef.current?.innerHTML)
