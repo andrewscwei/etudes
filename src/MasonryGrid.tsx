@@ -209,11 +209,13 @@ export default function MasonryGrid({
         }
       }
 
-      const currWidth = getCurrentWidth()
+      const w = getCurrentWidth()
+      const h = computeMaxLength(sectionHeights, numSections)
 
-      setMinWidth(currWidth)
-      setMinHeight(computeMaxLength(sectionHeights, numSections))
-      rootNode.style.height = `${minHeight}px`
+      setMinWidth(w)
+      setMinHeight(h)
+
+      if (!isNaN(h)) rootNode.style.height = `${h}px`
 
       if (isReversed) {
         for (let i = 0; i < children.length; i++) {
@@ -223,7 +225,7 @@ export default function MasonryGrid({
 
           const x = parseFloat(child.style.left)
 
-          child.style.left = `${currWidth - x - parseFloat(child.style.width)}px`
+          child.style.left = `${w - x - parseFloat(child.style.width)}px`
         }
       }
     }
@@ -257,11 +259,13 @@ export default function MasonryGrid({
         }
       }
 
-      const currHeight = getCurrentHeight()
-      setMinHeight(currHeight)
-      setMinWidth(computeMaxLength(sectionWidths, numSections))
+      const h = getCurrentHeight()
+      const w = computeMaxLength(sectionWidths, numSections)
 
-      if (!isNaN(minWidth)) rootNode.style.width = `${minWidth}px`
+      setMinHeight(h)
+      setMinWidth(w)
+
+      if (!isNaN(w)) rootNode.style.width = `${w}px`
 
       if (isReversed) {
         for (let i = 0; i < children.length; i++) {
@@ -271,7 +275,7 @@ export default function MasonryGrid({
 
           const y = parseFloat(child.style.top)
 
-          child.style.top = `${currHeight - y - parseFloat(child.style.height)}px`
+          child.style.top = `${h - y - parseFloat(child.style.height)}px`
         }
       }
     }
