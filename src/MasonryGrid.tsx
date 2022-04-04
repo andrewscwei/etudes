@@ -297,7 +297,7 @@ export default function MasonryGrid({
   useEffect(() => {
     const imageSources = getAllImageSources(rootRef.current?.innerHTML)
 
-    if (imageSources.length === 0) return
+    if (imageSources.length === 0) return repositionChildren()
 
     const numImages = imageSources.length
 
@@ -307,7 +307,7 @@ export default function MasonryGrid({
       image.src = src
       image.onload = () => repositionChildren()
     }
-  }, [])
+  }, [children])
 
   return (
     <StyledRoot
