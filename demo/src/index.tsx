@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === 'development') {
 
 const container = document.getElementById('app')
 
-if (container){
+if (container) {
   const root = createRoot(container)
   root.render(<App/>)
 }
