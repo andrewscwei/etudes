@@ -1,7 +1,7 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, ReactNode } from 'react'
 
 export type Props = {
-  children: JSX.Element | ((index: number) => JSX.Element)
+  children: ReactNode | ((index: number) => ReactNode)
   count?: number
 }
 

@@ -1,4 +1,4 @@
-import React, { HTMLAttributes, PropsWithChildren, useEffect, useRef, useState } from 'react'
+import React, { HTMLAttributes, useEffect, useRef, useState } from 'react'
 import { Rect } from 'spase'
 import styled from 'styled-components'
 import useResizeEffect from './hooks/useResizeEffect'
@@ -6,14 +6,14 @@ import { Orientation } from './types'
 
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:masonry-grid') : () => {}
 
-export type Props = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
+export type Props = HTMLAttributes<HTMLDivElement> & {
   areSectionsAligned?: boolean
   horizontalSpacing?: number
   isReversed?: boolean
   orientation?: Orientation
   sections?: number
   verticalSpacing?: number
-}>
+}
 
 const BASE_MODIFIER_CLASS_PREFIX = 'base-'
 

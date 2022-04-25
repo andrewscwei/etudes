@@ -1,9 +1,9 @@
-import React, { HTMLAttributes, MouseEvent, PropsWithChildren, RefObject, useEffect, useRef, useState } from 'react'
+import React, { HTMLAttributes, MouseEvent, RefObject, useEffect, useRef, useState } from 'react'
 import { Rect, Size } from 'spase'
 import styled, { css, CSSProp } from 'styled-components'
 import ExtractChild from './ExtractChild'
 
-export type Props = PropsWithChildren<HTMLAttributes<HTMLElement>> & {
+export type Props = HTMLAttributes<HTMLElement> & {
   /**
    * The height of the arrow. The width (longest edge) of the arrow is always twice its height.
    */

@@ -1,8 +1,8 @@
-import React, { HTMLAttributes, useEffect, useState } from 'react'
+import React, { HTMLAttributes, ReactNode, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-export type Props = HTMLAttributes<HTMLButtonElement> & {
-  children?: (props: Pick<Props, 'isDeselectable' | 'isDisabled' | 'isSelected' | 'label'>) => JSX.Element
+export type Props = Omit<HTMLAttributes<HTMLButtonElement>, 'children'> & {
+  children?: (props: Pick<Props, 'isDeselectable' | 'isDisabled' | 'isSelected' | 'label'>) => ReactNode
   isDeselectable?: boolean
   isDisabled?: boolean
   isSelected?: boolean

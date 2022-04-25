@@ -1,20 +1,14 @@
 import React from 'react'
-import { hydrate, render } from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import App from './containers/App'
 
 if (process.env.NODE_ENV === 'development') {
   window.localStorage.debug = 'demo*,etudes*'
 }
 
-const markup = () => (
-  <App/>
-)
+const container = document.getElementById('app')
 
-const root = document.getElementById('app')
-
-if (root?.hasChildNodes() && process.env.NODE_ENV !== 'development') {
-  hydrate(markup(), root)
-}
-else {
-  render(markup(), root)
+if (container){
+  const root = createRoot(container)
+  root.render(<App/>)
 }

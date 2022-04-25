@@ -1,15 +1,15 @@
-import React, { HTMLAttributes, PropsWithChildren, useState } from 'react'
+import React, { HTMLAttributes, useState } from 'react'
 import { Point } from 'spase'
 import styled from 'styled-components'
 
-type Props = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
+type Props = HTMLAttributes<HTMLDivElement> & {
   isEnabled?: boolean
   threshold?: number
   onSwipeDown?: () => void
   onSwipeLeft?: () => void
   onSwipeRight?: () => void
   onSwipeUp?: () => void
-}>
+}
 
 /**
  * An empty component with a backing `<div>` element that detects swipe gestures.
