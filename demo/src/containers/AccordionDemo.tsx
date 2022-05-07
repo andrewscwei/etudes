@@ -56,7 +56,7 @@ export default class Container extends PureComponent<Props, State> {
               ${selectors.hwot} {
                 transform: scale(1.2);
                 z-index: 1;
-                background: #2b14d4;
+                background: #ff0054;
 
                 label {
                   color: #fff;
@@ -93,7 +93,7 @@ const StyledItem = styled.button<{
 }>`
   ${container.fvcc}
   ${animations.transition(['transform', 'background', 'color'], 100)}
-  background: ${props => props.isSelected ? '#2b14d4' : '#fff'};
+  background: ${props => props.isSelected ? '#ff0054' : '#fff'};
   color: ${props => props.isSelected ? '#fff' : '#000'};
   font-size: 1.6rem;
   border-style: solid;
@@ -109,7 +109,7 @@ const StyledItem = styled.button<{
   `}
 
   ${selectors.hwot} {
-    background: #2b14d4;
+    background: #ff0054;
     color: #fff;
   }
 `

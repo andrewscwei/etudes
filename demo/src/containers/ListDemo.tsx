@@ -92,7 +92,7 @@ export default class Container extends PureComponent<Props, State> {
 
             ${selectors.hwot} {
               color: #fff;
-              background: #2b14d4;
+              background: #ff0054;
               transform: translate3d(0, 0, 0) scale(1.2);
 
               svg * {
@@ -129,7 +129,7 @@ const StyledDropdownItem = styled.button<{
 }>`
   ${container.fvcl}
   ${animations.transition(['background', 'color'], 100)}
-  background: ${props => props.isSelected ? '#2b14d4' : '#fff'};
+  background: ${props => props.isSelected ? '#ff0054' : '#fff'};
   border-style: solid;
   color: ${props => props.isSelected ? '#fff' : '#000'};
   flex: 0 0 auto;
@@ -139,7 +139,7 @@ const StyledDropdownItem = styled.button<{
   width: 100%;
 
   ${selectors.hwot} {
-    background: #2b14d4;
+    background: #ff0054;
     color: #fff;
   }
 `
@@ -150,7 +150,7 @@ const StyledListItem = styled.button<{
 }>`
   ${container.fvcc}
   ${animations.transition('transform', 100)}
-  background: ${props => props.isSelected ? '#2b14d4' : '#fff'};
+  background: ${props => props.isSelected ? '#ff0054' : '#fff'};
   color: ${props => props.isSelected ? '#fff' : '#000'};
   font-size: 3rem;
   font-weight: 700;

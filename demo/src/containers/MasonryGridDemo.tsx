@@ -40,7 +40,7 @@ export default function() {
 
 const StyledGridItem = styled.div`
   ${container.fvcc}
-  background: #2b14d4;
+  background: #ff0054;
   color: #fff;
   font-size: 2rem;
   font-weight: 700;

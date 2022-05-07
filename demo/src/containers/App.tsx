@@ -116,7 +116,7 @@ const StyledNavButton = styled.button<{
   isActive: boolean
 }>`
   ${container.box}
-  color: ${props => props.isActive ? '#2b14d4' : '#000'};
+  color: ${props => props.isActive ? '#ff0054' : '#000'};
   font-size: 1.8rem;
   font-weight: 700;
   pointer-events: ${props => props.isActive ? 'none' : 'auto'};
@@ -126,7 +126,7 @@ const StyledNavButton = styled.button<{
   transition: all .1s ease-out;
 
   ${selectors.hwot} {
-    color: #2b14d4;
+    color: #ff0054;
   }
 `
 
@@ -164,7 +164,6 @@ const StyledIntroduction = styled.div`
   h1 {
     font-size: 8rem;
     color: #fff;
-    text-shadow: -12px 4px 0px rgba(43, 20, 212, 1);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1rem;
@@ -176,7 +175,6 @@ const StyledIntroduction = styled.div`
     color: #fff;
     max-width: 26rem;
     text-align: center;
-    text-shadow: -2px 4px 0px rgba(255, 255, 255, .3);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: .1rem;
