@@ -2,7 +2,7 @@ import React, { HTMLAttributes, MouseEvent, RefObject, useEffect, useRef, useSta
 import { Rect, Size } from 'spase'
 import styled, { css, CSSProp } from 'styled-components'
 import ExtractChild from './ExtractChild'
-import useViewportSize from './hooks/useViewportSize'
+import useElementRect from './hooks/useElementRect'
 
 export type Props = HTMLAttributes<HTMLElement> & {
   /**
@@ -116,16 +116,15 @@ export default function WithTooltip({
 
   const [textSize, setTextSize] = useState<Size | undefined>(new Size())
   const [alignment, setAlignment] = useState<Alignment | undefined>(undefined)
-  const viewportSize = useViewportSize()
-
   const childRef = useRef<HTMLElement>(null)
+  const childRect = useElementRect(childRef)
 
   useEffect(() => {
     const childNode = childRef.current
     if (!childNode) return
     setAlignment(computeAlignment(childNode, threshold))
     setTextSize(computeTextSize(childNode, threshold))
-  }, [viewportSize])
+  }, [childRect])
 
   return (
     <StyledRoot
