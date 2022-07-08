@@ -9,7 +9,7 @@ type ReturnedStates<T> = {
   value: [T, Dispatch<SetStateAction<T>>]
 }
 
-type Options<T> = Omit<Interact.DraggableOptions, 'onstart' | 'onmove' | 'onend'> & {
+type Options<T> = Omit<Parameters<Interact.Interactable['draggable']>[0], 'onstart' | 'onmove' | 'onend'> & {
   /**
    * The initial associated value of this hook.
    */
