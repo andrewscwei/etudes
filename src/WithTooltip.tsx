@@ -3,6 +3,7 @@ import { Rect, Size } from 'spase'
 import styled, { css, CSSProp } from 'styled-components'
 import ExtractChild from './ExtractChild'
 import useElementRect from './hooks/useElementRect'
+import useViewportSize from './hooks/useViewportSize'
 
 export type Props = HTMLAttributes<HTMLElement> & {
   /**
@@ -118,13 +119,14 @@ export default function WithTooltip({
   const [alignment, setAlignment] = useState<Alignment | undefined>(undefined)
   const childRef = useRef<HTMLElement>(null)
   const childRect = useElementRect(childRef)
+  const viewportSize = useViewportSize()
 
   useEffect(() => {
     const childNode = childRef.current
     if (!childNode) return
     setAlignment(computeAlignment(childNode, threshold))
     setTextSize(computeTextSize(childNode, threshold))
-  }, [childRect])
+  }, [childRect, viewportSize])
 
   return (
     <StyledRoot
