@@ -2,19 +2,20 @@ import React, { Fragment, ReactNode } from 'react'
 
 export type Props<T> = {
   children: ReactNode | ((value: T, index: number) => ReactNode)
-  array?: T[]
+  list?: T[]
 }
 
-export default function Map<T>({
-  array,
+export default function Each<T>({
+  list,
   children,
 }: Props<T>) {
-  if (!(array instanceof Array)) throw TypeError(`Provided collection must be an array: ${array}`)
+  if (list === undefined || list === null) return <></>
+  if (!(list instanceof Array)) throw TypeError(`Provided list must be an array: ${list}`)
 
   return (
     <>
-      {array.map((v, i) => (
-        <Fragment key={`element-${i}`}>
+      {list.map((v, i) => (
+        <Fragment key={`item-${i}`}>
           {typeof children === 'function' ? children(v, i) : children}
         </Fragment>
       ))}
