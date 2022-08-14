@@ -1,22 +1,24 @@
 import React, { Fragment, ReactNode } from 'react'
 
 export type Props<T> = {
-  children: ReactNode | ((value: T, index: number) => ReactNode)
-  list?: T[]
+  children?: ReactNode | ((value: T, index: number) => ReactNode)
+  in?: T[]
+  render?: (value: T, index: number) => ReactNode
 }
 
 export default function Each<T>({
-  list,
+  in: array,
   children,
+  render,
 }: Props<T>) {
-  if (list === undefined || list === null) return <></>
-  if (!(list instanceof Array)) throw TypeError(`Provided list must be an array: ${list}`)
+  if (array === undefined || array === null) return <></>
+  if (!(array instanceof Array)) throw TypeError(`Provided list <${array}> is not an array`)
 
   return (
     <>
-      {list.map((v, i) => (
+      {array.map((v, i) => (
         <Fragment key={`item-${i}`}>
-          {typeof children === 'function' ? children(v, i) : children}
+          {render ? render(v, i) : typeof children === 'function' ? children(v, i) : children}
         </Fragment>
       ))}
     </>
