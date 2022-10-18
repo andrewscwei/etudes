@@ -1,6 +1,6 @@
 import $$ExpandIcon from '!!raw-loader!../assets/images/expand-icon.svg'
 import { animations, container, selectors } from 'promptu'
-import React, { FunctionComponent, PureComponent } from 'react'
+import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
 import Dropdown, { ItemComponentProps as DropdownItemComponentProps } from '../../../lib/Dropdown'
@@ -22,105 +22,101 @@ const DropdownItemComponent = ({ data, isSelected, onClick, style }: DropdownIte
   </StyledDropdownItem>
 )
 
-const ListItemComponent: FunctionComponent<ListItemComponentProps<string>> = ({
-  data,
-  orientation,
-  isSelected,
-  onClick,
-  style,
-}: ListItemComponentProps<string>) => (
-  <StyledListItem orientation={orientation} isSelected={isSelected ?? false} onClick={() => onClick?.()} style={style}>{data}</StyledListItem>
+const ListItemComponent = ({ data, orientation, isSelected, onClick, style }: ListItemComponentProps<string>) => (
+  <StyledListItem
+    orientation={orientation}
+    isSelected={isSelected ?? false}
+    onClick={() => onClick?.()}
+    style={style}
+  >
+    {data}
+  </StyledListItem>
 )
 
-export default class Container extends PureComponent<void, State> {
-  state: State = {
-    selectedItemIndex: -1,
-    selectedOrientationIndex: 0,
-  }
+export default function() {
+  const [selectedItemIndex, setSelectedItemIndex] = useState(-1)
+  const [selectedOrientationIndex, setSelectedOrientationIndex] = useState(0)
+  const orientation = selectedOrientationIndex === 0 ? 'vertical' : 'horizontal'
 
-  render() {
-    const orientation = this.state.selectedOrientationIndex === 0 ? 'vertical' : 'horizontal'
+  return (
+    <>
+      <StyledRoot orientation={orientation}>
+        <List
+          data={[...new Array(60)].map((v, i) => `${i + 1}`)}
+          isTogglable={true}
+          orientation={orientation}
+          onDeselectAt={idx => setSelectedItemIndex(-1)}
+          onSelectAt={idx => setSelectedItemIndex(idx)}
+          itemComponentType={ListItemComponent}
+          shouldStaySelected={true}
+          itemPadding={20}
+          style={{
+            ...orientation === 'vertical' ? {
+              width: '80%',
+              minWidth: '400px',
+              transform: 'translate3d(0, 0, 0) rotate3d(1, 1, 0, 10deg)',
+            } : {
+              height: '80%',
+              minHeight: '400px',
+              transform: 'translate3d(0, 0, 0) rotate3d(1, .1, 0, 10deg)',
+            },
+          }}
+        />
+      </StyledRoot>
+      <Dropdown
+        borderThickness={2}
+        itemPadding={10}
+        data={[{ label: 'Vertical' }, { label: 'Horizontal' }]}
+        defaultLabel='Select orientation'
+        defaultSelectedItemIndex={selectedOrientationIndex}
+        expandIconSvg={$$ExpandIcon}
+        isInverted={false}
+        itemComponentType={DropdownItemComponent}
+        maxVisibleItems={-1}
+        onIndexChange={idx => setSelectedOrientationIndex(idx)}
+        orientation='vertical'
+        buttonCSS={props => css`
+          font-size: 2rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          transition: all .1s ease-out;
 
-    return (
-      <>
-        <StyledRoot orientation={orientation}>
-          <List
-            data={[...new Array(60)].map((v, i) => `${i + 1}`)}
-            isTogglable={true}
-            orientation={orientation}
-            onDeselectAt={idx => this.setState({ selectedItemIndex: -1 })}
-            onSelectAt={idx => this.setState({ selectedItemIndex: idx })}
-            itemComponentType={ListItemComponent}
-            shouldStaySelected={true}
-            itemPadding={20}
-            style={{
-              ...orientation === 'vertical' ? {
-                width: '80%',
-                minWidth: '400px',
-                transform: 'translate3d(0, 0, 0) rotate3d(1, 1, 0, 10deg)',
-              } : {
-                height: '80%',
-                minHeight: '400px',
-                transform: 'translate3d(0, 0, 0) rotate3d(1, .1, 0, 10deg)',
-              },
-            }}
-          />
-        </StyledRoot>
-        <Dropdown
-          borderThickness={2}
-          itemPadding={10}
-          data={[{ label: 'Vertical' }, { label: 'Horizontal' }]}
-          defaultLabel='Select orientation'
-          defaultSelectedItemIndex={this.state.selectedOrientationIndex}
-          expandIconSvg={$$ExpandIcon}
-          isInverted={false}
-          itemComponentType={DropdownItemComponent}
-          maxVisibleItems={-1}
-          onIndexChange={idx => this.setState({ selectedOrientationIndex: idx })}
-          orientation='vertical'
-          buttonCSS={props => css`
-            font-size: 2rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            transition: all .1s ease-out;
+          svg * {
+            transform: fill .1s ease-out;
+            fill: #000;
+          }
+
+          ${selectors.hwot} {
+            color: #fff;
+            background: #ff0054;
+            transform: translate3d(0, 0, 0) scale(1.2);
 
             svg * {
               transform: fill .1s ease-out;
-              fill: #000;
+              fill: #fff;
             }
-
-            ${selectors.hwot} {
-              color: #fff;
-              background: #ff0054;
-              transform: translate3d(0, 0, 0) scale(1.2);
-
-              svg * {
-                transform: fill .1s ease-out;
-                fill: #fff;
-              }
-            }
-          `}
-          style={{
-            height: '6rem',
-            left: '0',
-            margin: '3rem',
-            position: 'fixed',
-            top: '0',
-            transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(20deg)',
-            width: '30rem',
-            zIndex: 10,
-          }}
-        />
-        <DebugConsole
-          title='?: List+Dropdown'
-          message={this.state.selectedItemIndex > -1 ? `<strong>[${orientation.toUpperCase()}]</strong> You selected item <strong>#${this.state.selectedItemIndex + 1}</strong>!` : 'No item selected!'}
-          style={{
-            transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)',
-          }}
-        />
-      </>
-    )
-  }
+          }
+        `}
+        style={{
+          height: '6rem',
+          left: '0',
+          margin: '3rem',
+          position: 'fixed',
+          top: '0',
+          transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(20deg)',
+          width: '30rem',
+          zIndex: 10,
+        }}
+      />
+      <DebugConsole
+        title='?: List+Dropdown'
+        message={selectedItemIndex > -1 ? `<strong>[${orientation.toUpperCase()}]</strong> You selected item <strong>#${selectedItemIndex + 1}</strong>!` : 'No item selected!'}
+        style={{
+          transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)',
+        }}
+      />
+    </>
+  )
 }
 
 const StyledDropdownItem = styled.button<{
