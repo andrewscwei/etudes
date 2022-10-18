@@ -2,7 +2,7 @@ import { DependencyList, Dispatch, RefObject, SetStateAction, useEffect, useRef,
 import ResizeObserver from 'resize-observer-polyfill'
 import { Rect, Size } from 'spase'
 
-// const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:hooks') : () => {}
+// Const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:hooks') : () => {}
 
 type Options = {
   /**
@@ -28,19 +28,19 @@ export default function useResizeEffect(targetRef: RefObject<Element>, { onResiz
   const [size, setSize] = useState<Size>(new Size())
 
   useEffect(() => {
-    // debug(`Using resize effect for element ${targetRef.current}...`, 'OK')
+    // Debug(`Using resize effect for element ${targetRef.current}...`, 'OK')
 
     observerRef.current = new ResizeObserver(() => {
       const rect = Rect.from(targetRef.current)
 
       if (!rect) return
 
-      const size = rect.size
+      const newSize = rect.size
 
-      // debug(`Observing size change for element ${targetRef.current}...`, 'OK', size)
+      // Debug(`Observing size change for element ${targetRef.current}...`, 'OK', size)
 
-      setSize(size)
-      onResize?.(size)
+      setSize(newSize)
+      onResize?.(newSize)
     })
 
     if (observerRef.current && targetRef.current) {
@@ -48,7 +48,7 @@ export default function useResizeEffect(targetRef: RefObject<Element>, { onResiz
     }
 
     return () => {
-      // debug(`Removing resize effect for element ${targetRef.current}...`, 'OK')
+      // Debug(`Removing resize effect for element ${targetRef.current}...`, 'OK')
 
       if (observerRef.current && targetRef.current) {
         observerRef.current.unobserve(targetRef.current)

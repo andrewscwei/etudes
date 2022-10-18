@@ -5,11 +5,7 @@ import DebugConsole from '../../../lib/DebugConsole'
 import Video from '../../../lib/Video'
 import $$Video from '../assets/videos/video.mp4'
 
-export interface Props {}
-
-export interface State {}
-
-export default class Container extends PureComponent<Props, State> {
+export default class Container extends PureComponent {
   render() {
     return (
       <Fragment>

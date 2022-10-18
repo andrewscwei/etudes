@@ -1,5 +1,6 @@
 import React, { CSSProperties, Fragment, PureComponent } from 'react'
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:asc') : () => {}
 
 export interface Props {
@@ -102,6 +103,7 @@ export default class AbstractSelectableCollection<P extends Props = Props, S ext
    */
   isIndexOutOfRange(index: number): boolean {
     if (index < 0) return true
+
     return false
   }
 
@@ -113,7 +115,7 @@ export default class AbstractSelectableCollection<P extends Props = Props, S ext
    * @returns `true` if the index is selected, `false` otherwise.
    */
   isSelectedAt(index: number): boolean {
-    return (this.state.selectedIndex === index)
+    return this.state.selectedIndex === index
   }
 
   /**

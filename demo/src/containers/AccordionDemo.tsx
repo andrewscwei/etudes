@@ -6,8 +6,6 @@ import Accordion, { ItemComponentProps } from '../../../lib/Accordion'
 import DebugConsole from '../../../lib/DebugConsole'
 import { Orientation } from '../../../lib/types'
 
-export interface Props {}
-
 export interface State {
   itemIndex: number
   sectionIndex: number
@@ -22,7 +20,7 @@ const ItemComponent: FunctionComponent<ItemComponentProps<string>> = ({
   <StyledItem orientation={orientation} isSelected={isSelected ?? false} onClick={() => onClick?.()} style={style}>{data}</StyledItem>
 )
 
-export default class Container extends PureComponent<Props, State> {
+export default class Container extends PureComponent<void, State> {
   state: State = {
     itemIndex: -1,
     sectionIndex: -1,
@@ -77,7 +75,7 @@ export default class Container extends PureComponent<Props, State> {
         </StyledRoot>
         <DebugConsole
           title='?: Accordion'
-          message={this.state.sectionIndex > -1 ? (this.state.itemIndex > -1 ? `You selected item <strong>#${this.state.itemIndex + 1}</strong> in section <strong>#${this.state.sectionIndex + 1}</strong>!` : `No item seletected in section <strong>#${this.state.sectionIndex + 1}</strong>!`) : 'No section selected!'}
+          message={this.state.sectionIndex > -1 ? this.state.itemIndex > -1 ? `You selected item <strong>#${this.state.itemIndex + 1}</strong> in section <strong>#${this.state.sectionIndex + 1}</strong>!` : `No item seletected in section <strong>#${this.state.sectionIndex + 1}</strong>!` : 'No section selected!'}
           style={{
             transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)',
           }}

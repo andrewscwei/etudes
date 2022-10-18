@@ -90,15 +90,15 @@ export default class DebugConsole extends PureComponent<Props, State> {
 
   private getStyleByAlignment(align: Props['align']): CSSProperties {
     switch (align) {
-    case 'tl': return { top: `${this.props.margin}px`, left: `${this.props.margin}px` }
-    case 'tc': return { top: `${this.props.margin}px`, left: 0, right: 0, margin: '0 auto' }
-    case 'tr': return { top: `${this.props.margin}px`, right: `${this.props.margin}px` }
-    case 'cl': return { top: 0, left: `${this.props.margin}px`, bottom: 0, margin: 'auto 0' }
-    case 'cc': return { top: 0, left: 0, right: 0, bottom: 0, margin: 'auto' }
-    case 'cr': return { top: 0, bottom: 0, right: `${this.props.margin}px`, margin: 'auto 0' }
-    case 'bl': return { bottom: `${this.props.margin}px`, left: `${this.props.margin}px` }
-    case 'bc': return { bottom: `${this.props.margin}px`, left: 0, right: 0, margin: '0 auto' }
-    default: return { bottom: `${this.props.margin}px`, right: `${this.props.margin}px` }
+      case 'tl': return { top: `${this.props.margin}px`, left: `${this.props.margin}px` }
+      case 'tc': return { top: `${this.props.margin}px`, left: 0, right: 0, margin: '0 auto' }
+      case 'tr': return { top: `${this.props.margin}px`, right: `${this.props.margin}px` }
+      case 'cl': return { top: 0, left: `${this.props.margin}px`, bottom: 0, margin: 'auto 0' }
+      case 'cc': return { top: 0, left: 0, right: 0, bottom: 0, margin: 'auto' }
+      case 'cr': return { top: 0, bottom: 0, right: `${this.props.margin}px`, margin: 'auto 0' }
+      case 'bl': return { bottom: `${this.props.margin}px`, left: `${this.props.margin}px` }
+      case 'bc': return { bottom: `${this.props.margin}px`, left: 0, right: 0, margin: '0 auto' }
+      default: return { bottom: `${this.props.margin}px`, right: `${this.props.margin}px` }
     }
   }
 }

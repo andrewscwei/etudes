@@ -109,7 +109,7 @@ const StyledJoint = styled.div<{
 
     ${BurgerButtonBar}:nth-child(2) {
       left: 0;
-      top: ${props => props.height*.5 - props.thickness*.5}px;
+      top: ${props => props.height * 0.5 - props.thickness * 0.5}px;
       transform-origin: center;
       transform: translate3d(0, 0, 0) scale(1);
     }
@@ -124,7 +124,7 @@ const StyledJoint = styled.div<{
 
     &.active {
       ${BurgerButtonBar}:nth-child(1) {
-        transform: ${props => `translate3d(0, ${props.height*.5 - props.thickness*.5}px, 0) rotate(45deg)`};
+        transform: ${props => `translate3d(0, ${props.height * 0.5 - props.thickness * 0.5}px, 0) rotate(45deg)`};
       }
 
       ${BurgerButtonBar}:nth-child(2) {
@@ -132,7 +132,7 @@ const StyledJoint = styled.div<{
       }
 
       ${BurgerButtonBar}:nth-child(3) {
-        transform: ${props => `translate3d(0, ${props.thickness*.5 - props.height*.5}px, 0) rotate(-45deg)`};
+        transform: ${props => `translate3d(0, ${props.thickness * 0.5 - props.height * 0.5}px, 0) rotate(-45deg)`};
         width: 100%;
       }
     }
@@ -166,7 +166,7 @@ const StyledJoint = styled.div<{
 
     span:nth-child(2) {
       left: 0;
-      top: ${props => props.height*.5 - props.thickness*.5}px;
+      top: ${props => props.height * 0.5 - props.thickness * 0.5}px;
       transform-origin: left center;
       transform: translate3d(0, 0, 0) scale(1);
     }
@@ -181,7 +181,7 @@ const StyledJoint = styled.div<{
 
     &.active {
       span:nth-child(1) {
-        transform: ${props => `translate3d(0, ${props.height*.5 - props.thickness*.5}px, 0) rotate(-45deg)`};
+        transform: ${props => `translate3d(0, ${props.height * 0.5 - props.thickness * 0.5}px, 0) rotate(-45deg)`};
       }
 
       span:nth-child(2) {
@@ -189,7 +189,7 @@ const StyledJoint = styled.div<{
       }
 
       span:nth-child(3) {
-        transform: ${props => `translate3d(0, ${props.thickness*.5 - props.height*.5}px, 0) rotate(45deg)`};
+        transform: ${props => `translate3d(0, ${props.thickness * 0.5 - props.height * 0.5}px, 0) rotate(45deg)`};
         width: 100%;
       }
     }
@@ -224,7 +224,7 @@ const StyledRoot = styled.button<{
 
     ${StyledJoint}.half:nth-of-type(2) {
       span:nth-child(3) {
-        width: ${props => props.width*.5}px;
+        width: ${props => props.width * 0.5}px;
       }
     }
   }

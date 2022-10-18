@@ -40,7 +40,7 @@ export default function() {
         />
         <Panorama
           angle={angle}
-          onAngleChange={(angle, isDragging) => { if (isDragging) setAngle(angle) }}
+          onAngleChange={(value, isDragging) => { if (isDragging) setAngle(value) }}
           onResize={size => setViewportSize(size)}
           src={$$PanoramaImage}
           zeroAnchor={zeroAnchor}
@@ -53,7 +53,7 @@ export default function() {
         />
         <PanoramaSlider
           angle={angle}
-          onAngleChange={(angle, isDragging) => { if (isDragging) setAngle(angle) }}
+          onAngleChange={(value, isDragging) => { if (isDragging) setAngle(value) }}
           src={$$PanoramaImage}
           viewportSize={viewportSize}
           zeroAnchor={zeroAnchor}

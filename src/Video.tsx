@@ -1,6 +1,7 @@
 import React, { createRef, CSSProperties, PureComponent } from 'react'
 import styled from 'styled-components'
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:video') : () => {}
 
 export interface Props {
@@ -21,10 +22,7 @@ export interface Props {
   style: CSSProperties
 }
 
-export interface State {
-}
-
-export default class Video extends PureComponent<Props, State> {
+export default class Video extends PureComponent<Props> {
   static defaultProps = {
     autoLoop: true,
     autoPlay: true,
@@ -52,6 +50,7 @@ export default class Video extends PureComponent<Props, State> {
 
   get isPaused(): boolean {
     if (!this.nodeRefs.video.current) return false
+
     return this.nodeRefs.video.current.paused
   }
 
@@ -59,7 +58,6 @@ export default class Video extends PureComponent<Props, State> {
     const videoNode = this.nodeRefs.video.current
 
     if (videoNode) {
-      // HACK: https://github.com/facebook/react/issues/10389
       videoNode.muted = this.props.isMuted
       videoNode.load()
 
@@ -81,9 +79,8 @@ export default class Video extends PureComponent<Props, State> {
     this.pause()
   }
 
-  componentDidUpdate(prevProps: Props, prevState: State) {
-    if ((prevProps.isMuted !== this.props.isMuted) && this.nodeRefs.video.current) {
-      // HACK: https://github.com/facebook/react/issues/10389
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps.isMuted !== this.props.isMuted && this.nodeRefs.video.current) {
       this.nodeRefs.video.current.muted = this.props.isMuted
     }
 
@@ -144,7 +141,6 @@ export default class Video extends PureComponent<Props, State> {
   }
 
   render() {
-    // HACK: Need to dangerously insert HTML because https://github.com/facebook/react/issues/6544.
     return (
       <StyledRoot
         className={this.props.className}

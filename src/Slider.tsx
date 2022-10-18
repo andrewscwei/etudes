@@ -4,6 +4,7 @@ import { Rect } from 'spase'
 import styled, { css } from 'styled-components'
 import useDragEffect from './hooks/useDragEffect'
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:slider') : () => {}
 
 export type Props = HTMLAttributes<HTMLDivElement> & {
@@ -114,8 +115,9 @@ export default function Slider({
     const naturalPosition = isInverted ? 1 - currentPosition : currentPosition
     const naturalNewPositionX = naturalPosition * rect.width + dx
     const naturalNewPositionY = naturalPosition * rect.height + dy
-    const naturalNewPosition = (orientation === 'vertical') ? Math.max(0, Math.min(1, naturalNewPositionY / rect.height)) : Math.max(0, Math.min(1, naturalNewPositionX / rect.width))
+    const naturalNewPosition = orientation === 'vertical' ? Math.max(0, Math.min(1, naturalNewPositionY / rect.height)) : Math.max(0, Math.min(1, naturalNewPositionX / rect.width))
     const newPosition = isInverted ? 1 - naturalNewPosition : naturalNewPosition
+
     return newPosition
   }
 
@@ -125,18 +127,20 @@ export default function Slider({
     const rect = Rect.from(rootRef.current) ?? new Rect()
 
     switch (orientation) {
-    case 'horizontal': {
-      const position = (event.clientX - rect.left) / rect.width
-      const naturalPosition = isInverted ? 1 - position : position
-      setPosition(naturalPosition)
-      break
-    }
-    case 'vertical': {
-      const position = (event.clientY - rect.top) / rect.height
-      const naturalPosition = isInverted ? 1 - position : position
-      setPosition(naturalPosition)
-      break
-    }
+      case 'horizontal': {
+        const position = (event.clientX - rect.left) / rect.width
+        const naturalPosition = isInverted ? 1 - position : position
+        setPosition(naturalPosition)
+        break
+      }
+      case 'vertical': {
+        const position = (event.clientY - rect.top) / rect.height
+        const naturalPosition = isInverted ? 1 - position : position
+        setPosition(naturalPosition)
+        break
+      }
+      default:
+        break
     }
   }
 
@@ -150,7 +154,7 @@ export default function Slider({
     onDragEnd,
   })
 
-  // debug('Rendering...', 'OK')
+  // Debug('Rendering...', 'OK')
 
   // Natural position is the position after taking `isInverted` into account.
   const naturalPosition = isInverted ? 1 - position : position
@@ -178,28 +182,28 @@ export default function Slider({
       <SliderStartingTrack orientation={orientation} isClickable={isTrackInteractive} onClick={event => onTrackClick(event)}
         style={orientation === 'vertical' ? {
           top: 0,
-          height: `calc(${naturalPosition*100}% - ${trackPadding <= 0 ? 0 : knobHeight*.5}px - ${trackPadding}px)`,
+          height: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
         } : {
           left: 0,
-          width: `calc(${naturalPosition*100}% - ${trackPadding <= 0 ? 0 : knobWidth*.5}px - ${trackPadding}px)`,
+          width: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
         }}
       />
       <StyledKnobContainer ref={knobRef} style={{
         transform: 'translate3d(-50%, -50%, 0)',
-        ...(orientation === 'vertical' ? {
+        ...orientation === 'vertical' ? {
           left: '50%',
-          top: `${naturalPosition*100}%`,
+          top: `${naturalPosition * 100}%`,
           transition: isDragging === false ? 'top 100ms ease-out' : 'none',
         } : {
-          left: `${naturalPosition*100}%`,
+          left: `${naturalPosition * 100}%`,
           top: '50%',
           transition: isDragging === false ? 'left 100ms ease-out' : 'none',
-        }),
+        },
       }}>
         <SliderKnob
           className={classNames({
-            'at-end': isInverted ? (position === 0) : (position === 1),
-            'at-start': isInverted ? (position === 1) : (position === 0),
+            'at-end': isInverted ? position === 0 : position === 1,
+            'at-start': isInverted ? position === 1 : position === 0,
             'dragging': isDragging === true,
           })}
           style={{
@@ -215,10 +219,10 @@ export default function Slider({
       <SliderEndingTrack orientation={orientation} isClickable={isTrackInteractive} onClick={event => onTrackClick(event)}
         style={orientation === 'vertical' ? {
           bottom: 0,
-          height: `calc(${(1 - naturalPosition)*100}% - ${trackPadding <= 0 ? 0 : knobHeight*.5}px - ${trackPadding}px)`,
+          height: `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
         } : {
           right: 0,
-          width: `calc(${(1 - naturalPosition)*100}% - ${trackPadding <= 0 ? 0 : knobWidth*.5}px - ${trackPadding}px)`,
+          width: `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
         }}
       />
     </StyledRoot>
@@ -230,8 +234,8 @@ export const SliderStartingTrack = styled.div<{
   isClickable: boolean
 }>`
   background: #fff;
-  cursor: ${props => props.isClickable ? 'pointer' : 'auto' };
-  pointer-events: ${props => props.isClickable ? 'auto' : 'none' };
+  cursor: ${props => props.isClickable ? 'pointer' : 'auto'};
+  pointer-events: ${props => props.isClickable ? 'auto' : 'none'};
   position: absolute;
   transition-duration: 100ms;
   transition-property: background, color, opacity, transform;
@@ -265,8 +269,8 @@ export const SliderEndingTrack = styled.div<{
   isClickable: boolean
 }>`
   background: #fff;
-  cursor: ${props => props.isClickable ? 'pointer' : 'auto' };
-  pointer-events: ${props => props.isClickable ? 'auto' : 'none' };;
+  cursor: ${props => props.isClickable ? 'pointer' : 'auto'};
+  pointer-events: ${props => props.isClickable ? 'auto' : 'none'};;
   position: absolute;
   transition-duration: 100ms;
   transition-property: background, color, opacity, transform;
@@ -310,7 +314,7 @@ export const SliderKnob = styled.div`
 
 export const SliderKnobLabel = styled.label<{ knobHeight: NonNullable<Props['knobHeight']> }>`
   color: #000;
-  font-size: ${props => props.knobHeight * .5}px;
+  font-size: ${props => props.knobHeight * 0.5}px;
   pointer-events: none;
   user-select: none;
 `

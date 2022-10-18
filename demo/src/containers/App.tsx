@@ -33,6 +33,7 @@ export default function App() {
     }
 
     window.addEventListener('hashchange', onHashChange)
+
     return () => window.removeEventListener('hashchange', onHashChange)
   }, [])
 
@@ -43,20 +44,20 @@ export default function App() {
 
   function renderDemo() {
     switch (hash) {
-    case 'masonry-grid': return <MasonryGridDemo/>
-    case 'list': return <ListDemo/>
-    case 'accordion': return <AccordionDemo/>
-    case 'dial+sliders': return <DialSlidersDemo/>
-    case 'video': return <VideoDemo/>
-    case 'panorama+slider': return <PanoramaDemo/>
-    default: return (
-      <StyledIntroduction>
-        <div>
-          <h1>Études</h1>
-        </div>
-        <span>A study of styled React components</span>
-      </StyledIntroduction>
-    )
+      case 'masonry-grid': return <MasonryGridDemo/>
+      case 'list': return <ListDemo/>
+      case 'accordion': return <AccordionDemo/>
+      case 'dial+sliders': return <DialSlidersDemo/>
+      case 'video': return <VideoDemo/>
+      case 'panorama+slider': return <PanoramaDemo/>
+      default: return (
+        <StyledIntroduction>
+          <div>
+            <h1>Études</h1>
+          </div>
+          <span>A study of styled React components</span>
+        </StyledIntroduction>
+      )
     }
   }
 

@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:hooks') : () => {}
 
 export type Options<T> = {
@@ -35,19 +36,19 @@ export type Options<T> = {
  *          state and a function that updates it.
  */
 export default function useSearchParamState<T>(param: string, defaultValue: T, { mapSearchParamToState, mapStateToSearchParam }: Options<T> = {}): [T, Dispatch<SetStateAction<T>>] {
-  const _mapSearchParamToState = (value: string | undefined, defaultValue: T): T => {
+  const defaultMapSearchParamToState = (value: string | undefined, fallback: T): T => {
     if (mapSearchParamToState) {
       return mapSearchParamToState(value)
     }
     else if (!value) {
-      return defaultValue
+      return fallback
     }
     else {
       return value as unknown as NonNullable<T>
     }
   }
 
-  const _mapStateToSearchParam = (state: T): string | undefined => {
+  const defaultMapStateToSearchParam = (state: T): string | undefined => {
     if (mapStateToSearchParam) {
       return mapStateToSearchParam(state)
     }
@@ -60,14 +61,14 @@ export default function useSearchParamState<T>(param: string, defaultValue: T, {
   }
 
   const [searchParams, setSearchParams] = useSearchParams()
-  const currentState = _mapSearchParamToState(searchParams.get(param) ?? undefined, defaultValue)
+  const currentState = defaultMapSearchParamToState(searchParams.get(param) ?? undefined, defaultValue)
   const [state, setState] = useState(currentState)
 
   debug('Using search param state...', 'OK', `param=${param}, defaultValue=${currentState}`)
 
   useEffect(() => {
     const value = searchParams.get(param)
-    const newValue = _mapStateToSearchParam(state)
+    const newValue = defaultMapStateToSearchParam(state)
 
     if (newValue === value) return
 

@@ -42,7 +42,7 @@ export default function SelectableButton({
   }, [externalIsSelected])
 
   return (
-    <StyledRoot {...props} onClick={() => toggleSelection()} disabled={isDisabled || (isSelected && !isDeselectable)}>
+    <StyledRoot {...props} onClick={() => toggleSelection()} disabled={isDisabled || isSelected && !isDeselectable}>
       {children?.({ isDeselectable, isDisabled, isSelected, label }) ?? label}
     </StyledRoot>
   )

@@ -109,17 +109,19 @@ function getFilledImageSize(originalSize: Size, sizeToFill: Size): Size {
 function getDisplacementFromAngle(angle: number, originalImageSize: Size, componentSize: Size, zeroAnchor: number): number {
   const { width: imageWidth } = getFilledImageSize(originalImageSize, componentSize)
   const { width: componentWidth } = componentSize
-  const offset = componentWidth*zeroAnchor
-  return (angle / 360) * imageWidth - offset
+  const offset = componentWidth * zeroAnchor
+
+  return angle / 360 * imageWidth - offset
 }
 
 function getAngleFromDisplacement(displacement: number, originalImageSize: Size, componentSize: Size, zeroAnchor: number): number {
   const { width: imageWidth } = getFilledImageSize(originalImageSize, componentSize)
   const { width: componentWidth } = componentSize
-  const offset = componentWidth*zeroAnchor
+  const offset = componentWidth * zeroAnchor
 
-  let angle = ((displacement + offset) % imageWidth) / imageWidth*360
+  let angle = (displacement + offset) % imageWidth / imageWidth * 360
   while (angle < 0) angle += 360
+
   return angle
 }
 
@@ -143,7 +145,8 @@ export default function Panorama({
   ...props
 }: Props) {
   const mapDragPositionToDisplacement = (currentPosition: number, dx: number, dy: number): number => {
-    const newDisplacement = currentPosition - (dx * speed)
+    const newDisplacement = currentPosition - dx * speed
+
     return newDisplacement
   }
 

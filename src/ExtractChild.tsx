@@ -24,7 +24,7 @@ export default forwardRef<HTMLElement, Props>(({
         if (idx > 0) return undefined
 
         if (isValidElement(child)) {
-          return cloneElement(child, { className: classNames(className, child.props.className), ...props, ref })
+          return cloneElement(child, { className: classNames(className, child.props.className), ...props, ref } as any)
         }
 
         return child

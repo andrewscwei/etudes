@@ -7,8 +7,6 @@ import Dropdown, { ItemComponentProps as DropdownItemComponentProps } from '../.
 import List, { ItemComponentProps as ListItemComponentProps } from '../../../lib/List'
 import { Orientation } from '../../../lib/types'
 
-export interface Props {}
-
 export interface State {
   selectedItemIndex: number
   selectedOrientationIndex: number
@@ -33,7 +31,7 @@ const ListItemComponent: FunctionComponent<ListItemComponentProps<string>> = ({
   <StyledListItem orientation={orientation} isSelected={isSelected ?? false} onClick={() => onClick?.()} style={style}>{data}</StyledListItem>
 )
 
-export default class Container extends PureComponent<Props, State> {
+export default class Container extends PureComponent<void, State> {
   state: State = {
     selectedItemIndex: -1,
     selectedOrientationIndex: 0,
@@ -55,7 +53,7 @@ export default class Container extends PureComponent<Props, State> {
             shouldStaySelected={true}
             itemPadding={20}
             style={{
-              ...(orientation === 'vertical' ? {
+              ...orientation === 'vertical' ? {
                 width: '80%',
                 minWidth: '400px',
                 transform: 'translate3d(0, 0, 0) rotate3d(1, 1, 0, 10deg)',
@@ -63,7 +61,7 @@ export default class Container extends PureComponent<Props, State> {
                 height: '80%',
                 minHeight: '400px',
                 transform: 'translate3d(0, 0, 0) rotate3d(1, .1, 0, 10deg)',
-              }),
+              },
             }}
           />
         </StyledRoot>

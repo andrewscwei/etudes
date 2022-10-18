@@ -203,7 +203,7 @@ export default class Dropdown<T = Record<string, any>> extends PureComponent<Pro
           onClick={() => this.toggle()}
         >
           <label>
-            {this.state.selectedItemIndex === -1 ? (this.props.defaultLabel ?? 'Select') : this.props.data[this.state.selectedItemIndex].label}
+            {this.state.selectedItemIndex === -1 ? this.props.defaultLabel ?? 'Select' : this.props.data[this.state.selectedItemIndex].label}
           </label>
           {this.props.expandIconSvg && <span dangerouslySetInnerHTML={{ __html: this.props.expandIconSvg }}/>}
         </StyledToggle>
@@ -214,7 +214,7 @@ export default class Dropdown<T = Record<string, any>> extends PureComponent<Pro
           defaultSelectedIndex={this.props.defaultSelectedItemIndex ?? -1}
           isInverted={this.props.isInverted ?? false}
           isTogglable={isTogglable}
-          itemComponentType={this.props.itemComponentType as any} // HACK: Generic types cannot be inferred by props, so this is the only way.
+          itemComponentType={this.props.itemComponentType as any}
           itemPadding={itemPadding}
           onDeselectAt={idx => this.selectItemAt(-1)}
           onSelectAt={idx => this.selectItemAt(idx)}
@@ -227,10 +227,10 @@ export default class Dropdown<T = Record<string, any>> extends PureComponent<Pro
           }}
           style={orientation === 'vertical' ? {
             height: this.state.isCollapsed ? '0px' : `${menuLength}px`,
-            overflowY: (maxVisibleItems === -1) ? 'hidden' : (maxVisibleItems < numItems ? 'scroll' : 'hidden'),
+            overflowY: maxVisibleItems === -1 ? 'hidden' : maxVisibleItems < numItems ? 'scroll' : 'hidden',
           } : {
             width: this.state.isCollapsed ? '0px' : `${menuLength}px`,
-            overflowX: (maxVisibleItems === -1) ? 'hidden' : (maxVisibleItems < numItems ? 'scroll' : 'hidden'),
+            overflowX: maxVisibleItems === -1 ? 'hidden' : maxVisibleItems < numItems ? 'scroll' : 'hidden',
           }}
         />
       </StyledRoot>
@@ -246,7 +246,7 @@ export default class Dropdown<T = Record<string, any>> extends PureComponent<Pro
    *          otherwise.
    */
   isItemSelectedAt(index: number) {
-    return (this.state.selectedItemIndex === index)
+    return this.state.selectedItemIndex === index
   }
 
   /**

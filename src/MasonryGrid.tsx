@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import useResizeEffect from './hooks/useResizeEffect'
 import { Orientation } from './types'
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:masonry-grid') : () => {}
 
 export type Props = HTMLAttributes<HTMLDivElement> & {
@@ -37,7 +38,7 @@ function computeNextAvailableSectionAndLengthByBase(currentSectionLengths: numbe
   for (let i = 0; i < numSections; i++) {
     const length = currentSectionLengths[i]
     const isShorter = length < minLength
-    const isEligibleSection = (i + base) <= numSections
+    const isEligibleSection = i + base <= numSections
     let hasRoomInSubsequentSections = true
 
     for (let j = 1; j < base; j++) {
@@ -78,7 +79,7 @@ function computeMaxLength(currentSectionLengths: number[], base?: number): numbe
     arr = arr.slice(0, Math.max(1, Math.min(base, currentSectionLengths.length)))
   }
 
-  return arr.reduce((out, curr, i) => (curr > out) ? curr : out, 0)
+  return arr.reduce((out, curr, i) => curr > out ? curr : out, 0)
 }
 
 /**
@@ -148,7 +149,7 @@ function getAllImageSources(htmlString?: string): string[] {
 export default function MasonryGrid({
   areSectionsAligned = false,
   children,
-  horizontalSpacing= 0,
+  horizontalSpacing = 0,
   isReversed = false,
   orientation = 'vertical',
   sections = 3,
@@ -174,7 +175,7 @@ export default function MasonryGrid({
 
     debug('Repositioning children... OK')
 
-    const children = rootNode.children
+    const nodes = rootNode.children
     const numSections = sections
 
     if (numSections <= 0) throw new Error('You must specifiy a minimum of 1 section(s) (a.k.a. row(s) for horizontal orientation, column(s) for vertical orientation) for a MasonryGrid instance')
@@ -182,8 +183,8 @@ export default function MasonryGrid({
     if (orientation === 'vertical') {
       const sectionHeights: number[] = [...new Array(numSections)].map(() => 0)
 
-      for (let i = 0; i < children.length; i++) {
-        const child = children[i]
+      for (let i = 0; i < nodes.length; i++) {
+        const child = nodes[i]
 
         if (!(child instanceof HTMLElement)) continue
 
@@ -191,16 +192,16 @@ export default function MasonryGrid({
         const [colIdx, y] = computeNextAvailableSectionAndLengthByBase(sectionHeights, base)
 
         child.style.position = 'absolute'
-        child.style.width = `calc(${100 / numSections * base}% - ${(horizontalSpacing * (numSections - 1) / numSections) * base}px + ${horizontalSpacing * (base - 1)}px)`
+        child.style.width = `calc(${100 / numSections * base}% - ${horizontalSpacing * (numSections - 1) / numSections * base}px + ${horizontalSpacing * (base - 1)}px)`
         child.style.height = ''
-        child.style.left = `calc(${100 / numSections * colIdx}% - ${(horizontalSpacing * (numSections - 1) / numSections) * colIdx}px + ${horizontalSpacing * colIdx}px)`
+        child.style.left = `calc(${100 / numSections * colIdx}% - ${horizontalSpacing * (numSections - 1) / numSections * colIdx}px + ${horizontalSpacing * colIdx}px)`
         child.style.top = `${y + (y === 0 ? 0 : verticalSpacing)}px`
 
         for (let j = 0; j < base; j++) {
           sectionHeights[colIdx + j] = y + (y === 0 ? 0 : verticalSpacing) + (Rect.from(child)?.height ?? 0)
         }
 
-        if (areSectionsAligned && ((colIdx + base) === numSections)) {
+        if (areSectionsAligned && colIdx + base === numSections) {
           const m = computeMaxLength(sectionHeights)
 
           for (let j = 0; j < numSections; j++) {
@@ -218,8 +219,8 @@ export default function MasonryGrid({
       if (!isNaN(h)) rootNode.style.height = `${h}px`
 
       if (isReversed) {
-        for (let i = 0; i < children.length; i++) {
-          const child = children[i]
+        for (let i = 0; i < nodes.length; i++) {
+          const child = nodes[i]
 
           if (!(child instanceof HTMLElement)) continue
 
@@ -232,8 +233,8 @@ export default function MasonryGrid({
     else {
       const sectionWidths: number[] = [...new Array(numSections)].map(() => 0)
 
-      for (let i = 0; i < children.length; i++) {
-        const child = children[i]
+      for (let i = 0; i < nodes.length; i++) {
+        const child = nodes[i]
 
         if (!(child instanceof HTMLElement)) continue
 
@@ -242,15 +243,15 @@ export default function MasonryGrid({
 
         child.style.position = 'absolute'
         child.style.width = ''
-        child.style.height = `calc(${100 / numSections * base}% - ${(verticalSpacing * (numSections - 1) / numSections) * base}px + ${verticalSpacing * (base - 1)}px)`
-        child.style.top = `calc(${100 / numSections * rowIdx}% - ${(verticalSpacing * (numSections - 1) / numSections) * rowIdx}px + ${verticalSpacing * rowIdx}px)`
+        child.style.height = `calc(${100 / numSections * base}% - ${verticalSpacing * (numSections - 1) / numSections * base}px + ${verticalSpacing * (base - 1)}px)`
+        child.style.top = `calc(${100 / numSections * rowIdx}% - ${verticalSpacing * (numSections - 1) / numSections * rowIdx}px + ${verticalSpacing * rowIdx}px)`
         child.style.left = `${x + (x === 0 ? 0 : horizontalSpacing)}px`
 
         for (let j = 0; j < base; j++) {
           sectionWidths[rowIdx + j] = x + (x === 0 ? 0 : horizontalSpacing) + (Rect.from(child)?.width ?? 0)
         }
 
-        if (areSectionsAligned && ((rowIdx + base) === numSections)) {
+        if (areSectionsAligned && rowIdx + base === numSections) {
           const m = computeMaxLength(sectionWidths)
 
           for (let j = 0; j < numSections; j++) {
@@ -268,8 +269,8 @@ export default function MasonryGrid({
       if (!isNaN(w)) rootNode.style.width = `${w}px`
 
       if (isReversed) {
-        for (let i = 0; i < children.length; i++) {
-          const child = children[i]
+        for (let i = 0; i < nodes.length; i++) {
+          const child = nodes[i]
 
           if (!(child instanceof HTMLElement)) continue
 
@@ -286,7 +287,7 @@ export default function MasonryGrid({
       const currWidth = getCurrentWidth()
       const currHeight = getCurrentHeight()
 
-      if ((minWidth !== currWidth) || (minHeight !== currHeight) || (maxSize.width !== maxWidth) || maxSize.height !== maxHeight) {
+      if (minWidth !== currWidth || minHeight !== currHeight || maxSize.width !== maxWidth || maxSize.height !== maxHeight) {
         repositionChildren()
         setMaxWidth(maxSize.width)
         setMaxHeight(maxSize.height)
@@ -317,8 +318,8 @@ export default function MasonryGrid({
       style={{
         ...style,
         flex: '0 0 auto',
-        minHeight: ((orientation === 'vertical' && !isNaN(minHeight)) ? `${minHeight}px` : ''),
-        minWidth: ((orientation === 'horizontal' && !isNaN(minWidth)) ? `${minWidth}px` : ''),
+        minHeight: orientation === 'vertical' && !isNaN(minHeight) ? `${minHeight}px` : '',
+        minWidth: orientation === 'horizontal' && !isNaN(minWidth) ? `${minWidth}px` : '',
         padding: '0',
       }}
     >

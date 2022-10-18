@@ -16,7 +16,7 @@ export default function Repeat({
 }: Props) {
   return (
     <>
-      {[...Array(count)].map((_, i) => (
+      {[...Array(count)].map((v, i) => (
         <Fragment key={`element-${i}`}>
           {render ? render(i) : typeof children === 'function' ? children(i) : children}
         </Fragment>

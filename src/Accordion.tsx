@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components'
 import List, { ItemComponentProps as ListItemComponentProps } from './List'
 import { ExtendedCSSFunction, ExtendedCSSProps, Orientation } from './types'
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:accordion') : () => {}
 
 /**
@@ -190,11 +191,11 @@ export default class Accordion<T = Record<string, never>> extends PureComponent<
         orientation={orientation}
         style={{
           ...this.props.style ?? {},
-          ...(orientation === 'vertical' ? {
+          ...orientation === 'vertical' ? {
             height: 'auto',
           } : {
             width: 'auto',
-          }),
+          },
         }}
       >
         {this.props.data.map((section, i) => {
@@ -250,10 +251,10 @@ export default class Accordion<T = Record<string, never>> extends PureComponent<
                 style={orientation === 'vertical' ? {
                   height: isCollapsed ? '0px' : `${menuLength}px`,
                   marginTop: isCollapsed ? '0px' : `${itemPadding - borderThickness}px`,
-                  overflowY: (maxVisibleItems === -1) ? 'hidden' : (maxVisibleItems < numItems ? 'scroll' : 'hidden'),
+                  overflowY: maxVisibleItems === -1 ? 'hidden' : maxVisibleItems < numItems ? 'scroll' : 'hidden',
                 } : {
                   marginLeft: isCollapsed ? '0px' : `${itemPadding - borderThickness}px`,
-                  overflowX: (maxVisibleItems === -1) ? 'hidden' : (maxVisibleItems < numItems ? 'scroll' : 'hidden'),
+                  overflowX: maxVisibleItems === -1 ? 'hidden' : maxVisibleItems < numItems ? 'scroll' : 'hidden',
                   width: isCollapsed ? '0px' : `${menuLength}px`,
                 }}
               />
@@ -302,7 +303,7 @@ export default class Accordion<T = Record<string, never>> extends PureComponent<
   }
 
   private isItemSelectedAt(index: number): boolean {
-    return (this.state.selectedItemIndex === index)
+    return this.state.selectedItemIndex === index
   }
 
   private toggleItemAt(index: number) {

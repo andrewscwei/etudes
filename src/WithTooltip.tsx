@@ -62,15 +62,15 @@ export default function WithTooltip({
   threshold = 100,
   ...props
 }: Props) {
-  const computeAlignment = (target: Element, threshold: number): Alignment => {
+  const computeAlignment = (target: Element): Alignment => {
     const vrect = Rect.fromViewport()
     const rect = Rect.intersecting(target)
 
     if (rect) {
-      const leftBound = (rect.left - vrect.left) < threshold
-      const rightBound = (vrect.right - rect.right) < threshold
-      const topBound = (rect.top - vrect.top) < threshold
-      const bottomBound = (vrect.bottom - rect.bottom) < threshold
+      const leftBound = rect.left - vrect.left < threshold
+      const rightBound = vrect.right - rect.right < threshold
+      const topBound = rect.top - vrect.top < threshold
+      const bottomBound = vrect.bottom - rect.bottom < threshold
 
       if (leftBound && topBound) return 'br'
       if (leftBound && bottomBound) return 'tr'
@@ -84,7 +84,7 @@ export default function WithTooltip({
     return 'bc'
   }
 
-  const computeTextSize = (target: Element, threshold: number): Size => {
+  const computeTextSize = (target: Element): Size => {
     const computedStyle = window.getComputedStyle(target, '::after')
     const div = document.createElement('div')
     div.innerHTML = hint
@@ -111,8 +111,8 @@ export default function WithTooltip({
   }
 
   const onMouseOver = (event: MouseEvent) => {
-    setAlignment(computeAlignment(event.currentTarget, threshold))
-    setTextSize(computeTextSize(event.currentTarget, threshold))
+    setAlignment(computeAlignment(event.currentTarget))
+    setTextSize(computeTextSize(event.currentTarget))
   }
 
   const [textSize, setTextSize] = useState<Size | undefined>(new Size())
@@ -124,8 +124,8 @@ export default function WithTooltip({
   useEffect(() => {
     const childNode = childRef.current
     if (!childNode) return
-    setAlignment(computeAlignment(childNode, threshold))
-    setTextSize(computeTextSize(childNode, threshold))
+    setAlignment(computeAlignment(childNode))
+    setTextSize(computeTextSize(childNode))
   }, [childRect, viewportSize])
 
   return (
@@ -148,27 +148,29 @@ export default function WithTooltip({
 
 function makeDisplacementCSS(alignment: Alignment, arrowHeight: number, gap: number): CSSProp {
   switch (alignment) {
-  case 'tl': return css`top: ${-arrowHeight}px; left: calc(50% + ${arrowHeight*2.5}px);`
-  case 'tc': return css`top: ${-arrowHeight}px; left: 50%;`
-  case 'tr': return css`top: ${-arrowHeight}px; right: calc(50% + ${arrowHeight*2.5}px);`
-  case 'cl': return css`top: 50%; left: ${-arrowHeight}px;`
-  case 'cr': return css`top: 50%; right: ${-arrowHeight}px;`
-  case 'bl': return css`bottom: ${-arrowHeight}px; left: calc(50% + ${arrowHeight*2.5}px);`
-  case 'bc': return css`bottom: ${-arrowHeight}px; left: 50%;`
-  case 'br': return css`bottom: ${-arrowHeight}px; right: calc(50% + ${arrowHeight*2.5}px);`
+    case 'tl': return css`top: ${-arrowHeight}px; left: calc(50% + ${arrowHeight * 2.5}px);`
+    case 'tc': return css`top: ${-arrowHeight}px; left: 50%;`
+    case 'tr': return css`top: ${-arrowHeight}px; right: calc(50% + ${arrowHeight * 2.5}px);`
+    case 'cl': return css`top: 50%; left: ${-arrowHeight}px;`
+    case 'cr': return css`top: 50%; right: ${-arrowHeight}px;`
+    case 'bl': return css`bottom: ${-arrowHeight}px; left: calc(50% + ${arrowHeight * 2.5}px);`
+    case 'bc': return css`bottom: ${-arrowHeight}px; left: 50%;`
+    case 'br': return css`bottom: ${-arrowHeight}px; right: calc(50% + ${arrowHeight * 2.5}px);`
+    default: return css``
   }
 }
 
 function makeDialogPositionCSS(alignment: Alignment, arrowHeight: number, gap: number): CSSProp {
   switch (alignment) {
-  case 'tl': return css`transform: translate3d(calc(-100% - ${gap}px), calc(-100% - ${gap}px), 0);`
-  case 'tc': return css`transform: translate3d(-50%, calc(-100% - ${gap}px), 0);`
-  case 'tr': return css`transform: translate3d(calc(100% + ${gap}px), calc(-100% - ${gap}px), 0);`
-  case 'cl': return css`transform: translate3d(calc(-100% - ${gap}px), -50%, 0);`
-  case 'cr': return css`transform: translate3d(calc(100% + ${gap}px), -50%, 0);`
-  case 'bl': return css`transform: translate3d(calc(-100% - ${gap}px), calc(100% + ${gap}px), 0);`
-  case 'bc': return css`transform: translate3d(-50%, calc(100% + ${gap}px), 0);`
-  case 'br': return css`transform: translate3d(calc(100% + ${gap}px), calc(100% + ${gap}px), 0);`
+    case 'tl': return css`transform: translate3d(calc(-100% - ${gap}px), calc(-100% - ${gap}px), 0);`
+    case 'tc': return css`transform: translate3d(-50%, calc(-100% - ${gap}px), 0);`
+    case 'tr': return css`transform: translate3d(calc(100% + ${gap}px), calc(-100% - ${gap}px), 0);`
+    case 'cl': return css`transform: translate3d(calc(-100% - ${gap}px), -50%, 0);`
+    case 'cr': return css`transform: translate3d(calc(100% + ${gap}px), -50%, 0);`
+    case 'bl': return css`transform: translate3d(calc(-100% - ${gap}px), calc(100% + ${gap}px), 0);`
+    case 'bc': return css`transform: translate3d(-50%, calc(100% + ${gap}px), 0);`
+    case 'br': return css`transform: translate3d(calc(100% + ${gap}px), calc(100% + ${gap}px), 0);`
+    default: return css``
   }
 }
 
@@ -176,27 +178,29 @@ function makeArrowPositionCSS(alignment: Alignment, arrowHeight: number, gap: nu
   return css`
     ${() => {
     switch (alignment) {
-    case 'tl': return css`border-color: ${color} transparent transparent transparent;`
-    case 'tc': return css`border-color: ${color} transparent transparent transparent;`
-    case 'tr': return css`border-color: ${color} transparent transparent transparent;`
-    case 'cl': return css`border-color: transparent transparent transparent ${color};`
-    case 'cr': return css`border-color: transparent ${color} transparent transparent;`
-    case 'bl': return css`border-color: transparent transparent ${color} transparent;`
-    case 'bc': return css`border-color: transparent transparent ${color} transparent;`
-    case 'br': return css`border-color: transparent transparent ${color} transparent;`
+      case 'tl': return css`border-color: ${color} transparent transparent transparent;`
+      case 'tc': return css`border-color: ${color} transparent transparent transparent;`
+      case 'tr': return css`border-color: ${color} transparent transparent transparent;`
+      case 'cl': return css`border-color: transparent transparent transparent ${color};`
+      case 'cr': return css`border-color: transparent ${color} transparent transparent;`
+      case 'bl': return css`border-color: transparent transparent ${color} transparent;`
+      case 'bc': return css`border-color: transparent transparent ${color} transparent;`
+      case 'br': return css`border-color: transparent transparent ${color} transparent;`
+      default: return css``
     }
   }}
 
     ${() => {
     switch (alignment) {
-    case 'tl': return css`transform: translate3d(calc(0% - ${gap}px - ${arrowHeight*3}px), calc(0% - ${gap}px), 0);`
-    case 'tc': return css`transform: translate3d(-50%, calc(0% - ${gap}px), 0);`
-    case 'tr': return css`transform: translate3d(calc(100% + ${gap}px + ${arrowHeight}px), calc(0% - ${gap}px), 0);`
-    case 'cl': return css`transform: translate3d(calc(0% - ${gap}px), -50%, 0);`
-    case 'cr': return css`transform: translate3d(calc(0% + ${gap}px), -50%, 0);`
-    case 'bl': return css`transform: translate3d(calc(0% - ${gap}px - ${arrowHeight*3}px), calc(0% + ${gap}px), 0);`
-    case 'bc': return css`transform: translate3d(-50%, calc(0% + ${gap}px), 0);`
-    case 'br': return css`transform: translate3d(calc(100% + ${gap}px + ${arrowHeight}px), calc(0% + ${gap}px), 0);`
+      case 'tl': return css`transform: translate3d(calc(0% - ${gap}px - ${arrowHeight * 3}px), calc(0% - ${gap}px), 0);`
+      case 'tc': return css`transform: translate3d(-50%, calc(0% - ${gap}px), 0);`
+      case 'tr': return css`transform: translate3d(calc(100% + ${gap}px + ${arrowHeight}px), calc(0% - ${gap}px), 0);`
+      case 'cl': return css`transform: translate3d(calc(0% - ${gap}px), -50%, 0);`
+      case 'cr': return css`transform: translate3d(calc(0% + ${gap}px), -50%, 0);`
+      case 'bl': return css`transform: translate3d(calc(0% - ${gap}px - ${arrowHeight * 3}px), calc(0% + ${gap}px), 0);`
+      case 'bc': return css`transform: translate3d(-50%, calc(0% + ${gap}px), 0);`
+      case 'br': return css`transform: translate3d(calc(100% + ${gap}px + ${arrowHeight}px), calc(0% + ${gap}px), 0);`
+      default: return css``
     }
   }}
   `

@@ -2,7 +2,7 @@ import interact from 'interactjs'
 import _ from 'lodash'
 import { DependencyList, Dispatch, RefObject, SetStateAction, useEffect, useRef, useState } from 'react'
 
-// const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:hooks') : () => {}
+// Const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:hooks') : () => {}
 
 type ReturnedStates<T> = {
   isDragging: [boolean, Dispatch<SetStateAction<boolean>>]
@@ -67,6 +67,7 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
   const setValueRef = (value: T): boolean => {
     if (_.isEqual(valueRef.current, value)) return false
     valueRef.current = value
+
     return true
   }
 
@@ -75,11 +76,11 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
   const [value, setValue] = useState(valueRef.current)
 
   useEffect(() => {
-    // debug(`Using drag effect for element ${targetRef.current}...`, 'OK', `value=${valueRef.current}`)
+    // Debug(`Using drag effect for element ${targetRef.current}...`, 'OK', `value=${valueRef.current}`)
 
     if (targetRef.current && !interact.isSet(targetRef.current)) {
       // Do not consume states in these listeners as they will remain their initial values within
-      // the scope of the listeners.
+      // The scope of the listeners.
       interact(targetRef.current).draggable({
         inertia: true,
         ...options,
@@ -91,7 +92,7 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
           const newValue = transform?.(valueRef.current, dx, dy) ?? [dx, dy] as unknown as T
 
           if (setValueRef(newValue)) {
-            // debug('Updating value from dragging...', 'OK', newValue)
+            // Debug('Updating value from dragging...', 'OK', newValue)
             setValue(newValue)
           }
 
@@ -105,7 +106,7 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
     }
 
     return () => {
-      // debug(`Removing drag effect for element ${targetRef.current}...`, 'OK', `value=${valueRef.current}`)
+      // Debug(`Removing drag effect for element ${targetRef.current}...`, 'OK', `value=${valueRef.current}`)
 
       if (targetRef.current && interact.isSet(targetRef.current)) {
         interact(targetRef.current).unset()
@@ -115,7 +116,7 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
 
   useEffect(() => {
     if (setValueRef(value)) {
-      // debug('Updating value from externally...', 'OK', value)
+      // Debug('Updating value from externally...', 'OK', value)
     }
   }, [value])
 

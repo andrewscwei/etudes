@@ -38,9 +38,9 @@ export default function() {
           isInverted={true}
           knobHeight={40}
           knobWidth={60}
-          labelProvider={position => `${Math.round(getAngleByPosition(position))}°`}
+          labelProvider={pos => `${Math.round(getAngleByPosition(pos))}°`}
           onlyDispatchesOnDragEnd={false}
-          onPositionChange={position => setPosition(position)}
+          onPositionChange={pos => setPosition(pos)}
           orientation='vertical'
           position={position}
           trackPadding={10}
@@ -72,8 +72,8 @@ export default function() {
           isTrackInteractive={false}
           knobHeight={40}
           knobWidth={60}
-          labelProvider={(position, index) => `${index}`}
-          onIndexChange={index => setIndex(index)}
+          labelProvider={(pos, idx) => `${idx}`}
+          onIndexChange={idx => setIndex(idx)}
           onlyDispatchesOnDragEnd={false}
           orientation='vertical'
           trackPadding={10}

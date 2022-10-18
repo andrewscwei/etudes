@@ -13,9 +13,9 @@ export default function ExtractChildren({
 }: Props) {
   return (
     <>
-      {Children.map(children, (child, idx) => {
+      {Children.map(children, child => {
         if (isValidElement(child)) {
-          return cloneElement(child, { className: classNames(className, child.props.className), ...props })
+          return cloneElement(child, { className: classNames(className, child.props.className), ...props } as any)
         }
 
         return child

@@ -97,7 +97,8 @@ export default class RangeSlider extends PureComponent<Props, State> {
     const [valA, valB] = this.state.range
     const a = this.getDisplacementByValue(valA)
     const b = this.getDisplacementByValue(valB)
-    return (b - a)
+
+    return b - a
   }
 
   get breakpoints(): readonly number[] {
@@ -156,7 +157,7 @@ export default class RangeSlider extends PureComponent<Props, State> {
           hitboxPadding={this.props.hitboxPadding}
           isDragging={this.state.isDraggingStartingKnob}
           isReleasing={this.state.isReleasingStartingKnob}
-          isDisabled={(this.state.range[1] === this.props.min) && (this.state.range[0] === this.props.min)}
+          isDisabled={this.state.range[1] === this.props.min && this.state.range[0] === this.props.min}
           style={this.props.orientation === 'horizontal' ? {
             marginLeft: `${this.getDisplacementByValue(this.state.range[0])}px`,
           } : {
@@ -200,7 +201,7 @@ export default class RangeSlider extends PureComponent<Props, State> {
           hitboxPadding={this.props.hitboxPadding}
           isDragging={this.state.isDraggingEndingKnob}
           isReleasing={this.state.isReleasingEndingKnob}
-          isDisabled={(this.state.range[1] === this.props.max) && (this.state.range[0] === this.props.max)}
+          isDisabled={this.state.range[1] === this.props.max && this.state.range[0] === this.props.max}
           style={this.props.orientation === 'horizontal' ? {
             marginLeft: `${this.getDisplacementByValue(this.state.range[1])}px`,
           } : {
@@ -264,11 +265,13 @@ export default class RangeSlider extends PureComponent<Props, State> {
     if (!range2) return false
     if (range1[0] !== range2[0]) return false
     if (range1[1] !== range2[1]) return false
+
     return true
   }
 
   private getPositionByValue(value: number): number {
     const { min, max } = this.props
+
     return (value - min) / (max - min)
   }
 
@@ -283,6 +286,7 @@ export default class RangeSlider extends PureComponent<Props, State> {
 
   private getDisplacementByValue(value: number): number {
     const position = this.getPositionByValue(value)
+
     return this.getDisplacementByPosition(position)
   }
 
@@ -297,7 +301,8 @@ export default class RangeSlider extends PureComponent<Props, State> {
 
   private getValueByPosition(position: number): number {
     const { min, max } = this.props
-    return (position * (max - min)) + min
+
+    return position * (max - min) + min
   }
 
   private getClosestSteppedValueOfValue(value: number): number {

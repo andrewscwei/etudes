@@ -15,11 +15,11 @@ export default function useElementRect(targetRef: RefObject<Element>): Rect {
 
   useEffect(() => {
     observerRef.current = new ResizeObserver(() => {
-      const rect = Rect.from(targetRef.current)
+      const newRect = Rect.from(targetRef.current)
 
-      if (!rect) return
+      if (!newRect) return
 
-      setRect(rect)
+      setRect(newRect)
     })
 
     if (observerRef.current && targetRef.current) {

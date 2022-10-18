@@ -107,7 +107,7 @@ export default class List<T = Record<string, never>> extends AbstractSelectableC
     const borderColor = this.props.borderColor ?? '#000'
     const borderThickness = this.props.borderThickness ?? 0
     const maxLength = this.props.maxLength ?? -1
-    const scrollBarPadding = maxLength < 0 ? 0 : (this.props.scrollBarPadding ?? 0)
+    const scrollBarPadding = maxLength < 0 ? 0 : this.props.scrollBarPadding ?? 0
     const orientation = this.props.orientation ?? 'vertical'
 
     return (
@@ -117,7 +117,7 @@ export default class List<T = Record<string, never>> extends AbstractSelectableC
         itemPadding={this.props.itemPadding ?? 0}
         style={{
           ...this.props.style ?? {},
-          ...(maxLength < 0 ? {} : (
+          ...maxLength < 0 ? {} :
             orientation === 'vertical' ? {
               height: `${maxLength}px`,
               overflowY: 'scroll',
@@ -129,7 +129,7 @@ export default class List<T = Record<string, never>> extends AbstractSelectableC
               width: `${maxLength}px`,
               WebkitOverflowScrolling: 'touch',
             }
-          )),
+          ,
         }}
       >
         {this.props.data.map((t, i) => (
@@ -146,11 +146,11 @@ export default class List<T = Record<string, never>> extends AbstractSelectableC
               borderWidth: `${borderThickness}px`,
               counterIncrement: 'item-counter',
               pointerEvents: this.props.isTogglable !== true && this.isSelectedAt(i) ? 'none' : 'auto',
-              ...(orientation === 'vertical' ? {
+              ...orientation === 'vertical' ? {
                 marginTop: `${i === 0 ? 0 : -borderThickness}px`,
               } : {
                 marginLeft: `${i === 0 ? 0 : -borderThickness}px`,
-              }),
+              },
             }}
           />
         ))}
@@ -160,6 +160,7 @@ export default class List<T = Record<string, never>> extends AbstractSelectableC
 
   isIndexOutOfRange(index: number): boolean {
     if (index >= this.props.data.length) return true
+
     return super.isIndexOutOfRange(index)
   }
 }
