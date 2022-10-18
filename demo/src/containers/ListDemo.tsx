@@ -1,24 +1,25 @@
 import $$ExpandIcon from '!!raw-loader!../assets/images/expand-icon.svg'
 import { animations, container, selectors } from 'promptu'
-import React, { Fragment, FunctionComponent, PureComponent } from 'react'
+import React, { FunctionComponent, PureComponent } from 'react'
 import styled, { css } from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
 import Dropdown, { ItemComponentProps as DropdownItemComponentProps } from '../../../lib/Dropdown'
 import List, { ItemComponentProps as ListItemComponentProps } from '../../../lib/List'
 import { Orientation } from '../../../lib/types'
 
-export interface State {
+export type State = {
   selectedItemIndex: number
   selectedOrientationIndex: number
 }
 
-const DropdownItemComponent: FunctionComponent<DropdownItemComponentProps> = ({
-  data,
-  isSelected,
-  onClick,
-  style,
-}: DropdownItemComponentProps) => (
-  <StyledDropdownItem isSelected={isSelected ?? false} onClick={() => onClick?.()} style={style}>{data.label}</StyledDropdownItem>
+const DropdownItemComponent = ({ data, isSelected, onClick, style }: DropdownItemComponentProps) => (
+  <StyledDropdownItem
+    isSelected={isSelected ?? false}
+    style={style}
+    onClick={() => onClick?.()}
+  >
+    {data.label}
+  </StyledDropdownItem>
 )
 
 const ListItemComponent: FunctionComponent<ListItemComponentProps<string>> = ({
@@ -41,7 +42,7 @@ export default class Container extends PureComponent<void, State> {
     const orientation = this.state.selectedOrientationIndex === 0 ? 'vertical' : 'horizontal'
 
     return (
-      <Fragment>
+      <>
         <StyledRoot orientation={orientation}>
           <List
             data={[...new Array(60)].map((v, i) => `${i + 1}`)}
@@ -117,7 +118,7 @@ export default class Container extends PureComponent<void, State> {
             transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)',
           }}
         />
-      </Fragment>
+      </>
     )
   }
 }

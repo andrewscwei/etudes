@@ -1,4 +1,4 @@
-import React, { CSSProperties, Fragment, PureComponent } from 'react'
+import React, { CSSProperties, PureComponent } from 'react'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:asc') : () => {}
@@ -15,25 +15,22 @@ export interface Props {
   style?: CSSProperties
 
   /**
-   * Indicates whether selections can be toggled. For example, in the case of
-   * a vertical list of selectable rows, being able to toggle a row means it
-   * gets deselected when selected again. Being unable to toggle the row means
-   * it does not get deselected when selected again.
+   * Indicates whether selections can be toggled. For example, in the case of a vertical list of
+   * selectable rows, being able to toggle a row means it gets deselected when selected again. Being
+   * unable to toggle the row means it does not get deselected when selected again.
    */
   isTogglable?: boolean
 
   /**
-   * Indicates whether selections are retained. For example, in the case of
-   * a vertical list of clickable rows, being able to retain a selection means
-   * when the row is clicked, it becomes and stays selected. Being unable to
-   * retain a selection means when the row is clicked, it does not become
-   * selected. It is simply clicked and the subsequent event is dispatched.
+   * Indicates whether selections are retained. For example, in the case of a vertical list of
+   * clickable rows, being able to retain a selection means when the row is clicked, it becomes and
+   * stays selected. Being unable to retain a selection means when the row is clicked, it does not
+   * become selected. It is simply clicked and the subsequent event is dispatched.
    */
   shouldStaySelected?: boolean
 
   /**
-   * The default selected index. Any value below 0 indicates that nothing is
-   * selected.
+   * The default selected index. Any value below 0 indicates that nothing is selected.
    */
   defaultSelectedIndex?: number
 
@@ -50,15 +47,13 @@ export interface Props {
 
 export interface State {
   /**
-   * The current selected index. Any value less than 0 indicates that no index
-   * is selected.
+   * The current selected index. Any value less than 0 indicates that no index is selected.
    */
   selectedIndex?: number
 }
 
 /**
- * An abstract component that mimics and handles index selection in an abstract
- * collection.
+ * An abstract component that mimics and handles index selection in an abstract collection.
  */
 export default class AbstractSelectableCollection<P extends Props = Props, S extends State = State> extends PureComponent<P, S> {
   constructor(props: P) {
@@ -91,7 +86,7 @@ export default class AbstractSelectableCollection<P extends Props = Props, S ext
   }
 
   render() {
-    return <Fragment/>
+    return <></>
   }
 
   /**
