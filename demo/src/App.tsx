@@ -23,7 +23,7 @@ export default function App() {
   }
 
   const [isNavActive, setIsNavActive] = useState(false)
-  const [hash, setHash] = useState<string | undefined>('accordion')
+  const [hash, setHash] = useState<string | undefined>()
 
   useEffect(() => {
     mapLocationToHash()

@@ -75,9 +75,7 @@ export default function() {
       <DebugConsole
         title='?: Accordion'
         message={sectionIndex > -1 ? itemIndex > -1 ? `You selected item <strong>#${itemIndex + 1}</strong> in section <strong>#${sectionIndex + 1}</strong>!` : `No item seletected in section <strong>#${sectionIndex + 1}</strong>!` : 'No section selected!'}
-        // style={{
-        //   transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)',
-        // }}
+        style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
       />
     </>
   )
