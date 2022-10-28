@@ -1,5 +1,4 @@
 import React, { forwardRef, HTMLAttributes } from 'react'
-import styled from 'styled-components'
 
 export type Props = HTMLAttributes<HTMLDivElement> & {
   /**
@@ -38,6 +37,46 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
   whitelistedAttributes?: string[]
 }
 
+/**
+ * A component whose root element wraps an SVG markup. When wrapping the SVG, it will attempt to
+ * sanitize the markup (i.e. stripping useless attributes) according to the props specified.
+ */
+export default forwardRef<HTMLDivElement, Props>(({
+  markup,
+  stripClasses = true,
+  stripExtraneousAttributes = true,
+  stripIds = true,
+  stripStyles = true,
+  whitelistedAttributes = ['viewBox'],
+  ...props
+}, ref) => {
+  function sanitizedMarkup(): string {
+    const mockContainer = document.createElement('div')
+    mockContainer.innerHTML = markup
+
+    const elements = mockContainer.getElementsByTagName('svg')
+    if (elements.length > 1) throw new Error('More than one SVG element found in provided markup')
+
+    const svgElement = elements[0]
+    if (!svgElement) throw new Error('No SVG in provided markup')
+
+    if (stripExtraneousAttributes) removeAttributes(svgElement, undefined, false, [...whitelistedAttributes, 'style', 'class', 'id'])
+    if (stripIds) removeAttributes(svgElement, ['id'], true)
+    if (stripClasses) removeAttributes(svgElement, ['class'], true)
+    if (stripStyles) removeStyles(svgElement)
+
+    return svgElement.outerHTML
+  }
+
+  return (
+    <figure
+      ref={ref}
+      dangerouslySetInnerHTML={{ __html: sanitizedMarkup() }}
+      {...props}
+    />
+  )
+})
+
 function removeStyles(element: Element) {
   element.removeAttribute('style')
 
@@ -74,68 +113,3 @@ function removeAttributes(element: Element, attributes: string[] | undefined = u
     }
   }
 }
-
-/**
- * A component whose root element wraps an SVG markup. When wrapping the SVG, it will attempt to
- * sanitize the markup (i.e. stripping useless attributes) according to the props specified.
- */
-export default forwardRef<HTMLDivElement, Props>(({
-  markup,
-  stripClasses = true,
-  stripExtraneousAttributes = true,
-  stripIds = true,
-  stripStyles = true,
-  whitelistedAttributes = ['viewBox'],
-  ...props
-}, ref) => {
-  function sanitizedMarkup(): string {
-    const mockContainer = document.createElement('div')
-    mockContainer.innerHTML = markup
-
-    const elements = mockContainer.getElementsByTagName('svg')
-    if (elements.length > 1) throw new Error('More than one SVG element found in provided markup')
-
-    const svgElement = elements[0]
-    if (!svgElement) throw new Error('No SVG in provided markup')
-
-    if (stripExtraneousAttributes) removeAttributes(svgElement, undefined, false, [...whitelistedAttributes, 'style', 'class', 'id'])
-    if (stripIds) removeAttributes(svgElement, ['id'], true)
-    if (stripClasses) removeAttributes(svgElement, ['class'], true)
-    if (stripStyles) removeStyles(svgElement)
-
-    return svgElement.outerHTML
-  }
-
-  return (
-    <StyledRoot
-      ref={ref}
-      dangerouslySetInnerHTML={{ __html: sanitizedMarkup() }}
-      {...props}
-    />
-  )
-})
-
-const StyledRoot = styled.figure`
-  box-sizing: border-box;
-  display: inline-block;
-  flex: 0 0 auto;
-  height: auto;
-  position: relative;
-  width: auto;
-
-  svg {
-    height: auto;
-    transition-delay: inherit;
-    transition-duration: inherit;
-    transition-property: inherit;
-    transition-timing-function: inherit;
-    width: auto;
-
-    * {
-      transition-delay: inherit;
-      transition-duration: inherit;
-      transition-property: inherit;
-      transition-timing-function: inherit;
-    }
-  }
-`
