@@ -1,6 +1,5 @@
-import React, { HTMLAttributes, useEffect, useRef, useState } from 'react'
+import React, { forwardRef, HTMLAttributes, useEffect, useRef, useState } from 'react'
 import { Rect } from 'spase'
-import styled from 'styled-components'
 import useResizeEffect from './hooks/useResizeEffect'
 import { Orientation } from './types'
 
@@ -19,121 +18,6 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
 const BASE_MODIFIER_CLASS_PREFIX = 'base-'
 
 /**
- * Computes the index and current length of the next available section for a specific base value,
- * based on a provided array of existing section lengths.
- *
- * @param currentSectionLengths - An array of the current section lengths.
- * @param base - The base value of the item to be inserted into the grid, and to be used to evaluate
- *               the next available section.
- *
- * @returns An array consiting of the computed section index and its to-be length if a new item were
- *          to be placed in it.
- */
-function computeNextAvailableSectionAndLengthByBase(currentSectionLengths: number[], base: number): [number, number] {
-  const numSections = currentSectionLengths.length
-
-  let sectionIdx = NaN
-  let minLength = Infinity
-
-  for (let i = 0; i < numSections; i++) {
-    const length = currentSectionLengths[i]
-    const isShorter = length < minLength
-    const isEligibleSection = i + base <= numSections
-    let hasRoomInSubsequentSections = true
-
-    for (let j = 1; j < base; j++) {
-      if (currentSectionLengths[i + j] > length) {
-        hasRoomInSubsequentSections = false
-      }
-    }
-
-    if (isShorter && isEligibleSection && hasRoomInSubsequentSections) {
-      sectionIdx = i
-      minLength = length
-    }
-  }
-
-  if (isNaN(sectionIdx)) {
-    return [0, computeMaxLength(currentSectionLengths, base)]
-  }
-  else {
-    return [sectionIdx, minLength]
-  }
-}
-
-/**
- * A helper function that computes the max section length of an array of section lengths. Only the
- * first n = `base` sections are inspected.
- *
- * @param currentSectionLengths - An array of section lengths.
- * @param base - The number representing the first n sections to inspect. Any non-numerical values
- *               will be ignored and return value will be based on all sections. A `base` value will
- *               be clamped between 1 and the maximum length of the array of section lengths.
- *
- * @returns The max section length.
- */
-function computeMaxLength(currentSectionLengths: number[], base?: number): number {
-  let arr = currentSectionLengths
-
-  if (base !== undefined && base !== null && !isNaN(base)) {
-    arr = arr.slice(0, Math.max(1, Math.min(base, currentSectionLengths.length)))
-  }
-
-  return arr.reduce((out, curr, i) => curr > out ? curr : out, 0)
-}
-
-/**
- * Computes the base value of an element from its classes.
- *
- * @param element - The HTML element.
- * @param numSections - Total number of sections.
- *
- * @returns The computed base value that is clamped between 1 and max number of sections.
- */
-function computeBaseFromElement(element: HTMLElement, numSections: number): number {
-  const classList = element.classList
-
-  for (let i = 0; i < classList.length; i++) {
-    const c = classList[i]
-
-    if (c.startsWith(BASE_MODIFIER_CLASS_PREFIX)) {
-      const base = parseFloat(c.replace(BASE_MODIFIER_CLASS_PREFIX, ''))
-      if (!isNaN(base)) return Math.min(Math.max(base, 1), numSections)
-    }
-  }
-
-  return 1
-}
-
-/**
- * Scans an HTML string and returns all the image sources.
- *
- * @param htmlString The HTML string.
- *
- * @returns The image sources.
- */
-function getAllImageSources(htmlString?: string): string[] {
-  if (!htmlString) return []
-
-  const regexImg = /<img.*?src=("|')(.*?)("|')/g
-  const regexSrc = /<img.*?src=("|')(.*?)("|')/
-  const imageTags = htmlString.match(regexImg) ?? []
-
-  const out: string[] = []
-
-  for (let i = 0; i < imageTags.length; i++) {
-    const tag = imageTags[i]
-    const src = tag.match(regexSrc)?.[2]
-
-    if (!src) continue
-
-    out.push(src)
-  }
-
-  return out
-}
-
-/**
  * This is a React component that arranges all of its immediate children in a masonry grid. Refrain
  * from assigning CSS styles to it via `className` or `style` property, though they are still
  * handled if absolutely necessary. Customize the grid via its supported properties. The grid can be
@@ -146,17 +30,17 @@ function getAllImageSources(htmlString?: string): string[] {
  * Hence, in a vertically oriented grid, *number of secitons* refers to the *number of rows*,
  * whereas in a horizontally oriented grid, *number of sections* refers to the *number of columns*.
  */
-export default function MasonryGrid({
+export default forwardRef<HTMLDivElement, Props>(({
   areSectionsAligned = false,
   children,
+  className,
   horizontalSpacing = 0,
   isReversed = false,
   orientation = 'vertical',
   sections = 3,
-  style = {},
   verticalSpacing = 0,
   ...props
-}: Props) {
+}, ref) => {
   const rootRef = useRef<HTMLDivElement>(null)
 
   const [minWidth, setMinWidth] = useState(NaN)
@@ -311,29 +195,131 @@ export default function MasonryGrid({
   }, [children])
 
   return (
-    <StyledRoot
-      {...props}
-      ref={rootRef}
-      orientation={orientation}
-      style={{
-        ...style,
-        flex: '0 0 auto',
+    <div {...props} className={`${className ?? ''} ${orientation}`.split(' ').filter(Boolean).join(' ')} ref={ref}>
+      <div ref={rootRef} style={{
+        height: orientation === 'horizontal' ? '100%' : 'auto',
         minHeight: orientation === 'vertical' && !isNaN(minHeight) ? `${minHeight}px` : '',
         minWidth: orientation === 'horizontal' && !isNaN(minWidth) ? `${minWidth}px` : '',
         padding: '0',
-      }}
-    >
-      {children}
-    </StyledRoot>
+        width: orientation === 'horizontal' ? 'auto' : '100%',
+      }}>
+        {children}
+      </div>
+    </div>
   )
+})
+
+/**
+ * Computes the index and current length of the next available section for a specific base value,
+ * based on a provided array of existing section lengths.
+ *
+ * @param currentSectionLengths - An array of the current section lengths.
+ * @param base - The base value of the item to be inserted into the grid, and to be used to evaluate
+ *               the next available section.
+ *
+ * @returns An array consiting of the computed section index and its to-be length if a new item were
+ *          to be placed in it.
+ */
+function computeNextAvailableSectionAndLengthByBase(currentSectionLengths: number[], base: number): [number, number] {
+  const numSections = currentSectionLengths.length
+
+  let sectionIdx = NaN
+  let minLength = Infinity
+
+  for (let i = 0; i < numSections; i++) {
+    const length = currentSectionLengths[i]
+    const isShorter = length < minLength
+    const isEligibleSection = i + base <= numSections
+    let hasRoomInSubsequentSections = true
+
+    for (let j = 1; j < base; j++) {
+      if (currentSectionLengths[i + j] > length) {
+        hasRoomInSubsequentSections = false
+      }
+    }
+
+    if (isShorter && isEligibleSection && hasRoomInSubsequentSections) {
+      sectionIdx = i
+      minLength = length
+    }
+  }
+
+  if (isNaN(sectionIdx)) {
+    return [0, computeMaxLength(currentSectionLengths, base)]
+  }
+  else {
+    return [sectionIdx, minLength]
+  }
 }
 
-const StyledRoot = styled.div<{
-  orientation: Props['orientation']
-}>`
-  box-sizing: border-box;
-  display: block;
-  height: ${props => props.orientation === 'vertical' ? 'auto' : '100%'};
-  position: relative;
-  width: ${props => props.orientation === 'horizontal' ? 'auto' : '100%'};
-`
+/**
+ * A helper function that computes the max section length of an array of section lengths. Only the
+ * first n = `base` sections are inspected.
+ *
+ * @param currentSectionLengths - An array of section lengths.
+ * @param base - The number representing the first n sections to inspect. Any non-numerical values
+ *               will be ignored and return value will be based on all sections. A `base` value will
+ *               be clamped between 1 and the maximum length of the array of section lengths.
+ *
+ * @returns The max section length.
+ */
+function computeMaxLength(currentSectionLengths: number[], base?: number): number {
+  let arr = currentSectionLengths
+
+  if (base !== undefined && base !== null && !isNaN(base)) {
+    arr = arr.slice(0, Math.max(1, Math.min(base, currentSectionLengths.length)))
+  }
+
+  return arr.reduce((out, curr, i) => curr > out ? curr : out, 0)
+}
+
+/**
+ * Computes the base value of an element from its classes.
+ *
+ * @param element - The HTML element.
+ * @param numSections - Total number of sections.
+ *
+ * @returns The computed base value that is clamped between 1 and max number of sections.
+ */
+function computeBaseFromElement(element: HTMLElement, numSections: number): number {
+  const classList = element.classList
+
+  for (let i = 0; i < classList.length; i++) {
+    const c = classList[i]
+
+    if (c.startsWith(BASE_MODIFIER_CLASS_PREFIX)) {
+      const base = parseFloat(c.replace(BASE_MODIFIER_CLASS_PREFIX, ''))
+      if (!isNaN(base)) return Math.min(Math.max(base, 1), numSections)
+    }
+  }
+
+  return 1
+}
+
+/**
+ * Scans an HTML string and returns all the image sources.
+ *
+ * @param htmlString The HTML string.
+ *
+ * @returns The image sources.
+ */
+function getAllImageSources(htmlString?: string): string[] {
+  if (!htmlString) return []
+
+  const regexImg = /<img.*?src=("|')(.*?)("|')/g
+  const regexSrc = /<img.*?src=("|')(.*?)("|')/
+  const imageTags = htmlString.match(regexImg) ?? []
+
+  const out: string[] = []
+
+  for (let i = 0; i < imageTags.length; i++) {
+    const tag = imageTags[i]
+    const src = tag.match(regexSrc)?.[2]
+
+    if (!src) continue
+
+    out.push(src)
+  }
+
+  return out
+}

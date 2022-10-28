@@ -1,14 +1,17 @@
-import { container } from 'promptu'
-import React from 'react'
+import { animations, container, selectors } from 'promptu'
+import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
+import Each from '../../../lib/Each'
 import MasonryGrid from '../../../lib/MasonryGrid'
 
 export default function() {
-  const items = [...new Array(200)].map((v, i) => ({
+  const [itemIndex, setItemIndex] = useState(-1)
+
+  const items = useMemo(() => [...new Array(200)].map((v, i) => ({
     h: Math.floor(Math.random() * 6) + 1,
     b: Math.floor(Math.random() * 1) + 1,
-  }))
+  })), [])
 
   return (
     <>
@@ -23,25 +26,27 @@ export default function() {
             transform: 'translate3d(0, 0, 0) rotate3d(1, 1, 0, 2deg)',
           }}
         >
-          {items.map((v, i) => (
-            <StyledGridItem key={i} className={`h-${v.h} base-${v.b}`}>{i + 1}</StyledGridItem>
-          ))}
+          <Each in={items}>
+            {(val, idx) => (
+              <StyledGridItem className={`h-${val.h} base-${val.b}`} onClick={() => setItemIndex(idx)}>{idx + 1}</StyledGridItem>
+            )}
+          </Each>
         </MasonryGrid>
       </StyledRoot>
       <DebugConsole
         title='?: Masonry Grid'
-        style={{
-          transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)',
-        }}
+        message={itemIndex > -1 ? `You selected item <strong>#${itemIndex + 1}</strong>!` : 'No item seletected!'}
+        style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
       />
     </>
   )
 }
 
-const StyledGridItem = styled.div`
+const StyledGridItem = styled.button`
   ${container.fvcc}
-  background: #ff0054;
-  color: #fff;
+  ${animations.transition(['transform', 'background', 'color'], 100)}
+  background: #fff;
+  color: #000;
   font-size: 2rem;
   font-weight: 700;
 
@@ -51,6 +56,12 @@ const StyledGridItem = styled.div`
   &.h-4 { height: 16rem; }
   &.h-5 { height: 20rem; }
   &.h-6 { height: 24rem; }
+
+  ${selectors.hwot} {
+    background: #ff0054;
+    color: #fff;
+    transform: translate3d(0, 0, 0) scale(1.1);
+  }
 `
 
 const StyledRoot = styled.div`
