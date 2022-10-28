@@ -4,7 +4,7 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
   /**
    * The SVG string markup, i.e. "<svg>...</svg>".
    */
-  markup: string
+  svg: string
 
   /**
    * Specifies whether the 'class' should be removed in the SVG root node and all of its child
@@ -42,7 +42,7 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
  * sanitize the markup (i.e. stripping useless attributes) according to the props specified.
  */
 export default forwardRef<HTMLDivElement, Props>(({
-  markup,
+  svg,
   stripClasses = true,
   stripExtraneousAttributes = true,
   stripIds = true,
@@ -52,7 +52,7 @@ export default forwardRef<HTMLDivElement, Props>(({
 }, ref) => {
   function sanitizedMarkup(): string {
     const mockContainer = document.createElement('div')
-    mockContainer.innerHTML = markup
+    mockContainer.innerHTML = svg
 
     const elements = mockContainer.getElementsByTagName('svg')
     if (elements.length > 1) throw new Error('More than one SVG element found in provided markup')
@@ -70,9 +70,9 @@ export default forwardRef<HTMLDivElement, Props>(({
 
   return (
     <figure
+      {...props}
       ref={ref}
       dangerouslySetInnerHTML={{ __html: sanitizedMarkup() }}
-      {...props}
     />
   )
 })
