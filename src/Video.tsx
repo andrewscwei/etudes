@@ -1,189 +1,129 @@
-import React, { createRef, CSSProperties, PureComponent } from 'react'
-import styled from 'styled-components'
+import React, { CSSProperties, forwardRef, HTMLAttributes, ReactEventHandler, useEffect, useRef } from 'react'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:video') : () => {}
 
-export interface Props {
+export type Props = HTMLAttributes<HTMLDivElement> & {
   autoLoop: boolean
   autoPlay: boolean
-  className?: string
   hasControls: boolean
   isCover: boolean
   isMuted: boolean
+  playsInline: boolean
+  posterSrc?: string
+  src: string
   onCanPlay: () => void
   onEnd: () => void
   onFullscreenChange: (isFullscreen: boolean) => void
   onPause: () => void
   onPlay: () => void
-  playsInline: boolean
-  posterSrc?: string
-  src: string
-  style: CSSProperties
 }
 
-export default class Video extends PureComponent<Props> {
-  static defaultProps = {
-    autoLoop: true,
-    autoPlay: true,
-    hasControls: false,
-    isCover: true,
-    isMuted: true,
-    onCanPlay: () => {},
-    onEnd: () => {},
-    onFullscreenChange: () => {},
-    onPause: () => {},
-    onPlay: () => {},
-    playsInline: true,
-    style: {},
-  }
+export default forwardRef<HTMLDivElement, Props>(({
+  autoLoop = true,
+  autoPlay = true,
+  hasControls = false,
+  isCover = true,
+  isMuted = true,
+  playsInline = true,
+  posterSrc,
+  src,
+  onCanPlay,
+  onEnd,
+  onFullscreenChange,
+  onPause,
+  onPlay,
+  ...props
+}, ref) => {
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const isPaused = videoRef.current?.paused ?? false
 
-  nodeRefs = {
-    root: createRef<HTMLDivElement>(),
-    video: createRef<HTMLVideoElement>(),
-  }
+  useEffect(() => {
+    debug(`Initializing video with src <${src}>...`, 'OK')
 
-  constructor(props: Props) {
-    super(props)
-    debug(`Initializing with src <${this.props.src}>...`, 'OK')
-  }
+    if (!videoRef.current) return
 
-  get isPaused(): boolean {
-    if (!this.nodeRefs.video.current) return false
+    videoRef.current.muted = isMuted
+    videoRef.current.load()
+    videoRef.current.addEventListener('webkitfullscreenchange', fullscreenChangeHandler)
+    videoRef.current.addEventListener('mozfullscreenchange', fullscreenChangeHandler)
+    videoRef.current.addEventListener('fullscreenchange', fullscreenChangeHandler)
 
-    return this.nodeRefs.video.current.paused
-  }
+    return () => {
+      debug(`Deinitializing video with src <${src}>...`, 'OK')
 
-  componentDidMount() {
-    const videoNode = this.nodeRefs.video.current
+      pause()
 
-    if (videoNode) {
-      videoNode.muted = this.props.isMuted
-      videoNode.load()
-
-      videoNode.addEventListener('webkitfullscreenchange', this.onFullscreenChange)
-      videoNode.addEventListener('mozfullscreenchange', this.onFullscreenChange)
-      videoNode.addEventListener('fullscreenchange', this.onFullscreenChange)
+      videoRef.current?.removeEventListener('webkitfullscreenchange', fullscreenChangeHandler)
+      videoRef.current?.removeEventListener('mozfullscreenchange', fullscreenChangeHandler)
+      videoRef.current?.removeEventListener('fullscreenchange', fullscreenChangeHandler)
     }
-  }
+  }, [src])
 
-  componentWillUnmount() {
-    const videoNode = this.nodeRefs.video.current
-
-    if (videoNode) {
-      videoNode.removeEventListener('webkitfullscreenchange', this.onFullscreenChange)
-      videoNode.removeEventListener('mozfullscreenchange', this.onFullscreenChange)
-      videoNode.removeEventListener('fullscreenchange', this.onFullscreenChange)
-    }
-
-    this.pause()
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (prevProps.isMuted !== this.props.isMuted && this.nodeRefs.video.current) {
-      this.nodeRefs.video.current.muted = this.props.isMuted
-    }
-
-    if (prevProps.autoPlay !== this.props.autoPlay) {
-      if (this.props.autoPlay) {
-        this.play()
-      }
-      else {
-        this.pause()
-      }
-    }
-  }
-
-  onFullscreenChange = (event: Event) => {
+  const fullscreenChangeHandler = (event: Event) => {
     const isFullscreen: boolean | undefined = (document as any).fullScreen || (document as any).mozFullScreen || (document as any).webkitIsFullScreen
-
     if (isFullscreen === undefined) return
-
-    this.props.onFullscreenChange(isFullscreen)
+    onFullscreenChange?.(isFullscreen)
   }
 
-  onCanPlay(element: HTMLVideoElement) {
+  const canPlayHandler: ReactEventHandler<HTMLVideoElement> = event => {
     debug('Checking if video is ready to play...', 'OK')
 
-    if (this.props.autoPlay && this.isPaused) {
-      this.play()
+    if (autoPlay && isPaused) {
+      play()
     }
 
-    this.props.onCanPlay()
+    onCanPlay?.()
   }
 
-  onPlay(element: HTMLVideoElement) {
+  const playHandler: ReactEventHandler<HTMLVideoElement> = event => {
     debug('Playing video...', 'OK')
-
-    this.props.onPlay()
+    onPlay?.()
   }
 
-  onPause(element: HTMLVideoElement) {
+  const pauseHandler: ReactEventHandler<HTMLVideoElement> = event => {
     debug('Pausing video...', 'OK')
-
-    this.props.onPause()
+    onPause?.()
   }
 
-  onEnd(element: HTMLVideoElement) {
+  const endHandler: ReactEventHandler<HTMLVideoElement> = event => {
     debug('Ending video...', 'OK')
-
-    this.props.onEnd()
+    onEnd?.()
   }
 
-  play() {
-    if (!this.nodeRefs.video.current) return
-    this.nodeRefs.video.current.play()
+  const play = () => {
+    if (!videoRef.current) return
+    videoRef.current.play()
   }
 
-  pause() {
-    if (!this.nodeRefs.video.current) return
-    this.nodeRefs.video.current.pause()
+  const pause = () => {
+    if (!videoRef.current) return
+    videoRef.current.pause()
   }
 
-  render() {
-    return (
-      <StyledRoot
-        className={this.props.className}
-        isCover={this.props.isCover}
-        ref={this.nodeRefs.root}
-        style={this.props.style}
+  return (
+    <div {...props} ref={ref}>
+      <video
+        ref={videoRef}
+        autoPlay={autoPlay}
+        playsInline={playsInline}
+        muted={isMuted}
+        controls={hasControls}
+        onCanPlay={canPlayHandler}
+        onPlay={playHandler}
+        onPause={pauseHandler}
+        onEnded={endHandler}
+        loop={autoLoop}
+        poster={posterSrc}
+        style={{ objectFit: isCover ? 'cover' : 'fill', ...videoStyle }}
       >
-        <video
-          ref={this.nodeRefs.video}
-          autoPlay={this.props.autoPlay}
-          playsInline={this.props.playsInline}
-          muted={this.props.isMuted}
-          controls={this.props.hasControls}
-          onCanPlay={event => this.onCanPlay(event.currentTarget)}
-          onPlay={event => this.onPlay(event.currentTarget)}
-          onPause={event => this.onPause(event.currentTarget)}
-          onEnded={event => this.onEnd(event.currentTarget)}
-          loop={this.props.autoLoop}
-          poster={this.props.posterSrc}
-        >
-          <source src={this.props.src}/>
-        </video>
-      </StyledRoot>
-    )
-  }
+        <source src={src}/>
+      </video>
+    </div>
+  )
+})
+
+const videoStyle: CSSProperties = {
+  height: '100%',
+  width: '100%',
 }
-
-const StyledRoot = styled.div<{
-  isCover: boolean
-}>`
-  box-sizing: border-box;
-  display: block;
-  margin: 0;
-  padding: 0;
-  position: relative;
-
-  video {
-    display: block;
-    height: 100%;
-    margin: 0;
-    object-fit: ${props => props.isCover ? 'cover' : 'filled'};
-    outline: none;
-    padding: 0;
-    width: 100%;
-  }
-`
