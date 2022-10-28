@@ -1,16 +1,16 @@
-import $$GithubIcon from '!!raw-loader!../assets/images/github-icon.svg'
+import $$GithubIcon from '!!raw-loader!./assets/images/github-icon.svg'
 import { align, container, selectors } from 'promptu'
 import React, { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
-import BurgerButton, { BurgerButtonBar } from '../../../lib/BurgerButton'
-import FlatSVG from '../../../lib/FlatSVG'
-import WithTooltip from '../../../lib/WithTooltip'
-import AccordionDemo from './AccordionDemo'
-import DialSlidersDemo from './DialSlidersDemo'
-import ListDemo from './ListDemo'
-import MasonryGridDemo from './MasonryGridDemo'
-import PanoramaDemo from './PanoramaDemo'
-import VideoDemo from './VideoDemo'
+import BurgerButton, { BurgerButtonBar } from '../../lib/BurgerButton'
+import FlatSVG from '../../lib/FlatSVG'
+import WithTooltip from '../../lib/WithTooltip'
+import AccordionDemo from './containers/AccordionDemo'
+import DialSlidersDemo from './containers/DialSlidersDemo'
+import ListDemo from './containers/ListDemo'
+import MasonryGridDemo from './containers/MasonryGridDemo'
+import PanoramaDemo from './containers/PanoramaDemo'
+import VideoDemo from './containers/VideoDemo'
 
 export default function App() {
   const mapLocationToHash = () => {
@@ -23,7 +23,7 @@ export default function App() {
   }
 
   const [isNavActive, setIsNavActive] = useState(false)
-  const [hash, setHash] = useState<string | undefined>()
+  const [hash, setHash] = useState<string | undefined>('accordion')
 
   useEffect(() => {
     mapLocationToHash()

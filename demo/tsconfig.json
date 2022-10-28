@@ -29,7 +29,7 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx"
-  ],
+, "App.tsx"  ],
   "exclude": [
     "**/*.spec.ts",
     "**/*.spec.tsx",
