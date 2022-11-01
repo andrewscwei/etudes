@@ -1,6 +1,5 @@
-import React, { HTMLAttributes, useState } from 'react'
+import React, { forwardRef, HTMLAttributes, useState } from 'react'
 import { Point } from 'spase'
-import styled from 'styled-components'
 
 type Props = HTMLAttributes<HTMLDivElement> & {
   isEnabled?: boolean
@@ -14,7 +13,7 @@ type Props = HTMLAttributes<HTMLDivElement> & {
 /**
  * An empty component with a backing `<div>` element that detects swipe gestures.
  */
-export default function SwipeContainer({
+export default forwardRef<HTMLDivElement, Props>(({
   children,
   isEnabled = true,
   threshold = 0.5,
@@ -23,7 +22,7 @@ export default function SwipeContainer({
   onSwipeRight,
   onSwipeUp,
   ...props
-}: Props) {
+}, ref) => {
   const [dragStartPosition, setDragStartPosition] = useState<Point | undefined>(undefined)
   const [dragEndPosition, setDragEndPosition] = useState<Point | undefined>(undefined)
   const [dragStartTime, setDragStartTime] = useState(NaN)
@@ -90,8 +89,9 @@ export default function SwipeContainer({
   }
 
   return (
-    <StyledRoot
+    <div
       {...props}
+      ref={ref}
       onTouchStart={event => onDragStart(event.targetTouches[0].clientX, event.targetTouches[0].clientY)}
       onTouchMove={event => onDragMove(event.targetTouches[0].clientX, event.targetTouches[0].clientY)}
       onTouchEnd={() => onDragEnd()}
@@ -101,10 +101,6 @@ export default function SwipeContainer({
       onMouseLeave={() => onDragCancel()}
     >
       {children}
-    </StyledRoot>
+    </div>
   )
-}
-
-const StyledRoot = styled.div`
-
-`
+})
