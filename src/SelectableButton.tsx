@@ -1,5 +1,4 @@
 import React, { HTMLAttributes, ReactNode, useEffect, useState } from 'react'
-import styled from 'styled-components'
 
 export type Props = Omit<HTMLAttributes<HTMLButtonElement>, 'children'> & {
   children?: (props: Pick<Props, 'isDeselectable' | 'isDisabled' | 'isSelected' | 'label'>) => ReactNode
@@ -42,14 +41,11 @@ export default function SelectableButton({
   }, [externalIsSelected])
 
   return (
-    <StyledRoot {...props} onClick={() => toggleSelection()} disabled={isDisabled || isSelected && !isDeselectable}>
+    <button
+      {...props}
+      onClick={() => toggleSelection()} disabled={isDisabled || isSelected && !isDeselectable}
+    >
       {children?.({ isDeselectable, isDisabled, isSelected, label }) ?? label}
-    </StyledRoot>
+    </button>
   )
 }
-
-const StyledRoot = styled.button`
-  &[disabled] {
-    pointer-events: none;
-  }
-`
