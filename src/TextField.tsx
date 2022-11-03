@@ -1,13 +1,13 @@
 import React, { ChangeEvent, FocusEvent, forwardRef, HTMLAttributes } from 'react'
 
-export type Props = HTMLAttributes<HTMLInputElement> & {
+export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
   value?: string
   onFocus?: (value: string) => void
   onUnfocus?: (value: string) => void
   onValueChange?: (value: string) => void
 }
 
-export default forwardRef<HTMLInputElement, Props>(({
+export default forwardRef<HTMLInputElement, TextFieldProps>(({
   value = '',
   onFocus,
   onUnfocus,

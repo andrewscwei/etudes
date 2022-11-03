@@ -1,6 +1,6 @@
 import React, { Fragment, ReactNode } from 'react'
 
-export type Props = {
+export type RepeatProps = {
   children?: ReactNode | ((index: number) => ReactNode)
   count?: number
   render?: (index: number) => ReactNode
@@ -13,7 +13,7 @@ export default function Repeat({
   count = 1,
   children,
   render,
-}: Props) {
+}: RepeatProps) {
   return (
     <>
       {[...Array(count)].map((v, i) => (

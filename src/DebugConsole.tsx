@@ -1,7 +1,7 @@
 import React, { CSSProperties, forwardRef, HTMLAttributes, useEffect, useRef, useState } from 'react'
 import Each from './Each'
 
-export type Props = HTMLAttributes<HTMLDivElement> & {
+export type DebugConsoleProps = HTMLAttributes<HTMLDivElement> & {
   align?: 'tl' | 'tc' | 'tr' | 'cl' | 'cc' | 'cr' | 'bl' | 'bc' | 'br'
   margin?: number
   maxEntries?: number
@@ -9,7 +9,7 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
   title?: string
 }
 
-export default forwardRef<HTMLDivElement, Props>(({
+export default forwardRef<HTMLDivElement, DebugConsoleProps>(({
   align = 'br',
   margin = 0,
   maxEntries = -1,
@@ -42,7 +42,15 @@ export default forwardRef<HTMLDivElement, Props>(({
   }, [messages])
 
   return (
-    <div {...props} ref={ref} style={{ ...style, ...rootStyle, ...getStyleByAlignment(align, margin) }}>
+    <div
+      {...props}
+      ref={ref}
+      style={{
+        ...style,
+        ...rootStyle,
+        ...getStyleByAlignment(align, margin),
+      }}
+    >
       <div style={titleStyle}>{title ?? 'Untitled'}</div>
       <div style={messagesStyle} ref={messagesRef}>
         <Each in={messages} render={msg => <div dangerouslySetInnerHTML={{ __html: msg }}/>}/>
@@ -51,7 +59,7 @@ export default forwardRef<HTMLDivElement, Props>(({
   )
 })
 
-function getStyleByAlignment(align: Props['align'], margin: number): CSSProperties {
+function getStyleByAlignment(align: DebugConsoleProps['align'], margin: number): CSSProperties {
   switch (align) {
     case 'tl': return { top: `${margin}px`, left: `${margin}px` }
     case 'tc': return { top: `${margin}px`, left: 0, right: 0, margin: '0 auto' }

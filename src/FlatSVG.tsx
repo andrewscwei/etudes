@@ -1,6 +1,6 @@
 import React, { forwardRef, HTMLAttributes } from 'react'
 
-export type Props = HTMLAttributes<HTMLDivElement> & {
+export type FlatSVGProps = HTMLAttributes<HTMLDivElement> & {
   /**
    * The SVG string markup, i.e. "<svg>...</svg>".
    */
@@ -41,7 +41,7 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
  * A component whose root element wraps an SVG markup. When wrapping the SVG, it will attempt to
  * sanitize the markup (i.e. stripping useless attributes) according to the props specified.
  */
-export default forwardRef<HTMLDivElement, Props>(({
+export default forwardRef<HTMLDivElement, FlatSVGProps>(({
   svg,
   stripClasses = true,
   stripExtraneousAttributes = true,
@@ -50,7 +50,7 @@ export default forwardRef<HTMLDivElement, Props>(({
   whitelistedAttributes = ['viewBox'],
   ...props
 }, ref) => {
-  function sanitizedMarkup(): string {
+  const sanitizedMarkup = () => {
     const mockContainer = document.createElement('div')
     mockContainer.innerHTML = svg
 

@@ -6,7 +6,7 @@ import { Orientation } from './types'
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:masonry-grid') : () => {}
 
-export type Props = HTMLAttributes<HTMLDivElement> & {
+export type MasonryGridProps = HTMLAttributes<HTMLDivElement> & {
   areSectionsAligned?: boolean
   horizontalSpacing?: number
   isReversed?: boolean
@@ -30,7 +30,7 @@ const BASE_MODIFIER_CLASS_PREFIX = 'base-'
  * Hence, in a vertically oriented grid, *number of secitons* refers to the *number of rows*,
  * whereas in a horizontally oriented grid, *number of sections* refers to the *number of columns*.
  */
-export default forwardRef<HTMLDivElement, Props>(({
+export default forwardRef<HTMLDivElement, MasonryGridProps>(({
   areSectionsAligned = false,
   children,
   className,
@@ -41,19 +41,19 @@ export default forwardRef<HTMLDivElement, Props>(({
   verticalSpacing = 0,
   ...props
 }, ref) => {
-  const rootRef = useRef<HTMLDivElement>(null)
+  const bodyRef = useRef<HTMLDivElement>(null)
 
   const [minWidth, setMinWidth] = useState(NaN)
   const [minHeight, setMinHeight] = useState(NaN)
   const [maxWidth, setMaxWidth] = useState(NaN)
   const [maxHeight, setMaxHeight] = useState(NaN)
 
-  const getCurrentWidth = () => Rect.from(rootRef.current)?.width ?? 0
+  const getCurrentWidth = () => Rect.from(bodyRef.current)?.width ?? 0
 
-  const getCurrentHeight = () => Rect.from(rootRef.current)?.height ?? 0
+  const getCurrentHeight = () => Rect.from(bodyRef.current)?.height ?? 0
 
   const repositionChildren = () => {
-    const rootNode = rootRef.current
+    const rootNode = bodyRef.current
 
     if (!rootNode) return
 
@@ -166,7 +166,7 @@ export default forwardRef<HTMLDivElement, Props>(({
     }
   }
 
-  useResizeEffect(rootRef, {
+  useResizeEffect(bodyRef, {
     onResize: maxSize => {
       const currWidth = getCurrentWidth()
       const currHeight = getCurrentHeight()
@@ -180,7 +180,7 @@ export default forwardRef<HTMLDivElement, Props>(({
   }, [areSectionsAligned, horizontalSpacing, isReversed, sections, verticalSpacing])
 
   useEffect(() => {
-    const imageSources = getAllImageSources(rootRef.current?.innerHTML)
+    const imageSources = getAllImageSources(bodyRef.current?.innerHTML)
 
     if (imageSources.length === 0) return repositionChildren()
 
@@ -195,8 +195,12 @@ export default forwardRef<HTMLDivElement, Props>(({
   }, [children])
 
   return (
-    <div {...props} className={`${className ?? ''} ${orientation}`.split(' ').filter(Boolean).join(' ')} ref={ref}>
-      <div ref={rootRef} style={{
+    <div
+      {...props}
+      ref={ref}
+      className={`${className ?? ''} ${orientation}`.split(' ').filter(Boolean).join(' ')}
+    >
+      <div ref={bodyRef} style={{
         height: orientation === 'horizontal' ? '100%' : 'auto',
         minHeight: orientation === 'vertical' && !isNaN(minHeight) ? `${minHeight}px` : '',
         minWidth: orientation === 'horizontal' && !isNaN(minWidth) ? `${minWidth}px` : '',

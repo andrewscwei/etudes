@@ -1,10 +1,10 @@
 import React, { PropsWithChildren } from 'react'
 
-type Props = PropsWithChildren<{
+export type ConditionalProps = PropsWithChildren<{
   if: boolean | (() => boolean)
 }>
 
-export default function Conditional({ children, if: boolOrExpression }: Props) {
+export default function Conditional({ children, if: boolOrExpression }: ConditionalProps) {
   switch (typeof boolOrExpression) {
     case 'boolean':
       return boolOrExpression ? <>{children}</> : <></>

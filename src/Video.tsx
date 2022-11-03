@@ -3,7 +3,7 @@ import React, { CSSProperties, forwardRef, HTMLAttributes, ReactEventHandler, us
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:video') : () => {}
 
-export type Props = HTMLAttributes<HTMLDivElement> & {
+export type VideoProps = HTMLAttributes<HTMLDivElement> & {
   autoLoop: boolean
   autoPlay: boolean
   hasControls: boolean
@@ -19,7 +19,7 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
   onPlay: () => void
 }
 
-export default forwardRef<HTMLDivElement, Props>(({
+export default forwardRef<HTMLDivElement, VideoProps>(({
   autoLoop = true,
   autoPlay = true,
   hasControls = false,
@@ -35,28 +35,28 @@ export default forwardRef<HTMLDivElement, Props>(({
   onPlay,
   ...props
 }, ref) => {
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const isPaused = videoRef.current?.paused ?? false
+  const bodyRef = useRef<HTMLVideoElement>(null)
+  const isPaused = bodyRef.current?.paused ?? false
 
   useEffect(() => {
     debug(`Initializing video with src <${src}>...`, 'OK')
 
-    if (!videoRef.current) return
+    if (!bodyRef.current) return
 
-    videoRef.current.muted = isMuted
-    videoRef.current.load()
-    videoRef.current.addEventListener('webkitfullscreenchange', fullscreenChangeHandler)
-    videoRef.current.addEventListener('mozfullscreenchange', fullscreenChangeHandler)
-    videoRef.current.addEventListener('fullscreenchange', fullscreenChangeHandler)
+    bodyRef.current.muted = isMuted
+    bodyRef.current.load()
+    bodyRef.current.addEventListener('webkitfullscreenchange', fullscreenChangeHandler)
+    bodyRef.current.addEventListener('mozfullscreenchange', fullscreenChangeHandler)
+    bodyRef.current.addEventListener('fullscreenchange', fullscreenChangeHandler)
 
     return () => {
       debug(`Deinitializing video with src <${src}>...`, 'OK')
 
       pause()
 
-      videoRef.current?.removeEventListener('webkitfullscreenchange', fullscreenChangeHandler)
-      videoRef.current?.removeEventListener('mozfullscreenchange', fullscreenChangeHandler)
-      videoRef.current?.removeEventListener('fullscreenchange', fullscreenChangeHandler)
+      bodyRef.current?.removeEventListener('webkitfullscreenchange', fullscreenChangeHandler)
+      bodyRef.current?.removeEventListener('mozfullscreenchange', fullscreenChangeHandler)
+      bodyRef.current?.removeEventListener('fullscreenchange', fullscreenChangeHandler)
     }
   }, [src])
 
@@ -92,19 +92,19 @@ export default forwardRef<HTMLDivElement, Props>(({
   }
 
   const play = () => {
-    if (!videoRef.current) return
-    videoRef.current.play()
+    if (!bodyRef.current) return
+    bodyRef.current.play()
   }
 
   const pause = () => {
-    if (!videoRef.current) return
-    videoRef.current.pause()
+    if (!bodyRef.current) return
+    bodyRef.current.pause()
   }
 
   return (
     <div {...props} ref={ref}>
       <video
-        ref={videoRef}
+        ref={bodyRef}
         autoPlay={autoPlay}
         playsInline={playsInline}
         muted={isMuted}

@@ -1,7 +1,7 @@
 import React, { forwardRef, HTMLAttributes, useState } from 'react'
 import { Point } from 'spase'
 
-type Props = HTMLAttributes<HTMLDivElement> & {
+export type SwipeContainerProps = HTMLAttributes<HTMLDivElement> & {
   isEnabled?: boolean
   threshold?: number
   onSwipeDown?: () => void
@@ -13,7 +13,7 @@ type Props = HTMLAttributes<HTMLDivElement> & {
 /**
  * An empty component with a backing `<div>` element that detects swipe gestures.
  */
-export default forwardRef<HTMLDivElement, Props>(({
+export default forwardRef<HTMLDivElement, SwipeContainerProps>(({
   children,
   isEnabled = true,
   threshold = 0.5,
