@@ -1,4 +1,3 @@
-import $$ExpandIcon from '!!raw-loader!../assets/images/expand-icon.svg'
 import { animations, container, selectors } from 'promptu'
 import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
@@ -6,6 +5,7 @@ import DebugConsole from '../../../lib/DebugConsole'
 import Dropdown, { ItemComponentProps as DropdownItemComponentProps } from '../../../lib/Dropdown'
 import List, { ItemComponentProps as ListItemComponentProps } from '../../../lib/List'
 import { Orientation } from '../../../lib/types'
+import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
 export type State = {
   selectedItemIndex: number

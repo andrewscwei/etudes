@@ -4,19 +4,19 @@ import React, { CSSProperties, forwardRef, HTMLAttributes, ReactEventHandler, us
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:video') : () => {}
 
 export type VideoProps = HTMLAttributes<HTMLDivElement> & {
-  autoLoop: boolean
-  autoPlay: boolean
-  hasControls: boolean
-  isCover: boolean
-  isMuted: boolean
-  playsInline: boolean
+  autoLoop?: boolean
+  autoPlay?: boolean
+  hasControls?: boolean
+  isCover?: boolean
+  isMuted?: boolean
+  playsInline?: boolean
   posterSrc?: string
   src: string
-  onCanPlay: () => void
-  onEnd: () => void
-  onFullscreenChange: (isFullscreen: boolean) => void
-  onPause: () => void
-  onPlay: () => void
+  onCanPlay?: () => void
+  onEnd?: () => void
+  onFullscreenChange?: (isFullscreen: boolean) => void
+  onPause?: () => void
+  onPlay?: () => void
 }
 
 export default forwardRef<HTMLDivElement, VideoProps>(({

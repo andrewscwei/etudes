@@ -1,10 +1,10 @@
-import $$ExpandIcon from '!!raw-loader!../assets/images/expand-icon.svg'
 import { animations, container, selectors } from 'promptu'
 import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
 import Accordion, { ItemComponentProps } from '../../../lib/Accordion'
 import DebugConsole from '../../../lib/DebugConsole'
 import { Orientation } from '../../../lib/types'
+import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
 export type State = {
   itemIndex: number

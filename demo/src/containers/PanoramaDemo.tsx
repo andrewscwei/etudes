@@ -6,11 +6,11 @@ import DebugConsole from '../../../lib/DebugConsole'
 import Panorama from '../../../lib/Panorama'
 import PanoramaSlider from '../../../lib/PanoramaSlider'
 import Slider, { SliderEndingTrack, SliderKnob } from '../../../lib/Slider'
-import $$PanoramaImage from '../assets/images/panorama.jpg'
+import $$PanoramaImage from '../assets/images/panorama.svg'
 
 export default function() {
   const [angle, setAngle] = useState(0)
-  const [width, setWidth] = useState(800)
+  const [width, setWidth] = useState(300)
   const [viewportSize, setViewportSize] = useState(new Size())
   const [zeroAnchor] = useState(0.5)
 
@@ -40,8 +40,6 @@ export default function() {
         />
         <Panorama
           angle={angle}
-          onAngleChange={(value, isDragging) => { if (isDragging) setAngle(value) }}
-          onResize={size => setViewportSize(size)}
           src={$$PanoramaImage}
           zeroAnchor={zeroAnchor}
           style={{
@@ -50,10 +48,11 @@ export default function() {
             width: `${width}px`,
             maxWidth: '80%',
           }}
+          onAngleChange={(value, isDragging) => { if (isDragging) setAngle(value) }}
+          onResize={size => setViewportSize(size)}
         />
         <PanoramaSlider
           angle={angle}
-          onAngleChange={(value, isDragging) => { if (isDragging) setAngle(value) }}
           src={$$PanoramaImage}
           viewportSize={viewportSize}
           zeroAnchor={zeroAnchor}
@@ -62,15 +61,14 @@ export default function() {
             height: '8rem',
             transform: 'translate3d(0, 0, 0) rotateX(0deg) rotateY(10deg)',
           }}
+          onAngleChange={(value, isDragging) => { if (isDragging) setAngle(value) }}
         />
       </StyledRoot>
       <DebugConsole
         title='?: Panorama+Slider'
         maxEntries={1}
         message={`Angle: ${Math.round(angle)}°`}
-        style={{
-          transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)',
-        }}
+        style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
       />
     </>
   )

@@ -1,16 +1,16 @@
 import HTMLPlugin from 'html-webpack-plugin'
 import path from 'path'
-import { Configuration, EnvironmentPlugin } from 'webpack'
+import { Configuration } from 'webpack'
 
-const isDev: boolean = process.env.NODE_ENV === 'development'
-const cwd: string = path.join(__dirname, '../')
-const inputDir: string = path.join(cwd, 'src')
-const outputDir: string = path.join(cwd, '../', '.gh-pages')
+const isDev = process.env.NODE_ENV === 'development'
+const cwd = path.join(__dirname, '../')
+const inputDir = path.join(cwd, 'src')
+const outputDir = path.join(cwd, '../', '.gh-pages')
 
 const config: Configuration = {
-  devtool: isDev ? 'eval-source-map' : 'source-map',
+  devtool: isDev ? 'source-map' : false,
   entry: {
-    bundle: path.join(inputDir, 'index.tsx'),
+    main: path.join(inputDir, 'index.tsx'),
   },
   infrastructureLogging: {
     level: 'error',
@@ -19,7 +19,7 @@ const config: Configuration = {
   module: {
     rules: [{
       exclude: /node_modules/,
-      test: /\.tsx?$/,
+      test: /\.[jt]sx?$/,
       use: [{
         loader: 'babel-loader',
         options: {
@@ -27,25 +27,23 @@ const config: Configuration = {
         },
       }],
     }, {
+      test: /\.svg$/,
+      include: /assets\/svgs/,
+      type: 'asset/source',
+    }, {
       test: /\.(jpe?g|png|gif|svg)(\?.*)?$/,
-      use: [{
-        loader: 'url-loader',
-        options: {
-          esModule: false,
-          limit: 8192,
-          name: `assets/images/[name]${isDev ? '' : '.[hash:6]'}.[ext]`,
-        },
-      }],
+      include: /assets\/images/,
+      type: 'asset',
+      generator: {
+        filename: `assets/images/${isDev ? '[name]' : '[name].[hash:base64]'}[ext]`,
+      },
     }, {
       test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
-      use: [{
-        loader: 'url-loader',
-        options: {
-          esModule: false,
-          limit: 8192,
-          name: `assets/videos/[name]${isDev ? '' : '.[hash:6]'}.[ext]`,
-        },
-      }],
+      include: /assets\/media/,
+      type: 'asset',
+      generator: {
+        filename: `assets/media/${isDev ? '[name]' : '[name].[hash:base64]'}[ext]`,
+      },
     }],
   },
   output: {
@@ -53,12 +51,8 @@ const config: Configuration = {
     path: outputDir,
     publicPath: process.env.NODE_ENV === 'development' ? '/' : './',
     sourceMapFilename: '[file].map',
-    globalObject: 'this', // https://github.com/webpack/webpack/issues/6642#issuecomment-371087342
   },
   plugins: [
-    new EnvironmentPlugin({
-      NODE_ENV: 'production',
-    }),
     new HTMLPlugin({
       filename: 'index.html',
       inject: true,
@@ -70,20 +64,20 @@ const config: Configuration = {
       template: path.join(inputDir, 'templates', 'index.html'),
     }),
   ],
-  ...!isDev ? {} : {
-    devServer: {
-      historyApiFallback: true,
-    },
-  } as any,
   resolve: {
     alias: {
       ...!isDev ? {} : {
         'etudes': path.join(cwd, '../lib'),
       },
     },
-    extensions: ['.js', '.ts', '.tsx'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
   },
   target: 'web',
+  ...isDev ? {
+    devServer: {
+      historyApiFallback: true,
+    },
+  } : {},
 }
 
 export default config

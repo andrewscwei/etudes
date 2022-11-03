@@ -1,10 +1,10 @@
-import $$GithubIcon from '!!raw-loader!./assets/images/github-icon.svg'
 import { align, container, selectors } from 'promptu'
 import React, { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 import BurgerButton, { BurgerButtonBar } from '../../lib/BurgerButton'
 import FlatSVG from '../../lib/FlatSVG'
 import WithTooltip from '../../lib/WithTooltip'
+import $$GithubIcon from './assets/svgs/github-icon.svg'
 import AccordionDemo from './containers/AccordionDemo'
 import DialSlidersDemo from './containers/DialSlidersDemo'
 import ListDemo from './containers/ListDemo'
@@ -23,7 +23,7 @@ export default function App() {
   }
 
   const [isNavActive, setIsNavActive] = useState(false)
-  const [hash, setHash] = useState<string | undefined>('video')
+  const [hash, setHash] = useState<string | undefined>()
 
   useEffect(() => {
     mapLocationToHash()
@@ -74,8 +74,8 @@ export default function App() {
           <StyledNavButton isActive={hash === 'panorama+slider'} onClick={() => setHash('panorama+slider')}>Panorama+Slider</StyledNavButton>
         </StyledNav>
         <StyledBurgerButton
-          isActive={isNavActive}
           height={32}
+          isActive={isNavActive}
           isDoubleJointed={true}
           isLastBarHalfWidth={true}
           thickness={6}
