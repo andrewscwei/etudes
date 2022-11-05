@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import React, { forwardRef, HTMLAttributes, useEffect, useRef, useState } from 'react'
 import { Rect } from 'spase'
 import useResizeEffect from './hooks/useResizeEffect'
@@ -198,7 +199,7 @@ export default forwardRef<HTMLDivElement, MasonryGridProps>(({
     <div
       {...props}
       ref={ref}
-      className={`${className ?? ''} ${orientation}`.split(' ').filter(Boolean).join(' ')}
+      className={classNames(className, orientation)}
     >
       <div ref={bodyRef} style={{
         height: orientation === 'horizontal' ? '100%' : 'auto',

@@ -7,7 +7,7 @@ import useDragEffect from './hooks/useDragEffect'
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:stepwise-slider') : () => {}
 
-export type Props = HTMLAttributes<HTMLDivElement> & {
+export type StepwiseSliderProps = HTMLAttributes<HTMLDivElement> & {
   /**
    * By default the position is a value from 0 - 1, 0 being the start of the slider and 1 being the
    * end. Switching on this flag inverts this behavior, where 0 becomes the end of the slider and 1
@@ -25,17 +25,6 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
    * disabled, aforementioned events are fired repeatedly while dragging.
    */
   onlyDispatchesOnDragEnd?: boolean
-
-  /**
-   * A function that returns the label to be displayed at a given slider position and closest step
-   * index (if steps are provided).
-   *
-   * @param position - The current slider position.
-   * @param index - The nearest step index (if steps are provided), or -1 if no steps are provided.
-   *
-   * @returns The label.
-   */
-  labelProvider?: (position: number, index: number) => string
 
   /**
    * Padding between the track and the knob in pixels.
@@ -68,6 +57,17 @@ export type Props = HTMLAttributes<HTMLDivElement> & {
    * The current index.
    */
   index?: number
+
+  /**
+   * A function that returns the label to be displayed at a given slider position and closest step
+   * index (if steps are provided).
+   *
+   * @param position - The current slider position.
+   * @param index - The nearest step index (if steps are provided), or -1 if no steps are provided.
+   *
+   * @returns The label.
+   */
+  labelProvider?: (position: number, index: number) => string
 
   /**
    * Handler invoked when index changes. This can either be invoked from the `index` prop
@@ -124,50 +124,6 @@ export function generateSteps(length: number): readonly number[] {
 }
 
 /**
- * Gets the index of the step of which the specified position is closest to. If for whatever
- * reason the index cannot be computed, -1 is returned.
- *
- * @param position - The position (0 - 1, inclusive).
- * @param steps - The steps.
- *
- * @returns The nearest index.
- */
-function getNearestIndexByPosition(position: number, steps: readonly number[]): number {
-  let index = -1
-  let minDelta = NaN
-
-  for (let i = 0, n = steps.length; i < n; i++) {
-    const step = getPositionAt(i, steps)
-
-    if (isNaN(step)) continue
-
-    const delta = Math.abs(position - step)
-
-    if (isNaN(minDelta) || delta < minDelta) {
-      minDelta = delta
-      index = i
-    }
-  }
-
-  return index
-}
-
-/**
- * Gets the position by step index. This value ranges between 0 - 1, inclusive.
- *
- * @param index - The step index.
- * @param steps - The steps.
- *
- * @returns The position. If for whatever reason the position cannot be determined, `NaN` is
- *          returned.
- */
-function getPositionAt(index: number, steps: readonly number[]): number {
-  if (index >= steps.length) return NaN
-
-  return steps[index]
-}
-
-/**
  * A "stepwise" slider component supporting both horizontal and vertical orientations that
  * automatically snaps to a set of predefined points on the slider when dragged. These points are
  * referred to as "steps", indexed by an integer referred to as "index". This index can be two-way
@@ -199,7 +155,7 @@ export default function StepwiseSlider({
   onIndexChange,
   onPositionChange,
   ...props
-}: Props) {
+}: StepwiseSliderProps) {
   const mapDragPositionToPosition = (currentPosition: number, dx: number, dy: number) => {
     const rect = Rect.from(rootRef.current) ?? new Rect()
     const naturalPosition = isInverted ? 1 - currentPosition : currentPosition
@@ -340,8 +296,52 @@ export default function StepwiseSlider({
   )
 }
 
+/**
+ * Gets the index of the step of which the specified position is closest to. If for whatever
+ * reason the index cannot be computed, -1 is returned.
+ *
+ * @param position - The position (0 - 1, inclusive).
+ * @param steps - The steps.
+ *
+ * @returns The nearest index.
+ */
+function getNearestIndexByPosition(position: number, steps: readonly number[]): number {
+  let index = -1
+  let minDelta = NaN
+
+  for (let i = 0, n = steps.length; i < n; i++) {
+    const step = getPositionAt(i, steps)
+
+    if (isNaN(step)) continue
+
+    const delta = Math.abs(position - step)
+
+    if (isNaN(minDelta) || delta < minDelta) {
+      minDelta = delta
+      index = i
+    }
+  }
+
+  return index
+}
+
+/**
+ * Gets the position by step index. This value ranges between 0 - 1, inclusive.
+ *
+ * @param index - The step index.
+ * @param steps - The steps.
+ *
+ * @returns The position. If for whatever reason the position cannot be determined, `NaN` is
+ *          returned.
+ */
+function getPositionAt(index: number, steps: readonly number[]): number {
+  if (index >= steps.length) return NaN
+
+  return steps[index]
+}
+
 export const StepwiseSliderStartingTrack = styled.div<{
-  orientation: NonNullable<Props['orientation']>
+  orientation: NonNullable<StepwiseSliderProps['orientation']>
   isClickable: boolean
 }>`
   background: #fff;
@@ -376,7 +376,7 @@ export const StepwiseSliderStartingTrack = styled.div<{
 `
 
 export const StepwiseSliderEndingTrack = styled.div<{
-  orientation: NonNullable<Props['orientation']>
+  orientation: NonNullable<StepwiseSliderProps['orientation']>
   isClickable: boolean
 }>`
   background: #fff;
@@ -424,7 +424,7 @@ export const StepwiseSliderKnob = styled.div`
   transition-timing-function: ease-out;
 `
 
-export const StepwiseSliderKnobLabel = styled.label<{ knobHeight: NonNullable<Props['knobHeight']> }>`
+export const StepwiseSliderKnobLabel = styled.label<{ knobHeight: NonNullable<StepwiseSliderProps['knobHeight']> }>`
   color: #000;
   font-size: ${props => props.knobHeight * 0.5}px;
   pointer-events: none;
@@ -437,7 +437,7 @@ const StyledKnobContainer = styled.button`
 `
 
 const StyledRoot = styled.div<{
-  orientation: Props['orientation']
+  orientation: StepwiseSliderProps['orientation']
 }>`
   box-sizing: border-box;
   display: block;

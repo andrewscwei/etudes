@@ -1,4 +1,5 @@
-import React, { Children, cloneElement, forwardRef, HTMLAttributes, isValidElement } from 'react'
+import React, { Children, forwardRef, HTMLAttributes, isValidElement } from 'react'
+import cloneStyledElement from './utils/cloneStyledElement'
 
 export type ExtractChildProps = HTMLAttributes<HTMLElement>
 
@@ -8,28 +9,24 @@ export type ExtractChildProps = HTMLAttributes<HTMLElement>
  */
 export default forwardRef<HTMLElement, ExtractChildProps>(({
   children,
-  className,
   ...props
 }, ref) => {
   if (Array.isArray(children)) {
-    /* eslint-disable-next-line no-console */
     console.error(`[etudes::ExtractChild] Only one child is expected, but found ${children.length}. Only the first child is extracted while the rest are discarded.`)
   }
 
   return (
     <>
       {Children.map(children, (child, idx) => {
-        if (idx > 0) return undefined
-
-        if (isValidElement(child)) {
-          return cloneElement(child, {
-            ...props,
-            className: `${className ?? ''} ${child.props.className}`.split(' ').filter(Boolean).join(' '),
-            ref,
-          } as any)
+        if (idx > 0) {
+          return undefined
         }
-
-        return child
+        else if (isValidElement(child)) {
+          return cloneStyledElement(child, { ...props, ref } as any)
+        }
+        else {
+          return child
+        }
       })}
     </>
   )

@@ -24,7 +24,7 @@ type Options<T> = Omit<Parameters<Interact.Interactable['draggable']>[0], 'onsta
    *
    * @returns The transformed value.
    */
-  transform?: (currentValue: T, dx: number, dy: number) => T
+  transform: (currentValue: T, dx: number, dy: number) => T
 
   /**
    * Handler invoked when dragging starts.
@@ -96,7 +96,7 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
           onDragStart?.()
         },
         onmove: ({ dx, dy }) => {
-          const newValue = transform?.(valueRef.current, dx, dy) ?? [dx, dy] as unknown as T
+          const newValue = transform(valueRef.current, dx, dy)
 
           if (setValueRef(newValue)) {
             // Debug('Updating value from dragging...', 'OK', newValue)

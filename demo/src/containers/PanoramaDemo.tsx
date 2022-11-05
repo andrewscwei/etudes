@@ -1,16 +1,16 @@
 import { container } from 'promptu'
 import React, { useState } from 'react'
 import { Size } from 'spase'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
 import Panorama from '../../../lib/Panorama'
 import PanoramaSlider from '../../../lib/PanoramaSlider'
-import Slider, { SliderEndingTrack, SliderKnob } from '../../../lib/Slider'
-import $$PanoramaImage from '../assets/images/panorama.svg'
+import Slider from '../../../lib/Slider'
+import $$PanoramaImage from '../assets/images/panorama.png'
 
 export default function() {
   const [angle, setAngle] = useState(0)
-  const [width, setWidth] = useState(300)
+  const [width, setWidth] = useState(800)
   const [viewportSize, setViewportSize] = useState(new Size())
   const [zeroAnchor] = useState(0.5)
 
@@ -18,26 +18,21 @@ export default function() {
     <>
       <StyledRoot>
         <Slider
+          isInverted={false}
           knobHeight={20}
           knobWidth={20}
-          onPositionChange={position => { setWidth(400 + position * 400) }}
           orientation='horizontal'
           position={(width - 400) / 400}
-          css={css`
-            ${SliderKnob} {
-              border-radius: 10px;
-            }
-            ${SliderEndingTrack} {
-              opacity: .6;
-            }
-          `}
           style={{
             transform: 'translate3d(0, 0, 0) rotateX(0deg) rotateY(-10deg)',
             width: '40rem',
+            height: '.4rem',
             maxWidth: '80%',
             marginBottom: '5rem',
           }}
-        />
+          onPositionChange={position => { setWidth(400 + position * 400) }}
+        >
+        </Slider>
         <Panorama
           angle={angle}
           src={$$PanoramaImage}

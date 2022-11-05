@@ -1,7 +1,10 @@
-import React, { Children, cloneElement, CSSProperties, forwardRef, HTMLAttributes, isValidElement, PropsWithChildren, ReactNode, useRef, useState } from 'react'
+import classNames from 'classnames'
+import React, { CSSProperties, forwardRef, HTMLAttributes, PropsWithChildren, useRef, useState } from 'react'
 import { Size } from 'spase'
 import useResizeEffect from './hooks/useResizeEffect'
 import Panorama, { PanoramaProps } from './Panorama'
+import cloneStyledElement from './utils/cloneStyledElement'
+import extractUniqueChildComponents from './utils/extractUniqueChildComponents'
 
 export type PanoramaSliderProps = HTMLAttributes<HTMLDivElement> & PanoramaProps & PropsWithChildren<{
   /**
@@ -26,26 +29,13 @@ export type PanoramaSliderProps = HTMLAttributes<HTMLDivElement> & PanoramaProps
   viewportSize?: Size
 }>
 
-export type PanoramaSliderTrackProps = HTMLAttributes<HTMLDivElement> & {
-  isDragging?: boolean
-}
-
-export type PanoramaSliderReticleProps = HTMLAttributes<HTMLDivElement> & {
-  isDragging?: boolean
-  width?: number
-}
-
-export type PanoramaSliderIndicatorProps = HTMLAttributes<HTMLDivElement> & {
-  isDragging?: boolean
-  width?: number
-}
-
 /**
  * A slider for a {@link Panorama} component.
  *
- * @exports PanoramaSliderIndicator
- * @exports PanoramaSliderReticle
- * @exports PanoramaSliderTrack
+ * @exports PanoramaSliderIndicator - The indicator that appears when the slider is being dragged.
+ * @exports PanoramaSliderReticle - The reticle that indicates the FOV of the backing
+ *                                  {@link Panorama}.
+ * @exports PanoramaSliderTrack - The slide track.
  */
 export default forwardRef<HTMLDivElement, PanoramaSliderProps>(({
   angle = 0,
@@ -99,13 +89,72 @@ export default forwardRef<HTMLDivElement, PanoramaSliderProps>(({
   }
 
   const panoramaRef = useRef<HTMLDivElement>(null)
+
   const [imageSize, setImageSize] = useState<Size | undefined>(undefined)
   const [isDragging, setIsDragging] = useState(false)
+
   const [size] = useResizeEffect(panoramaRef, { onResize })
+
   const aspectRatio = getAspectRatio()
   const reticleWidth = getReticleWidth()
   const adjustedZeroAnchor = getAdjustedZeroAnchor()
-  const customComponents = parseElements(children)
+
+  const customComponents = extractUniqueChildComponents(children, {
+    track: PanoramaSliderTrack,
+    reticle: PanoramaSliderReticle,
+    indicator: PanoramaSliderIndicator,
+  })
+
+  const bodyStyle: CSSProperties = {
+    height: '100%',
+    left: '0',
+    overflow: 'hidden',
+    pointerEvents: 'none',
+    position: 'absolute',
+    top: '0',
+    width: '100%',
+  }
+
+  const componentContainerStyle: CSSProperties = {
+    alignItems: 'center',
+    display: 'flex',
+    height: '100%',
+    justifyContent: 'flex-start',
+    left: '0',
+    overflow: 'visible',
+    position: 'absolute',
+    top: '0',
+    width: '100%',
+  }
+
+  const defaultTrackStyle: CSSProperties = {
+    background: 'rgba(0, 0, 0, .7)',
+    height: '100%',
+  }
+
+  const defaultReticleStyle: CSSProperties = {
+    background: `rgba(0, 0, 0, ${isDragging ? 0 : 0.3})`,
+    flex: '0 0 auto',
+    height: '100%',
+    transitionDuration: '100ms',
+    transitionProperty: 'background',
+    transitionTimingFunction: 'ease-out',
+  }
+
+  const defaultIndicatorStyle: CSSProperties = {
+    background: '#fff',
+    borderRadius: '2px',
+    bottom: '-10px',
+    boxSizing: 'border-box',
+    display: 'block',
+    height: '2px',
+    left: '0',
+    margin: '0 auto',
+    opacity: isDragging ? 1 : 0,
+    position: 'absolute',
+    right: '0',
+    transition: 'opacity .3s ease-out',
+  }
 
   return (
     <div
@@ -136,138 +185,40 @@ export default forwardRef<HTMLDivElement, PanoramaSliderProps>(({
         onImageSizeChange={setImageSize}
         onPositionChange={onPositionChange}
       />
-      <div style={bodyStyle()}>
-        <div style={componentContainerStyle()}>
-          {cloneElement(customComponents.track ?? <PanoramaSliderTrack style={defaultTrackStyle({ isDragging })}/>, { isDragging })}
-          {cloneElement(customComponents.reticle ?? <PanoramaSliderReticle style={defaultReticleStyle({ isDragging })}/>, { isDragging, width: reticleWidth })}
-          {cloneElement(customComponents.track ?? <PanoramaSliderTrack style={defaultTrackStyle({ isDragging })}/>, { isDragging })}
+      <div style={bodyStyle}>
+        <div style={componentContainerStyle}>
+          {cloneStyledElement(customComponents.track ?? <PanoramaSliderTrack style={defaultTrackStyle}/>, {
+            className: classNames({ dragging: isDragging }),
+            style: {
+              flex: '1 0 auto',
+            },
+          })}
+          {cloneStyledElement(customComponents.reticle ?? <PanoramaSliderReticle style={defaultReticleStyle}/>, {
+            className: classNames({ dragging: isDragging }),
+            style: {
+              width: `${reticleWidth}px`,
+            },
+          })}
+          {cloneStyledElement(customComponents.track ?? <PanoramaSliderTrack style={defaultTrackStyle}/>, {
+            className: classNames({ dragging: isDragging }),
+            style: {
+              flex: '1 0 auto',
+            },
+          })}
         </div>
       </div>
-      {cloneElement(customComponents.indicator ?? <PanoramaSliderIndicator style={defaultIndicatorStyle({ isDragging })}/>, { isDragging, width: reticleWidth })}
+      {cloneStyledElement(customComponents.indicator ?? <PanoramaSliderIndicator style={defaultIndicatorStyle}/>, {
+        className: classNames({ dragging: isDragging }),
+        style: {
+          width: `${reticleWidth}px`,
+        },
+       })}
     </div>
   )
 })
 
-export const PanoramaSliderTrack = forwardRef<HTMLDivElement, PanoramaSliderTrackProps>(({
-  className,
-  isDragging = false,
-  style = {},
-  ...props
-}, ref) => (
-  <div
-    {...props}
-    ref={ref}
-    className={`${className ?? ''} ${isDragging ? 'dragging' : ''}`.split(' ').filter(Boolean).join(' ')}
-    style={{ ...style, flex: '1 0 auto' }}
-  />
-))
+export const PanoramaSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
 
-export const PanoramaSliderReticle = forwardRef<HTMLDivElement, PanoramaSliderReticleProps>(({
-  className,
-  isDragging = false,
-  style = {},
-  width,
-  ...props
-}, ref) => (
-  <div
-    {...props}
-    ref={ref}
-    className={`${className ?? ''} ${isDragging ? 'dragging' : ''}`.split(' ').filter(Boolean).join(' ')}
-    style={{ ...style, width: `${width}px` }}
-  />
-))
+export const PanoramaSliderReticle = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
 
-export const PanoramaSliderIndicator = forwardRef<HTMLDivElement, PanoramaSliderIndicatorProps>(({
-  className,
-  isDragging = false,
-  style,
-  width,
-  ...props
-}, ref) => (
-  <div
-    {...props}
-    ref={ref}
-    className={`${className ?? ''} ${isDragging ? 'dragging' : ''}`.split(' ').filter(Boolean).join(' ')}
-    style={{ ...style, width: `${width}px` }}
-  />
-))
-
-function parseElements(children?: ReactNode): { track?: JSX.Element; reticle?: JSX.Element; indicator?: JSX.Element } {
-  let track: JSX.Element | undefined
-  let reticle: JSX.Element | undefined
-  let indicator: JSX.Element | undefined
-
-  Children.forEach(children, child => {
-    if (!isValidElement(child)) throw Error('Invalid child detected in PanoramaSlider')
-
-    switch (child.type) {
-      case PanoramaSliderTrack:
-        if (track) throw Error('Only one PanoramaSliderTrack can be specified as a child of PanoramaSlider')
-        track = child
-        break
-      case PanoramaSliderReticle:
-        if (reticle) throw Error('Only one PanoramaSliderReticle can be specified as a child of PanoramaSlider')
-        reticle = child
-        break
-      case PanoramaSliderIndicator:
-        if (indicator) throw Error('Only one PanoramaSliderIndicator can be specified as a child of PanoramaSlider')
-        indicator = child
-        break
-      default:
-        throw Error('Unsupported child of PanoramaSlider, only the following children are allowed: PanoramaSliderTrack, PanoramaSliderReticle, PanoramaSliderIndicator')
-    }
-  })
-
-  return { track, reticle, indicator }
-}
-
-const bodyStyle = (): CSSProperties => ({
-  height: '100%',
-  left: '0',
-  overflow: 'hidden',
-  pointerEvents: 'none',
-  position: 'absolute',
-  top: '0',
-  width: '100%',
-})
-
-const componentContainerStyle = (): CSSProperties => ({
-  alignItems: 'center',
-  display: 'flex',
-  height: '100%',
-  justifyContent: 'flex-start',
-  left: '0',
-  overflow: 'visible',
-  position: 'absolute',
-  top: '0',
-  width: '100%',
-})
-
-const defaultTrackStyle = (props: PanoramaSliderTrackProps): CSSProperties => ({
-  background: 'rgba(0, 0, 0, .7)',
-  height: '100%',
-})
-
-const defaultReticleStyle = ({ isDragging }: PanoramaSliderReticleProps): CSSProperties => ({
-  background: `rgba(0, 0, 0, ${isDragging ? 0 : 0.3})`,
-  flex: '0 0 auto',
-  height: '100%',
-  transitionDuration: '100ms',
-  transitionProperty: 'background',
-  transitionTimingFunction: 'ease-out',
-})
-
-const defaultIndicatorStyle = ({ isDragging }: PanoramaSliderIndicatorProps): CSSProperties => ({
-  background: '#fff',
-  borderRadius: '2px',
-  bottom: '-10px',
-  boxSizing: 'border-box',
-  display: 'block',
-  height: '2px',
-  left: '0',
-  margin: '0 auto',
-  opacity: isDragging ? 1 : 0,
-  position: 'absolute',
-  right: '0',
-  transition: 'opacity .3s ease-out',
-})
+export const PanoramaSliderIndicator = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>

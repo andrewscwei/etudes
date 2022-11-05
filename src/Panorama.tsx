@@ -165,22 +165,16 @@ export default forwardRef<HTMLDivElement, PanoramaProps>(({
   }, [angle])
 
   return (
-    <div
-      {...props}
-      ref={ref}
-    >
-      <div
-        ref={bodyRef}
-        style={{
-          backgroundImage: `url(${src})`,
-          backgroundPositionX: `${-displacement}px`,
-          backgroundRepeat: 'repeat',
-          backgroundSize: 'auto 100%',
-          height: '100%',
-          touchAction: 'none',
-          width: '100%',
-        }}
-      />
+    <div {...props} ref={ref}>
+      <div ref={bodyRef} style={{
+        backgroundImage: `url(${src})`,
+        backgroundPositionX: `${-displacement}px`,
+        backgroundRepeat: 'repeat',
+        backgroundSize: 'auto 100%',
+        height: '100%',
+        touchAction: 'none',
+        width: '100%',
+      }}/>
     </div>
   )
 })
