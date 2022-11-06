@@ -3,9 +3,9 @@ import React, { forwardRef, HTMLAttributes, useEffect, useRef, useState } from '
 import { Rect } from 'spase'
 import useResizeEffect from './hooks/useResizeEffect'
 import { Orientation } from './types'
+import useDebug from './utils/useDebug'
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:masonry-grid') : () => {}
+const debug = useDebug('masonry')
 
 export type MasonryGridProps = HTMLAttributes<HTMLDivElement> & {
   areSectionsAligned?: boolean
@@ -19,17 +19,21 @@ export type MasonryGridProps = HTMLAttributes<HTMLDivElement> & {
 const BASE_MODIFIER_CLASS_PREFIX = 'base-'
 
 /**
- * This is a React component that arranges all of its immediate children in a masonry grid. Refrain
- * from assigning CSS styles to it via `className` or `style` property, though they are still
- * handled if absolutely necessary. Customize the grid via its supported properties. The grid can be
- * in either vertical or horizontal orientation. The length of every child element *parallel to the
- * direction of the orientation* is automatically set according to the number of sections specified
- * for the grid. This means that in an horizontally oriented grid, the *width* of each child element
- * is automatically set, whereas in a vertically oriented grid the *height* of each child element is
- * automatically set. Additionally, the *number of sections* corresponds to the maximum the number
- * of child elements present in the direction that is parallel to the orientation of the grid.
- * Hence, in a vertically oriented grid, *number of secitons* refers to the *number of rows*,
- * whereas in a horizontally oriented grid, *number of sections* refers to the *number of columns*.
+ * This is a React component that arranges all of its immediate children in a
+ * masonry grid. Refrain from assigning CSS styles to it via `className` or
+ * `style` property, though they are still handled if absolutely necessary.
+ * Customize the grid via its supported properties. The grid can be in either
+ * vertical or horizontal orientation. The length of every child element
+ * *parallel to the direction of the orientation* is automatically set according
+ * to the number of sections specified for the grid. This means that in an
+ * horizontally oriented grid, the *width* of each child element is
+ * automatically set, whereas in a vertically oriented grid the *height* of each
+ * child element is automatically set. Additionally, the *number of sections*
+ * corresponds to the maximum the number of child elements present in the
+ * direction that is parallel to the orientation of the grid. Hence, in a
+ * vertically oriented grid, *number of secitons* refers to the *number of
+ * rows*, whereas in a horizontally oriented grid, *number of sections* refers
+ * to the *number of columns*.
  */
 export default forwardRef<HTMLDivElement, MasonryGridProps>(({
   areSectionsAligned = false,
@@ -215,15 +219,15 @@ export default forwardRef<HTMLDivElement, MasonryGridProps>(({
 })
 
 /**
- * Computes the index and current length of the next available section for a specific base value,
- * based on a provided array of existing section lengths.
+ * Computes the index and current length of the next available section for a
+ * specific base value, based on a provided array of existing section lengths.
  *
  * @param currentSectionLengths - An array of the current section lengths.
- * @param base - The base value of the item to be inserted into the grid, and to be used to evaluate
- *               the next available section.
+ * @param base - The base value of the item to be inserted into the grid, and to
+ *               be used to evaluate the next available section.
  *
- * @returns An array consiting of the computed section index and its to-be length if a new item were
- *          to be placed in it.
+ * @returns An array consiting of the computed section index and its to-be
+ *          length if a new item were to be placed in it.
  */
 function computeNextAvailableSectionAndLengthByBase(currentSectionLengths: number[], base: number): [number, number] {
   const numSections = currentSectionLengths.length
@@ -258,13 +262,14 @@ function computeNextAvailableSectionAndLengthByBase(currentSectionLengths: numbe
 }
 
 /**
- * A helper function that computes the max section length of an array of section lengths. Only the
- * first n = `base` sections are inspected.
+ * A helper function that computes the max section length of an array of section
+ * lengths. Only the first n = `base` sections are inspected.
  *
  * @param currentSectionLengths - An array of section lengths.
- * @param base - The number representing the first n sections to inspect. Any non-numerical values
- *               will be ignored and return value will be based on all sections. A `base` value will
- *               be clamped between 1 and the maximum length of the array of section lengths.
+ * @param base - The number representing the first n sections to inspect. Any
+ *               non-numerical values will be ignored and return value will be
+ *               based on all sections. A `base` value will be clamped between 1
+ *               and the maximum length of the array of section lengths.
  *
  * @returns The max section length.
  */
@@ -284,7 +289,8 @@ function computeMaxLength(currentSectionLengths: number[], base?: number): numbe
  * @param element - The HTML element.
  * @param numSections - Total number of sections.
  *
- * @returns The computed base value that is clamped between 1 and max number of sections.
+ * @returns The computed base value that is clamped between 1 and max number of
+ *          sections.
  */
 function computeBaseFromElement(element: HTMLElement, numSections: number): number {
   const classList = element.classList

@@ -11,7 +11,8 @@ export type SwipeContainerProps = HTMLAttributes<HTMLDivElement> & {
 }
 
 /**
- * An empty component with a backing `<div>` element that detects swipe gestures.
+ * An empty component with a backing `<div>` element that detects swipe
+ * gestures.
  */
 export default forwardRef<HTMLDivElement, SwipeContainerProps>(({
   children,
@@ -92,13 +93,13 @@ export default forwardRef<HTMLDivElement, SwipeContainerProps>(({
     <div
       {...props}
       ref={ref}
-      onTouchStart={event => onDragStart(event.targetTouches[0].clientX, event.targetTouches[0].clientY)}
-      onTouchMove={event => onDragMove(event.targetTouches[0].clientX, event.targetTouches[0].clientY)}
-      onTouchEnd={() => onDragEnd()}
       onMouseDown={event => onDragStart(event.clientX, event.clientY)}
+      onMouseLeave={() => onDragCancel()}
       onMouseMove={event => onDragMove(event.clientX, event.clientY)}
       onMouseUp={() => onDragEnd()}
-      onMouseLeave={() => onDragCancel()}
+      onTouchEnd={() => onDragEnd()}
+      onTouchMove={event => onDragMove(event.targetTouches[0].clientX, event.targetTouches[0].clientY)}
+      onTouchStart={event => onDragStart(event.targetTouches[0].clientX, event.targetTouches[0].clientY)}
     >
       {children}
     </div>

@@ -1,12 +1,14 @@
 import { Attributes, CElement, ClassAttributes, cloneElement, Component, ComponentState, FunctionComponentElement, ReactElement, ReactNode } from 'react'
 
 /**
- * Wrapper for {@link cloneElement} but instead of overwriting `className` and `style` of the
- * cloned element with the values specified in the `props` argument, they are merged instead.
+ * Wrapper for {@link cloneElement} but instead of overwriting `className` and
+ * `style` of the cloned element with the values specified in the `props`
+ * argument, they are merged instead.
  *
  * @param element - The target element to clone.
- * @param props - The props to apply to the cloned element. Overlapping props are overwritten with
- *                the exception of `className` and `style`, which are merged.
+ * @param props - The props to apply to the cloned element. Overlapping props
+ *                are overwritten with the exception of `className` and `style`,
+ *                which are merged.
  * @param children - Optional child elements add into the cloned element.
  *
  * @returns The cloned element.

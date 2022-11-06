@@ -1,30 +1,34 @@
 import classNames from 'classnames'
-import React, { CSSProperties, forwardRef, HTMLAttributes, PropsWithChildren, useRef, useState } from 'react'
+import React, { forwardRef, HTMLAttributes, PropsWithChildren, useRef, useState } from 'react'
 import { Size } from 'spase'
 import useResizeEffect from './hooks/useResizeEffect'
 import Panorama, { PanoramaProps } from './Panorama'
+import asComponentDict from './utils/asComponentDict'
+import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
-import extractUniqueChildComponents from './utils/extractUniqueChildComponents'
 
 export type PanoramaSliderProps = HTMLAttributes<HTMLDivElement> & PanoramaProps & PropsWithChildren<{
   /**
-   * Field-of-view (0.0 - 360.0 degrees, inclusive) that represents the size of the reticle. 360
-   * indicates the reticle covers the entire image. If this is unspecified, the component will
-   * attempt to automatically calculate the FOV using the `viewportSize` prop.
+   * Field-of-view (0.0 - 360.0 degrees, inclusive) that represents the size of
+   * the reticle. 360 indicates the reticle covers the entire image. If this is
+   * unspecified, the component will attempt to automatically calculate the FOV
+   * using the `viewportSize` prop.
    */
   fov?: number
 
   /**
-   * Specifies which length (width or height) should be automatically calculated. The counterpart
-   * must be known (if `width` is specified here, the component's height must be known, i.e. it is
-   * specified in the CSS). Defaults to `width`.
+   * Specifies which length (width or height) should be automatically
+   * calculated. The counterpart must be known (if `width` is specified here,
+   * the component's height must be known, i.e. it is specified in the CSS).
+   * Defaults to `width`.
    */
   autoDimension?: 'width' | 'height'
 
   /**
-   * Size of the viewport that this component is controlling. A viewport can be thought of as a DOM
-   * element containing an aspect-filled image. This is used to automatically calculate the FOV if
-   * `fov` prop is not specified. If it is, this prop is ignored.
+   * Size of the viewport that this component is controlling. A viewport can be
+   * thought of as a DOM element containing an aspect-filled image. This is used
+   * to automatically calculate the FOV if `fov` prop is not specified. If it
+   * is, this prop is ignored.
    */
   viewportSize?: Size
 }>
@@ -32,9 +36,10 @@ export type PanoramaSliderProps = HTMLAttributes<HTMLDivElement> & PanoramaProps
 /**
  * A slider for a {@link Panorama} component.
  *
- * @exports PanoramaSliderIndicator - The indicator that appears when the slider is being dragged.
- * @exports PanoramaSliderReticle - The reticle that indicates the FOV of the backing
- *                                  {@link Panorama}.
+ * @exports PanoramaSliderIndicator - The indicator that appears when the slider
+ *                                    is being dragged.
+ * @exports PanoramaSliderReticle - The reticle that indicates the FOV of the
+ *                                  backing {@link Panorama}.
  * @exports PanoramaSliderTrack - The slide track.
  */
 export default forwardRef<HTMLDivElement, PanoramaSliderProps>(({
@@ -99,62 +104,63 @@ export default forwardRef<HTMLDivElement, PanoramaSliderProps>(({
   const reticleWidth = getReticleWidth()
   const adjustedZeroAnchor = getAdjustedZeroAnchor()
 
-  const customComponents = extractUniqueChildComponents(children, {
+  const components = asComponentDict(children, {
     track: PanoramaSliderTrack,
     reticle: PanoramaSliderReticle,
     indicator: PanoramaSliderIndicator,
   })
 
-  const bodyStyle: CSSProperties = {
-    height: '100%',
-    left: '0',
-    overflow: 'hidden',
-    pointerEvents: 'none',
-    position: 'absolute',
-    top: '0',
-    width: '100%',
-  }
+  const fixedStyles = asStyleDict({
+    body: {
+      height: '100%',
+      left: '0',
+      overflow: 'hidden',
+      pointerEvents: 'none',
+      position: 'absolute',
+      top: '0',
+      width: '100%',
+    },
+    componentContainer: {
+      alignItems: 'center',
+      display: 'flex',
+      height: '100%',
+      justifyContent: 'flex-start',
+      left: '0',
+      overflow: 'visible',
+      position: 'absolute',
+      top: '0',
+      width: '100%',
+    },
+  })
 
-  const componentContainerStyle: CSSProperties = {
-    alignItems: 'center',
-    display: 'flex',
-    height: '100%',
-    justifyContent: 'flex-start',
-    left: '0',
-    overflow: 'visible',
-    position: 'absolute',
-    top: '0',
-    width: '100%',
-  }
-
-  const defaultTrackStyle: CSSProperties = {
-    background: 'rgba(0, 0, 0, .7)',
-    height: '100%',
-  }
-
-  const defaultReticleStyle: CSSProperties = {
-    background: `rgba(0, 0, 0, ${isDragging ? 0 : 0.3})`,
-    flex: '0 0 auto',
-    height: '100%',
-    transitionDuration: '100ms',
-    transitionProperty: 'background',
-    transitionTimingFunction: 'ease-out',
-  }
-
-  const defaultIndicatorStyle: CSSProperties = {
-    background: '#fff',
-    borderRadius: '2px',
-    bottom: '-10px',
-    boxSizing: 'border-box',
-    display: 'block',
-    height: '2px',
-    left: '0',
-    margin: '0 auto',
-    opacity: isDragging ? 1 : 0,
-    position: 'absolute',
-    right: '0',
-    transition: 'opacity .3s ease-out',
-  }
+  const defaultStyles = asStyleDict({
+    track: {
+      background: 'rgba(0, 0, 0, .7)',
+      height: '100%',
+    },
+    reticle: {
+      background: `rgba(0, 0, 0, ${isDragging ? 0 : 0.3})`,
+      flex: '0 0 auto',
+      height: '100%',
+      transitionDuration: '100ms',
+      transitionProperty: 'background',
+      transitionTimingFunction: 'ease-out',
+    },
+    indicator: {
+      background: '#fff',
+      borderRadius: '2px',
+      bottom: '-10px',
+      boxSizing: 'border-box',
+      display: 'block',
+      height: '2px',
+      left: '0',
+      margin: '0 auto',
+      opacity: isDragging ? 1 : 0,
+      position: 'absolute',
+      right: '0',
+      transition: 'opacity .3s ease-out',
+    },
+  })
 
   return (
     <div
@@ -185,21 +191,21 @@ export default forwardRef<HTMLDivElement, PanoramaSliderProps>(({
         onImageSizeChange={setImageSize}
         onPositionChange={onPositionChange}
       />
-      <div style={bodyStyle}>
-        <div style={componentContainerStyle}>
-          {cloneStyledElement(customComponents.track ?? <PanoramaSliderTrack style={defaultTrackStyle}/>, {
+      <div style={fixedStyles.body}>
+        <div style={fixedStyles.componentContainer}>
+          {cloneStyledElement(components.track ?? <PanoramaSliderTrack style={defaultStyles.track}/>, {
             className: classNames({ dragging: isDragging }),
             style: {
               flex: '1 0 auto',
             },
           })}
-          {cloneStyledElement(customComponents.reticle ?? <PanoramaSliderReticle style={defaultReticleStyle}/>, {
+          {cloneStyledElement(components.reticle ?? <PanoramaSliderReticle style={defaultStyles.reticle}/>, {
             className: classNames({ dragging: isDragging }),
             style: {
               width: `${reticleWidth}px`,
             },
           })}
-          {cloneStyledElement(customComponents.track ?? <PanoramaSliderTrack style={defaultTrackStyle}/>, {
+          {cloneStyledElement(components.track ?? <PanoramaSliderTrack style={defaultStyles.track}/>, {
             className: classNames({ dragging: isDragging }),
             style: {
               flex: '1 0 auto',
@@ -207,7 +213,7 @@ export default forwardRef<HTMLDivElement, PanoramaSliderProps>(({
           })}
         </div>
       </div>
-      {cloneStyledElement(customComponents.indicator ?? <PanoramaSliderIndicator style={defaultIndicatorStyle}/>, {
+      {cloneStyledElement(components.indicator ?? <PanoramaSliderIndicator style={defaultStyles.indicator}/>, {
         className: classNames({ dragging: isDragging }),
         style: {
           width: `${reticleWidth}px`,

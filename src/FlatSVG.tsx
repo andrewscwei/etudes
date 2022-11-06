@@ -7,39 +7,42 @@ export type FlatSVGProps = HTMLAttributes<HTMLDivElement> & {
   svg: string
 
   /**
-   * Specifies whether the 'class' should be removed in the SVG root node and all of its child
-   * nodes.
+   * Specifies whether the 'class' should be removed in the SVG root node and
+   * all of its child nodes.
    */
   stripClasses?: boolean
 
   /**
-   * Specifies whether extraneous attributes should be removed from the SVG root node. The
-   * `whitelistedAttributes` prop defines what attributes should be kept.
+   * Specifies whether extraneous attributes should be removed from the SVG root
+   * node. The `whitelistedAttributes` prop defines what attributes should be
+   * kept.
    */
   stripExtraneousAttributes?: boolean
 
   /**
-   * Specifies whether the 'id' attribute should be removed in the SVG root node and all of its
-   * child nodes.
+   * Specifies whether the 'id' attribute should be removed in the SVG root node
+   * and all of its child nodes.
    */
   stripIds?: boolean
 
   /**
-   * Specifies whether the 'style' atribute and any <style> nodes should be removed in the SVG root
-   * node and all of its child nodes.
+   * Specifies whether the 'style' atribute and any <style> nodes should be
+   * removed in the SVG root node and all of its child nodes.
    */
   stripStyles?: boolean
 
   /**
-   * Specifies attribute names to exclude from being stripped if `stripExtraneousAttributes` is
-   * enabled. By default, only `viewBox` is whitelisted.
+   * Specifies attribute names to exclude from being stripped if
+   * `stripExtraneousAttributes` is enabled. By default, only `viewBox` is
+   * whitelisted.
    */
   whitelistedAttributes?: string[]
 }
 
 /**
- * A component whose root element wraps an SVG markup. When wrapping the SVG, it will attempt to
- * sanitize the markup (i.e. stripping useless attributes) according to the props specified.
+ * A component whose root element wraps an SVG markup. When wrapping the SVG, it
+ * will attempt to sanitize the markup (i.e. stripping useless attributes)
+ * according to the props specified.
  */
 export default forwardRef<HTMLDivElement, FlatSVGProps>(({
   svg,

@@ -1,7 +1,7 @@
 import React, { CSSProperties, forwardRef, HTMLAttributes, ReactEventHandler, useEffect, useRef } from 'react'
+import useDebug from './utils/useDebug'
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:video') : () => {}
+const debug = useDebug('video')
 
 export type VideoProps = HTMLAttributes<HTMLDivElement> & {
   autoLoop?: boolean
@@ -104,18 +104,18 @@ export default forwardRef<HTMLDivElement, VideoProps>(({
   return (
     <div {...props} ref={ref}>
       <video
-        ref={bodyRef}
         autoPlay={autoPlay}
-        playsInline={playsInline}
-        muted={isMuted}
         controls={hasControls}
-        onCanPlay={canPlayHandler}
-        onPlay={playHandler}
-        onPause={pauseHandler}
-        onEnded={endHandler}
         loop={autoLoop}
+        muted={isMuted}
+        playsInline={playsInline}
         poster={posterSrc}
+        ref={bodyRef}
         style={{ objectFit: isCover ? 'cover' : 'fill', ...videoStyle }}
+        onCanPlay={canPlayHandler}
+        onEnded={endHandler}
+        onPause={pauseHandler}
+        onPlay={playHandler}
       >
         <source src={src}/>
       </video>

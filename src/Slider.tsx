@@ -1,19 +1,20 @@
 import classNames from 'classnames'
-import React, { CSSProperties, forwardRef, HTMLAttributes, MouseEvent, PropsWithChildren, useEffect, useRef } from 'react'
+import React, { forwardRef, HTMLAttributes, MouseEvent, PropsWithChildren, useEffect, useRef } from 'react'
 import { Rect } from 'spase'
 import Each from './Each'
 import useDragEffect from './hooks/useDragEffect'
+import asComponentDict from './utils/asComponentDict'
+import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
-import extractUniqueChildComponents from './utils/extractUniqueChildComponents'
+import useDebug from './utils/useDebug'
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-const debug = process.env.NODE_ENV === 'development' ? require('debug')('etudes:slider') : () => {}
+const debug = useDebug('slider')
 
 export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   /**
-   * By default the position is a value from 0 - 1, 0 being the start of the slider and 1 being the
-   * end. Switching on this flag inverts this behavior, where 0 becomes the end of the slider and 1
-   * being the start.
+   * By default the position is a value from 0 - 1, 0 being the start of the
+   * slider and 1 being the end. Switching on this flag inverts this behavior,
+   * where 0 becomes the end of the slider and 1 being the start.
    */
   isInverted?: boolean
 
@@ -23,8 +24,8 @@ export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   isTrackInteractive?: boolean
 
   /**
-   * Indicates if position change events are dispatched only when dragging ends. When disabled,
-   * aforementioned events are fired repeatedly while dragging.
+   * Indicates if position change events are dispatched only when dragging ends.
+   * When disabled, aforementioned events are fired repeatedly while dragging.
    */
   onlyDispatchesOnDragEnd?: boolean
 
@@ -54,7 +55,8 @@ export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   position?: number
 
   /**
-   * A function that returns the label to be displayed at a given slider position.
+   * A function that returns the label to be displayed at a given slider
+   * position.
    *
    * @param position - The current slider position.
    *
@@ -63,9 +65,10 @@ export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   labelProvider?: (position: number) => string
 
   /**
-   * Handler invoked when position changes. This can either be invoked from the `position` prop
-   * being changed or from the slider being dragged. Note that if the event is emitted at the end of
-   * dragging due to `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here is
+   * Handler invoked when position changes. This can either be invoked from the
+   * `position` prop being changed or from the slider being dragged. Note that
+   * if the event is emitted at the end of dragging due to
+   * `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here is
    * still `true`.
    *
    * @param position - The current slider position.
@@ -85,16 +88,18 @@ export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
 }>
 
 /**
- * A slider component supporting both horizontal and vertical orientations whose sliding position (a
- * decimal between 0.0 and 1.0, inclusive) can be two-way binded. The component consists of three
- * customizable elements: a draggable knob, a label on the knob, and a scroll track on either side
- * of the knob. While the width and height of the slider is inferred from its CSS rules, the width
- * and height of the knob are set via props (`knobWidth` and `knobHeight`, respectively). The size
- * of the knob does not impact the size of the slider.
+ * A slider component supporting both horizontal and vertical orientations whose
+ * sliding position (a decimal between 0.0 and 1.0, inclusive) can be two-way
+ * binded. The component consists of three customizable elements: a draggable
+ * knob, a label on the knob, and a scroll track on either side of the knob.
+ * While the width and height of the slider is inferred from its CSS rules, the
+ * width and height of the knob are set via props (`knobWidth` and `knobHeight`,
+ * respectively). The size of the knob does not impact the size of the slider.
  *
  * @exports SliderKnob - The component for the knob.
  * @exports SliderKnobLabel - The component for the label on the knob.
- * @exports SliderTrack - The component for the slide track on either side of the knob.
+ * @exports SliderTrack - The component for the slide track on either side of
+ *                        the knob.
  */
 export default forwardRef<HTMLDivElement, SliderProps>(({
   children,
@@ -157,14 +162,9 @@ export default forwardRef<HTMLDivElement, SliderProps>(({
     onDragEnd,
   })
 
-  // Natural position is the position affecting internal components accounting for `isInverted`.
+  // Natural position is the position affecting internal components accounting
+  // for `isInverted`.
   const naturalPosition = isInverted ? 1 - position : position
-
-  const customComponents = extractUniqueChildComponents(children, {
-    knob: SliderKnob,
-    knobLabel: SliderKnobLabel,
-    track: SliderTrack,
-  })
 
   useEffect(() => {
     if (isDragging || externalPosition === position) return
@@ -184,55 +184,64 @@ export default forwardRef<HTMLDivElement, SliderProps>(({
     onPositionChange?.(position, true)
   }, [isDragging])
 
-  const bodyStyle: CSSProperties = {
-    height: '100%',
-    width: '100%',
-  }
+  const components = asComponentDict(children, {
+    knob: SliderKnob,
+    knobLabel: SliderKnobLabel,
+    track: SliderTrack,
+  })
 
-  const knobContainerStyle: CSSProperties = {
-    position: 'absolute',
-    transform: 'translate3d(-50%, -50%, 0)',
-    zIndex: '1',
-    ...orientation === 'vertical' ? {
-      left: '50%',
-      top: `${naturalPosition * 100}%`,
-      transition: isDragging === false ? 'top 100ms ease-out' : 'none',
-    } : {
-      left: `${naturalPosition * 100}%`,
-      top: '50%',
-      transition: isDragging === false ? 'left 100ms ease-out' : 'none',
+  const fixedStyles = asStyleDict({
+    body: {
+      height: '100%',
+      width: '100%',
     },
-  }
+    knobContainer: {
+      position: 'absolute',
+      transform: 'translate3d(-50%, -50%, 0)',
+      zIndex: '1',
+      ...orientation === 'vertical' ? {
+        left: '50%',
+        top: `${naturalPosition * 100}%`,
+        transition: isDragging === false ? 'top 100ms ease-out' : 'none',
+      } : {
+        left: `${naturalPosition * 100}%`,
+        top: '50%',
+        transition: isDragging === false ? 'left 100ms ease-out' : 'none',
+      },
+    },
+    trackPadding: {
+      height: '100%',
+      minHeight: '20px',
+      minWidth: '20px',
+      position: 'absolute',
+      transform: orientation === 'horizontal' ? 'translate3d(0, -50%, 0)' : 'translate3d(-50%, 0, 0)',
+      width: '100%',
+    },
+  })
 
-  const sliderTrackPaddingStyle: CSSProperties = {
-    height: '100%',
-    minHeight: '20px',
-    minWidth: '20px',
-    position: 'absolute',
-    transform: orientation === 'horizontal' ? 'translate3d(0, -50%, 0)' : 'translate3d(-50%, 0, 0)',
-    width: '100%',
-  }
-
-  const defaultSliderKnobStyle: CSSProperties = {
-    background: '#fff',
-    borderRadius: `${knobHeight * 0.5}px`,
-  }
-
-  const defaultSliderKnobLabelStyle: CSSProperties = {
-    color: '#000',
-    fontSize: '12px',
-    lineHeight: `${knobHeight}px`,
-  }
-
-  const defaultSliderTrackStyle: CSSProperties = {
-    background: '#fff',
-  }
+  const defaultStyles = asStyleDict({
+    knob: {
+      alignItems: 'center',
+      background: '#fff',
+      boxSizing: 'border-box',
+      display: 'flex',
+      justifyContent: 'center',
+    },
+    knobLabel: {
+      color: '#000',
+      fontSize: '12px',
+      lineHeight: `${knobHeight}px`,
+    },
+    track: {
+      background: '#fff',
+    },
+  })
 
   return (
     <div {...props} className={classNames(className, orientation)} ref={ref}>
-      <div ref={bodyRef} style={bodyStyle}>
+      <div ref={bodyRef} style={fixedStyles.body}>
         <Each in={['start', 'end']}>
-          {align => cloneStyledElement(customComponents.track ?? <SliderTrack style={defaultSliderTrackStyle}/>, {
+          {align => cloneStyledElement(components.track ?? <SliderTrack style={defaultStyles.track}/>, {
             className: align,
             style: {
               cursor: isTrackInteractive ? 'pointer' : 'auto',
@@ -261,10 +270,10 @@ export default forwardRef<HTMLDivElement, SliderProps>(({
               },
             },
             onClick: trackClickHandler,
-          }, <div style={sliderTrackPaddingStyle}/>)}
+          }, <div style={fixedStyles.trackPadding}/>)}
         </Each>
-        <button ref={knobContainerRef} style={knobContainerStyle}>
-          {cloneStyledElement(customComponents.knob ?? <SliderKnob style={defaultSliderKnobStyle}/>, {
+        <button ref={knobContainerRef} style={fixedStyles.knobContainer}>
+          {cloneStyledElement(components.knob ?? <SliderKnob style={defaultStyles.knob}/>, {
             className: classNames({
               [orientation]: true,
               'at-end': isInverted ? position === 0 : position === 1,
@@ -277,7 +286,7 @@ export default forwardRef<HTMLDivElement, SliderProps>(({
               width: `${knobWidth}px`,
             },
           }, ...labelProvider ? [
-            cloneStyledElement(customComponents.knobLabel ?? <SliderKnobLabel style={defaultSliderKnobLabelStyle}/>, {
+            cloneStyledElement(components.knobLabel ?? <SliderKnobLabel style={defaultStyles.knobLabel}/>, {
               style: {
                 pointerEvents: 'none',
                 userSelect: 'none',
@@ -296,4 +305,3 @@ export const SliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <di
 export const SliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
 
 export const SliderKnobLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
-

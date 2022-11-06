@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
 import Panorama from '../../../lib/Panorama'
 import PanoramaSlider from '../../../lib/PanoramaSlider'
-import Slider from '../../../lib/Slider'
+import Slider, { SliderKnob } from '../../../lib/Slider'
 import $$PanoramaImage from '../assets/images/panorama.png'
 
 export default function() {
@@ -32,6 +32,10 @@ export default function() {
           }}
           onPositionChange={position => { setWidth(400 + position * 400) }}
         >
+          <SliderKnob style={{
+            background: '#fff',
+            borderRadius: `${20 * 0.5}px`,
+          }}/>
         </Slider>
         <Panorama
           angle={angle}
@@ -60,9 +64,9 @@ export default function() {
         />
       </StyledRoot>
       <DebugConsole
-        title='?: Panorama+Slider'
         maxEntries={1}
         message={`Angle: ${Math.round(angle)}°`}
+        title='?: Panorama+Slider'
         style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
       />
     </>

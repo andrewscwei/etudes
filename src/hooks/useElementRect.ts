@@ -3,7 +3,8 @@ import ResizeObserver from 'resize-observer-polyfill'
 import { Rect } from 'spase'
 
 /**
- * Hook for monitoring changes in and returning the size and position of the target element.
+ * Hook for monitoring changes in and returning the size and position of the
+ * target element.
  *
  * @param targetRef - Reference to the target element.
  *

@@ -4,7 +4,7 @@ type ComponentTypeDict = Record<string, JSXElementConstructor<any>>
 
 type ComponentElementDict<T extends ComponentTypeDict> = Record<keyof T, JSX.Element>
 
-export default function extractUniqueChildComponents<T extends ComponentTypeDict>(children?: ReactNode, typeDict: T = {} as T): Partial<ComponentElementDict<T>> {
+export default function asComponentDict<T extends ComponentTypeDict>(children?: ReactNode, typeDict: T = {} as T): Partial<ComponentElementDict<T>> {
   const keys: (keyof T)[] = Object.keys(typeDict)
   const types = Object.values(typeDict)
   const components: Partial<ComponentElementDict<T>> = {}

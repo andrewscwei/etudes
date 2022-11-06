@@ -11,7 +11,6 @@ export default function Conditional({ children, if: boolOrExpression }: Conditio
     case 'function':
       return boolOrExpression() ? <>{children}</> : <></>
     default:
-    // eslint-disable-next-line no-console
       console.error(`[etudes::Conditional] The type of provided condition ${boolOrExpression} is not supported.`)
 
       return <></>

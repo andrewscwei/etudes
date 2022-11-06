@@ -1,11 +1,11 @@
-import { align, container, selectors } from 'promptu'
+import { align, animations, container, selectors } from 'promptu'
 import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
 import Dial, { DialKnob, DialTrack } from '../../../lib/Dial'
 import RangeSlider from '../../../lib/RangeSlider'
-import Slider, { SliderEndingTrack, SliderKnob, SliderKnobLabel, SliderStartingTrack } from '../../../lib/Slider'
-import StepwiseSlider, { StepwiseSliderEndingTrack, StepwiseSliderKnob, StepwiseSliderKnobLabel } from '../../../lib/StepwiseSlider'
+import Slider, { SliderKnob, SliderKnobLabel, SliderTrack } from '../../../lib/Slider'
+import StepwiseSlider, { StepwiseSliderKnob, StepwiseSliderKnobLabel, StepwiseSliderTrack } from '../../../lib/StepwiseSlider'
 
 export default function() {
   const getAngleByPosition = (position: number): number => position * (max - min) + min
@@ -34,67 +34,60 @@ export default function() {
           `}
           style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg)' }}
         />
-        <Slider
+        <StyledSlider
           isInverted={true}
           knobHeight={40}
           knobWidth={60}
-          labelProvider={pos => `${Math.round(getAngleByPosition(pos))}°`}
           onlyDispatchesOnDragEnd={false}
-          onPositionChange={pos => setPosition(pos)}
           orientation='vertical'
           position={position}
           trackPadding={10}
-          css={css`
-            ${align.cc}
-            ${SliderKnob} {
-              ${selectors.hwot} { transform: scale(1.2); }
-            }
-            ${SliderKnobLabel} {
-              font-size: 1.8rem;
-              font-weight: 700;
-            }
-            ${SliderStartingTrack} {
-              ${selectors.hwot} { transform: scale(1.1); }
-            }
-            ${SliderEndingTrack} {
-              background: grey;
-              ${selectors.hwot} { transform: scale(1.1); }
-            }
-          `}
-          style={{
-            height: `${(index + 1) * 30}px`,
-            transform: 'translate3d(-5rem, 0, 0) rotateX(20deg) rotateY(-20deg)',
-          }}
-        />
-        <StepwiseSlider
+          style={{ height: `${(index + 1) * 30}px` }}
+          labelProvider={pos => `${Math.round(getAngleByPosition(pos))}°`}
+          onPositionChange={pos => setPosition(pos)}
+        >
+          <SliderKnob className='hover:expand' style={{
+            alignItems: 'center',
+            background: '#fff',
+            boxSizing: 'border-box',
+            display: 'flex',
+            justifyContent: 'center',
+          }}/>
+          <SliderKnobLabel style={{
+            fontSize: '1.8rem',
+            fontWeight: '700',
+          }}/>
+          <SliderTrack className='hover:expand' style={{
+            background: '#fff',
+          }}/>
+        </StyledSlider>
+        <StyledStepwiseSlider
           index={index}
           isInverted={true}
           isTrackInteractive={false}
           knobHeight={40}
           knobWidth={60}
-          labelProvider={(pos, idx) => `${idx}`}
-          onIndexChange={idx => setIndex(idx)}
           onlyDispatchesOnDragEnd={false}
           orientation='vertical'
           trackPadding={10}
-          css={css`
-            ${align.cc}
-            ${StepwiseSliderKnob} {
-              ${selectors.hwot} { transform: scale(1.2); }
-            }
-            ${StepwiseSliderKnobLabel} {
-              font-size: 1.8rem;
-              font-weight: 700;
-            }
-            ${StepwiseSliderEndingTrack} {
-              background: grey;
-              ${selectors.hwot} { transform: scale(1.1); }
-            }
-          `}
-          style={{
-            transform: 'translate3d(5rem, 0, 0) rotateX(20deg) rotateY(-20deg)',
-          }}
-        />
+          labelProvider={(pos, idx) => `${idx}`}
+          onIndexChange={idx => setIndex(idx)}
+        >
+          <StepwiseSliderKnob className='hover:expand' style={{
+            alignItems: 'center',
+            background: '#fff',
+            boxSizing: 'border-box',
+            display: 'flex',
+            justifyContent: 'center',
+          }}/>
+          <StepwiseSliderKnobLabel style={{
+            fontSize: '1.8rem',
+            fontWeight: '700',
+          }}/>
+          <StepwiseSliderTrack className='hover:expand' style={{
+            background: '#fff',
+          }}/>
+        </StyledStepwiseSlider>
       </StyledRoot>
       <RangeSlider
         defaultRange={[0, 360]}
@@ -127,12 +120,49 @@ export default function() {
       <DebugConsole
         maxEntries={1}
         message={`Position: ${position.toFixed(3)}, Size: ${index}, Angle: ${Math.round(angle)}°, Min: ${Math.round(min)}°, Max: ${Math.round(max)}°`}
-        style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
         title='?: Dial+Sliders'
+        style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
       />
     </>
   )
 }
+
+const StyledStepwiseSlider = styled(StepwiseSlider)`
+  ${align.cc}
+  height: 30rem;
+  transform: translate3d(5rem, 0, 0) rotateX(20deg) rotateY(-20deg);
+  width: 4px;
+
+  [class~='hover:expand'] {
+    ${animations.transition('all', 100)}
+
+    &.end {
+      background: #666 !important;
+    }
+
+    ${selectors.hwot} {
+      transform: scale(1.1);
+    }
+  }
+`
+
+const StyledSlider = styled(Slider)`
+  ${align.cc}
+  transform: translate3d(-5rem, 0, 0) rotateX(20deg) rotateY(-20deg);
+  width: 4px;
+
+  [class~='hover:expand'] {
+    ${animations.transition('all', 100)}
+
+    &.end {
+      background: #666 !important;
+    }
+
+    ${selectors.hwot} {
+      transform: scale(1.1);
+    }
+  }
+`
 
 const StyledRoot = styled.div`
   ${container.fhcc}

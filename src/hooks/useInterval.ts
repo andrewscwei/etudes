@@ -2,8 +2,8 @@ import { DependencyList, useEffect, useRef } from 'react'
 
 type Options = {
   /**
-   * Specifies if the handler should be invoked initially (as opposed to waiting for the specified
-   * interval for the initial invocation).
+   * Specifies if the handler should be invoked initially (as opposed to waiting
+   * for the specified interval for the initial invocation).
    */
   shouldInvokeInitially?: boolean
 }

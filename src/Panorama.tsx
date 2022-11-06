@@ -6,14 +6,15 @@ import useResizeEffect from './hooks/useResizeEffect'
 
 export type PanoramaProps = HTMLAttributes<HTMLDivElement> & {
   /**
-   * The current angle in degrees, 0.0 - 360.0, inclusive. When angle is 0 or 360, the left bound of
-   * the image is at the center of the component.
+   * The current angle in degrees, 0.0 - 360.0, inclusive. When angle is 0 or
+   * 360, the left bound of the image is at the center of the component.
    */
   angle?: number
 
   /**
-   * The panning speed. This is a multiplier to the number of pixels dragged, i.e. when set to 1,
-   * the image will shift the same amount of pixels that were dragged.
+   * The panning speed. This is a multiplier to the number of pixels dragged,
+   * i.e. when set to 1, the image will shift the same amount of pixels that
+   * were dragged.
    */
   speed?: number
 
@@ -23,15 +24,15 @@ export type PanoramaProps = HTMLAttributes<HTMLDivElement> & {
   src?: string
 
   /**
-   * A decimal percentage of the component width indicating where 0° should be, i.e. if `zeroAnchor`
-   * is `0`, the `angle` would be 0° when the left edge of the image is at the left edge of the
-   * component.
+   * A decimal percentage of the component width indicating where 0° should be,
+   * i.e. if `zeroAnchor` is `0`, the `angle` would be 0° when the left edge of
+   * the image is at the left edge of the component.
    */
   zeroAnchor?: number
 
   /**
-   * Handler invoked when the positionchanges. This can either be invoked from the `angle` prop
-   * being changed or from the image being dragged.
+   * Handler invoked when the positionchanges. This can either be invoked from
+   * the `angle` prop being changed or from the image being dragged.
    *
    * @param position - The current position.
    * @param isDragging - Specifies if the position change is due to dragging.
@@ -39,10 +40,10 @@ export type PanoramaProps = HTMLAttributes<HTMLDivElement> & {
   onPositionChange?: (position: number, isDragging: boolean) => void
 
   /**
-   * Handler invoked when the angle changes. This can either be invoked from the `angle` prop being
-   * changed or from the image being dragged. When `angle` is being double-binded, ensure that the
-   * value is only being set by this handler when `isDragging` is `true` to avoid potential update
-   * overflow.
+   * Handler invoked when the angle changes. This can either be invoked from the
+   * `angle` prop being changed or from the image being dragged. When `angle` is
+   * being double-binded, ensure that the value is only being set by this
+   * handler when `isDragging` is `true` to avoid potential update overflow.
    *
    * @param angle - The current angle.
    * @param isDragging - Specifies if the angle change is due to dragging.
@@ -77,11 +78,11 @@ export type PanoramaProps = HTMLAttributes<HTMLDivElement> & {
   onImageLoadError?: () => void
 
   /**
-   * Handler invoked when the image size changes. This is the actual size of the loaded image. When
-   * no images are loaded yet, the size is `undefined`.
+   * Handler invoked when the image size changes. This is the actual size of the
+   * loaded image. When no images are loaded yet, the size is `undefined`.
    *
-   * @param size - The actual size of the loaded iamge. If no images are loaded yet, the size is
-   *               `undefined`.
+   * @param size - The actual size of the loaded iamge. If no images are loaded
+   *               yet, the size is `undefined`.
    */
   onImageSizeChange?: (size?: Size) => void
 
@@ -94,7 +95,8 @@ export type PanoramaProps = HTMLAttributes<HTMLDivElement> & {
 }
 
 /**
- * A component containing a pannable 360° panorama image. The angle supports two-way binding.
+ * A component containing a pannable 360° panorama image. The angle supports
+ * two-way binding.
  */
 export default forwardRef<HTMLDivElement, PanoramaProps>(({
   angle: externalAngle = 0,

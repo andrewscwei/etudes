@@ -259,7 +259,12 @@
         "allowSingleLine": true
       }
     ],
-    "capitalized-comments": "warn",
+    "capitalized-comments": [
+      "warn",
+      {
+        "ignoreInlineComments": true
+      }
+    ],
     "comma-dangle": "off",
     "comma-spacing": "off",
     "comma-style": [

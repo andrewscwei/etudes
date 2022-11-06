@@ -17,13 +17,13 @@ export default function() {
     <>
       <StyledRoot>
         <MasonryGrid
+          horizontalSpacing={30}
+          orientation='vertical'
           sections={6}
           verticalSpacing={30}
-          orientation='vertical'
-          horizontalSpacing={30}
           style={{
-            width: '80%',
             transform: 'translate3d(0, 0, 0) rotate3d(1, 1, 0, 2deg)',
+            width: '80%',
           }}
         >
           <Each in={items}>
@@ -34,8 +34,8 @@ export default function() {
         </MasonryGrid>
       </StyledRoot>
       <DebugConsole
-        title='?: Masonry Grid'
         message={itemIndex > -1 ? `You selected item <strong>#${itemIndex + 1}</strong>!` : 'No item seletected!'}
+        title='?: Masonry Grid'
         style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
       />
     </>
