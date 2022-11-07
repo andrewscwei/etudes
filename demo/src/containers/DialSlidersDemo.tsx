@@ -93,7 +93,7 @@ export default function() {
         defaultRange={[0, 360]}
         max={360}
         min={0}
-        orientation='horizontal'
+        orientation='vertical'
         steps={359}
         tintColor='#fff'
         cssLabel={props => css`
@@ -110,11 +110,11 @@ export default function() {
           setMax(range[1])
         }}
         style={{
+          left: '0',
           margin: '8vh 4vw',
-          transform: 'translate3d(0, 0, 0) rotateX(20deg) rotateY(-20deg)',
           position: 'fixed',
           top: '0',
-          left: '0',
+          transform: 'translate3d(0, 0, 0) rotateX(20deg) rotateY(-20deg)',
         }}
       />
       <DebugConsole

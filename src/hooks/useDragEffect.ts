@@ -3,7 +3,8 @@ import interact from 'interactjs'
 import { DependencyList, Dispatch, RefObject, SetStateAction, useEffect, useRef, useState } from 'react'
 
 type ReturnedStates<T> = {
-  isDragging: [boolean, Dispatch<SetStateAction<boolean>>]
+  isDragging: [boolean]
+  isReleasing: [boolean]
   value: [T, Dispatch<SetStateAction<T>>]
 }
 
@@ -86,6 +87,7 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
 
   const valueRef = useRef<T>(initialValue)
   const [isDragging, setIsDragging] = useState<boolean>(false)
+  const [isReleasing, setIsReleasing] = useState<boolean>(false)
   const [value, setValue] = useState(valueRef.current)
 
   useEffect(() => {
@@ -97,6 +99,7 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
         ...options,
         onstart: () => {
           setIsDragging(true)
+          setIsReleasing(false)
           onDragStart?.()
         },
         onmove: ({ dx, dy }) => {
@@ -106,10 +109,13 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
             setValue(newValue)
           }
 
+          setIsDragging(true)
+          setIsReleasing(false)
           onDragMove?.(dx, dy)
         },
         onend: () => {
           setIsDragging(false)
+          setIsReleasing(true)
           onDragEnd?.()
         },
       })
@@ -127,7 +133,8 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
   }, [value])
 
   return {
-    isDragging: [isDragging, setIsDragging],
+    isDragging: [isDragging],
+    isReleasing: [isReleasing],
     value: [value, setValue],
   }
 }
