@@ -1,6 +1,6 @@
 import { align, container, selectors } from 'promptu'
 import React, { useEffect, useState } from 'react'
-import styled, { css } from 'styled-components'
+import styled, { createGlobalStyle, css } from 'styled-components'
 import BurgerButton, { BurgerButtonBar } from '../../lib/BurgerButton'
 import FlatSVG from '../../lib/FlatSVG'
 import WithTooltip from '../../lib/WithTooltip'
@@ -11,6 +11,7 @@ import ListDemo from './containers/ListDemo'
 import MasonryGridDemo from './containers/MasonryGridDemo'
 import PanoramaDemo from './containers/PanoramaDemo'
 import VideoDemo from './containers/VideoDemo'
+import globalStyle from './styles/global'
 
 export default function App() {
   const mapLocationToHash = () => {
@@ -23,7 +24,7 @@ export default function App() {
   }
 
   const [isNavActive, setIsNavActive] = useState(false)
-  const [hash, setHash] = useState<string | undefined>('dial+sliders')
+  const [hash, setHash] = useState<string | undefined>()
 
   useEffect(() => {
     mapLocationToHash()
@@ -41,6 +42,10 @@ export default function App() {
     mapHashToLocation()
     setIsNavActive(false)
   }, [hash])
+
+  const GlobalStyle = createGlobalStyle`
+    ${globalStyle}
+  `
 
   function renderDemo() {
     switch (hash) {
@@ -63,6 +68,7 @@ export default function App() {
 
   return (
     <>
+      <GlobalStyle/>
       <StyledDemo>{renderDemo()}</StyledDemo>
       <StyledHUDs>
         <StyledNav isActive={isNavActive}>

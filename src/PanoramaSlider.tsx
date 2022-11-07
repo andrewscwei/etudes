@@ -218,7 +218,7 @@ export default forwardRef<HTMLDivElement, PanoramaSliderProps>(({
         style: {
           width: `${reticleWidth}px`,
         },
-       })}
+      })}
     </div>
   )
 })
