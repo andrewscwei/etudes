@@ -6,6 +6,7 @@ import Panorama, { PanoramaProps } from './Panorama'
 import asComponentDict from './utils/asComponentDict'
 import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
+import styles from './utils/styles'
 
 export type PanoramaSliderProps = HTMLAttributes<HTMLDivElement> & PanoramaProps & PropsWithChildren<{
   /**
@@ -120,7 +121,11 @@ export default forwardRef<HTMLDivElement, PanoramaSliderProps>(({
       top: '0',
       width: '100%',
     },
-    componentContainer: {
+    panorama: {
+      height: '100%',
+      width: '100%',
+    },
+    controls: {
       alignItems: 'center',
       display: 'flex',
       height: '100%',
@@ -130,6 +135,15 @@ export default forwardRef<HTMLDivElement, PanoramaSliderProps>(({
       position: 'absolute',
       top: '0',
       width: '100%',
+    },
+    track: {
+      flex: '1 0 auto',
+    },
+    reticle: {
+      width: `${reticleWidth}px`,
+    },
+    indicator: {
+      width: `${reticleWidth}px`,
     },
   })
 
@@ -166,21 +180,18 @@ export default forwardRef<HTMLDivElement, PanoramaSliderProps>(({
     <div
       {...props}
       ref={ref}
-      style={{
-        ...style,
-        ...autoDimension === 'width' ? {
-          width: `${size.height * aspectRatio}px`,
-        } : {
-          height: `${size.width / aspectRatio}px`,
-        },
-      }}
+      style={styles(style, autoDimension === 'width' ? {
+        width: `${size.height * aspectRatio}px`,
+      } : {
+        height: `${size.width / aspectRatio}px`,
+      })}
     >
       <Panorama
         angle={angle}
         ref={panoramaRef}
         speed={speed}
         src={src}
-        style={{ height: '100%', width: '100%' }}
+        style={fixedStyles.panorama}
         zeroAnchor={adjustedZeroAnchor}
         onAngleChange={onAngleChange}
         onDragEnd={dragEndHandler}
@@ -192,32 +203,24 @@ export default forwardRef<HTMLDivElement, PanoramaSliderProps>(({
         onPositionChange={onPositionChange}
       />
       <div style={fixedStyles.body}>
-        <div style={fixedStyles.componentContainer}>
+        <div style={fixedStyles.controls}>
           {cloneStyledElement(components.track ?? <PanoramaSliderTrack style={defaultStyles.track}/>, {
             className: classNames({ dragging: isDragging }),
-            style: {
-              flex: '1 0 auto',
-            },
+            style: styles(fixedStyles.track),
           })}
           {cloneStyledElement(components.reticle ?? <PanoramaSliderReticle style={defaultStyles.reticle}/>, {
             className: classNames({ dragging: isDragging }),
-            style: {
-              width: `${reticleWidth}px`,
-            },
+            style: styles(fixedStyles.reticle),
           })}
           {cloneStyledElement(components.track ?? <PanoramaSliderTrack style={defaultStyles.track}/>, {
             className: classNames({ dragging: isDragging }),
-            style: {
-              flex: '1 0 auto',
-            },
+            style: styles(fixedStyles.track),
           })}
         </div>
       </div>
       {cloneStyledElement(components.indicator ?? <PanoramaSliderIndicator style={defaultStyles.indicator}/>, {
         className: classNames({ dragging: isDragging }),
-        style: {
-          width: `${reticleWidth}px`,
-        },
+        style: styles(fixedStyles.indicator),
       })}
     </div>
   )

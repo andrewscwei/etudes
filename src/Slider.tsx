@@ -1,14 +1,11 @@
 import classNames from 'classnames'
 import React, { forwardRef, HTMLAttributes, MouseEvent, PropsWithChildren, useEffect, useRef } from 'react'
 import { Rect } from 'spase'
-import Each from './Each'
 import useDragEffect from './hooks/useDragEffect'
 import asComponentDict from './utils/asComponentDict'
 import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
-import useDebug from './utils/useDebug'
-
-const debug = useDebug('slider')
+import styles from './utils/styles'
 
 export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   /**
@@ -97,7 +94,7 @@ export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
  * respectively). The size of the knob does not impact the size of the slider.
  *
  * @exports SliderKnob - The component for the knob.
- * @exports SliderKnobLabel - The component for the label on the knob.
+ * @exports SliderLabel - The component for the label on the knob.
  * @exports SliderTrack - The component for the slide track on either side of
  *                        the knob.
  */
@@ -153,7 +150,7 @@ export default forwardRef<HTMLDivElement, SliderProps>(({
   const bodyRef = useRef<HTMLDivElement>(null)
   const knobContainerRef = useRef<HTMLButtonElement>(null)
 
-  const { isDragging: [isDragging], value: [position, setPosition] } = useDragEffect(knobContainerRef, {
+  const { isDragging: [isDragging], isReleasing: [isReleasing], value: [position, setPosition] } = useDragEffect(knobContainerRef, {
     initialValue: externalPosition,
     transform: mapDragValueToPosition,
     onDragStart,
@@ -163,12 +160,11 @@ export default forwardRef<HTMLDivElement, SliderProps>(({
   // Natural position is the position affecting internal components accounting
   // for `isInverted`.
   const naturalPosition = isInverted ? 1 - position : position
+  const isAtEnd = isInverted ? position === 0 : position === 1
+  const isAtStart = isInverted ? position === 1 : position === 0
 
   useEffect(() => {
     if (isDragging || externalPosition === position) return
-
-    debug('Updating drag effect value from position prop...', 'OK', `prop=${externalPosition}, effect=${position}`)
-
     setPosition(externalPosition)
   }, [externalPosition])
 
@@ -184,7 +180,7 @@ export default forwardRef<HTMLDivElement, SliderProps>(({
 
   const components = asComponentDict(children, {
     knob: SliderKnob,
-    knobLabel: SliderKnobLabel,
+    label: SliderLabel,
     track: SliderTrack,
   })
 
@@ -207,7 +203,32 @@ export default forwardRef<HTMLDivElement, SliderProps>(({
         transition: isDragging === false ? 'left 100ms ease-out' : 'none',
       },
     },
-    trackPadding: {
+    knob: {
+      height: `${knobHeight}px`,
+      touchAction: 'none',
+      width: `${knobWidth}px`,
+    },
+    label: {
+      pointerEvents: 'none',
+      userSelect: 'none',
+    },
+    track: {
+      cursor: isTrackInteractive ? 'pointer' : 'auto',
+      pointerEvents: isTrackInteractive ? 'auto' : 'none',
+      position: 'absolute',
+      ...orientation === 'vertical' ? {
+        left: '0',
+        margin: '0 auto',
+        right: '0',
+        width: '100%',
+      } : {
+        bottom: '0',
+        height: '100%',
+        margin: 'auto 0',
+        top: '0',
+      },
+    },
+    trackHitbox: {
       height: '100%',
       minHeight: '20px',
       minWidth: '20px',
@@ -225,7 +246,7 @@ export default forwardRef<HTMLDivElement, SliderProps>(({
       display: 'flex',
       justifyContent: 'center',
     },
-    knobLabel: {
+    label: {
       color: '#000',
       fontSize: '12px',
       lineHeight: `${knobHeight}px`,
@@ -238,60 +259,56 @@ export default forwardRef<HTMLDivElement, SliderProps>(({
   return (
     <div {...props} className={classNames(className, orientation)} ref={ref}>
       <div ref={bodyRef} style={fixedStyles.body}>
-        <Each in={['start', 'end']}>
-          {align => cloneStyledElement(components.track ?? <SliderTrack style={defaultStyles.track}/>, {
-            className: align,
-            style: {
-              cursor: isTrackInteractive ? 'pointer' : 'auto',
-              pointerEvents: isTrackInteractive ? 'auto' : 'none',
-              position: 'absolute',
-              ...orientation === 'vertical' ? {
-                bottom: align === 'start' ? undefined : 0,
-                height: align === 'start'
-                  ? `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`
-                  : `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
-                left: '0',
-                margin: '0 auto',
-                right: '0',
-                top: align === 'start' ? 0 : undefined,
-                width: '100%',
-              } : {
-                bottom: '0',
-                height: '100%',
-                left: align === 'start' ? 0 : undefined,
-                margin: 'auto 0',
-                right: align === 'start' ? undefined : 0,
-                top: '0',
-                width: align === 'start'
-                  ? `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`
-                  : `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
-              },
-            },
-            onClick: trackClickHandler,
-          }, <div style={fixedStyles.trackPadding}/>)}
-        </Each>
+        {cloneStyledElement(components.track ?? <SliderTrack style={defaultStyles.track}/>, {
+          className: classNames('start', orientation, {
+            'at-end': isAtEnd,
+            'at-start': isAtStart,
+            'dragging': isDragging,
+            'releasing': isReleasing,
+          }),
+          style: styles(fixedStyles.track, orientation === 'vertical' ? {
+            height: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
+            top: '0',
+          } : {
+            left: '0',
+            width: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
+          }),
+          onClick: trackClickHandler,
+        }, <div style={fixedStyles.trackHitbox}/>)}
+        {cloneStyledElement(components.track ?? <SliderTrack style={defaultStyles.track}/>, {
+          className: classNames('end', orientation, {
+            'at-end': isAtEnd,
+            'at-start': isAtStart,
+            'dragging': isDragging,
+            'releasing': isReleasing,
+          }),
+          style: styles(fixedStyles.track, orientation === 'vertical' ? {
+            bottom: '0',
+            height: `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
+          } : {
+            right: '0',
+            width: `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
+          }),
+          onClick: trackClickHandler,
+        }, <div style={fixedStyles.trackHitbox}/>)}
         <button ref={knobContainerRef} style={fixedStyles.knobContainer}>
           {cloneStyledElement(components.knob ?? <SliderKnob style={defaultStyles.knob}/>, {
-            className: classNames({
-              [orientation]: true,
-              'at-end': isInverted ? position === 0 : position === 1,
-              'at-start': isInverted ? position === 1 : position === 0,
-              'dragging': isDragging === true,
+            className: classNames(orientation, {
+              'at-end': isAtEnd,
+              'at-start': isAtStart,
+              'dragging': isDragging,
+              'releasing': isReleasing,
             }),
-            style: {
-              height: `${knobHeight}px`,
-              touchAction: 'none',
-              width: `${knobWidth}px`,
-            },
-          }, ...labelProvider ? [
-            cloneStyledElement(components.knobLabel ?? <SliderKnobLabel style={defaultStyles.knobLabel}/>, {
-              style: {
-                pointerEvents: 'none',
-                userSelect: 'none',
-              },
-            },
-            labelProvider(position)),
-          ] : [])}
+            style: styles(fixedStyles.knob),
+          }, labelProvider && cloneStyledElement(components.label ?? <SliderLabel style={defaultStyles.label}/>, {
+            className: classNames(orientation, {
+              'at-end': isAtEnd,
+              'at-start': isAtStart,
+              'dragging': isDragging,
+              'releasing': isReleasing,
+            }),
+            style: styles(fixedStyles.label),
+          }, labelProvider(position)))}
         </button>
       </div>
     </div>
@@ -302,4 +319,4 @@ export const SliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <di
 
 export const SliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
 
-export const SliderKnobLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
+export const SliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>

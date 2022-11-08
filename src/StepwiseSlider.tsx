@@ -1,11 +1,11 @@
 import classNames from 'classnames'
 import React, { forwardRef, HTMLAttributes, MouseEvent, PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { Rect } from 'spase'
-import Each from './Each'
 import useDragEffect from './hooks/useDragEffect'
 import asComponentDict from './utils/asComponentDict'
 import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
+import styles from './utils/styles'
 import useDebug from './utils/useDebug'
 
 const debug = useDebug('stepwise-slider')
@@ -124,7 +124,7 @@ export type StepwiseSliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChil
  * where the position is a decimal ranging between 0.0 and 1.0, inclusive.
  *
  * @exports StepwiseSliderKnob - The component for the knob.
- * @exports StepwiseSliderKnobLabel - The component for the label on the knob.
+ * @exports StepwiseSliderLabel - The component for the label on the knob.
  * @exports StepwiseSliderTrack - The component for the slide track on either
  *                                side of the knob.
  */
@@ -185,7 +185,7 @@ export default forwardRef<HTMLDivElement, StepwiseSliderProps>(({
   const knobContainerRef = useRef<HTMLButtonElement>(null)
   const [index, setIndex] = useState(externalIndex)
 
-  const { isDragging: [isDragging], value: [position, setPosition] } = useDragEffect(knobContainerRef, {
+  const { isDragging: [isDragging], isReleasing: [isReleasing], value: [position, setPosition] } = useDragEffect(knobContainerRef, {
     initialValue: getPositionAt(externalIndex, steps),
     transform: mapDragValueToPosition,
     onDragStart,
@@ -195,6 +195,8 @@ export default forwardRef<HTMLDivElement, StepwiseSliderProps>(({
   // Natural position is the position affecting internal components accounting
   // for `isInverted`.
   const naturalPosition = isInverted ? 1 - position : position
+  const isAtEnd = isInverted ? position === 0 : position === 1
+  const isAtStart = isInverted ? position === 1 : position === 0
 
   useEffect(() => {
     if (isDragging) return
@@ -238,7 +240,7 @@ export default forwardRef<HTMLDivElement, StepwiseSliderProps>(({
 
   const components = asComponentDict(children, {
     knob: StepwiseSliderKnob,
-    knobLabel: StepwiseSliderKnobLabel,
+    label: StepwiseSliderLabel,
     track: StepwiseSliderTrack,
   })
 
@@ -261,7 +263,32 @@ export default forwardRef<HTMLDivElement, StepwiseSliderProps>(({
         transition: isDragging === false ? 'left 100ms ease-out' : 'none',
       },
     },
-    trackPadding: {
+    knob: {
+      height: `${knobHeight}px`,
+      touchAction: 'none',
+      width: `${knobWidth}px`,
+    },
+    label: {
+      pointerEvents: 'none',
+      userSelect: 'none',
+    },
+    track: {
+      cursor: isTrackInteractive ? 'pointer' : 'auto',
+      pointerEvents: isTrackInteractive ? 'auto' : 'none',
+      position: 'absolute',
+      ...orientation === 'vertical' ? {
+        left: '0',
+        margin: '0 auto',
+        right: '0',
+        width: '100%',
+      } : {
+        bottom: '0',
+        height: '100%',
+        margin: 'auto 0',
+        top: '0',
+      },
+    },
+    trackHitbox: {
       height: '100%',
       minHeight: '20px',
       minWidth: '20px',
@@ -279,7 +306,7 @@ export default forwardRef<HTMLDivElement, StepwiseSliderProps>(({
       display: 'flex',
       justifyContent: 'center',
     },
-    knobLabel: {
+    label: {
       color: '#000',
       fontSize: '12px',
       lineHeight: `${knobHeight}px`,
@@ -292,60 +319,56 @@ export default forwardRef<HTMLDivElement, StepwiseSliderProps>(({
   return (
     <div {...props} className={classNames(className, orientation)} ref={ref}>
       <div ref={bodyRef} style={fixedStyles.body}>
-        <Each in={['start', 'end']}>
-          {align => cloneStyledElement(components.track ?? <StepwiseSliderTrack style={defaultStyles.track}/>, {
-            className: align,
-            style: {
-              cursor: isTrackInteractive ? 'pointer' : 'auto',
-              pointerEvents: isTrackInteractive ? 'auto' : 'none',
-              position: 'absolute',
-              ...orientation === 'vertical' ? {
-                bottom: align === 'start' ? undefined : 0,
-                height: align === 'start'
-                  ? `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`
-                  : `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
-                left: '0',
-                margin: '0 auto',
-                right: '0',
-                top: align === 'start' ? 0 : undefined,
-                width: '100%',
-              } : {
-                bottom: '0',
-                height: '100%',
-                left: align === 'start' ? 0 : undefined,
-                margin: 'auto 0',
-                right: align === 'start' ? undefined : 0,
-                top: '0',
-                width: align === 'start'
-                  ? `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`
-                  : `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
-              },
-            },
-            onClick: trackClickHandler,
-          }, <div style={fixedStyles.trackPadding}/>)}
-        </Each>
+        {cloneStyledElement(components.track ?? <StepwiseSliderTrack style={defaultStyles.track}/>, {
+          className: classNames('start', orientation, {
+            'at-end': isAtEnd,
+            'at-start': isAtStart,
+            'dragging': isDragging,
+            'releasing': isReleasing,
+          }),
+          style: styles(fixedStyles.track, orientation === 'vertical' ? {
+            height: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
+            top: '0',
+          } : {
+            left: '0',
+            width: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
+          }),
+          onClick: trackClickHandler,
+        }, <div style={fixedStyles.trackHitbox}/>)}
+        {cloneStyledElement(components.track ?? <StepwiseSliderTrack style={defaultStyles.track}/>, {
+          className: classNames('end', orientation, {
+            'at-end': isAtEnd,
+            'at-start': isAtStart,
+            'dragging': isDragging,
+            'releasing': isReleasing,
+          }),
+          style: styles(fixedStyles.track, orientation === 'vertical' ? {
+            bottom: '0',
+            height: `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
+          } : {
+            right: '0',
+            width: `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
+          }),
+          onClick: trackClickHandler,
+        }, <div style={fixedStyles.trackHitbox}/>)}
         <button ref={knobContainerRef} style={fixedStyles.knobContainer}>
           {cloneStyledElement(components.knob ?? <StepwiseSliderKnob style={defaultStyles.knob}/>, {
-            className: classNames({
-              [orientation]: true,
-              'at-end': isInverted ? position === 0 : position === 1,
-              'at-start': isInverted ? position === 1 : position === 0,
-              'dragging': isDragging === true,
+            className: classNames(orientation, {
+              'at-end': isAtEnd,
+              'at-start': isAtStart,
+              'dragging': isDragging,
+              'releasing': isReleasing,
             }),
-            style: {
-              height: `${knobHeight}px`,
-              touchAction: 'none',
-              width: `${knobWidth}px`,
-            },
-          }, ...steps && labelProvider ? [
-            cloneStyledElement(components.knobLabel ?? <StepwiseSliderKnobLabel style={defaultStyles.knobLabel}/>, {
-              style: {
-                pointerEvents: 'none',
-                userSelect: 'none',
-              },
-            },
-            labelProvider(position, getNearestIndexByPosition(position, steps))),
-          ] : [])}
+            style: styles(fixedStyles.knob),
+          }, steps && labelProvider && cloneStyledElement(components.label ?? <StepwiseSliderLabel style={defaultStyles.label}/>, {
+            className: classNames(orientation, {
+              'at-end': isAtEnd,
+              'at-start': isAtStart,
+              'dragging': isDragging,
+              'releasing': isReleasing,
+            }),
+            style: styles(fixedStyles.label),
+          }, labelProvider(position, getNearestIndexByPosition(position, steps))))}
         </button>
       </div>
     </div>
@@ -356,7 +379,7 @@ export const StepwiseSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>
 
 export const StepwiseSliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
 
-export const StepwiseSliderKnobLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
+export const StepwiseSliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
 
 /**
  * Generates a set of steps compatible with this component.
