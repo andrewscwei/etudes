@@ -1,10 +1,10 @@
-import equal from 'fast-deep-equal'
+import isEqual from 'fast-deep-equal'
 import interact from 'interactjs'
 import { DependencyList, Dispatch, RefObject, SetStateAction, useEffect, useRef, useState } from 'react'
 
 type ReturnedStates<T> = {
-  isDragging: [boolean]
-  isReleasing: [boolean]
+  isDragging: [boolean, Dispatch<SetStateAction<boolean>>]
+  isReleasing: [boolean, Dispatch<SetStateAction<boolean>>]
   value: [T, Dispatch<SetStateAction<T>>]
 }
 
@@ -79,7 +79,7 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
    * @returns `true` if the value was set, `false` otherwise.
    */
   const setValueRef = (value: T): boolean => {
-    if (equal(valueRef.current, value)) return false
+    if (isEqual(valueRef.current, value)) return false
     valueRef.current = value
 
     return true
@@ -93,7 +93,7 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
   useEffect(() => {
     if (targetRef.current && !interact.isSet(targetRef.current)) {
       // Do not consume states in these listeners as they will remain their
-      // initial values within The scope of the listeners.
+      // initial values within the scope of the listeners.
       interact(targetRef.current).draggable({
         inertia: true,
         ...options,
@@ -133,8 +133,8 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
   }, [value])
 
   return {
-    isDragging: [isDragging],
-    isReleasing: [isReleasing],
+    isDragging: [isDragging, setIsDragging],
+    isReleasing: [isReleasing, setIsReleasing],
     value: [value, setValue],
   }
 }
