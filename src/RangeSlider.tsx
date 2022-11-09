@@ -13,13 +13,11 @@ export type RangeSliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildre
   areLabelsVisible?: boolean
   decimalPlaces?: number
   knobPadding?: number
-  knobRadius?: number
   max: number
   min: number
   orientation?: Orientation
   range?: Range
   steps?: number
-  tintColor?: string
   onRangeChange?: (range: Range) => void
 }>
 
@@ -29,13 +27,11 @@ export default forwardRef<HTMLDivElement, RangeSliderProps>(({
   areLabelsVisible = true,
   decimalPlaces = 2,
   knobPadding = 20,
-  knobRadius = 10,
   max: maxValue,
   min: minValue,
   orientation = 'vertical',
   range: externalRange,
   steps = -1,
-  tintColor = '#fff',
   onRangeChange,
   ...props
 }, ref) => {
@@ -148,7 +144,6 @@ export default forwardRef<HTMLDivElement, RangeSliderProps>(({
       height: '100%',
     },
     highlight: {
-      background: tintColor,
       height: '100%',
       left: '0',
       position: 'absolute',
@@ -191,21 +186,22 @@ export default forwardRef<HTMLDivElement, RangeSliderProps>(({
       background: 'rgba(255, 255, 255, .2)',
     },
     highlight: {
+      background: '#fff',
       transitionDuration: '100ms',
       transitionProperty: (isReleasingStartKnob ? !isReleasingEndKnob : isReleasingEndKnob) ? 'opacity, width, transform' : 'opacity',
       transitionTimingFunction: 'ease-out',
     },
     knob: {
       alignItems: 'center',
-      background: tintColor,
-      borderRadius: `${knobRadius}px`,
+      background: '#fff',
+      borderRadius: '10px',
       boxSizing: 'border-box',
       display: 'flex',
-      height: `${knobRadius * 2}px`,
+      height: '20px',
       justifyContent: 'center',
       transitionDuration: '100ms',
       transitionTimingFunction: 'ease-out',
-      width: `${knobRadius * 2}px`,
+      width: '20px',
     },
     label: {
       background: 'transparent',

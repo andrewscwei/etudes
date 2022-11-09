@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
 import Dial, { DialKnob, DialTrack } from '../../../lib/Dial'
-import RangeSlider from '../../../lib/RangeSlider'
+import RangeSlider, { RangeSliderKnob, RangeSliderLabel } from '../../../lib/RangeSlider'
 import Slider, { SliderKnob, SliderLabel, SliderTrack } from '../../../lib/Slider'
 import StepwiseSlider, { StepwiseSliderKnob, StepwiseSliderLabel, StepwiseSliderTrack } from '../../../lib/StepwiseSlider'
 
@@ -46,20 +46,9 @@ export default function() {
           labelProvider={pos => `${Math.round(getAngleByPosition(pos))}°`}
           onPositionChange={pos => setPosition(pos)}
         >
-          <SliderKnob className='hover:expand' style={{
-            alignItems: 'center',
-            background: '#fff',
-            boxSizing: 'border-box',
-            display: 'flex',
-            justifyContent: 'center',
-          }}/>
-          <SliderLabel style={{
-            fontSize: '1.8rem',
-            fontWeight: '700',
-          }}/>
-          <SliderTrack className='hover:expand' style={{
-            background: '#fff',
-          }}/>
+          <SliderKnob className='knob'/>
+          <SliderLabel className='label'/>
+          <SliderTrack className='track'/>
         </StyledSlider>
         <StyledStepwiseSlider
           index={index}
@@ -73,43 +62,25 @@ export default function() {
           labelProvider={(pos, idx) => `${idx}`}
           onIndexChange={idx => setIndex(idx)}
         >
-          <StepwiseSliderKnob className='hover:expand' style={{
-            alignItems: 'center',
-            background: '#fff',
-            boxSizing: 'border-box',
-            display: 'flex',
-            justifyContent: 'center',
-          }}/>
-          <StepwiseSliderLabel style={{
-            fontSize: '1.8rem',
-            fontWeight: '700',
-          }}/>
-          <StepwiseSliderTrack className='hover:expand' style={{
-            background: '#fff',
-          }}/>
+          <StepwiseSliderKnob className='knob'/>
+          <StepwiseSliderLabel className='label'/>
+          <StepwiseSliderTrack className='track'/>
         </StyledStepwiseSlider>
       </StyledRoot>
-      <RangeSlider
+      <StyledRangeSlider
         max={360}
         min={0}
         orientation='horizontal'
         range={[min, max]}
         steps={359}
-        tintColor='#fff'
         onRangeChange={([min, max]) => {
           setMin(min)
           setMax(max)
         }}
-        style={{
-          height: '4px',
-          left: '0',
-          margin: '8vh 4vw',
-          position: 'fixed',
-          top: '0',
-          transform: 'translate3d(0, 0, 0) rotateX(20deg) rotateY(-20deg)',
-          width: '300px',
-        }}
-      />
+      >
+        <RangeSliderLabel className='label'/>
+        <RangeSliderKnob className='knob'/>
+      </StyledRangeSlider>
       <DebugConsole
         maxEntries={1}
         message={`Position: ${position.toFixed(3)}, Size: ${index}, Angle: ${Math.round(angle)}°, Min: ${Math.round(min)}°, Max: ${Math.round(max)}°`}
@@ -120,21 +91,62 @@ export default function() {
   )
 }
 
+const StyledRangeSlider = styled(RangeSlider)`
+  ${align.ftl}
+  height: 4px;
+  margin: 8vh 4vw;
+  transform: translate3d(0, 0, 0) rotateX(20deg) rotateY(-20deg);
+  width: 300px;
+
+  .knob {
+    ${container.fvcc}
+    ${animations.transition('transform', 100)}
+    background: #fff;
+    border-radius: 10px;
+    width: 20px;
+    height: 20px;
+
+    ${selectors.hwot} {
+      transform: scale(1.2);
+    }
+  }
+
+  .label {
+    ${animations.transition('opacity', 100)}
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    top: calc(100% + 10px);
+  }
+`
+
 const StyledStepwiseSlider = styled(StepwiseSlider)`
   ${align.cc}
   height: 30rem;
   transform: translate3d(5rem, 0, 0) rotateX(20deg) rotateY(-20deg);
   width: 4px;
 
-  [class~='hover:expand'] {
+  .knob {
+    ${container.fvcc}
     ${animations.transition('all', 100)}
-
-    &.end {
-      background: #666 !important;
-    }
+    background: #fff;
 
     ${selectors.hwot} {
-      transform: scale(1.1);
+      transform: scale(1.2);
+    }
+  }
+
+  .label {
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+
+  .track {
+    background: #fff;
+
+    &.end {
+      background: #666;
     }
   }
 `
@@ -144,8 +156,24 @@ const StyledSlider = styled(Slider)`
   transform: translate3d(-5rem, 0, 0) rotateX(20deg) rotateY(-20deg);
   width: 4px;
 
-  [class~='hover:expand'] {
+  .knob {
+    ${container.fvcc}
     ${animations.transition('all', 100)}
+    background: #fff;
+
+    ${selectors.hwot} {
+      transform: scale(1.2);
+    }
+  }
+
+  .label {
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+
+  .track {
+    ${animations.transition('all', 100)}
+    background: #fff;
 
     &.end {
       background: #666 !important;
