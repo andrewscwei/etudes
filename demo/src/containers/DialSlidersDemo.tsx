@@ -73,9 +73,9 @@ export default function() {
         orientation='horizontal'
         range={[min, max]}
         steps={359}
-        onRangeChange={([min, max]) => {
-          setMin(min)
-          setMax(max)
+        onRangeChange={range => {
+          setMin(range[0])
+          setMax(range[1])
         }}
       >
         <RangeSliderLabel className='label'/>

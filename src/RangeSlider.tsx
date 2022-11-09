@@ -210,10 +210,10 @@ export default forwardRef<HTMLDivElement, RangeSliderProps>(({
       transitionDuration: '100ms',
       transitionTimingFunction: 'ease-out',
       ...orientation === 'horizontal' ? {
-        top: `calc(100% + 10px)`,
+        top: 'calc(100% + 10px)',
       } : {
-        left: `calc(100% + 10px)`,
-      }
+        left: 'calc(100% + 10px)',
+      },
     },
   })
 
@@ -238,7 +238,7 @@ export default forwardRef<HTMLDivElement, RangeSliderProps>(({
           } : {
             marginTop: `${start}px`,
           }),
-        }, <div style={fixedStyles.knobHitbox}/>, areLabelsVisible && (
+        }, <div style={fixedStyles.knobHitbox}/>, areLabelsVisible &&
           cloneStyledElement(components.label ?? <RangeSliderLabel style={styles(defaultStyles.label, {
             transitionProperty: isReleasingStartKnob ? 'opacity, transform' : 'opacity',
           })}/>, {
@@ -248,10 +248,10 @@ export default forwardRef<HTMLDivElement, RangeSliderProps>(({
             }),
             style: styles(fixedStyles.label),
           }, Number(startValue.toFixed(decimalPlaces)).toLocaleString())
-        ))}
+        )}
         {cloneStyledElement(components.knob ?? <RangeSliderKnob style={styles(defaultStyles.knob, {
-            transitionProperty: isReleasingEndKnob ? 'opacity, transform' : 'opacity',
-          })}/>, {
+          transitionProperty: isReleasingEndKnob ? 'opacity, transform' : 'opacity',
+        })}/>, {
           ref: endKnobRef,
           disabled: isEqual([startValue, endValue], [maxValue, maxValue]),
           className: classNames(orientation, {
@@ -265,7 +265,7 @@ export default forwardRef<HTMLDivElement, RangeSliderProps>(({
           } : {
             marginTop: `${end}px`,
           }),
-        }, <div style={fixedStyles.knobHitbox}/>, areLabelsVisible && (
+        }, <div style={fixedStyles.knobHitbox}/>, areLabelsVisible &&
           cloneStyledElement(components.label ?? <RangeSliderLabel style={styles(defaultStyles.label, {
             transitionProperty: isReleasingEndKnob ? 'opacity, transform' : 'opacity',
           })}/>, {
@@ -275,7 +275,7 @@ export default forwardRef<HTMLDivElement, RangeSliderProps>(({
             }),
             style: styles(fixedStyles.label),
           }, Number(endValue.toFixed(decimalPlaces)).toLocaleString())
-        ))}
+        )}
       </div>
     </div>
   )

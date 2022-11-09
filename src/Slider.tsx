@@ -144,6 +144,7 @@ export default forwardRef<HTMLDivElement, SliderProps>(({
         setPosition(normalizedPosition)
         break
       }
+      default: break
     }
   }
 
