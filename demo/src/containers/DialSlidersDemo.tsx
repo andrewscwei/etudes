@@ -4,8 +4,8 @@ import styled, { css } from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
 import Dial, { DialKnob, DialTrack } from '../../../lib/Dial'
 import RangeSlider from '../../../lib/RangeSlider'
-import Slider, { SliderKnob, SliderKnobLabel, SliderTrack } from '../../../lib/Slider'
-import StepwiseSlider, { StepwiseSliderKnob, StepwiseSliderKnobLabel, StepwiseSliderTrack } from '../../../lib/StepwiseSlider'
+import Slider, { SliderKnob, SliderLabel, SliderTrack } from '../../../lib/Slider'
+import StepwiseSlider, { StepwiseSliderKnob, StepwiseSliderLabel, StepwiseSliderTrack } from '../../../lib/StepwiseSlider'
 
 export default function() {
   const getAngleByPosition = (position: number): number => position * (max - min) + min
@@ -53,7 +53,7 @@ export default function() {
             display: 'flex',
             justifyContent: 'center',
           }}/>
-          <SliderKnobLabel style={{
+          <SliderLabel style={{
             fontSize: '1.8rem',
             fontWeight: '700',
           }}/>
@@ -80,7 +80,7 @@ export default function() {
             display: 'flex',
             justifyContent: 'center',
           }}/>
-          <StepwiseSliderKnobLabel style={{
+          <StepwiseSliderLabel style={{
             fontSize: '1.8rem',
             fontWeight: '700',
           }}/>
@@ -90,31 +90,24 @@ export default function() {
         </StyledStepwiseSlider>
       </StyledRoot>
       <RangeSlider
-        defaultRange={[0, 360]}
         max={360}
         min={0}
-        orientation='vertical'
+        orientation='horizontal'
+        range={[0, 360]}
         steps={359}
         tintColor='#fff'
-        cssLabel={props => css`
-          font-weight: 700;
-          font-size: 2rem;
-        `}
-        cssKnob={props => css`
-          ${selectors.hwot} {
-            transform: scale(1.2);
-          }
-        `}
-        onRangeChange={range => {
-          setMin(range[0])
-          setMax(range[1])
+        onRangeChange={([min, max]) => {
+          setMin(min)
+          setMax(max)
         }}
         style={{
+          height: '4px',
           left: '0',
           margin: '8vh 4vw',
           position: 'fixed',
           top: '0',
           transform: 'translate3d(0, 0, 0) rotateX(20deg) rotateY(-20deg)',
+          width: '300px',
         }}
       />
       <DebugConsole
