@@ -10,8 +10,9 @@ import styles from './utils/styles'
 
 export type RotatingGalleryProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   /**
-   * Current image index. An error is thrown if the index is invalid (must be between 0 and length
-   * of `srcs` - 1, inclusive). This prop supports two-way binding.
+   * Current image index. An error is thrown if the index is invalid (must be
+   * between 0 and length of `srcs` - 1, inclusive). This prop supports two-way
+   * binding.
    */
   index?: number
 
@@ -21,9 +22,9 @@ export type RotatingGalleryProps = HTMLAttributes<HTMLDivElement> & PropsWithChi
   srcs?: string[]
 
   /**
-   * The duration of one rotation in milliseconds (how long one image stays before transitioning to
-   * the next). Specifying `NaN` or a negative number will prevent the component from automatically
-   * rotating.
+   * The duration of one rotation in milliseconds (how long one image stays
+   * before transitioning to the next). Specifying `NaN` or a negative number
+   * will prevent the component from automatically rotating.
    */
   rotationDuration?: number
 
