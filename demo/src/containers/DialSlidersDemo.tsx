@@ -1,6 +1,6 @@
 import { align, animations, container, selectors } from 'promptu'
 import React, { useState } from 'react'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
 import Dial, { DialKnob, DialTrack } from '../../../lib/Dial'
 import RangeSlider, { RangeSliderKnob, RangeSliderLabel } from '../../../lib/RangeSlider'
@@ -19,21 +19,15 @@ export default function() {
   return (
     <>
       <StyledRoot>
-        <Dial
+        <StyledDial
           angle={angle}
           knobLength={50}
           radius={200}
-          css={css`
-            ${align.cc}
-            ${DialKnob} {
-              stroke: #fff;
-            }
-            ${DialTrack} {
-              stroke: #666;
-            }
-          `}
           style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg)' }}
-        />
+        >
+          <DialKnob className='knob'/>
+          <DialTrack className='track'/>
+        </StyledDial>
         <StyledSlider
           isInverted={true}
           knobHeight={40}
@@ -90,6 +84,19 @@ export default function() {
     </>
   )
 }
+
+const StyledDial = styled(Dial)`
+  ${align.cc}
+
+  .knob {
+    stroke: #fff;
+  }
+
+  .track {
+    stroke-dasharray: 4;
+    stroke: #666;
+  }
+`
 
 const StyledRangeSlider = styled(RangeSlider)`
   ${align.ftl}
