@@ -16,22 +16,18 @@ export default function() {
   return (
     <>
       <StyledRoot>
-        <MasonryGrid
+        <StyledMasonryGrid
           horizontalSpacing={30}
           orientation='vertical'
           sections={6}
           verticalSpacing={30}
-          style={{
-            transform: 'translate3d(0, 0, 0) rotate3d(1, 1, 0, 2deg)',
-            width: '80%',
-          }}
         >
           <Each in={items}>
             {(val, idx) => (
               <StyledGridItem className={`h-${val.h} base-${val.b}`} onClick={() => setItemIndex(idx)}>{idx + 1}</StyledGridItem>
             )}
           </Each>
-        </MasonryGrid>
+        </StyledMasonryGrid>
       </StyledRoot>
       <DebugConsole
         message={itemIndex > -1 ? `You selected item <strong>#${itemIndex + 1}</strong>!` : 'No item seletected!'}
@@ -41,6 +37,11 @@ export default function() {
     </>
   )
 }
+
+const StyledMasonryGrid = styled(MasonryGrid)`
+  transform: translate3d(0, 0, 0) rotate3d(1, 1, 0, 2deg);
+  width: 80%;
+`
 
 const StyledGridItem = styled.button`
   ${container.fvcc}

@@ -23,7 +23,7 @@ export default function App() {
   }
 
   const [isNavActive, setIsNavActive] = useState(false)
-  const [hash, setHash] = useState<string | undefined>('dial+sliders')
+  const [hash, setHash] = useState<string | undefined>()
 
   useEffect(() => {
     mapLocationToHash()

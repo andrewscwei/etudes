@@ -10,8 +10,8 @@ export default function() {
     <>
       <StyledRoot>
         <StyledVideo
-          autoPlay={true}
           autoLoop={true}
+          autoPlay={true}
           isCover={true}
           src={$$Video}
         />
@@ -26,16 +26,16 @@ export default function() {
 
 const StyledVideo = styled(Video)`
   ${align.tl}
-  width: 100%;
   height: 100%;
   transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(10deg);
+  width: 100%;
 `
 
 const StyledRoot = styled.div`
   ${container.box}
-  width: 100%;
   height: 100%;
+  overflow: hidden;
   padding: 3rem;
   perspective: 80rem;
-  overflow: hidden;
+  width: 100%;
 `

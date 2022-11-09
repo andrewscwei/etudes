@@ -17,49 +17,29 @@ export default function() {
   return (
     <>
       <StyledRoot>
-        <Slider
+        <StyledSlider
           isInverted={false}
           knobHeight={20}
           knobWidth={20}
           orientation='horizontal'
           position={(width - 400) / 400}
-          style={{
-            transform: 'translate3d(0, 0, 0) rotateX(0deg) rotateY(-10deg)',
-            width: '40rem',
-            height: '.4rem',
-            maxWidth: '80%',
-            marginBottom: '5rem',
-          }}
           onPositionChange={position => { setWidth(400 + position * 400) }}
         >
-          <SliderKnob style={{
-            background: '#fff',
-            borderRadius: `${20 * 0.5}px`,
-          }}/>
-        </Slider>
-        <Panorama
+          <SliderKnob className='knob'/>
+        </StyledSlider>
+        <StyledPanorama
           angle={angle}
           src={$$PanoramaImage}
           zeroAnchor={zeroAnchor}
-          style={{
-            height: '40rem',
-            transform: 'translate3d(0, 0, 0) rotateX(0deg) rotateY(-10deg)',
-            width: `${width}px`,
-            maxWidth: '80%',
-          }}
+          style={{ width: `${width}px` }}
           onAngleChange={(value, isDragging) => { if (isDragging) setAngle(value) }}
           onResize={size => setViewportSize(size)}
         />
-        <PanoramaSlider
+        <StyledPanoramaSlider
           angle={angle}
           src={$$PanoramaImage}
           viewportSize={viewportSize}
           zeroAnchor={zeroAnchor}
-          style={{
-            marginTop: '3rem',
-            height: '8rem',
-            transform: 'translate3d(0, 0, 0) rotateX(0deg) rotateY(10deg)',
-          }}
           onAngleChange={(value, isDragging) => { if (isDragging) setAngle(value) }}
         />
       </StyledRoot>
@@ -72,6 +52,31 @@ export default function() {
     </>
   )
 }
+
+const StyledSlider = styled(Slider)`
+  height: .4rem;
+  margin-bottom: 5rem;
+  max-width: 80%;
+  transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(-10deg);
+  width: 40rem;
+
+  .knob {
+    background: #fff;
+    border-radius: 10px;
+  }
+`
+
+const StyledPanorama = styled(Panorama)`
+  height: 40rem;
+  transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(-10deg);
+  max-width: 80%;
+`
+
+const StyledPanoramaSlider = styled(PanoramaSlider)`
+  margin-top: 3rem;
+  height: 8rem;
+  transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(10deg);
+`
 
 const StyledRoot = styled.div`
   ${container.fvcc}
