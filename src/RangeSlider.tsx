@@ -1,340 +1,304 @@
 import classNames from 'classnames'
-import React, { forwardRef, HTMLAttributes, useEffect, useRef } from 'react'
-import { Size } from 'spase'
-import styled, { css } from 'styled-components'
+import isEqual from 'fast-deep-equal'
+import React, { forwardRef, HTMLAttributes, PropsWithChildren, useEffect, useRef, useState } from 'react'
 import useDragEffect from './hooks/useDragEffect'
 import useResizeEffect from './hooks/useResizeEffect'
-import { ExtendedCSSFunction, ExtendedCSSProps, Orientation, Range } from './types'
+import { Orientation, Range } from './types'
+import asComponentDict from './utils/asComponentDict'
+import asStyleDict from './utils/asStyleDict'
+import cloneStyledElement from './utils/cloneStyledElement'
+import styles from './utils/styles'
 
-export type KnobCSSProps = {
-  radius: number
-  tintColor: string
-  hitboxPadding: number
-  isDragging: boolean
-  isReleasing: boolean
-  isDisabled: boolean
-}
-
-export type LabelCSSProps = {
-  knobRadius: number
-  orientation: Orientation
-  isDragging: boolean
-  isReleasing: boolean
-}
-
-export type HighlightCSSProps = {
-  tintColor: string
-  isDragging: boolean
-  isReleasing: boolean
-}
-
-export type RangeSliderProps = HTMLAttributes<HTMLDivElement> & {
-  areLabelsVisible: boolean
-  decimalPlaces: number
-  defaultRange?: Range
-  hitboxPadding: number
-  knobRadius: number
+export type RangeSliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
+  areLabelsVisible?: boolean
+  decimalPlaces?: number
+  knobPadding?: number
+  knobRadius?: number
   max: number
   min: number
-  orientation: Orientation
-  steps: number
-  tintColor: string
-  onRangeChange: (range: Range) => void
-  cssKnob: ExtendedCSSFunction<KnobCSSProps>
-  cssHighlight: ExtendedCSSFunction<HighlightCSSProps>
-  cssLabel: ExtendedCSSFunction<LabelCSSProps>
-  cssGutter: ExtendedCSSFunction
-}
+  orientation?: Orientation
+  range?: Range
+  steps?: number
+  tintColor?: string
+  onRangeChange?: (range: Range) => void
+}>
 
 export default forwardRef<HTMLDivElement, RangeSliderProps>(({
-  areLabelsVisible = true,
+  children,
   className,
+  areLabelsVisible = true,
   decimalPlaces = 2,
-  defaultRange,
-  hitboxPadding = 20,
+  knobPadding = 20,
   knobRadius = 10,
-  max,
-  min,
+  max: maxValue,
+  min: minValue,
   orientation = 'vertical',
+  range: externalRange,
   steps = -1,
-  style,
   tintColor = '#fff',
   onRangeChange,
-  cssGutter = () => css``,
-  cssHighlight = () => css``,
-  cssKnob = () => css``,
-  cssLabel = () => css``,
   ...props
 }, ref) => {
+  const getPositionByValue = (value: number) => (value - minValue) / (maxValue - minValue)
+  const getPositionByDisplacement = (displacement: number) => displacement / (orientation === 'horizontal' ? size.width : size.height)
+  const getValueByPosition = (position: number) => position * (maxValue - minValue) + minValue
+  const getValueByDisplacement = (displacement: number) => getValueByPosition(getPositionByDisplacement(displacement))
+  const getDisplacementByPosition = (position: number) => position * (orientation === 'horizontal' ? size.width : size.height)
+  const getDisplacementByValue = (value: number) => getDisplacementByPosition(getPositionByValue(value))
+
+  const getClosestSteppedValue = (value: number) => {
+    const n = breakpoints.length
+    let idx = 0
+    let diff = Infinity
+
+    for (let i = 0; i < n; i++) {
+      const t = breakpoints[i]
+      const d = Math.abs(value - t)
+
+      if (d < diff) {
+        diff = d
+        idx = i
+      }
+    }
+
+    return breakpoints[idx]
+  }
+
   const bodyRef = useRef<HTMLDivElement>(null)
-  const knob0Ref = useRef<HTMLDivElement>(null)
-  const knob1Ref = useRef<HTMLDivElement>(null)
+  const startKnobRef = useRef<HTMLDivElement>(null)
+  const endKnobRef = useRef<HTMLDivElement>(null)
 
   const [size] = useResizeEffect(bodyRef)
 
-  const { isDragging: [isDraggingStartKnob], isReleasing: [isReleasingStartKnob], value: [startValue, setStartValue] } = useDragEffect(knob0Ref, {
-    initialValue: defaultRange?.[0] ?? min,
-    transform: (value: number, dx: number, dy: number) => {
+  const [startValue, setStartValue] = useState(externalRange?.[0] ?? minValue)
+  const [endValue, setEndValue] = useState(externalRange?.[1] ?? maxValue)
+
+  const { isDragging: [isDraggingStartKnob], isReleasing: [isReleasingStartKnob], value: [start, setStart] } = useDragEffect(startKnobRef, {
+    initialValue: getDisplacementByValue(externalRange?.[0] ?? minValue),
+    transform: (displacement: number, dx: number, dy: number) => {
       const delta = orientation === 'horizontal' ? dx : dy
-      const dMin = getDisplacementByValue(min, { min, max, orientation, size })
-      const dMax = end
-      const dCurr = getDisplacementByValue(value, { min, max, orientation, size })
-      const dNext = Math.max(dMin, Math.min(dMax, dCurr + delta))
-      const pos = getPositionByDisplacement(dNext, { orientation, size })
+      const dMin = getDisplacementByValue(minValue)
+      const dMax = getDisplacementByValue(endValue)
+      const dCurr = displacement
 
-      return getValueByPosition(pos, { min, max })
+      return Math.max(dMin, Math.min(dMax, dCurr + delta))
     },
-  }, [min, max, orientation, size])
+  }, [minValue, orientation, size, endValue])
 
-  const { isDragging: [isDraggingEndKnob], isReleasing: [isReleasingEndKnob], value: [endValue, setEndValue] } = useDragEffect(knob1Ref, {
-    initialValue: defaultRange?.[1] ?? max,
-    transform: (value: number, dx: number, dy: number) => {
+  const { isDragging: [isDraggingEndKnob], isReleasing: [isReleasingEndKnob], value: [end, setEnd] } = useDragEffect(endKnobRef, {
+    initialValue: getDisplacementByValue(externalRange?.[1] ?? maxValue),
+    transform: (displacement: number, dx: number, dy: number) => {
       const delta = orientation === 'horizontal' ? dx : dy
-      const dMin = start
-      const dMax = end
-      const dCurr = getDisplacementByValue(value, { min, max, orientation, size })
-      const dNext = Math.max(dMin, Math.min(dMax, dCurr + delta))
-      const pos = getPositionByDisplacement(dNext, { orientation, size })
+      const dMin = getDisplacementByValue(startValue)
+      const dMax = getDisplacementByValue(maxValue)
+      const dCurr = displacement + delta
 
-      return getValueByPosition(pos, { min, max })
+      return Math.max(dMin, Math.min(dMax, dCurr))
     },
-  }, [min, max, orientation, size])
+  }, [maxValue, orientation, size, startValue])
 
-  const breakpoints = [min, ...[...Array(steps)].map((v, i) => min + (i + 1) * (max - min) / (1 + steps)), max]
-  const start = getDisplacementByValue(startValue, { min, max, orientation, size })
-  const end = getDisplacementByValue(endValue, { min, max, orientation, size })
+  const breakpoints = [minValue, ...[...Array(steps)].map((v, i) => minValue + (i + 1) * (maxValue - minValue) / (1 + steps)), maxValue]
   const highlightLength = end - start
+
+  useEffect(() => {
+    const value = getValueByDisplacement(start)
+    if (isNaN(value) || startValue === value) return
+    setStartValue(getValueByDisplacement(start))
+  }, [start, minValue, maxValue, orientation, size])
+
+  useEffect(() => {
+    const value = getValueByDisplacement(end)
+    if (isNaN(value) || endValue === value) return
+    setEndValue(getValueByDisplacement(end))
+  }, [end, minValue, maxValue, orientation, size])
+
+  useEffect(() => {
+    if (isDraggingStartKnob || isDraggingEndKnob || isEqual(externalRange, [startValue, endValue])) return
+
+    setStart(getDisplacementByValue(externalRange?.[0] ?? minValue))
+    setEnd(getDisplacementByValue(externalRange?.[1] ?? maxValue))
+  }, [externalRange])
+
+  useEffect(() => {
+    if (steps < 0) return
+    const value = getValueByDisplacement(start)
+    const closestSteppedValue = getClosestSteppedValue(value)
+    setStart(getDisplacementByValue(closestSteppedValue))
+  }, [isReleasingStartKnob])
+
+  useEffect(() => {
+    if (steps < 0 || !isReleasingEndKnob) return
+    const value = getValueByDisplacement(end)
+    const closestSteppedValue = getClosestSteppedValue(value)
+    setEnd(getDisplacementByValue(closestSteppedValue))
+  }, [isReleasingEndKnob])
 
   useEffect(() => {
     onRangeChange?.([startValue, endValue])
   }, [startValue, endValue])
 
-  useEffect(() => {
-    if (steps < 0) return
+  const components = asComponentDict(children, {
+    gutter: RangeSliderGutter,
+    highlight: RangeSliderHighlight,
+    knob: RangeSliderKnob,
+    label: RangeSliderLabel,
+  })
 
-    setStartValue(getClosestSteppedValue(startValue, breakpoints))
-    setEndValue(getClosestSteppedValue(endValue, breakpoints))
-  }, [isReleasingStartKnob, isReleasingEndKnob])
+  const fixedStyles = asStyleDict({
+    body: {
+      height: '100%',
+      width: '100%',
+    },
+    gutter: {
+      display: 'block',
+      top: '0',
+      left: '0',
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+    },
+    highlight: {
+      background: tintColor,
+      height: '100%',
+      left: '0',
+      position: 'absolute',
+      top: '0',
+      ...orientation === 'horizontal' ? {
+        width: `${highlightLength}px`,
+        transform: `translate3d(${start}px, 0, 0)`,
+      } : {
+        height: `${highlightLength}px`,
+        transform: `translate3d(0, ${start}px, 0)`,
+      },
+    },
+    knob: {
+      bottom: '0',
+      left: '0',
+      margin: 'auto',
+      position: 'absolute',
+      right: '0',
+      top: '0',
+      touchAction: 'none',
+      zIndex: '1',
+    },
+    knobHitbox: {
+      background: 'transparent',
+      height: `calc(100% + ${knobPadding * 2}px)`,
+      left: `-${knobPadding}px`,
+      padding: `${knobPadding}px`,
+      position: 'absolute',
+      top: `-${knobPadding}px`,
+      width: `calc(100% + ${knobPadding * 2}px)`,
+    },
+    label: {
+      pointerEvents: 'none',
+      userSelect: 'none',
+    },
+  })
+
+  const defaultStyles = asStyleDict({
+    gutter: {
+      background: 'rgba(255, 255, 255, .2)',
+    },
+    highlight: {
+      transitionDuration: '100ms',
+      transitionProperty: (isReleasingStartKnob ? !isReleasingEndKnob : isReleasingEndKnob) ? 'opacity, width, transform' : 'opacity',
+      transitionTimingFunction: 'ease-out',
+    },
+    knob: {
+      alignItems: 'center',
+      background: tintColor,
+      borderRadius: `${knobRadius}px`,
+      boxSizing: 'border-box',
+      display: 'flex',
+      height: `${knobRadius * 2}px`,
+      justifyContent: 'center',
+      transitionDuration: '100ms',
+      transitionTimingFunction: 'ease-out',
+      width: `${knobRadius * 2}px`,
+    },
+    label: {
+      background: 'transparent',
+      color: '#fff',
+      textAlign: 'center',
+      transitionDuration: '100ms',
+      transitionTimingFunction: 'ease-out',
+      ...orientation === 'horizontal' ? {
+        top: `calc(100% + 10px)`,
+      } : {
+        left: `calc(100% + 10px)`,
+      }
+    },
+  })
 
   return (
-    <StyledRoot
-      {...props}
-      className={classNames(className, orientation)}
-      orientation={orientation}
-      ref={bodyRef}
-      style={{
-        ...style ?? {},
-      }}
-    >
-      <StyledGutter
-        extendedCSS={cssGutter}
-      />
-      <StyledKnob
-        ref={knob0Ref}
-        radius={knobRadius}
-        tintColor={tintColor}
-        hitboxPadding={hitboxPadding}
-        isDragging={isDraggingStartKnob}
-        isReleasing={isReleasingStartKnob}
-        isDisabled={endValue === min && startValue === min}
-        style={orientation === 'horizontal' ? {
-          marginLeft: `${start}px`,
-        } : {
-          marginTop: `${start}px`,
-        }}
-        extendedCSS={cssKnob}
-      />
-      {areLabelsVisible && (
-        <StyledLabel
-          knobRadius={knobRadius}
-          orientation={orientation}
-          isDragging={isDraggingStartKnob}
-          isReleasing={isReleasingStartKnob}
-          style={orientation === 'horizontal' ? {
-            transform: `translate3d(calc(-50% + ${start}px), 0, 0)`,
+    <div {...props} className={classNames(className, orientation)} ref={ref}>
+      <div ref={bodyRef} style={fixedStyles.body}>
+        {cloneStyledElement(components.gutter ?? <RangeSliderGutter style={defaultStyles.gutter}/>, { className: orientation, style: fixedStyles.gutter })}
+        {cloneStyledElement(components.highlight ?? <RangeSliderHighlight style={defaultStyles.highlight}/>, { className: orientation, style: fixedStyles.highlight })}
+        {cloneStyledElement(components.knob ?? <RangeSliderKnob style={styles(defaultStyles.knob, {
+          transitionProperty: isReleasingStartKnob ? 'opacity, transform' : 'opacity',
+        })}/>, {
+          ref: startKnobRef,
+          disabled: isEqual([startValue, endValue], [maxValue, maxValue]),
+          className: classNames(orientation, {
+            dragging: isDraggingStartKnob,
+            releasing: isReleasingStartKnob,
+          }),
+          style: styles(fixedStyles.knob, {
+            pointerEvents: isEqual([startValue, endValue], [minValue, minValue]) ? 'none' : 'auto',
+          }, orientation === 'horizontal' ? {
+            marginLeft: `${start}px`,
           } : {
-            transform: `translate3d(0, calc(-50% + ${start}px), 0)`,
-          }}
-          extendedCSS={cssLabel}
-        >
-          {Number(startValue.toFixed(decimalPlaces)).toLocaleString()}
-        </StyledLabel>
-      )}
-      <StyledHighlight
-        tintColor={tintColor}
-        isDragging={isDraggingStartKnob || isDraggingEndKnob}
-        isReleasing={isReleasingStartKnob || isReleasingEndKnob}
-        style={orientation === 'horizontal' ? {
-          width: `${highlightLength}px`,
-          transform: `translate3d(${start}px, 0, 0)`,
-        } : {
-          height: `${highlightLength}px`,
-          transform: `translate3d(0, ${start}px, 0)`,
-        }}
-        extendedCSS={cssHighlight}
-      />
-      <StyledKnob
-        ref={knob1Ref}
-        radius={knobRadius}
-        tintColor={tintColor}
-        hitboxPadding={hitboxPadding}
-        isDragging={isDraggingEndKnob}
-        isReleasing={isReleasingEndKnob}
-        isDisabled={endValue === max && startValue === max}
-        style={orientation === 'horizontal' ? {
-          marginLeft: `${end}px`,
-        } : {
-          marginTop: `${end}px`,
-        }}
-        extendedCSS={cssKnob}
-      />
-      {areLabelsVisible && (
-        <StyledLabel
-          knobRadius={knobRadius}
-          orientation={orientation}
-          isDragging={isDraggingStartKnob || isDraggingEndKnob}
-          isReleasing={isReleasingStartKnob || isReleasingEndKnob}
-          style={orientation === 'horizontal' ? {
-            transform: `translate3d(calc(-50% + ${end}px), 0, 0)`,
+            marginTop: `${start}px`,
+          }),
+        }, <div style={fixedStyles.knobHitbox}/>, areLabelsVisible && (
+          cloneStyledElement(components.label ?? <RangeSliderLabel style={styles(defaultStyles.label, {
+            transitionProperty: isReleasingStartKnob ? 'opacity, transform' : 'opacity',
+          })}/>, {
+            className: classNames(orientation, {
+              dragging: isDraggingStartKnob || isDraggingEndKnob,
+              releasing: isReleasingStartKnob || isReleasingEndKnob,
+            }),
+            style: styles(fixedStyles.label),
+          }, Number(startValue.toFixed(decimalPlaces)).toLocaleString())
+        ))}
+        {cloneStyledElement(components.knob ?? <RangeSliderKnob style={styles(defaultStyles.knob, {
+            transitionProperty: isReleasingEndKnob ? 'opacity, transform' : 'opacity',
+          })}/>, {
+          ref: endKnobRef,
+          disabled: isEqual([startValue, endValue], [maxValue, maxValue]),
+          className: classNames(orientation, {
+            dragging: isDraggingEndKnob,
+            releasing: isDraggingEndKnob,
+          }),
+          style: styles(fixedStyles.knob, {
+            pointerEvents: isEqual([startValue, endValue], [maxValue, maxValue]) ? 'none' : 'auto',
+          }, orientation === 'horizontal' ? {
+            marginLeft: `${end}px`,
           } : {
-            transform: `translate3d(0, calc(-50% + ${end}px), 0)`,
-          }}
-          extendedCSS={cssLabel}
-        >
-          {Number(endValue.toFixed(decimalPlaces)).toLocaleString()}
-        </StyledLabel>
-      )}
-    </StyledRoot>
+            marginTop: `${end}px`,
+          }),
+        }, <div style={fixedStyles.knobHitbox}/>, areLabelsVisible && (
+          cloneStyledElement(components.label ?? <RangeSliderLabel style={styles(defaultStyles.label, {
+            transitionProperty: isReleasingEndKnob ? 'opacity, transform' : 'opacity',
+          })}/>, {
+            className: classNames(orientation, {
+              dragging: isDraggingEndKnob,
+              releasing: isReleasingEndKnob,
+            }),
+            style: styles(fixedStyles.label),
+          }, Number(endValue.toFixed(decimalPlaces)).toLocaleString())
+        ))}
+      </div>
+    </div>
   )
 })
 
-function getPositionByValue(value: number, { min, max }: Required<Pick<RangeSliderProps, 'min' | 'max'>>) {
-  return (value - min) / (max - min)
-}
+export const RangeSliderGutter = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
 
-function getDisplacementByPosition(position: number, { orientation, size }: Required<Pick<RangeSliderProps, 'orientation'>> & { size: Size }) {
-  switch (orientation) {
-    case 'horizontal': return position * size.width
-    case 'vertical': return position * size.height
-  }
-}
+export const RangeSliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
 
-function getDisplacementByValue(value: number, { min, max, orientation, size }: Parameters<typeof getPositionByValue>[1] & Parameters<typeof getDisplacementByPosition>[1]) {
-  return getDisplacementByPosition(getPositionByValue(value, { min, max }), { orientation, size})
-}
+export const RangeSliderHighlight = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
 
-function getPositionByDisplacement(displacement: number, { orientation, size }: Required<Pick<RangeSliderProps, 'orientation'>> & { size: Size }) {
-  switch (orientation) {
-    case 'horizontal': return displacement / size.width
-    case 'vertical': return displacement / size.height
-  }
-}
-
-function getValueByPosition(position: number, { min, max }: Required<Pick<RangeSliderProps, 'min' | 'max'>>) {
-  return position * (max - min) + min
-}
-
-function getClosestSteppedValue(value: number, breakpoints: number[]) {
-  const n = breakpoints.length
-  let idx = 0
-  let diff = Infinity
-
-  for (let i = 0; i < n; i++) {
-    const t = breakpoints[i]
-    const d = Math.abs(value - t)
-
-    if (d < diff) {
-      diff = d
-      idx = i
-    }
-  }
-
-  return breakpoints[idx]
-}
-
-const StyledHighlight = styled.div<HighlightCSSProps & ExtendedCSSProps<HighlightCSSProps>>`
-  top: 0;
-  left: 0;
-  position: absolute;
-  height: 100%;
-  width: 100%;
-  background: ${props => props.tintColor};
-  transition-property: ${props => props.isReleasing ? 'opacity, width, transform' : 'opacity'};
-  transition-duration: 100ms;
-  transition-timing-function: ease-out;
-  will-change: opacity, width, transform;
-  ${props => props.extendedCSS(props)}
-`
-
-const StyledLabel = styled.span<LabelCSSProps & ExtendedCSSProps<LabelCSSProps>>`
-  background: transparent;
-  color: #fff;
-  left: ${props => props.orientation === 'horizontal' ? '0' : `${props.knobRadius}px`};
-  padding: 10px;
-  pointer-events: none;
-  position: absolute;
-  text-align: center;
-  top: ${props => props.orientation === 'horizontal' ? `${props.knobRadius}px` : '0'};
-  transition-duration: 100ms;
-  transition-property: ${props => props.isReleasing ? 'opacity, transform' : 'opacity'};
-  transition-timing-function: ease-out;
-  user-select: none;
-  will-change: opacity, transform;
-  ${props => props.extendedCSS(props)}
-`
-
-const StyledKnob = styled.div<KnobCSSProps & ExtendedCSSProps<KnobCSSProps>>`
-  background: transparent;
-  box-sizing: border-box;
-  display: block;
-  height: ${props => (props.radius + props.hitboxPadding) * 2}px;
-  left: ${props => -props.radius - props.hitboxPadding}px;
-  padding: ${props => props.hitboxPadding}px;
-  pointer-events: ${props => props.isDisabled ? 'none' : 'auto'};
-  position: absolute;
-  top: ${props => -props.radius - props.hitboxPadding}px;
-  touch-action: none;
-  transition-duration: 100ms;
-  transition-property: ${props => props.isReleasing ? 'background, opacity, margin, transform' : 'background, opacity, transform'};
-  transition-timing-function: ease-out;
-  width: ${props => (props.radius + props.hitboxPadding) * 2}px;
-  will-change: opacity, transform, margin, background;
-  z-index: 1;
-
-  &::after {
-    content: '';
-    border-radius: 100%;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    margin: auto;
-    position: absolute;
-    width: ${props => props.radius * 2}px;
-    height: ${props => props.radius * 2}px;
-    background: ${props => props.tintColor};
-  }
-
-  ${props => props.extendedCSS(props)}
-`
-
-const StyledGutter = styled.div<ExtendedCSSProps<any>>`
-  display: block;
-  top: 0;
-  left: 0;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, .2);
-  ${props => props.extendedCSS(props)}
-`
-
-const StyledRoot = styled.div<{
-  orientation: Orientation
-}>`
-  display: flex;
-  flex: 0 0 auto;
-  height: ${props => props.orientation === 'horizontal' ? '2px' : '300px'};
-  position: relative;
-  width: ${props => props.orientation === 'horizontal' ? '300px' : '2px'};
-`
+export const RangeSliderKnob = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => <div {...props} ref={ref}/>)

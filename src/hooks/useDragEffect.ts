@@ -88,9 +88,10 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
   }
 
   const valueRef = useRef<T>(initialValue)
+  const [hasDragged, setHasDragged] = useState<boolean>(false)
   const [isDragging, setIsDragging] = useState<boolean>(false)
   const [isReleasing, setIsReleasing] = useState<boolean>(false)
-  const [value, setValue] = useState(valueRef.current)
+  const [value, setValue] = useState(initialValue)
 
   useEffect(() => {
     if (targetRef.current && !interact.isSet(targetRef.current)) {
@@ -100,6 +101,7 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
         inertia: true,
         ...options,
         onstart: () => {
+          setHasDragged(true)
           setIsDragging(true)
           setIsReleasing(false)
           onDragStart?.()
@@ -129,6 +131,11 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
       }
     }
   }, [...deps ? deps : []])
+
+  useEffect(() => {
+    if (hasDragged) return
+    setValue(initialValue)
+  }, [initialValue])
 
   useEffect(() => {
     setValueRef(value)

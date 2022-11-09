@@ -1,6 +1,6 @@
 import { align, container, selectors } from 'promptu'
 import React, { useEffect, useState } from 'react'
-import styled, { createGlobalStyle, css } from 'styled-components'
+import styled, { css } from 'styled-components'
 import BurgerButton, { BurgerButtonBar } from '../../lib/BurgerButton'
 import FlatSVG from '../../lib/FlatSVG'
 import WithTooltip from '../../lib/WithTooltip'
@@ -11,7 +11,6 @@ import ListDemo from './containers/ListDemo'
 import MasonryGridDemo from './containers/MasonryGridDemo'
 import PanoramaDemo from './containers/PanoramaDemo'
 import VideoDemo from './containers/VideoDemo'
-import globalStyle from './styles/global'
 
 export default function App() {
   const mapLocationToHash = () => {
@@ -43,10 +42,6 @@ export default function App() {
     setIsNavActive(false)
   }, [hash])
 
-  const GlobalStyle = createGlobalStyle`
-    ${globalStyle}
-  `
-
   function renderDemo() {
     switch (hash) {
       case 'masonry-grid': return <MasonryGridDemo/>
@@ -68,7 +63,6 @@ export default function App() {
 
   return (
     <>
-      <GlobalStyle/>
       <StyledDemo>{renderDemo()}</StyledDemo>
       <StyledHUDs>
         <StyledNav isActive={isNavActive}>
