@@ -4,6 +4,6 @@ export type ExtendedCSSFunction<P = Record<string, never>> = (props: P) => Flatt
 
 export type ExtendedCSSProps<P = Record<string, never>> = Readonly<{ extendedCSS: ExtendedCSSFunction<P> }>
 
-export type Range = Readonly<[number, number]>
+export type Range = [number, number]
 
 export type Orientation = 'horizontal' | 'vertical'

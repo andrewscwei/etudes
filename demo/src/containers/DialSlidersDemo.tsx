@@ -93,7 +93,7 @@ export default function() {
         max={360}
         min={0}
         orientation='horizontal'
-        range={[0, 360]}
+        range={[min, max]}
         steps={359}
         tintColor='#fff'
         onRangeChange={([min, max]) => {

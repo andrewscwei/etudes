@@ -70,72 +70,62 @@ export default forwardRef<HTMLDivElement, RangeSliderProps>(({
 
   const [size] = useResizeEffect(bodyRef)
 
-  const [startValue, setStartValue] = useState(externalRange?.[0] ?? minValue)
-  const [endValue, setEndValue] = useState(externalRange?.[1] ?? maxValue)
+  const [range, setRange] = useState<Range>(externalRange ?? [minValue, maxValue])
 
-  const { isDragging: [isDraggingStartKnob], isReleasing: [isReleasingStartKnob], value: [start, setStart] } = useDragEffect(startKnobRef, {
-    initialValue: getDisplacementByValue(externalRange?.[0] ?? minValue),
-    transform: (displacement: number, dx: number, dy: number) => {
+  const { isDragging: [isDraggingStartKnob], isReleasing: [isReleasingStartKnob], value: [startValue, setStartValue] } = useDragEffect(startKnobRef, {
+    initialValue: externalRange?.[0] ?? minValue,
+    transform: (value: number, dx: number, dy: number) => {
       const delta = orientation === 'horizontal' ? dx : dy
       const dMin = getDisplacementByValue(minValue)
-      const dMax = getDisplacementByValue(endValue)
-      const dCurr = displacement
+      const dMax = getDisplacementByValue(range[1])
+      const dCurr = getDisplacementByValue(value) + delta
 
-      return Math.max(dMin, Math.min(dMax, dCurr + delta))
+      return getValueByDisplacement(Math.max(dMin, Math.min(dMax, dCurr)))
     },
-  }, [minValue, orientation, size, endValue])
+  }, [minValue, orientation, size, range[1]])
 
-  const { isDragging: [isDraggingEndKnob], isReleasing: [isReleasingEndKnob], value: [end, setEnd] } = useDragEffect(endKnobRef, {
-    initialValue: getDisplacementByValue(externalRange?.[1] ?? maxValue),
-    transform: (displacement: number, dx: number, dy: number) => {
+  const { isDragging: [isDraggingEndKnob], isReleasing: [isReleasingEndKnob], value: [endValue, setEndValue] } = useDragEffect(endKnobRef, {
+    initialValue: externalRange?.[1] ?? maxValue,
+    transform: (value: number, dx: number, dy: number) => {
       const delta = orientation === 'horizontal' ? dx : dy
-      const dMin = getDisplacementByValue(startValue)
+      const dMin = getDisplacementByValue(range[0])
       const dMax = getDisplacementByValue(maxValue)
-      const dCurr = displacement + delta
+      const dCurr = getDisplacementByValue(value) + delta
 
-      return Math.max(dMin, Math.min(dMax, dCurr))
+      return getValueByDisplacement(Math.max(dMin, Math.min(dMax, dCurr)))
     },
-  }, [maxValue, orientation, size, startValue])
+  }, [maxValue, orientation, size, range[0]])
 
   const breakpoints = [minValue, ...[...Array(steps)].map((v, i) => minValue + (i + 1) * (maxValue - minValue) / (1 + steps)), maxValue]
+  const [start, end] = range.map(getDisplacementByValue)
   const highlightLength = end - start
 
   useEffect(() => {
-    const value = getValueByDisplacement(start)
-    if (isNaN(value) || startValue === value) return
-    setStartValue(getValueByDisplacement(start))
-  }, [start, minValue, maxValue, orientation, size])
+    if (range[0] === startValue) return
+    setRange([startValue, range[1]])
+    onRangeChange?.(range)
+  }, [startValue])
 
   useEffect(() => {
-    const value = getValueByDisplacement(end)
-    if (isNaN(value) || endValue === value) return
-    setEndValue(getValueByDisplacement(end))
-  }, [end, minValue, maxValue, orientation, size])
+    if (range[1] === endValue) return
+    setRange([range[0], endValue])
+    onRangeChange?.(range)
+  }, [endValue])
 
   useEffect(() => {
-    if (isDraggingStartKnob || isDraggingEndKnob || isEqual(externalRange, [startValue, endValue])) return
-
-    setStart(getDisplacementByValue(externalRange?.[0] ?? minValue))
-    setEnd(getDisplacementByValue(externalRange?.[1] ?? maxValue))
+    if (isDraggingStartKnob || isDraggingEndKnob || isEqual(externalRange, range)) return
+    setRange(externalRange ?? [minValue, maxValue])
   }, [externalRange])
 
   useEffect(() => {
     if (steps < 0) return
-    const value = getValueByDisplacement(start)
-    const closestSteppedValue = getClosestSteppedValue(value)
-    setStart(getDisplacementByValue(closestSteppedValue))
+    setStartValue(getClosestSteppedValue(startValue))
   }, [isReleasingStartKnob])
 
   useEffect(() => {
     if (steps < 0 || !isReleasingEndKnob) return
-    const value = getValueByDisplacement(end)
-    const closestSteppedValue = getClosestSteppedValue(value)
-    setEnd(getDisplacementByValue(closestSteppedValue))
+    setEndValue(getClosestSteppedValue(endValue))
   }, [isReleasingEndKnob])
-
-  useEffect(() => {
-    onRangeChange?.([startValue, endValue])
-  }, [startValue, endValue])
 
   const components = asComponentDict(children, {
     gutter: RangeSliderGutter,
