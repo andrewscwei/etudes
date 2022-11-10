@@ -83,7 +83,9 @@ export default function App() {
           width={36}
           onActivate={() => setIsNavActive(true)}
           onDeactivate={() => setIsNavActive(false)}
-        />
+        >
+          <BurgerButtonBar className='bar'/>
+        </StyledBurgerButton>
         <WithTooltip hint='This is wrapped with WithTooltip!' backgroundColor='#fff' textColor='#000'>
           <StyledGithubButton href='https://github.com/andrewscwei/etudes'>
             <FlatSVG svg={$$GithubIcon} css={css`svg * { fill: #fff; }`}/>
@@ -187,15 +189,20 @@ const StyledBurgerButton = styled(BurgerButton)`
   ${align.ftr}
   margin: 8vh 8vw;
   pointer-events: auto;
-  transition: all .1s ease-out;
+  transition: all 100ms ease-out;
   transform: translate3d(0, 0, 10rem) rotateX(-5deg) rotateY(-60deg) scale(1);
   z-index: 1000;
 
   ${selectors.hwot} {
     transform: translate3d(0, 0, 10rem) rotateX(-5deg) rotateY(-20deg) scale(1.2);
+
+    .bar.index-2 {
+      width: 100% !important;
+    }
   }
 
-  ${BurgerButtonBar} {
+  .bar {
+    transition: all 100ms ease-out;
     background: #fff;
     &.active { background: #000; }
   }
