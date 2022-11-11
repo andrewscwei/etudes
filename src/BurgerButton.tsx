@@ -153,8 +153,9 @@ export default forwardRef<HTMLButtonElement, BurgerButtonProps>(({
           >
             <Repeat count={3}>
               {i => cloneStyledElement(components.bar ?? <BurgerButtonBar style={defaultStyles.bar}/>, {
-                className: classNames(`index-${i}`, { active: isActive, half: isDoubleJointed }),
-                style: styles(fixedStyles.bar, (fixedStyles as any)[`bar${j}${i}`]),
+                'className': classNames({ active: isActive, half: isDoubleJointed }),
+                'style': styles(fixedStyles.bar, (fixedStyles as any)[`bar${j}${i}`]),
+                'data-index': i,
               })}
             </Repeat>
           </div>

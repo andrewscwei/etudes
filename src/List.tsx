@@ -1,58 +1,42 @@
-import React, { ComponentType, CSSProperties } from 'react'
-import styled, { css } from 'styled-components'
-import AbstractSelectableCollection, { Props as AbstractSelectableCollectionProps } from './AbstractSelectableCollection'
+import classNames from 'classnames'
+import React, { CSSProperties, forwardRef, HTMLAttributes, ReactElement, Ref, useEffect, useState } from 'react'
+import Each from './Each'
+import usePrevious from './hooks/usePrevious'
 import { Orientation } from './types'
+import asStyleDict from './utils/asStyleDict'
+import cloneStyledElement from './utils/cloneStyledElement'
+import styles from './utils/styles'
 
-/**
- * Interface defining the props of the item component type to be provided to the
- * list. The data type is generic.
- */
-export interface ItemComponentProps<T = Record<string, never>> {
-  /**
-   * Class attribute of the root element.
-   */
-  className?: string
-
-  /**
-   * Inline style attribute of the root element.
-   */
-  style: CSSProperties
-
-  /**
-   * Data passed to the item component.
-   */
+export type ListItemProps<T> = {
   data: T
-
-  /**
-   * Indicates if the item is selected.
-   */
-  isSelected?: boolean
-
-  /**
-   * Orientation of the list.
-   */
+  index: number
+  isSelected: boolean
   orientation: Orientation
-
-  /**
-   * Handler invoked when the item is clicked.
-   */
-  onClick?: () => void
 }
 
-export interface Props<T = Record<string, never>> extends AbstractSelectableCollectionProps {
+export type ListProps<T> = Omit<HTMLAttributes<HTMLOListElement>, 'children'> & {
+  /**
+   * The children inside this component represents the component for each item
+   * in the list. Only 1 child is expected and will be used to generate all
+   * items.
+   */
+  children?: (props: ListItemProps<T>) => JSX.Element
+
   /**
    * Generically typed data of each item.
    */
   data: T[]
 
   /**
-   * Maximum length (in pixels) of this component. The definition of length here
-   * is dependent on the orientation of the component. If the orientation is
-   * horizontal, length means width. If the orientation is vertical, length
-   * means height. If specified, the length will be capped at this value and the
-   * component becomes scrollable.
+   * The selected index. Any value below 0 indicates that nothing is
+   * selected.
    */
-  maxLength?: number
+  selectedIndex?: number
+
+  /**
+   * React component type to be used to generate items for this list.
+   */
+  // itemComponentType: ComponentType<ItemComponentProps<T>>
 
   /**
    * Padding between every item (in pixels).
@@ -60,9 +44,26 @@ export interface Props<T = Record<string, never>> extends AbstractSelectableColl
   itemPadding?: number
 
   /**
-   * Thickness of item borders (in pixels). 0 indicates no borders.
+   * Inline style attribute of the root element of the item component.
    */
-  borderThickness?: number
+  itemStyle?: CSSProperties
+
+  /**
+   * Indicates whether selections are retained. For example, in the case of a
+   * vertical list of clickable rows, being able to retain a selection means
+   * when the row is clicked, it becomes and stays selected. Being unable to
+   * retain a selection means when the row is clicked, it does not become
+   * selected. It is simply clicked and the subsequent event is dispatched.
+   */
+  isSelectable?: boolean
+
+  /**
+   * Indicates whether selections can be toggled. For example, in the case of a
+   * vertical list of selectable rows, being able to toggle a row means it gets
+   * deselected when selected again. Being unable to toggle the row means it
+   * does not get deselected when selected again.
+   */
+  isTogglable?: boolean
 
   /**
    * Orientation of the list.
@@ -70,30 +71,19 @@ export interface Props<T = Record<string, never>> extends AbstractSelectableColl
   orientation?: Orientation
 
   /**
-   * Color of item borders.
+   * Handler invoked when an index is activated.
    */
-  borderColor?: string
+  onActivate?: (index: number) => void
 
   /**
-   * React component type to be used to generate items for this list.
+   * Handler invoked when an index is deselected.
    */
-  itemComponentType: ComponentType<ItemComponentProps<T>>
+  onDeselectAt?: (index: number) => void
 
   /**
-   * Class attribute of the root element of the item component.
+   * Handler invoked when an index is selected.
    */
-  itemClassName?: string
-
-  /**
-   * Inline style attribute of the root element of the item component.
-   */
-  itemStyle?: CSSProperties
-
-  /**
-   * Padding (in pixels) between the items and the scrollbar. Note that this is
-   * unused if there is no scrollbar (i.e. max length is not specified).
-   */
-  scrollBarPadding?: number
+  onSelectAt?: (index: number) => void
 }
 
 /**
@@ -101,96 +91,128 @@ export interface Props<T = Record<string, never>> extends AbstractSelectableColl
  * provided React component type. The type of data passed to each item is
  * generic. This component supports both horizontal and vertical orientations.
  */
-export default class List<T = Record<string, never>> extends AbstractSelectableCollection<Props<T>> {
-  render() {
-    const ItemComponentType = this.props.itemComponentType
-    const borderColor = this.props.borderColor ?? '#000'
-    const borderThickness = this.props.borderThickness ?? 0
-    const maxLength = this.props.maxLength ?? -1
-    const scrollBarPadding = maxLength < 0 ? 0 : this.props.scrollBarPadding ?? 0
-    const orientation = this.props.orientation ?? 'vertical'
+export default forwardRef(({
+  children,
+  className,
+  style,
+  data,
+  isSelectable,
+  isTogglable,
+  itemPadding = 0,
+  itemStyle,
+  orientation = 'vertical',
+  selectedIndex: externalSelectedIndex = -1,
+  onActivate,
+  onDeselectAt,
+  onSelectAt,
+  ...props
+}, ref) => {
+  const isIndexOutOfRange = (index: number) => {
+    if (index >= data.length) return true
+    if (index < 0) return true
 
-    return (
-      <StyledRoot
-        className={this.props.className}
-        orientation={orientation}
-        itemPadding={this.props.itemPadding ?? 0}
-        style={{
-          ...this.props.style ?? {},
-          ...maxLength < 0 ? {} :
-            orientation === 'vertical' ? {
-              height: `${maxLength}px`,
-              overflowY: 'scroll',
-              paddingRight: `${scrollBarPadding}px`,
-              WebkitOverflowScrolling: 'touch',
-            } : {
-              overflowX: 'scroll',
-              paddingBottom: `${scrollBarPadding}px`,
-              width: `${maxLength}px`,
-              WebkitOverflowScrolling: 'touch',
-            }
-          ,
-        }}
-      >
-        {this.props.data.map((t, i) => (
-          <ItemComponentType
-            className={this.props.itemClassName}
-            data={t}
-            isSelected={this.isSelectedAt(i)}
-            key={`item-${i}`}
-            onClick={() => this.toggleAt(i)}
-            orientation={orientation}
-            style={{
-              ...this.props.itemStyle ?? {},
-              borderColor,
-              borderWidth: `${borderThickness}px`,
-              counterIncrement: 'item-counter',
-              pointerEvents: this.props.isTogglable !== true && this.isSelectedAt(i) ? 'none' : 'auto',
-              ...orientation === 'vertical' ? {
-                marginTop: `${i === 0 ? 0 : -borderThickness}px`,
-              } : {
-                marginLeft: `${i === 0 ? 0 : -borderThickness}px`,
-              },
-            }}
-          />
-        ))}
-      </StyledRoot>
-    )
+    return false
   }
 
-  isIndexOutOfRange(index: number): boolean {
-    if (index >= this.props.data.length) return true
+  const isSelectedAt = (index: number) => selectedIndex === index
 
-    return super.isIndexOutOfRange(index)
-  }
-}
-
-const StyledRoot = styled.ol<{
-  itemPadding: number
-  orientation: Props['orientation']
-}>`
-  counter-reset: item-counter;
-  list-style: none;
-  align-items: flex-start;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: ${props => props.orientation === 'horizontal' ? 'row' : 'column'};
-  flex: 0 0 auto;
-  justify-content: flex-start;
-  overflow-x: visible;
-  overflow-y: visible;
-  width: ${props => props.orientation === 'horizontal' ? 'auto' : '100%'};
-  height: ${props => props.orientation === 'horizontal' ? '100%' : 'auto'};
-
-  > * {
-    flex: 0 0 auto;
-
-    &:not(:last-child) {
-      ${props => props.orientation === 'horizontal' ? css`
-        margin-right: ${props.itemPadding}px;
-      ` : css`
-        margin-bottom: ${props.itemPadding}px;
-      `}
+  const toggleAt = (index: number) => {
+    if (isSelectedAt(index)) {
+      deselectAt(index)
+    }
+    else {
+      selectAt(index)
     }
   }
-`
+
+  const selectAt = (index: number) => {
+    if (isSelectedAt(index)) return
+    setSelectedIndex(index)
+  }
+
+  const deselectAt = (index: number) => {
+    if (!isSelectedAt(index)) return
+    setSelectedIndex(-1)
+  }
+
+  const onClick = (index: number) => {
+    if (isSelectable) {
+      if (isTogglable) {
+        toggleAt(index)
+      }
+      else {
+        selectAt(index)
+      }
+    }
+
+    onActivate?.(index)
+  }
+
+  const [selectedIndex, setSelectedIndex] = useState(externalSelectedIndex)
+  const prevSelectedIndex = usePrevious(selectedIndex)
+
+  useEffect(() => {
+    if (externalSelectedIndex === selectedIndex) return
+    setSelectedIndex(selectedIndex)
+  }, [externalSelectedIndex])
+
+  useEffect(() => {
+    if (!isSelectable) return
+
+    if (!isIndexOutOfRange(prevSelectedIndex ?? -1)) onDeselectAt?.(prevSelectedIndex ?? -1)
+    if (!isIndexOutOfRange(selectedIndex)) onSelectAt?.(selectedIndex)
+  }, [selectedIndex])
+
+  const fixedStyles = asStyleDict({
+    root: {
+      alignItems: 'flex-start',
+      counterReset: 'item-counter',
+      display: 'flex',
+      flex: '0 0 auto',
+      flexDirection: orientation === 'horizontal' ? 'row' : 'column',
+      justifyContent: 'flex-start',
+      listStyle: 'none',
+    },
+    item: {
+      flex: '0 0 auto',
+      counterIncrement: 'item-counter',
+    },
+  })
+
+  return (
+    <ol
+      {...props}
+      className={classNames(className, orientation)}
+      ref={ref}
+      style={styles(style, fixedStyles.root)}
+    >
+      {children && (
+        <Each in={data}>
+          {(val, idx) => cloneStyledElement(children({
+            data: val,
+            index: idx,
+            isSelected: isSelectedAt(idx),
+            orientation,
+          }), {
+            'className': classNames(orientation, {
+              selected: isSelectedAt(idx),
+              togglable: isTogglable,
+            }),
+            'style': styles(fixedStyles.item, {
+              pointerEvents: isTogglable !== true && isSelectedAt(idx) ? 'none' : 'auto',
+              ...idx >= data.length - 1 ? {} : {
+                ...orientation === 'vertical' ? {
+                  marginBottom: `${itemPadding}px`,
+                } : {
+                  marginRight: `${itemPadding}px`,
+                },
+              },
+            }),
+            'data-index': idx,
+            'onClick': () => onClick(idx),
+          })}
+        </Each>
+      )}
+    </ol>
+  )
+}) as <T>(props: ListProps<T> & { ref?: Ref<HTMLOListElement> }) => ReactElement

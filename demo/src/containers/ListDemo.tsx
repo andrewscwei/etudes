@@ -1,10 +1,9 @@
 import { animations, container, selectors } from 'promptu'
-import React, { useState } from 'react'
+import React, { HTMLAttributes, useState } from 'react'
 import styled, { css } from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
 import Dropdown, { ItemComponentProps as DropdownItemComponentProps } from '../../../lib/Dropdown'
-import List, { ItemComponentProps as ListItemComponentProps } from '../../../lib/List'
-import { Orientation } from '../../../lib/types'
+import List, { ListItemProps } from '../../../lib/List'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
 export type State = {
@@ -22,13 +21,8 @@ const DropdownItemComponent = ({ data, isSelected, onClick, style }: DropdownIte
   </StyledDropdownItem>
 )
 
-const ListItemComponent = ({ data, orientation, isSelected, onClick, style }: ListItemComponentProps<string>) => (
-  <StyledListItem
-    orientation={orientation}
-    isSelected={isSelected ?? false}
-    onClick={() => onClick?.()}
-    style={style}
-  >
+const ListItem = ({ data, ...props }: ListItemProps<string> & HTMLAttributes<HTMLButtonElement>) => (
+  <StyledListItem {...props}>
     {data}
   </StyledListItem>
 )
@@ -40,28 +34,18 @@ export default function() {
 
   return (
     <>
-      <StyledRoot orientation={orientation}>
-        <List
+      <StyledRoot className={orientation}>
+        <StyledList
           data={[...new Array(60)].map((v, i) => `${i + 1}`)}
           isTogglable={true}
+          itemPadding={20}
           orientation={orientation}
+          isSelectable={true}
           onDeselectAt={idx => setSelectedItemIndex(-1)}
           onSelectAt={idx => setSelectedItemIndex(idx)}
-          itemComponentType={ListItemComponent}
-          shouldStaySelected={true}
-          itemPadding={20}
-          style={{
-            ...orientation === 'vertical' ? {
-              width: '80%',
-              minWidth: '400px',
-              transform: 'translate3d(0, 0, 0) rotate3d(1, 1, 0, 10deg)',
-            } : {
-              height: '80%',
-              minHeight: '400px',
-              transform: 'translate3d(0, 0, 0) rotate3d(1, .1, 0, 10deg)',
-            },
-          }}
-        />
+        >
+          {({ ...props }) => <ListItem {...props}/>}
+        </StyledList>
       </StyledRoot>
       <Dropdown
         borderThickness={2}
@@ -111,9 +95,7 @@ export default function() {
       <DebugConsole
         title='?: List+Dropdown'
         message={selectedItemIndex > -1 ? `<strong>[${orientation.toUpperCase()}]</strong> You selected item <strong>#${selectedItemIndex + 1}</strong>!` : 'No item selected!'}
-        style={{
-          transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)',
-        }}
+        style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
       />
     </>
   )
@@ -139,14 +121,11 @@ const StyledDropdownItem = styled.button<{
   }
 `
 
-const StyledListItem = styled.button<{
-  isSelected: boolean
-  orientation: Orientation
-}>`
+const StyledListItem = styled.button`
   ${container.fvcc}
   ${animations.transition('transform', 100)}
-  background: ${props => props.isSelected ? '#ff0054' : '#fff'};
-  color: ${props => props.isSelected ? '#fff' : '#000'};
+  background: #fff;
+  color: #000;
   font-size: 3rem;
   font-weight: 700;
   padding: 20px;
@@ -154,31 +133,52 @@ const StyledListItem = styled.button<{
   transform: translate3d(0, 0, 0) scale(1);
   z-index: 0;
 
-  ${props => props.orientation === 'vertical' ? css`
-    width: 100%;
-  ` : css`
-    height: 100%;
-  `}
-
   ${selectors.hwot} {
     transform: translate3d(0, 0, 0) scale(1.1);
     z-index: 1;
   }
+
+  &.horizontal {
+    height: 100%;
+  }
+
+  &.vertical {
+    width: 100%;
+  }
+
+  &.selected {
+    background: #ff0054;
+    color: #fff;
+  }
 `
 
-const StyledRoot = styled.div<{
-  orientation: Orientation
-}>`
+const StyledList = styled(List<string>)`
+  &.horizontal {
+    height: 80%;
+    min-height: 400px;
+    transform: translate3d(0, 0, 0) rotate3d(1, .1, 0, 10deg);
+  }
+
+  &.vertical {
+    width: 80%;
+    min-width: 400px;
+    transform: translate3d(0, 0, 0) rotate3d(1, 1, 0, 10deg);
+  }
+`
+
+const StyledRoot = styled.div`
   padding: 10rem 3rem;
   perspective: 80rem;
   width: 100%;
   height: 100%;
 
-  ${props => props.orientation === 'vertical' ? css`
-    ${container.fvtc}
-    overflow-x: hidden;
-  ` : css`
+  &.horizontal {
     ${container.fhcl}
     overflow-y: hidden;
-  `}
+  }
+
+  &.vertical {
+    ${container.fvtc}
+    overflow-x: hidden;
+  }
 `
