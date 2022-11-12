@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import { align, container, selectors } from 'promptu'
 import React, { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
@@ -65,13 +66,13 @@ export default function App() {
     <>
       <StyledDemo>{renderDemo()}</StyledDemo>
       <StyledHUDs>
-        <StyledNav isActive={isNavActive}>
-          <StyledNavButton isActive={hash === 'masonry-grid'} onClick={() => setHash('masonry-grid')}>Masonry Grid</StyledNavButton>
-          <StyledNavButton isActive={hash === 'list'} onClick={() => setHash('list')}>List+Dropdown</StyledNavButton>
-          <StyledNavButton isActive={hash === 'accordion'} onClick={() => setHash('accordion')}>Accordion</StyledNavButton>
-          <StyledNavButton isActive={hash === 'dial+sliders'} onClick={() => setHash('dial+sliders')}>Dial+Sliders</StyledNavButton>
-          <StyledNavButton isActive={hash === 'video'} onClick={() => setHash('video')}>Video</StyledNavButton>
-          <StyledNavButton isActive={hash === 'panorama+slider'} onClick={() => setHash('panorama+slider')}>Panorama+Slider</StyledNavButton>
+        <StyledNav className={classNames({ active: isNavActive })}>
+          <StyledNavButton className={classNames({ active: hash === 'masonry-grid' })} onClick={() => setHash('masonry-grid')}>Masonry Grid</StyledNavButton>
+          <StyledNavButton className={classNames({ active: hash === 'list' })} onClick={() => setHash('list')}>List+Dropdown</StyledNavButton>
+          <StyledNavButton className={classNames({ active: hash === 'accordion' })} onClick={() => setHash('accordion')}>Accordion</StyledNavButton>
+          <StyledNavButton className={classNames({ active: hash === 'dial+sliders' })} onClick={() => setHash('dial+sliders')}>Dial+Sliders</StyledNavButton>
+          <StyledNavButton className={classNames({ active: hash === 'video' })} onClick={() => setHash('video')}>Video</StyledNavButton>
+          <StyledNavButton className={classNames({ active: hash === 'panorama+slider' })} onClick={() => setHash('panorama+slider')}>Panorama+Slider</StyledNavButton>
         </StyledNav>
         <StyledBurgerButton
           height={32}
@@ -114,42 +115,43 @@ const StyledDemo = styled.main`
   width: 100%;
 `
 
-const StyledNavButton = styled.button<{
-  isActive: boolean
-}>`
+const StyledNavButton = styled.button`
   ${container.box}
-  color: ${props => props.isActive ? '#ff0054' : '#000'};
+  color: #000;
   font-size: 1.8rem;
   font-weight: 700;
-  pointer-events: ${props => props.isActive ? 'none' : 'auto'};
   text-align: right;
   text-transform: uppercase;
   transform: translate3d(0, 0, 0) rotateX(${Math.floor(Math.random() * 10) + 5}deg) rotateY(${Math.floor(Math.random() * 10) + 5}deg) rotateZ(0deg);
   transition: all .1s ease-out;
+
+  &.active {
+    color: #ff0054;
+    pointer-events: none;
+  }
 
   ${selectors.hwot} {
     color: #ff0054;
   }
 `
 
-const StyledNav = styled.nav<{
-  isActive: boolean
-}>`
+const StyledNav = styled.nav`
   ${container.fvtr}
   ${align.ftr}
-  padding: 10rem 8vw 10rem 0rem;
+  -webkit-overflow-scrolling: touch;
   background: #fff;
   height: 100%;
-  width: 30rem;
-  transition: all .1s ease-out;
-  transform: ${props => props.isActive ?
-    'translate3d(0, 2rem, 5rem) rotateX(0deg) rotateY(-20deg) rotateZ(0deg)' :
-    'translate3d(100%, 0, 5rem) rotateX(0deg) rotateY(0deg) rotateZ(0deg)'
-};
-  pointer-events: ${props => props.isActive ? 'auto' : 'none'};
   overflow-y: scroll;
-  -webkit-overflow-scrolling: touch;
+  padding: 10rem 8vw 10rem 0rem;
+  transform: translate3d(100%, 0, 5rem) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+  transition: all .1s ease-out;
+  width: 30rem;
   z-index: 100;
+
+  &.active {
+    pointer-events: auto;
+    transform: translate3d(0, 2rem, 5rem) rotateX(0deg) rotateY(-20deg) rotateZ(0deg);
+  }
 
   ${selectors.eblc} {
     margin-bottom: .6rem;
