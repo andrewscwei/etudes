@@ -17,10 +17,10 @@ export default function() {
     <>
       <StyledRoot>
         <StyledMasonryGrid
-          horizontalSpacing={30}
+          horizontalSpacing={20}
           orientation='vertical'
           sections={6}
-          verticalSpacing={30}
+          verticalSpacing={20}
         >
           <Each in={items}>
             {(val, idx) => (

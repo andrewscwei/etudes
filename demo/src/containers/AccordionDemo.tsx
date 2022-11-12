@@ -77,13 +77,14 @@ const StyledAccordion = styled(Accordion<string>)`
   width: 30rem;
 
   .header {
-    ${container.fhss}
+    ${container.fhcs}
     ${animations.transition('all', 100)}
     background: #fff;
     cursor: pointer;
     font-size: 16px;
     font-weight: 700;
     height: 50px;
+    line-height: 16px;
     padding: 10px;
     text-transform: uppercase;
 
