@@ -2,10 +2,11 @@ import classNames from 'classnames'
 import React, { ComponentType, forwardRef, HTMLAttributes, ReactElement, Ref, useEffect, useState } from 'react'
 import Each from './Each'
 import usePrevious from './hooks/usePrevious'
-import { Orientation } from './types'
 import asClassNameDict from './utils/asClassNameDict'
 import asStyleDict from './utils/asStyleDict'
 import styles from './utils/styles'
+
+type Orientation = 'horizontal' | 'vertical'
 
 export type ListItemProps<T> = HTMLAttributes<HTMLElement> & {
   data: T

@@ -8,6 +8,8 @@ import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
 import styles from './utils/styles'
 
+type Orientation = 'horizontal' | 'vertical'
+
 export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   /**
    * By default the position is a value from 0 - 1, 0 being the start of the
@@ -45,7 +47,7 @@ export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   /**
    * Orientation of the slider.
    */
-  orientation?: 'horizontal' | 'vertical'
+  orientation?: Orientation
 
   /**
    * The current position.

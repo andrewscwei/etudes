@@ -3,12 +3,15 @@ import isEqual from 'fast-deep-equal'
 import React, { forwardRef, HTMLAttributes, PropsWithChildren, useEffect, useRef, useState } from 'react'
 import useDragEffect from './hooks/useDragEffect'
 import useResizeEffect from './hooks/useResizeEffect'
-import { Orientation, Range } from './types'
 import asClassNameDict from './utils/asClassNameDict'
 import asComponentDict from './utils/asComponentDict'
 import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
 import styles from './utils/styles'
+
+type Orientation = 'horizontal' | 'vertical'
+
+type Range = [number, number]
 
 export type RangeSliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   areLabelsVisible?: boolean

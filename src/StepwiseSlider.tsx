@@ -11,6 +11,8 @@ import useDebug from './utils/useDebug'
 
 const debug = useDebug('stepwise-slider')
 
+type Orientation = 'horizontal' | 'vertical'
+
 export type StepwiseSliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   /**
    * By default the position is a value from 0 - 1, 0 being the start of the
@@ -49,7 +51,7 @@ export type StepwiseSliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChil
   /**
    * Orientation of the slider.
    */
-  orientation?: 'horizontal' | 'vertical'
+  orientation?: Orientation
 
   /**
    * An array of step descriptors. A step is a position (0 - 1 inclusive) on the

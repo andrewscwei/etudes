@@ -3,12 +3,13 @@ import React, { ComponentType, forwardRef, HTMLAttributes, PropsWithChildren, Re
 import Each from './Each'
 import FlatSVG from './FlatSVG'
 import List, { ListItemProps } from './List'
-import { Orientation } from './types'
 import asClassNameDict from './utils/asClassNameDict'
 import asComponentDict from './utils/asComponentDict'
 import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
 import styles from './utils/styles'
+
+type Orientation = 'horizontal' | 'vertical'
 
 export type AccordionItemProps<T> = ListItemProps<T>
 

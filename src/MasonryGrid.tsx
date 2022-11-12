@@ -2,12 +2,13 @@ import classNames from 'classnames'
 import React, { forwardRef, HTMLAttributes, useEffect, useRef, useState } from 'react'
 import { Rect } from 'spase'
 import useResizeEffect from './hooks/useResizeEffect'
-import { Orientation } from './types'
 import asClassNameDict from './utils/asClassNameDict'
 import asStyleDict from './utils/asStyleDict'
 import useDebug from './utils/useDebug'
 
 const debug = useDebug('masonry')
+
+type Orientation = 'horizontal' | 'vertical'
 
 export type MasonryGridProps = HTMLAttributes<HTMLDivElement> & {
   areSectionsAligned?: boolean

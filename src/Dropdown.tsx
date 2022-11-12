@@ -3,24 +3,18 @@ import React, { ComponentType, forwardRef, HTMLAttributes, PropsWithChildren, Re
 import FlatSVG from './FlatSVG'
 import useElementRect from './hooks/useElementRect'
 import List, { ListItemProps } from './List'
-import { Orientation } from './types'
 import asClassNameDict from './utils/asClassNameDict'
 import asComponentDict from './utils/asComponentDict'
 import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
 import styles from './utils/styles'
 
-/**
- * Type constraint of the data passed to each item in the component.
- */
+type Orientation = 'horizontal' | 'vertical'
+
 export type DropdownData = {
   label?: string
 }
 
-/**
- * Type defining the props of the item component type to be provided to the
- * component. The data type is generic.
- */
 export type DropdownItemProps<T extends DropdownData = DropdownData> = ListItemProps<T>
 
 export type DropdownProps<T extends DropdownData = DropdownData> = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
