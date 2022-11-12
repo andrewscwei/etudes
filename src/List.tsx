@@ -152,7 +152,7 @@ export default forwardRef(({
 
   useEffect(() => {
     if (externalSelectedIndex === selectedIndex) return
-    setSelectedIndex(selectedIndex)
+    setSelectedIndex(externalSelectedIndex)
   }, [externalSelectedIndex])
 
   useEffect(() => {
@@ -185,6 +185,11 @@ export default forwardRef(({
       borderWidth: `${borderThickness}px`,
       counterIncrement: 'item-counter',
       flex: '0 0 auto',
+      ...orientation === 'vertical' ? {
+        width: '100%',
+      } : {
+        height: '100%',
+      },
     },
   })
 

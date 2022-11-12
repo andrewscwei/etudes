@@ -1,25 +1,14 @@
 import { animations, container, selectors } from 'promptu'
 import React, { useState } from 'react'
-import styled, { css } from 'styled-components'
-import Accordion, { ItemComponentProps } from '../../../lib/Accordion'
+import styled from 'styled-components'
+import Accordion, { AccordionHeader, AccordionItemProps } from '../../../lib/Accordion'
 import DebugConsole from '../../../lib/DebugConsole'
-import { Orientation } from '../../../lib/types'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
-export type State = {
-  itemIndex: number
-  sectionIndex: number
-}
-
-const ItemComponent = ({ data, orientation, isSelected, onClick, style }: ItemComponentProps<string>) => (
-  <StyledItem
-    isSelected={isSelected ?? false}
-    orientation={orientation}
-    style={style}
-    onClick={() => onClick?.()}
-  >
+const AccordionItem = ({ data, ...props }: AccordionItemProps<string>) => (
+  <StyledAccordionItem {...props}>
     {data}
-  </StyledItem>
+  </StyledAccordionItem>
 )
 
 export default function() {
@@ -29,10 +18,10 @@ export default function() {
   return (
     <>
       <StyledRoot>
-        <Accordion
+        <StyledAccordion
           orientation='vertical'
           expandIconSvg={$$ExpandIcon}
-          itemComponentType={ItemComponent as any}
+          itemComponentType={AccordionItem}
           itemLength={50}
           data={[{
             label: 'Section 1',
@@ -44,33 +33,11 @@ export default function() {
             label: 'Section 3',
             items: ['foo', 'bar', 'baz'],
           }]}
-          sectionHeaderCSS={props => css`
-            label {
-              text-transform: uppercase;
-              font-weight: 700;
-            }
-
-            ${selectors.hwot} {
-              transform: scale(1.2);
-              z-index: 1;
-              background: #ff0054;
-
-              label {
-                color: #fff;
-              }
-
-              svg * {
-                fill: #fff;
-              }
-            }
-          `}
-          onSectionIndexChange={idx => setSectionIndex(idx)}
           onItemIndexChange={idx => setItemIndex(idx)}
-          style={{
-            transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg)',
-            width: '30rem',
-          }}
-        />
+          onSectionIndexChange={idx => setSectionIndex(idx)}
+        >
+          <AccordionHeader className='header'/>
+        </StyledAccordion>
       </StyledRoot>
       <DebugConsole
         title='?: Accordion'
@@ -81,30 +48,55 @@ export default function() {
   )
 }
 
-const StyledItem = styled.button<{
-  isSelected: boolean
-  orientation: Orientation
-}>`
+const StyledAccordionItem = styled.button`
   ${container.fvcc}
   ${animations.transition(['transform', 'background', 'color'], 100)}
-  background: ${props => props.isSelected ? '#ff0054' : '#fff'};
-  color: ${props => props.isSelected ? '#fff' : '#000'};
-  font-size: 1.6rem;
+  background: #fff;
   border-style: solid;
+  color: #000;
+  cursor: pointer;
+  font-size: 16px;
   padding: 20px;
   transform-origin: center;
   transform: translate3d(0, 0, 0) scale(1);
   z-index: 0;
 
-  ${props => props.orientation === 'vertical' ? css`
-    width: 100%;
-  ` : css`
-    height: 100%;
-  `}
+  &.selected {
+    background: #ff0054;
+    color: #fff;
+  }
 
   ${selectors.hwot} {
     background: #ff0054;
     color: #fff;
+  }
+`
+
+const StyledAccordion = styled(Accordion<string>)`
+  transform: translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg);
+  width: 30rem;
+
+  .header {
+    ${container.fhss}
+    ${animations.transition('all', 100)}
+    background: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+    height: 50px;
+    padding: 10px;
+    text-transform: uppercase;
+
+    ${selectors.hwot} {
+      transform: scale(1.2);
+      z-index: 1;
+      background: #ff0054;
+      color: #fff;
+
+      svg * {
+        fill: #fff;
+      }
+    }
   }
 `
 

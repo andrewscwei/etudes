@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React, { ComponentType, HTMLAttributes, PropsWithChildren, useEffect, useRef, useState } from 'react'
+import React, { ComponentType, forwardRef, HTMLAttributes, PropsWithChildren, ReactElement, Ref, useEffect, useRef, useState } from 'react'
 import FlatSVG from './FlatSVG'
 import useElementRect from './hooks/useElementRect'
 import List, { ListItemProps } from './List'
@@ -110,7 +110,7 @@ export type DropdownProps<T extends DropdownData = DropdownData> = HTMLAttribute
  * supports both horizontal and vertical orientations. Provide data and item
  * component type to this component to automatically generate menu items.
  */
-export default function Dropdown<T extends DropdownData = DropdownData>({
+export default forwardRef(({
   children,
   className,
   style,
@@ -129,7 +129,7 @@ export default function Dropdown<T extends DropdownData = DropdownData>({
   selectedIndex: externalSelectedIndex = -1,
   onIndexChange,
   ...props
-}: DropdownProps<T>) {
+}, ref) => {
   const selectItemAt = (index: number) => {
     setSelectedIndex(index)
     setIsCollapsed(true)
@@ -244,6 +244,10 @@ export default function Dropdown<T extends DropdownData = DropdownData>({
         flexDirection: isInverted ? 'row-reverse' : 'row',
       },
     },
+    body: {
+      height: '100%',
+      width: '100%',
+    },
     toggle: {
       height: '100%',
       left: '0',
@@ -318,39 +322,41 @@ export default function Dropdown<T extends DropdownData = DropdownData>({
   return (
     <div
       {...props}
-      ref={bodyRef}
+      ref={ref}
       className={classNames(className, fixedClassNames.root)}
       style={styles(style, fixedStyles.root)}
     >
-      {cloneStyledElement(components.toggle ?? <button style={defaultStyles.toggle}/>, {
-        className: classNames(fixedClassNames.toggle),
-        style: styles(fixedStyles.toggle),
-        onClick: () => toggle(),
-      }, ...[
-        <label style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: selectedIndex === -1 ? defaultLabel : data[selectedIndex].label ?? '' }}/>,
-        expandIconSvg && cloneStyledElement(components.toggleIcon ?? <FlatSVG svg={expandIconSvg} style={defaultStyles.toggleIcon}/>, {
-          className: classNames(fixedClassNames.toggleIcon),
-          style: styles(fixedStyles.toggleIcon),
-        }),
-      ])}
-      <List
-        className={fixedClassNames.list}
-        style={styles(fixedStyles.list)}
-        borderThickness={borderThickness}
-        data={data}
-        isSelectable={true}
-        isTogglable={false}
-        itemComponentType={itemComponentType}
-        itemLength={itemLength}
-        itemPadding={itemPadding}
-        orientation={orientation}
-        selectedIndex={selectedIndex}
-        onDeselectAt={idx => selectItemAt(-1)}
-        onSelectAt={idx => selectItemAt(idx)}
-      />
+      <div ref={bodyRef} style={styles(fixedStyles.body)}>
+        {cloneStyledElement(components.toggle ?? <button style={defaultStyles.toggle}/>, {
+          className: classNames(fixedClassNames.toggle),
+          style: styles(fixedStyles.toggle),
+          onClick: () => toggle(),
+        }, ...[
+          <label style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: selectedIndex === -1 ? defaultLabel : data[selectedIndex].label ?? '' }}/>,
+          expandIconSvg && cloneStyledElement(components.toggleIcon ?? <FlatSVG svg={expandIconSvg} style={defaultStyles.toggleIcon}/>, {
+            className: classNames(fixedClassNames.toggleIcon),
+            style: styles(fixedStyles.toggleIcon),
+          }),
+        ])}
+        <List
+          className={fixedClassNames.list}
+          style={styles(fixedStyles.list)}
+          borderThickness={borderThickness}
+          data={data}
+          isSelectable={true}
+          isTogglable={false}
+          itemComponentType={itemComponentType}
+          itemLength={itemLength}
+          itemPadding={itemPadding}
+          orientation={orientation}
+          selectedIndex={selectedIndex}
+          onDeselectAt={idx => selectItemAt(-1)}
+          onSelectAt={idx => selectItemAt(idx)}
+        />
+      </div>
     </div>
   )
-}
+}) as <T extends DropdownData = DropdownData>(props: DropdownProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
 export const DropdownToggle = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => <button {...props}/>
 
