@@ -3,6 +3,8 @@ import React, { forwardRef, HTMLAttributes, useEffect, useRef, useState } from '
 import { Rect } from 'spase'
 import useResizeEffect from './hooks/useResizeEffect'
 import { Orientation } from './types'
+import asClassNameDict from './utils/asClassNameDict'
+import asStyleDict from './utils/asStyleDict'
 import useDebug from './utils/useDebug'
 
 const debug = useDebug('masonry')
@@ -199,19 +201,27 @@ export default forwardRef<HTMLDivElement, MasonryGridProps>(({
     }
   }, [children])
 
+  const fixedClassNames = asClassNameDict({
+    root: classNames(orientation),
+  })
+
+  const fixedStyles = asStyleDict({
+    body: {
+      height: orientation === 'horizontal' ? '100%' : 'auto',
+      minHeight: orientation === 'vertical' && !isNaN(minHeight) ? `${minHeight}px` : '',
+      minWidth: orientation === 'horizontal' && !isNaN(minWidth) ? `${minWidth}px` : '',
+      padding: '0',
+      width: orientation === 'horizontal' ? 'auto' : '100%',
+    },
+  })
+
   return (
     <div
       {...props}
       ref={ref}
-      className={classNames(className, orientation)}
+      className={classNames(className, fixedClassNames.root)}
     >
-      <div ref={bodyRef} style={{
-        height: orientation === 'horizontal' ? '100%' : 'auto',
-        minHeight: orientation === 'vertical' && !isNaN(minHeight) ? `${minHeight}px` : '',
-        minWidth: orientation === 'horizontal' && !isNaN(minWidth) ? `${minWidth}px` : '',
-        padding: '0',
-        width: orientation === 'horizontal' ? 'auto' : '100%',
-      }}>
+      <div ref={bodyRef} style={fixedStyles.body}>
         {children}
       </div>
     </div>

@@ -1,6 +1,6 @@
 import React, { ComponentType, createRef, CSSProperties, PureComponent, RefObject } from 'react'
 import styled, { css } from 'styled-components'
-import List, { ItemComponentProps as ListItemComponentProps } from './List'
+import List, { ListItemProps as ListItemComponentProps } from './List'
 import { ExtendedCSSFunction, ExtendedCSSProps, Orientation } from './types'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
@@ -144,7 +144,7 @@ export interface State {
 
 export default class Accordion<T = Record<string, never>> extends PureComponent<Props<T>, State> {
   nodeRefs = {
-    lists: [] as RefObject<List<T>>[],
+    lists: [] as RefObject<any>[],
   }
 
   constructor(props: Props<T>) {
@@ -203,7 +203,7 @@ export default class Accordion<T = Record<string, never>> extends PureComponent<
           const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
           const menuLength = (itemLength - borderThickness) * numVisibleItems + itemPadding * (numVisibleItems - 1) + borderThickness
           const isCollapsed = !this.isSectionSelectedAt(i)
-          const ref = createRef<List<T>>()
+          const ref = createRef<any>()
 
           this.nodeRefs.lists.push(ref)
 
@@ -232,22 +232,22 @@ export default class Accordion<T = Record<string, never>> extends PureComponent<
               </StyledSectionHeader>
               <StyledItemList
                 ref={ref as any}
-                borderColor={borderColor}
+                // BorderColor={borderColor}
                 borderThickness={borderThickness}
                 data={section.items}
-                defaultSelectedIndex={-1}
+                selectedIndex={-1}
                 isTogglable={isTogglable}
-                itemComponentType={this.props.itemComponentType as any}
+                // ItemComponentType={this.props.itemComponentType as any}
                 itemPadding={itemPadding}
                 onDeselectAt={idx => this.deselectItemAt(idx)}
                 onSelectAt={idx => this.selectItemAt(idx)}
                 orientation={orientation}
-                shouldStaySelected={true}
-                itemStyle={orientation === 'vertical' ? {
-                  height: `${itemLength}px`,
-                } : {
-                  width: `${itemLength}px`,
-                }}
+                isSelectable={true}
+                // ItemStyle={orientation === 'vertical' ? {
+                //   height: `${itemLength}px`,
+                // } : {
+                //   width: `${itemLength}px`,
+                // }}
                 style={orientation === 'vertical' ? {
                   height: isCollapsed ? '0px' : `${menuLength}px`,
                   marginTop: isCollapsed ? '0px' : `${itemPadding - borderThickness}px`,

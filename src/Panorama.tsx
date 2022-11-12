@@ -3,6 +3,7 @@ import { Size } from 'spase'
 import useDragEffect from './hooks/useDragEffect'
 import useLoadImageEffect from './hooks/useLoadImageEffect'
 import useResizeEffect from './hooks/useResizeEffect'
+import asStyleDict from './utils/asStyleDict'
 
 export type PanoramaProps = HTMLAttributes<HTMLDivElement> & {
   /**
@@ -166,17 +167,21 @@ export default forwardRef<HTMLDivElement, PanoramaProps>(({
     onPositionChange?.(angle / 360, isDragging)
   }, [angle])
 
+  const fixedStyles = asStyleDict({
+    body: {
+      backgroundImage: `url(${src})`,
+      backgroundPositionX: `${-displacement}px`,
+      backgroundRepeat: 'repeat',
+      backgroundSize: 'auto 100%',
+      height: '100%',
+      touchAction: 'none',
+      width: '100%',
+    },
+  })
+
   return (
     <div {...props} ref={ref}>
-      <div ref={bodyRef} style={{
-        backgroundImage: `url(${src})`,
-        backgroundPositionX: `${-displacement}px`,
-        backgroundRepeat: 'repeat',
-        backgroundSize: 'auto 100%',
-        height: '100%',
-        touchAction: 'none',
-        width: '100%',
-      }}/>
+      <div ref={bodyRef} style={fixedStyles.body}/>
     </div>
   )
 })

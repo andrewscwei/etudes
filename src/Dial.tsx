@@ -41,6 +41,101 @@ export type DialProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   trackThickness?: number
 }>
 
+/**
+ * A circular dial with a knob and a track.
+ *
+ * @exports DialKnob
+ * @exports DialTrack
+ */
+export default forwardRef<HTMLDivElement, DialProps>(({
+  angle = 0,
+  children,
+  knobLength = 30,
+  knobThickness = 10,
+  radius = 50,
+  trackThickness = 2,
+  style,
+  ...props
+}, ref) => {
+  const diameter = radius * 2
+  const clampedKnobAngle = Math.max(0, Math.min(360, knobLength))
+
+  const components = asComponentDict(children, {
+    track: DialTrack,
+    knob: DialKnob,
+  })
+
+  const fixedStyles = asStyleDict({
+    root: {
+      height: `${diameter}px`,
+      width: `${diameter}px`,
+    },
+    knobContainer: {
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: '100%',
+      height: '100%',
+      left: '0',
+      position: 'absolute',
+      top: '0',
+      transformOrigin: 'center',
+      width: '100%',
+      transform: `rotate(${(angle + 360) % 360}deg)`,
+    },
+    trackContainer: {
+      height: '100%',
+      left: '0',
+      position: 'absolute',
+      top: '0',
+      transformOrigin: 'center',
+      width: '100%',
+    },
+    svgContainer: {
+      overflow: 'visible',
+      position: 'absolute',
+      right: '0',
+      top: '0',
+    },
+  })
+
+  const defaultStyles = asStyleDict({
+    knob: {
+      stroke: '#fff',
+    },
+    track: {
+      strokeDasharray: '4',
+      stroke: '#fff',
+    },
+  })
+
+  return (
+    <div {...props} ref={ref} style={styles(style, fixedStyles.root)}>
+      <div style={fixedStyles.trackContainer}>
+        <svg width={diameter} height={diameter} viewBox={`0 0 ${diameter} ${diameter}`} style={fixedStyles.svgContainer}>
+          {cloneStyledElement(components.track ?? <DialTrack style={defaultStyles.track}/>, {
+            cx: radius,
+            cy: radius,
+            r: radius - trackThickness / 2,
+            strokeWidth: trackThickness,
+          })}
+        </svg>
+      </div>
+      <div style={styles(fixedStyles.knobContainer)}>
+        <svg viewBox={`0 0 ${diameter} ${diameter}`} xmlns='http://www.w3.org/2000/svg' style={fixedStyles.svgContainer}>
+          {cloneStyledElement(components.knob ?? <DialKnob style={defaultStyles.knob}/>, {
+            strokeWidth: knobThickness,
+            d: arcPath(radius, radius, radius - knobThickness / 2 - (trackThickness - knobThickness) / 2, -clampedKnobAngle / 2, clampedKnobAngle / 2),
+          })}
+        </svg>
+      </div>
+    </div>
+  )
+})
+
+export const DialTrack = ({ ...props }: SVGAttributes<SVGCircleElement>) => <circle {...props}/>
+
+export const DialKnob = ({ ...props }: SVGAttributes<SVGPathElement>) => <path {...props}/>
+
 function polarToCartesian(centerX: number, centerY: number, radius: number, angleInDegrees: number) {
   const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0
 
@@ -70,96 +165,3 @@ function arcPath(x: number, y: number, radius: number, startAngle: number, endAn
 
   return d.join(' ')
 }
-
-/**
- * A circular dial with a knob and a track.
- *
- * @exports DialKnob
- * @exports DialTrack
- */
-export default forwardRef<HTMLDivElement, DialProps>(({
-  angle = 0,
-  children,
-  knobLength = 30,
-  knobThickness = 10,
-  radius = 50,
-  trackThickness = 2,
-  style,
-  ...props
-}, ref) => {
-  const diameter = radius * 2
-  const clampedKnobAngle = Math.max(0, Math.min(360, knobLength))
-
-  const components = asComponentDict(children, {
-    track: DialTrack,
-    knob: DialKnob,
-  })
-
-  const fixedStyles = asStyleDict({
-    knobContainer: {
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-      backgroundSize: '100%',
-      height: '100%',
-      left: '0',
-      position: 'absolute',
-      top: '0',
-      transformOrigin: 'center',
-      width: '100%',
-    },
-    trackContainer: {
-      height: '100%',
-      left: '0',
-      position: 'absolute',
-      top: '0',
-      transformOrigin: 'center',
-      width: '100%',
-    },
-    svgContainer: {
-      overflow: 'visible',
-      position: 'absolute',
-      right: '0',
-      top: '0',
-    },
-  })
-
-  const defaultStyles = asStyleDict({
-    knob: {
-      stroke: '#fff',
-    },
-    track: {
-      strokeDasharray: '4',
-      stroke: '#fff',
-    },
-  })
-
-  return (
-    <div {...props} ref={ref} style={styles(style, {
-      height: `${diameter}px`,
-      width: `${diameter}px`,
-    })}>
-      <div style={fixedStyles.trackContainer}>
-        <svg width={diameter} height={diameter} viewBox={`0 0 ${diameter} ${diameter}`} style={fixedStyles.svgContainer}>
-          {cloneStyledElement(components.track ?? <DialTrack style={defaultStyles.track}/>, {
-            cx: radius,
-            cy: radius,
-            r: radius - trackThickness / 2,
-            strokeWidth: trackThickness,
-          })}
-        </svg>
-      </div>
-      <div style={styles(fixedStyles.knobContainer, { transform: `rotate(${(angle + 360) % 360}deg)` })}>
-        <svg viewBox={`0 0 ${diameter} ${diameter}`} xmlns='http://www.w3.org/2000/svg' style={fixedStyles.svgContainer}>
-          {cloneStyledElement(components.knob ?? <DialKnob style={defaultStyles.knob}/>, {
-            strokeWidth: knobThickness,
-            d: arcPath(radius, radius, radius - knobThickness / 2 - (trackThickness - knobThickness) / 2, -clampedKnobAngle / 2, clampedKnobAngle / 2),
-          })}
-        </svg>
-      </div>
-    </div>
-  )
-})
-
-export const DialTrack = ({ ...props }: SVGAttributes<SVGCircleElement>) => <circle {...props}/>
-
-export const DialKnob = ({ ...props }: SVGAttributes<SVGPathElement>) => <path {...props}/>

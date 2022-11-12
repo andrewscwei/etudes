@@ -84,6 +84,7 @@ export default forwardRef<HTMLDivElement, RotatingGalleryProps>(({
       position: 'absolute',
       top: '0',
       width: '100%',
+      transitionDuration: `${transitionDuration}ms`,
     },
   })
 
@@ -106,7 +107,6 @@ export default forwardRef<HTMLDivElement, RotatingGalleryProps>(({
             )}/>, {
               className: classNames(state),
               style: styles(fixedStyles.image, {
-                transitionDuration: `${transitionDuration}ms`,
                 backgroundImage: `url(${src})`,
               }),
             })}

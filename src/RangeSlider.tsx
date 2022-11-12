@@ -4,6 +4,7 @@ import React, { forwardRef, HTMLAttributes, PropsWithChildren, useEffect, useRef
 import useDragEffect from './hooks/useDragEffect'
 import useResizeEffect from './hooks/useResizeEffect'
 import { Orientation, Range } from './types'
+import asClassNameDict from './utils/asClassNameDict'
 import asComponentDict from './utils/asComponentDict'
 import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
@@ -130,6 +131,14 @@ export default forwardRef<HTMLDivElement, RangeSliderProps>(({
     label: RangeSliderLabel,
   })
 
+  const fixedClassNames = asClassNameDict({
+    root: classNames(orientation),
+    gutter: classNames(orientation),
+    highlight: classNames(orientation),
+    knob: classNames(orientation),
+    label: classNames(orientation),
+  })
+
   const fixedStyles = asStyleDict({
     body: {
       height: '100%',
@@ -218,16 +227,22 @@ export default forwardRef<HTMLDivElement, RangeSliderProps>(({
   })
 
   return (
-    <div {...props} className={classNames(className, orientation)} ref={ref}>
+    <div {...props} ref={ref} className={classNames(className, fixedClassNames.root)}>
       <div ref={bodyRef} style={fixedStyles.body}>
-        {cloneStyledElement(components.gutter ?? <RangeSliderGutter style={defaultStyles.gutter}/>, { className: orientation, style: fixedStyles.gutter })}
-        {cloneStyledElement(components.highlight ?? <RangeSliderHighlight style={defaultStyles.highlight}/>, { className: orientation, style: fixedStyles.highlight })}
+        {cloneStyledElement(components.gutter ?? <RangeSliderGutter style={defaultStyles.gutter}/>, {
+          className: classNames(fixedClassNames.gutter),
+          style: styles(fixedStyles.gutter),
+        })}
+        {cloneStyledElement(components.highlight ?? <RangeSliderHighlight style={defaultStyles.highlight}/>, {
+          className: classNames(fixedClassNames.highlight),
+          style: styles(fixedStyles.highlight),
+        })}
         {cloneStyledElement(components.knob ?? <RangeSliderKnob style={styles(defaultStyles.knob, {
           transitionProperty: isReleasingStartKnob ? 'opacity, transform' : 'opacity',
         })}/>, {
           ref: startKnobRef,
           disabled: isEqual([startValue, endValue], [maxValue, maxValue]),
-          className: classNames(orientation, {
+          className: classNames(fixedClassNames.knob, {
             dragging: isDraggingStartKnob,
             releasing: isReleasingStartKnob,
           }),
@@ -242,7 +257,7 @@ export default forwardRef<HTMLDivElement, RangeSliderProps>(({
           cloneStyledElement(components.label ?? <RangeSliderLabel style={styles(defaultStyles.label, {
             transitionProperty: isReleasingStartKnob ? 'opacity, transform' : 'opacity',
           })}/>, {
-            className: classNames(orientation, {
+            className: classNames(fixedClassNames.label, {
               dragging: isDraggingStartKnob || isDraggingEndKnob,
               releasing: isReleasingStartKnob || isReleasingEndKnob,
             }),
@@ -254,7 +269,7 @@ export default forwardRef<HTMLDivElement, RangeSliderProps>(({
         })}/>, {
           ref: endKnobRef,
           disabled: isEqual([startValue, endValue], [maxValue, maxValue]),
-          className: classNames(orientation, {
+          className: classNames(fixedClassNames.knob, {
             dragging: isDraggingEndKnob,
             releasing: isDraggingEndKnob,
           }),
@@ -269,7 +284,7 @@ export default forwardRef<HTMLDivElement, RangeSliderProps>(({
           cloneStyledElement(components.label ?? <RangeSliderLabel style={styles(defaultStyles.label, {
             transitionProperty: isReleasingEndKnob ? 'opacity, transform' : 'opacity',
           })}/>, {
-            className: classNames(orientation, {
+            className: classNames(fixedClassNames.label, {
               dragging: isDraggingEndKnob,
               releasing: isReleasingEndKnob,
             }),

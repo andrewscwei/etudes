@@ -1,5 +1,7 @@
 import React, { CSSProperties, forwardRef, HTMLAttributes, useEffect, useRef, useState } from 'react'
 import Each from './Each'
+import asStyleDict from './utils/asStyleDict'
+import styles from './utils/styles'
 
 export type DebugConsoleProps = HTMLAttributes<HTMLDivElement> & {
   align?: 'tl' | 'tc' | 'tr' | 'cl' | 'cc' | 'cr' | 'bl' | 'bc' | 'br'
@@ -41,18 +43,50 @@ export default forwardRef<HTMLDivElement, DebugConsoleProps>(({
     messagesRef.current?.scrollTo(0, messagesRef.current?.scrollHeight)
   }, [messages])
 
+  const fixedStyles = asStyleDict({
+    root: {
+      background: '#000',
+      fontFamily: 'monospace',
+      position: 'fixed',
+      width: '300px',
+    },
+    title: {
+      background: '#fff',
+      color: '#000',
+      fontSize: '14px',
+      fontWeight: '700',
+      height: '30px',
+      lineHeight: '30px',
+      overflow: 'hidden',
+      padding: '0 10px',
+      textOverflow: 'ellipsis',
+      textTransform: 'uppercase',
+      whiteSpace: 'nowrap',
+      width: '100%',
+    },
+    messages: {
+      boxSizing: 'border-box',
+      color: '#fff',
+      fontSize: '12px',
+      lineHeight: '150%',
+      maxHeight: '200px',
+      minHeight: '100px',
+      overflowX: 'hidden',
+      overflowY: 'scroll',
+      padding: '10px',
+      WebkitOverflowScrolling: 'touch',
+      width: '100%',
+    },
+  })
+
   return (
     <div
       {...props}
       ref={ref}
-      style={{
-        ...style,
-        ...rootStyle,
-        ...getStyleByAlignment(align, margin),
-      }}
+      style={styles(style, fixedStyles.root, getStyleByAlignment(align, margin))}
     >
-      <div style={titleStyle}>{title ?? 'Untitled'}</div>
-      <div style={messagesStyle} ref={messagesRef}>
+      <div style={fixedStyles.title}>{title ?? 'Untitled'}</div>
+      <div ref={messagesRef} style={fixedStyles.messages}>
         <Each in={messages} render={msg => <div dangerouslySetInnerHTML={{ __html: msg }}/>}/>
       </div>
     </div>
@@ -71,40 +105,4 @@ function getStyleByAlignment(align: DebugConsoleProps['align'], margin: number):
     case 'bc': return { bottom: `${margin}px`, left: 0, right: 0, margin: '0 auto' }
     default: return { bottom: `${margin}px`, right: `${margin}px` }
   }
-}
-
-const rootStyle: CSSProperties = {
-  background: '#000',
-  fontFamily: 'monospace',
-  position: 'fixed',
-  width: '300px',
-}
-
-const titleStyle: CSSProperties = {
-  background: '#fff',
-  color: '#000',
-  fontSize: '14px',
-  fontWeight: '700',
-  height: '30px',
-  lineHeight: '30px',
-  overflow: 'hidden',
-  padding: '0 10px',
-  textOverflow: 'ellipsis',
-  textTransform: 'uppercase',
-  whiteSpace: 'nowrap',
-  width: '100%',
-}
-
-const messagesStyle: CSSProperties = {
-  boxSizing: 'border-box',
-  color: '#fff',
-  fontSize: '12px',
-  lineHeight: '150%',
-  maxHeight: '200px',
-  minHeight: '100px',
-  overflowX: 'hidden',
-  overflowY: 'scroll',
-  padding: '10px',
-  WebkitOverflowScrolling: 'touch',
-  width: '100%',
 }

@@ -1,4 +1,5 @@
-import React, { CSSProperties, forwardRef, HTMLAttributes, ReactEventHandler, useEffect, useRef } from 'react'
+import React, { forwardRef, HTMLAttributes, ReactEventHandler, useEffect, useRef } from 'react'
+import asStyleDict from './utils/asStyleDict'
 import useDebug from './utils/useDebug'
 
 const debug = useDebug('video')
@@ -101,17 +102,25 @@ export default forwardRef<HTMLDivElement, VideoProps>(({
     bodyRef.current.pause()
   }
 
+  const fixedStyles = asStyleDict({
+    body: {
+      height: '100%',
+      width: '100%',
+      objectFit: isCover ? 'cover' : 'fill',
+    },
+  })
+
   return (
     <div {...props} ref={ref}>
       <video
+        ref={bodyRef}
+        style={fixedStyles.body}
         autoPlay={autoPlay}
         controls={hasControls}
         loop={autoLoop}
         muted={isMuted}
         playsInline={playsInline}
         poster={posterSrc}
-        ref={bodyRef}
-        style={{ objectFit: isCover ? 'cover' : 'fill', ...videoStyle }}
         onCanPlay={canPlayHandler}
         onEnded={endHandler}
         onPause={pauseHandler}
@@ -122,8 +131,3 @@ export default forwardRef<HTMLDivElement, VideoProps>(({
     </div>
   )
 })
-
-const videoStyle: CSSProperties = {
-  height: '100%',
-  width: '100%',
-}

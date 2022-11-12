@@ -1,44 +1,34 @@
-import React, { ComponentType, createRef, PureComponent } from 'react'
-import { Rect } from 'spase'
-import styled, { css, CSSProperties } from 'styled-components'
-import List, { ItemComponentProps as ListItemComponentProps } from './List'
-import { ExtendedCSSFunction, ExtendedCSSProps, Orientation } from './types'
-
-export type ButtonCSSProps = Readonly<{
-  borderColor: string
-  borderThickness: number
-  isActive: boolean
-}>
+import classNames from 'classnames'
+import React, { ComponentType, HTMLAttributes, PropsWithChildren, useEffect, useRef, useState } from 'react'
+import FlatSVG from './FlatSVG'
+import useElementRect from './hooks/useElementRect'
+import List, { ListItemProps } from './List'
+import { Orientation } from './types'
+import asClassNameDict from './utils/asClassNameDict'
+import asComponentDict from './utils/asComponentDict'
+import asStyleDict from './utils/asStyleDict'
+import cloneStyledElement from './utils/cloneStyledElement'
+import styles from './utils/styles'
 
 /**
  * Type constraint of the data passed to each item in the component.
  */
-export type DataProps<T = Record<string, any>> = T & {
+export type DropdownData = {
   label?: string
 }
 
 /**
- * Interface defining the props of the item component type to be provided to the
+ * Type defining the props of the item component type to be provided to the
  * component. The data type is generic.
  */
-export type ItemComponentProps<T = Record<string, any>> = ListItemComponentProps<DataProps<T>>
+export type DropdownItemProps<T extends DropdownData = DropdownData> = ListItemProps<T>
 
-export type Props<T = Record<string, any>> = {
-  /**
-   * Class attribute to the root element.
-   */
-  className?: string
-
-  /**
-   * Inline style attribute to the element.
-   */
-  style?: CSSProperties
-
+export type DropdownProps<T extends DropdownData = DropdownData> = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   /**
    * Data of every item in the component. This is used to generate individual
    * menu items. Data type is generic.
    */
-  data: DataProps<T>[]
+  data: T[]
 
   /**
    * Indicates if the component is inverted (i.e. "dropup" instead of dropdown).
@@ -61,7 +51,7 @@ export type Props<T = Record<string, any>> = {
   /**
    * The index of the default selected item.
    */
-  defaultSelectedItemIndex?: number
+  selectedIndex?: number
 
   /**
    * Length (in pixels) of each item. This does not apply to the dropdown button
@@ -107,203 +97,72 @@ export type Props<T = Record<string, any>> = {
   /**
    * React component type to be used for generating items inside the component.
    */
-  itemComponentType: ComponentType<ItemComponentProps<T>>
+  itemComponentType: ComponentType<DropdownItemProps<T>>
 
   /**
    * Handler invoked whenever the selected index changes.
    */
   onIndexChange?: (index: number) => void
-
-  /**
-   * Additional CSS to be provided to the dropdown button.
-   */
-  buttonCSS?: ExtendedCSSFunction<ButtonCSSProps>
-}
-
-export interface State {
-  /**
-   * Index of the currently selected item. Any value less than 0 indicates that
-   * no item is selected.
-   */
-  selectedItemIndex: number
-
-  /**
-   * Indicates if the dropdown menu is collapsed.
-   */
-  isCollapsed: boolean
-}
+}>
 
 /**
  * A dropdown menu component that is invertible (i.e. can "dropup" instead) and
  * supports both horizontal and vertical orientations. Provide data and item
  * component type to this component to automatically generate menu items.
  */
-export default class Dropdown<T = Record<string, any>> extends PureComponent<Props<T>, State> {
-  nodeRefs = {
-    root: createRef<HTMLDivElement>(),
+export default function Dropdown<T extends DropdownData = DropdownData>({
+  children,
+  className,
+  style,
+  borderColor = '#000',
+  borderThickness = 1,
+  data,
+  defaultLabel = 'Select',
+  expandIconSvg,
+  isInverted = false,
+  isTogglable = false,
+  itemComponentType,
+  itemLength: externalItemLength,
+  itemPadding = 0,
+  maxVisibleItems = -1,
+  orientation = 'vertical',
+  selectedIndex: externalSelectedIndex = -1,
+  onIndexChange,
+  ...props
+}: DropdownProps<T>) {
+  const selectItemAt = (index: number) => {
+    setSelectedIndex(index)
+    setIsCollapsed(true)
   }
 
-  constructor(props: Props<T>) {
-    super(props)
-
-    this.state = {
-      selectedItemIndex: this.props.defaultSelectedItemIndex ?? -1,
-      isCollapsed: true,
-    }
+  const expand = () => {
+    if (!isCollapsed) return
+    setIsCollapsed(false)
   }
 
-  get rect(): Rect {
-    return Rect.from(this.nodeRefs.root.current) ?? new Rect()
+  const collapse = () => {
+    if (isCollapsed) return
+    setIsCollapsed(true)
   }
 
-  componentDidMount() {
-    window.addEventListener('click', this.onClickOutside)
-    this.props.onIndexChange?.(this.state.selectedItemIndex)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('click', this.onClickOutside)
-  }
-
-  componentDidUpdate(prevProps: Props<T>, prevState: State) {
-    if (prevState.selectedItemIndex !== this.state.selectedItemIndex) {
-      this.props.onIndexChange?.(this.state.selectedItemIndex)
-    }
-
-    if (prevProps.orientation !== this.props.orientation) {
-      this.forceUpdate()
-    }
-  }
-
-  render() {
-    const borderColor = this.props.borderColor ?? '#000'
-    const borderThickness = this.props.borderThickness ?? 1
-    const orientation = this.props.orientation ?? 'vertical'
-    const itemLength = this.props.itemLength ?? (orientation === 'vertical' ? this.rect.height : this.rect.width)
-    const maxVisibleItems = this.props.maxVisibleItems ?? -1
-    const isTogglable = this.props.isTogglable ?? true
-    const itemPadding = this.props.itemPadding ?? 0
-    const numItems = this.props.data.length
-    const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
-    const menuLength = (itemLength - borderThickness) * numVisibleItems + itemPadding * (numVisibleItems - 1) + borderThickness
-
-    return (
-      <StyledRoot
-        className={this.props.className}
-        orientation={orientation}
-        isInverted={this.props.isInverted ?? false}
-        ref={this.nodeRefs.root}
-        style={this.props.style ?? {}}
-      >
-        <StyledToggle
-          borderColor={borderColor}
-          borderThickness={borderThickness}
-          extendedCSS={this.props.buttonCSS ?? (() => css``)}
-          isActive={!this.state.isCollapsed}
-          onClick={() => this.toggle()}
-        >
-          <label>
-            {this.state.selectedItemIndex === -1 ? this.props.defaultLabel ?? 'Select' : this.props.data[this.state.selectedItemIndex].label}
-          </label>
-          {this.props.expandIconSvg && <span dangerouslySetInnerHTML={{ __html: this.props.expandIconSvg }}/>}
-        </StyledToggle>
-        <StyledItemList
-          borderColor={borderColor}
-          borderThickness={borderThickness}
-          data={this.props.data}
-          defaultSelectedIndex={this.props.defaultSelectedItemIndex ?? -1}
-          isInverted={this.props.isInverted ?? false}
-          isTogglable={isTogglable}
-          itemComponentType={this.props.itemComponentType as any}
-          itemPadding={itemPadding}
-          onDeselectAt={idx => this.selectItemAt(-1)}
-          onSelectAt={idx => this.selectItemAt(idx)}
-          orientation={orientation}
-          shouldStaySelected={true}
-          itemStyle={orientation === 'vertical' ? {
-            height: `${itemLength}px`,
-          } : {
-            width: `${itemLength}px`,
-          }}
-          style={orientation === 'vertical' ? {
-            height: this.state.isCollapsed ? '0px' : `${menuLength}px`,
-            overflowY: maxVisibleItems === -1 ? 'hidden' : maxVisibleItems < numItems ? 'scroll' : 'hidden',
-          } : {
-            width: this.state.isCollapsed ? '0px' : `${menuLength}px`,
-            overflowX: maxVisibleItems === -1 ? 'hidden' : maxVisibleItems < numItems ? 'scroll' : 'hidden',
-          }}
-        />
-      </StyledRoot>
-    )
-  }
-
-  /**
-   * Indicates if the item at the specified index is selected.
-   *
-   * @param index - The index of the item.
-   *
-   * @returns `true` if the item at the specified index is selected, `false`
-   *          otherwise.
-   */
-  isItemSelectedAt(index: number) {
-    return this.state.selectedItemIndex === index
-  }
-
-  /**
-   * Selects the item at the specified index.
-   *
-   * @param index - The index of the item to select.
-   */
-  selectItemAt(index: number) {
-    this.setState({
-      selectedItemIndex: index,
-      isCollapsed: true,
-    })
-  }
-
-  /**
-   * Expands the menu, revealing its items.
-   */
-  expand() {
-    if (!this.state.isCollapsed) return
-    this.setState({ isCollapsed: false })
-  }
-
-  /**
-   * Collapses the menu, concealing its items.
-   */
-  collapse() {
-    if (this.state.isCollapsed) return
-    this.setState({ isCollapsed: true })
-  }
-
-  /**
-   * Toggles the visibility of the menu.
-   */
-  toggle() {
-    if (this.state.isCollapsed) {
-      this.expand()
+  const toggle = () => {
+    if (isCollapsed) {
+      expand()
     }
     else {
-      this.collapse()
+      collapse()
     }
   }
 
-  /**
-   * Handler invoked when click input is detected outside of the root element
-   * of the component.
-   *
-   * @param event - The MouseEvent passed to the handler.
-   */
-  private onClickOutside = (event: MouseEvent) => {
-    if (this.state.isCollapsed) return
+  const clickOutsideHandler = (event: MouseEvent) => {
+    if (isCollapsed) return
     if (!(event.target instanceof Node)) return
 
     let isOutside = true
     let node = event.target
 
     while (node) {
-      if (node === this.nodeRefs.root.current) {
+      if (node === bodyRef.current) {
         isOutside = false
         break
       }
@@ -315,116 +174,184 @@ export default class Dropdown<T = Record<string, any>> extends PureComponent<Pro
 
     if (!isOutside) return
 
-    this.collapse()
+    collapse()
   }
+
+  const bodyRef = useRef<HTMLDivElement>(null)
+  const [selectedIndex, setSelectedIndex] = useState(externalSelectedIndex)
+  const [isCollapsed, setIsCollapsed] = useState(true)
+  const rect = useElementRect(bodyRef)
+
+  useEffect(() => {
+    window.addEventListener('click', clickOutsideHandler)
+
+    return () => {
+      window.removeEventListener('click', clickOutsideHandler)
+    }
+  }, [isCollapsed])
+
+  useEffect(() => {
+    if (externalSelectedIndex === selectedIndex) return
+    setSelectedIndex(externalSelectedIndex)
+  }, [externalSelectedIndex])
+
+  useEffect(() => {
+    onIndexChange?.(selectedIndex)
+  }, [selectedIndex])
+
+  const itemLength = externalItemLength ?? (orientation === 'vertical' ? rect.height : rect.width)
+  const numItems = data.length
+  const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
+  const menuLength = (itemLength - borderThickness) * numVisibleItems + itemPadding * (numVisibleItems - 1) + borderThickness
+
+  const components = asComponentDict(children, {
+    toggle: DropdownToggle,
+    toggleIcon: DropdownToggleIcon,
+  })
+
+  const fixedClassNames = asClassNameDict({
+    root: classNames(orientation, {
+      togglable: isTogglable,
+      collapsed: isCollapsed,
+      expanded: !isCollapsed,
+    }),
+    toggle: classNames(orientation, {
+      togglable: isTogglable,
+      collapsed: isCollapsed,
+      expanded: !isCollapsed,
+    }),
+    toggleIcon: classNames(orientation, {
+      togglable: isTogglable,
+      collapsed: isCollapsed,
+      expanded: !isCollapsed,
+    }),
+    list: classNames(orientation, {
+      togglable: isTogglable,
+      collapsed: isCollapsed,
+      expanded: !isCollapsed,
+    }),
+  })
+
+  const fixedStyles = asStyleDict({
+    root: {
+      alignItems: 'center',
+      display: 'flex',
+      justifyContent: 'flex-start',
+      overflow: 'visible',
+      ...orientation === 'vertical' ? {
+        flexDirection: isInverted ? 'column-reverse' : 'column',
+      } : {
+        flexDirection: isInverted ? 'row-reverse' : 'row',
+      },
+    },
+    toggle: {
+      height: '100%',
+      left: '0',
+      margin: '0',
+      outline: 'none',
+      position: 'absolute',
+      top: '0',
+      width: '100%',
+      zIndex: '1',
+    },
+    toggleLabel: {
+      fontFamily: 'inherit',
+      fontSize: 'inherit',
+      fontWeight: 'inherit',
+      letterSpacing: 'inherit',
+      lineHeight: 'inherit',
+    },
+    toggleIcon: {
+
+    },
+    list: {
+      position: 'absolute',
+      ...orientation === 'vertical' ? {
+        transition: 'height 100ms ease-out',
+        width: '100%',
+        height: isCollapsed ? '0px' : `${menuLength}px`,
+        overflowY: maxVisibleItems === -1 ? 'hidden' : maxVisibleItems < numItems ? 'scroll' : 'hidden',
+        ...isInverted ? {
+          marginBottom: `${itemPadding - borderThickness}px`,
+          bottom: '100%',
+        } : {
+          top: '100%',
+          marginTop: `${itemPadding - borderThickness}px`,
+        },
+      } : {
+        transition: 'width 100ms ease-out',
+        width: isCollapsed ? '0px' : `${menuLength}px`,
+        height: '100%',
+        overflowX: maxVisibleItems === -1 ? 'hidden' : maxVisibleItems < numItems ? 'scroll' : 'hidden',
+        ...isInverted ? {
+          marginRight: `${itemPadding - borderThickness}px`,
+          right: '100%',
+        } : {
+          left: '100%',
+          marginLeft: `${itemPadding - borderThickness}px`,
+        },
+      },
+    },
+  })
+
+  const defaultStyles = asStyleDict({
+    toggle: {
+      alignItems: 'center',
+      background: '#fff',
+      boxSizing: 'border-box',
+      color: '#000',
+      display: 'flex',
+      flexDirection: 'row',
+      fontSize: '16px',
+      justifyContent: 'space-between',
+      margin: '0',
+      padding: '0 10px',
+    },
+    toggleIcon: {
+      height: '15px',
+      margin: '0',
+      padding: '0',
+      width: '15px',
+    },
+  })
+
+  return (
+    <div
+      {...props}
+      ref={bodyRef}
+      className={classNames(className, fixedClassNames.root)}
+      style={styles(style, fixedStyles.root)}
+    >
+      {cloneStyledElement(components.toggle ?? <button style={defaultStyles.toggle}/>, {
+        className: classNames(fixedClassNames.toggle),
+        style: styles(fixedStyles.toggle),
+        onClick: () => toggle(),
+      }, ...[
+        <label style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: selectedIndex === -1 ? defaultLabel : data[selectedIndex].label ?? '' }}/>,
+        expandIconSvg && cloneStyledElement(components.toggleIcon ?? <FlatSVG svg={expandIconSvg} style={defaultStyles.toggleIcon}/>, {
+          className: classNames(fixedClassNames.toggleIcon),
+          style: styles(fixedStyles.toggleIcon),
+        }),
+      ])}
+      <List
+        className={fixedClassNames.list}
+        style={styles(fixedStyles.list)}
+        borderThickness={borderThickness}
+        data={data}
+        isSelectable={true}
+        isTogglable={false}
+        itemComponentType={itemComponentType}
+        itemLength={itemLength}
+        itemPadding={itemPadding}
+        orientation={orientation}
+        selectedIndex={selectedIndex}
+        onDeselectAt={idx => selectItemAt(-1)}
+        onSelectAt={idx => selectItemAt(idx)}
+      />
+    </div>
+  )
 }
 
-const StyledItemList = styled(List)<{
-  isInverted: boolean
-  itemPadding: number
-  borderThickness: number
-  orientation: Orientation
-}>`
-  position: absolute;
+export const DropdownToggle = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => <button {...props}/>
 
-  ::-webkit-scrollbar {}
-  ::-webkit-scrollbar-track {}
-  ::-webkit-scrollbar-thumb {}
-  ::-webkit-scrollbar-hover {}
-
-  ${props => props.orientation === 'vertical' ? css`
-    transition: height 100ms ease-out;
-    will-change: height;
-
-    ${props.isInverted ? css`
-      margin-bottom: ${props.itemPadding - props.borderThickness}px;
-      bottom: 100%;
-    ` : css`
-      top: 100%;
-      margin-top: ${props.itemPadding - props.borderThickness}px;
-    `}
-  ` : css`
-    transition: width 100ms ease-out;
-    will-change: width;
-
-    ${props.isInverted ? css`
-      margin-right: ${props.itemPadding - props.borderThickness}px;
-      right: 100%;
-    ` : css`
-      left: 100%;
-      margin-left: ${props.itemPadding - props.borderThickness}px;
-    `}
-  `}
-`
-
-const StyledToggle = styled.button<ButtonCSSProps & ExtendedCSSProps<ButtonCSSProps>>`
-  > span {
-    height: 15px;
-    width: 15px;
-  }
-
-  > label {
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    letter-spacing: inherit;
-    line-height: inherit;
-  }
-
-  ${props => props.extendedCSS(props)}
-
-  align-items: center;
-  background: #fff;
-  box-sizing: border-box;
-  color: #000;
-  display: flex;
-  flex-direction: row;
-  height: 100%;
-  justify-content: space-between;
-  left: 0;
-  margin: 0;
-  outline: none;
-  padding: 0 10px;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: 1;
-
-  ${props => props.borderThickness > 0 && css`
-    border: ${props.borderThickness}px solid ${props.borderColor};
-  `}
-
-  > span {
-    box-sizing: border-box;
-    display: block;
-    transform-origin: center;
-
-    svg {
-      height: 100%;
-      width: auto;
-    }
-  }
-`
-
-const StyledRoot = styled.div<{
-  isInverted: boolean
-  orientation: Orientation
-}>`
-  align-items: center;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: flex-start;
-  padding: 0;
-  overflow: visible;
-  position: relative;
-
-  ${props => props.orientation === 'vertical' ? css`
-    flex-direction: ${props.isInverted ? 'column-reverse' : 'column'};
-    height: 50px;
-    width: 200px;
-  ` : css`
-    flex-direction: ${props.isInverted ? 'row-reverse' : 'row'};
-    height: 200px;
-    width: 50px;
-  `}
-`
+export const DropdownToggleIcon = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>

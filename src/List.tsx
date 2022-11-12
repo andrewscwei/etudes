@@ -1,26 +1,24 @@
 import classNames from 'classnames'
-import React, { CSSProperties, forwardRef, HTMLAttributes, ReactElement, Ref, useEffect, useState } from 'react'
+import React, { ComponentType, forwardRef, HTMLAttributes, ReactElement, Ref, useEffect, useState } from 'react'
 import Each from './Each'
 import usePrevious from './hooks/usePrevious'
 import { Orientation } from './types'
+import asClassNameDict from './utils/asClassNameDict'
 import asStyleDict from './utils/asStyleDict'
-import cloneStyledElement from './utils/cloneStyledElement'
 import styles from './utils/styles'
 
-export type ListItemProps<T> = {
+export type ListItemProps<T> = HTMLAttributes<HTMLElement> & {
   data: T
   index: number
   isSelected: boolean
   orientation: Orientation
 }
 
-export type ListProps<T> = Omit<HTMLAttributes<HTMLOListElement>, 'children'> & {
+export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
   /**
-   * The children inside this component represents the component for each item
-   * in the list. Only 1 child is expected and will be used to generate all
-   * items.
+   * Thickness of item borders (in pixels). 0 indicates no borders.
    */
-  children?: (props: ListItemProps<T>) => JSX.Element
+  borderThickness?: number
 
   /**
    * Generically typed data of each item.
@@ -36,17 +34,17 @@ export type ListProps<T> = Omit<HTMLAttributes<HTMLOListElement>, 'children'> & 
   /**
    * React component type to be used to generate items for this list.
    */
-  // itemComponentType: ComponentType<ItemComponentProps<T>>
+  itemComponentType?: ComponentType<ListItemProps<T>>
+
+  /**
+   * Optional length of each item.
+   */
+  itemLength?: number
 
   /**
    * Padding between every item (in pixels).
    */
   itemPadding?: number
-
-  /**
-   * Inline style attribute of the root element of the item component.
-   */
-  itemStyle?: CSSProperties
 
   /**
    * Indicates whether selections are retained. For example, in the case of a
@@ -92,14 +90,15 @@ export type ListProps<T> = Omit<HTMLAttributes<HTMLOListElement>, 'children'> & 
  * generic. This component supports both horizontal and vertical orientations.
  */
 export default forwardRef(({
-  children,
   className,
   style,
+  borderThickness = 0,
   data,
   isSelectable,
   isTogglable,
+  itemComponentType: ItemComponentType,
+  itemLength,
   itemPadding = 0,
-  itemStyle,
   orientation = 'vertical',
   selectedIndex: externalSelectedIndex = -1,
   onActivate,
@@ -163,6 +162,15 @@ export default forwardRef(({
     if (!isIndexOutOfRange(selectedIndex)) onSelectAt?.(selectedIndex)
   }, [selectedIndex])
 
+  const fixedClassNames = asClassNameDict({
+    root: classNames(orientation, {
+      togglable: isTogglable,
+    }),
+    item: classNames(orientation, {
+      togglable: isTogglable,
+    }),
+  })
+
   const fixedStyles = asStyleDict({
     root: {
       alignItems: 'flex-start',
@@ -174,45 +182,53 @@ export default forwardRef(({
       listStyle: 'none',
     },
     item: {
-      flex: '0 0 auto',
+      borderWidth: `${borderThickness}px`,
       counterIncrement: 'item-counter',
+      flex: '0 0 auto',
     },
   })
 
   return (
-    <ol
+    <div
       {...props}
-      className={classNames(className, orientation)}
       ref={ref}
+      className={classNames(className, fixedClassNames.root)}
       style={styles(style, fixedStyles.root)}
     >
-      {children && (
+      {ItemComponentType && (
         <Each in={data}>
-          {(val, idx) => cloneStyledElement(children({
-            data: val,
-            index: idx,
-            isSelected: isSelectedAt(idx),
-            orientation,
-          }), {
-            'className': classNames(orientation, {
-              selected: isSelectedAt(idx),
-              togglable: isTogglable,
-            }),
-            'style': styles(fixedStyles.item, {
-              pointerEvents: isTogglable !== true && isSelectedAt(idx) ? 'none' : 'auto',
-              ...idx >= data.length - 1 ? {} : {
+          {(val, idx) => (
+            <ItemComponentType
+              className={classNames(fixedClassNames.item, {
+                selected: isSelectedAt(idx),
+              })}
+              style={styles(fixedStyles.item, {
+                pointerEvents: isTogglable !== true && isSelectedAt(idx) ? 'none' : 'auto',
                 ...orientation === 'vertical' ? {
-                  marginBottom: `${itemPadding}px`,
+                  height: itemLength !== undefined ? `${itemLength}px` : undefined,
+                  marginTop: `${idx === 0 ? 0 : -borderThickness}px`,
                 } : {
-                  marginRight: `${itemPadding}px`,
+                  marginLeft: `${idx === 0 ? 0 : -borderThickness}px`,
+                  width: itemLength !== undefined ? `${itemLength}px` : undefined,
                 },
-              },
-            }),
-            'data-index': idx,
-            'onClick': () => onClick(idx),
-          })}
+                ...idx >= data.length - 1 ? {} : {
+                  ...orientation === 'vertical' ? {
+                    marginBottom: `${itemPadding}px`,
+                  } : {
+                    marginRight: `${itemPadding}px`,
+                  },
+                },
+              })}
+              data-index={idx}
+              data={val}
+              index={idx}
+              isSelected={isSelectedAt(idx)}
+              orientation={orientation}
+              onClick={() => onClick(idx)}
+            />
+          )}
         </Each>
       )}
-    </ol>
+    </div>
   )
-}) as <T>(props: ListProps<T> & { ref?: Ref<HTMLOListElement> }) => ReactElement
+}) as <T>(props: ListProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement

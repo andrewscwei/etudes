@@ -2,6 +2,7 @@ import classNames from 'classnames'
 import React, { forwardRef, HTMLAttributes, MouseEvent, PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { Rect } from 'spase'
 import useDragEffect from './hooks/useDragEffect'
+import asClassNameDict from './utils/asClassNameDict'
 import asComponentDict from './utils/asComponentDict'
 import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
@@ -244,6 +245,33 @@ export default forwardRef<HTMLDivElement, StepwiseSliderProps>(({
     track: StepwiseSliderTrack,
   })
 
+  const fixedClassNames = asClassNameDict({
+    root: classNames(orientation, {
+      'at-end': isAtEnd,
+      'at-start': isAtStart,
+      'dragging': isDragging,
+      'releasing': isReleasing,
+    }),
+    track: classNames(orientation, {
+      'at-end': isAtEnd,
+      'at-start': isAtStart,
+      'dragging': isDragging,
+      'releasing': isReleasing,
+    }),
+    knob: classNames(orientation, {
+      'at-end': isAtEnd,
+      'at-start': isAtStart,
+      'dragging': isDragging,
+      'releasing': isReleasing,
+    }),
+    label: classNames(orientation, {
+      'at-end': isAtEnd,
+      'at-start': isAtStart,
+      'dragging': isDragging,
+      'releasing': isReleasing,
+    }),
+  })
+
   const fixedStyles = asStyleDict({
     body: {
       height: '100%',
@@ -317,15 +345,10 @@ export default forwardRef<HTMLDivElement, StepwiseSliderProps>(({
   })
 
   return (
-    <div {...props} className={classNames(className, orientation)} ref={ref}>
+    <div {...props} ref={ref} className={classNames(className, fixedClassNames.root)}>
       <div ref={bodyRef} style={fixedStyles.body}>
         {cloneStyledElement(components.track ?? <StepwiseSliderTrack style={defaultStyles.track}/>, {
-          className: classNames('start', orientation, {
-            'at-end': isAtEnd,
-            'at-start': isAtStart,
-            'dragging': isDragging,
-            'releasing': isReleasing,
-          }),
+          className: classNames('start', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
             height: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
             top: '0',
@@ -336,12 +359,7 @@ export default forwardRef<HTMLDivElement, StepwiseSliderProps>(({
           onClick: trackClickHandler,
         }, <div style={fixedStyles.trackHitbox}/>)}
         {cloneStyledElement(components.track ?? <StepwiseSliderTrack style={defaultStyles.track}/>, {
-          className: classNames('end', orientation, {
-            'at-end': isAtEnd,
-            'at-start': isAtStart,
-            'dragging': isDragging,
-            'releasing': isReleasing,
-          }),
+          className: classNames('end', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
             bottom: '0',
             height: `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
@@ -353,20 +371,10 @@ export default forwardRef<HTMLDivElement, StepwiseSliderProps>(({
         }, <div style={fixedStyles.trackHitbox}/>)}
         <button ref={knobContainerRef} style={fixedStyles.knobContainer}>
           {cloneStyledElement(components.knob ?? <StepwiseSliderKnob style={defaultStyles.knob}/>, {
-            className: classNames(orientation, {
-              'at-end': isAtEnd,
-              'at-start': isAtStart,
-              'dragging': isDragging,
-              'releasing': isReleasing,
-            }),
+            className: classNames(fixedClassNames.knob),
             style: styles(fixedStyles.knob),
           }, steps && labelProvider && cloneStyledElement(components.label ?? <StepwiseSliderLabel style={defaultStyles.label}/>, {
-            className: classNames(orientation, {
-              'at-end': isAtEnd,
-              'at-start': isAtStart,
-              'dragging': isDragging,
-              'releasing': isReleasing,
-            }),
+            className: classNames(fixedClassNames.label),
             style: styles(fixedStyles.label),
           }, labelProvider(position, getNearestIndexByPosition(position, steps))))}
         </button>

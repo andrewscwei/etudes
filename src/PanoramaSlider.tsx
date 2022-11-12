@@ -3,6 +3,7 @@ import React, { forwardRef, HTMLAttributes, PropsWithChildren, useRef, useState 
 import { Size } from 'spase'
 import useResizeEffect from './hooks/useResizeEffect'
 import Panorama, { PanoramaProps } from './Panorama'
+import asClassNameDict from './utils/asClassNameDict'
 import asComponentDict from './utils/asComponentDict'
 import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
@@ -44,13 +45,14 @@ export type PanoramaSliderProps = HTMLAttributes<HTMLDivElement> & PanoramaProps
  * @exports PanoramaSliderTrack - The slide track.
  */
 export default forwardRef<HTMLDivElement, PanoramaSliderProps>(({
+  className,
+  style,
   angle = 0,
   autoDimension = 'width',
   children,
   fov,
   speed = 1,
   src,
-  style,
   viewportSize,
   zeroAnchor = 0,
   onAngleChange,
@@ -111,7 +113,29 @@ export default forwardRef<HTMLDivElement, PanoramaSliderProps>(({
     indicator: PanoramaSliderIndicator,
   })
 
+  const fixedClassNames = asClassNameDict({
+    root: classNames({
+      dragging: isDragging,
+    }),
+    track: classNames({
+      dragging: isDragging,
+    }),
+    reticle: classNames({
+      dragging: isDragging,
+    }),
+    indicator: classNames({
+      dragging: isDragging,
+    }),
+  })
+
   const fixedStyles = asStyleDict({
+    root: {
+      ...autoDimension === 'width' ? {
+        width: `${size.height * aspectRatio}px`,
+      } : {
+        height: `${size.width / aspectRatio}px`,
+      },
+    },
     body: {
       height: '100%',
       left: '0',
@@ -180,11 +204,8 @@ export default forwardRef<HTMLDivElement, PanoramaSliderProps>(({
     <div
       {...props}
       ref={ref}
-      style={styles(style, autoDimension === 'width' ? {
-        width: `${size.height * aspectRatio}px`,
-      } : {
-        height: `${size.width / aspectRatio}px`,
-      })}
+      className={classNames(className, fixedClassNames.root)}
+      style={styles(style, fixedStyles.body)}
     >
       <Panorama
         angle={angle}
@@ -205,21 +226,21 @@ export default forwardRef<HTMLDivElement, PanoramaSliderProps>(({
       <div style={fixedStyles.body}>
         <div style={fixedStyles.controls}>
           {cloneStyledElement(components.track ?? <PanoramaSliderTrack style={defaultStyles.track}/>, {
-            className: classNames({ dragging: isDragging }),
+            className: classNames(fixedClassNames.track),
             style: styles(fixedStyles.track),
           })}
           {cloneStyledElement(components.reticle ?? <PanoramaSliderReticle style={defaultStyles.reticle}/>, {
-            className: classNames({ dragging: isDragging }),
+            className: classNames(fixedClassNames.reticle),
             style: styles(fixedStyles.reticle),
           })}
           {cloneStyledElement(components.track ?? <PanoramaSliderTrack style={defaultStyles.track}/>, {
-            className: classNames({ dragging: isDragging }),
+            className: classNames(fixedClassNames.track),
             style: styles(fixedStyles.track),
           })}
         </div>
       </div>
       {cloneStyledElement(components.indicator ?? <PanoramaSliderIndicator style={defaultStyles.indicator}/>, {
-        className: classNames({ dragging: isDragging }),
+        className: classNames(fixedClassNames.indicator),
         style: styles(fixedStyles.indicator),
       })}
     </div>

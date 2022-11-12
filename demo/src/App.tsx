@@ -23,7 +23,7 @@ export default function App() {
   }
 
   const [isNavActive, setIsNavActive] = useState(false)
-  const [hash, setHash] = useState<string | undefined>()
+  const [hash, setHash] = useState<string | undefined>('list')
 
   useEffect(() => {
     mapLocationToHash()
@@ -79,7 +79,6 @@ export default function App() {
           isDoubleJointed={true}
           isLastBarHalfWidth={true}
           thickness={6}
-          tintColor={isNavActive ? '#000' : '#fff'}
           width={36}
           onActivate={() => setIsNavActive(true)}
           onDeactivate={() => setIsNavActive(false)}
@@ -196,7 +195,7 @@ const StyledBurgerButton = styled(BurgerButton)`
   ${selectors.hwot} {
     transform: translate3d(0, 0, 10rem) rotateX(-5deg) rotateY(-20deg) scale(1.2);
 
-    .bar.index-2 {
+    .bar[data-index='2'] {
       width: 100% !important;
     }
   }

@@ -1,27 +1,18 @@
 import { animations, container, selectors } from 'promptu'
-import React, { HTMLAttributes, useState } from 'react'
-import styled, { css } from 'styled-components'
+import React, { useState } from 'react'
+import styled from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
-import Dropdown, { ItemComponentProps as DropdownItemComponentProps } from '../../../lib/Dropdown'
+import Dropdown, { DropdownItemProps } from '../../../lib/Dropdown'
 import List, { ListItemProps } from '../../../lib/List'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
-export type State = {
-  selectedItemIndex: number
-  selectedOrientationIndex: number
-}
-
-const DropdownItemComponent = ({ data, isSelected, onClick, style }: DropdownItemComponentProps) => (
-  <StyledDropdownItem
-    isSelected={isSelected ?? false}
-    style={style}
-    onClick={() => onClick?.()}
-  >
+const DropdownItem = ({ data, ...props }: DropdownItemProps) => (
+  <StyledDropdownItem {...props}>
     {data.label}
   </StyledDropdownItem>
 )
 
-const ListItem = ({ data, ...props }: ListItemProps<string> & HTMLAttributes<HTMLButtonElement>) => (
+const ListItem = ({ data, ...props }: ListItemProps<string>) => (
   <StyledListItem {...props}>
     {data}
   </StyledListItem>
@@ -37,61 +28,30 @@ export default function() {
       <StyledRoot className={orientation}>
         <StyledList
           data={[...new Array(60)].map((v, i) => `${i + 1}`)}
+          isSelectable={true}
           isTogglable={true}
+          itemComponentType={ListItem}
           itemPadding={20}
           orientation={orientation}
-          isSelectable={true}
           onDeselectAt={idx => setSelectedItemIndex(-1)}
           onSelectAt={idx => setSelectedItemIndex(idx)}
-        >
-          {({ ...props }) => <ListItem {...props}/>}
-        </StyledList>
+        />
       </StyledRoot>
-      <Dropdown
+      <StyledDropdown
         borderThickness={2}
-        itemPadding={10}
         data={[{ label: 'Vertical' }, { label: 'Horizontal' }]}
         defaultLabel='Select orientation'
-        defaultSelectedItemIndex={selectedOrientationIndex}
         expandIconSvg={$$ExpandIcon}
         isInverted={false}
-        itemComponentType={DropdownItemComponent}
+        itemComponentType={DropdownItem}
+        itemPadding={10}
         maxVisibleItems={-1}
-        onIndexChange={idx => setSelectedOrientationIndex(idx)}
         orientation='vertical'
-        buttonCSS={props => css`
-          font-size: 2rem;
-          font-weight: 700;
-          text-transform: uppercase;
-          transition: all .1s ease-out;
-
-          svg * {
-            transform: fill .1s ease-out;
-            fill: #000;
-          }
-
-          ${selectors.hwot} {
-            color: #fff;
-            background: #ff0054;
-            transform: translate3d(0, 0, 0) scale(1.2);
-
-            svg * {
-              transform: fill .1s ease-out;
-              fill: #fff;
-            }
-          }
-        `}
-        style={{
-          height: '6rem',
-          left: '0',
-          margin: '3rem',
-          position: 'fixed',
-          top: '0',
-          transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(20deg)',
-          width: '30rem',
-          zIndex: 10,
-        }}
-      />
+        selectedIndex={selectedOrientationIndex}
+        onIndexChange={idx => setSelectedOrientationIndex(idx)}
+      >
+        {/* <DropdownToggle className='toggle'/> */}
+      </StyledDropdown>
       <DebugConsole
         title='?: List+Dropdown'
         message={selectedItemIndex > -1 ? `<strong>[${orientation.toUpperCase()}]</strong> You selected item <strong>#${selectedItemIndex + 1}</strong>!` : 'No item selected!'}
@@ -101,23 +61,62 @@ export default function() {
   )
 }
 
-const StyledDropdownItem = styled.button<{
-  isSelected: boolean
-}>`
+const StyledDropdownItem = styled.button`
   ${container.fvcl}
   ${animations.transition(['background', 'color'], 100)}
-  background: ${props => props.isSelected ? '#ff0054' : '#fff'};
+  background: #fff;
   border-style: solid;
-  color: ${props => props.isSelected ? '#fff' : '#000'};
+  color: #000;
   flex: 0 0 auto;
   height: 100%;
   padding: 0 10px;
   text-align: left;
   width: 100%;
 
+  &.selected {
+    background: #ff0054;
+    color: #fff;
+  }
+
   ${selectors.hwot} {
     background: #ff0054;
     color: #fff;
+  }
+`
+
+const StyledDropdown = styled(Dropdown)`
+  height: 6rem;
+  left: 0;
+  margin: 3rem;
+  position: fixed;
+  top: 0;
+  transform: translate3d(0, 0, 0) rotateX(10deg) rotateY(20deg);
+  width: 30rem;
+  z-index: 10;
+
+  .toggle {
+    ${container.fhcc}
+    background: #fff;
+    font-size: 2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: all .1s ease-out;
+
+    svg * {
+      transform: fill .1s ease-out;
+      fill: #000;
+    }
+
+    ${selectors.hwot} {
+      color: #fff;
+      background: #ff0054;
+      transform: translate3d(0, 0, 0) scale(1.2);
+
+      svg * {
+        transform: fill .1s ease-out;
+        fill: #fff;
+      }
+    }
   }
 `
 
