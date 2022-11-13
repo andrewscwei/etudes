@@ -86,11 +86,11 @@ export default function App() {
         >
           <BurgerButtonBar className='bar'/>
         </StyledBurgerButton>
-        <WithTooltip hint='This is wrapped with WithTooltip!' backgroundColor='#fff' textColor='#000'>
+        <StyledWithTooltip hint='This is wrapped with WithTooltip!' backgroundColor='#fff' textColor='#000'>
           <StyledGithubButton href='https://github.com/andrewscwei/etudes'>
             <FlatSVG svg={$$GithubIcon} css={css`svg * { fill: #fff; }`}/>
           </StyledGithubButton>
-        </WithTooltip>
+        </StyledWithTooltip>
       </StyledHUDs>
     </>
   )
@@ -207,6 +207,13 @@ const StyledBurgerButton = styled(BurgerButton)`
     background: #fff;
     &.active { background: #000; }
   }
+`
+
+const StyledWithTooltip = styled(WithTooltip)`
+  color: #000;
+  padding: 10px 14px;
+  text-align: left;
+  transition: opacity 200ms ease-out;
 `
 
 const StyledGithubButton = styled.a`

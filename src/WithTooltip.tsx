@@ -1,25 +1,30 @@
-import React, { CSSProperties, HTMLAttributes, MouseEvent, useEffect, useRef } from 'react'
+import classNames from 'classnames'
+import React, { CSSProperties, HTMLAttributes, MouseEvent, PropsWithChildren, useEffect, useRef } from 'react'
 import { Rect, Size } from 'spase'
 import ExtractChild from './ExtractChild'
 import useElementRect from './hooks/useElementRect'
 import useViewportSize from './hooks/useViewportSize'
 import asStyleDict from './utils/asStyleDict'
+import styles from './utils/styles'
 
 type Alignment = 'tl' | 'tc' | 'tr' | 'cl' | 'cr' | 'bl' | 'bc' | 'br'
 
-export type WithToolTipProps = HTMLAttributes<HTMLElement> & {
+export type WithToolTipProps = Pick<HTMLAttributes<HTMLElement>, 'className' | 'style'> & PropsWithChildren<{
   /**
-   * The height of the arrow. The width (longest edge) of the arrow is always twice its height.
+   * The height of the arrow. The width (longest edge) of the arrow is always
+   * twice its height.
    */
   arrowHeight?: number
 
   /**
-   * Color of the dialog background, same format as a CSS color string (i.e. '#000').
+   * Color of the dialog background, same format as a CSS color string (i.e.
+   * '#000').
    */
   backgroundColor?: string
 
   /**
-   * Specifies if the tooltip should be disabled in touch devices (i.e. `html` has class `.touch`).
+   * Specifies if the tooltip should be disabled in touch devices (i.e. `html`
+   * has class `.touch`).
    */
   disabledOnTouch?: boolean
 
@@ -29,35 +34,39 @@ export type WithToolTipProps = HTMLAttributes<HTMLElement> & {
   hint: string
 
   /**
-   * The gap (in pixels) between the target element and the tooltip, defaults to zero.
+   * The gap (in pixels) between the target element and the tooltip, defaults to
+   * zero.
    */
   gap?: number
 
   /**
-   * Color of the dialog text, same format as a CSS color string (i.e. '#000').
+   * The maximum width (in pixels) of the hint text.
    */
-  textColor?: string
+  maxTextWidth?: number
 
   /**
-   * The minimum space (in pixels) between the target element and the edge of the window required to
-   * trigger an alignment change, defaults to `100px`.
+   * The minimum space (in pixels) between the target element and the edge of
+   * the window required to trigger an alignment change, defaults to `100px`.
    */
   threshold?: number
-}
+}>
 
 export default function WithTooltip({
+  children,
+  className,
+  style,
   arrowHeight = 8,
   backgroundColor = '#000',
   disabledOnTouch = true,
-  hint,
   gap = 5,
-  textColor = '#fff',
+  hint,
+  maxTextWidth = 200,
   threshold = 100,
-  ...props
 }: WithToolTipProps) {
   const createDialog = () => {
     const dialog = document.createElement('div')
-    Object.keys(fixedStyles.dialog).forEach(rule => (dialog.style as any)[rule] = (fixedStyles.dialog as any)[rule])
+    dialog.className = classNames(className)
+    Object.keys(styles(style, fixedStyles.dialog)).forEach(rule => (dialog.style as any)[rule] = (fixedStyles.dialog as any)[rule])
 
     const arrow = document.createElement('div')
     Object.keys(fixedStyles.arrow).forEach(rule => (arrow.style as any)[rule] = (fixedStyles.arrow as any)[rule])
@@ -159,8 +168,8 @@ export default function WithTooltip({
       opacity: '0',
       position: 'absolute',
       top: '0',
-      transition: 'opacity 200ms ease-out',
       width: `${rect.size.width}px`,
+      zIndex: '10000',
     },
     arrow: {
       borderStyle: 'solid',
@@ -169,24 +178,25 @@ export default function WithTooltip({
       pointerEvents: 'none',
       position: 'absolute',
       width: '0',
-      zIndex: '10001',
       ...makeDisplacementStyle(alignment, arrowHeight, gap),
       ...makeArrowPositionStyle(alignment, arrowHeight, gap, backgroundColor),
     },
     content: {
-      boxSizing: 'content-box',
-      fontSize: '12px',
-      maxWidth: '200px',
-      padding: '10px 14px',
-      textAlign: 'left',
       background: backgroundColor,
-      color: textColor,
-      content: hint,
+      boxSizing: 'content-box',
+      color: 'inherit',
+      fontFamily: 'inherit',
+      fontSize: 'inherit',
+      fontWeight: 'inherit',
+      letterSpacing: 'inherit',
+      lineHeight: 'inherit',
+      maxWidth: `${maxTextWidth}px`,
       overflow: 'hidden',
+      padding: 'inherit',
       pointerEvents: 'none',
       position: 'absolute',
-      transform: 'translate3d(0, 0, 0)',
-      zIndex: '10000',
+      textAlign: 'inherit',
+      transition: 'inherit',
       width: textSize.width > 0 ? `${textSize.width}px` : 'auto',
       ...makeDisplacementStyle(alignment, arrowHeight, gap),
       ...makeContentPositionStyle(alignment, arrowHeight, gap),
@@ -195,7 +205,7 @@ export default function WithTooltip({
 
   return (
     <ExtractChild
-      {...props}
+      children={children}
       ref={rootRef}
       onMouseEnter={mouseEnterHandler}
       onMouseLeave={mouseLeaveHandler}
