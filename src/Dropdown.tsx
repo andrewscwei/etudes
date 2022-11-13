@@ -194,7 +194,7 @@ export default forwardRef(({
 
   const components = asComponentDict(children, {
     toggle: DropdownToggle,
-    toggleIcon: DropdownToggleIcon,
+    Dropdo: DropdownExpandIcon,
   })
 
   const fixedClassNames = asClassNameDict({
@@ -208,7 +208,7 @@ export default forwardRef(({
       collapsed: isCollapsed,
       expanded: !isCollapsed,
     }),
-    toggleIcon: classNames(orientation, {
+    expandIcon: classNames(orientation, {
       togglable: isTogglable,
       collapsed: isCollapsed,
       expanded: !isCollapsed,
@@ -254,7 +254,7 @@ export default forwardRef(({
       letterSpacing: 'inherit',
       lineHeight: 'inherit',
     },
-    toggleIcon: {
+    expandIcon: {
 
     },
     list: {
@@ -300,7 +300,7 @@ export default forwardRef(({
       margin: '0',
       padding: '0 10px',
     },
-    toggleIcon: {
+    expandIcon: {
       height: '15px',
       margin: '0',
       padding: '0',
@@ -322,9 +322,9 @@ export default forwardRef(({
           onClick: () => toggle(),
         }, ...[
           <label style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: selectedIndex === -1 ? defaultLabel : data[selectedIndex].label ?? '' }}/>,
-          expandIconSvg && cloneStyledElement(components.toggleIcon ?? <FlatSVG svg={expandIconSvg} style={defaultStyles.toggleIcon}/>, {
-            className: classNames(fixedClassNames.toggleIcon),
-            style: styles(fixedStyles.toggleIcon),
+          cloneStyledElement(components.expandIcon ?? (expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>), {
+            className: classNames(fixedClassNames.expandIcon),
+            style: styles(fixedStyles.expandIcon),
           }),
         ])}
         <List
@@ -349,4 +349,4 @@ export default forwardRef(({
 
 export const DropdownToggle = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => <button {...props}/>
 
-export const DropdownToggleIcon = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
+export const DropdownExpandIcon = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>

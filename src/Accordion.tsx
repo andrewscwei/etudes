@@ -138,13 +138,13 @@ export default forwardRef(({
 
   const components = asComponentDict(children, {
     header: AccordionHeader,
-    headerIcon: AccordionHeaderIcon,
+    expandIcon: AccordionExpandIcon,
   })
 
   const fixedClassNames = asClassNameDict({
     root: classNames(orientation),
     header: classNames(orientation),
-    headerIcon: classNames(orientation),
+    expandIcon: classNames(orientation),
   })
 
   const fixedStyles = asStyleDict({
@@ -197,7 +197,7 @@ export default forwardRef(({
       lineHeight: 'inherit',
       transition: 'inherit',
     },
-    headerIcon: {
+    expandIcon: {
       margin: '0',
       padding: '0',
     },
@@ -235,7 +235,7 @@ export default forwardRef(({
         width: '50px',
       },
     },
-    headerIcon: {
+    expandIcon: {
       boxSizing: 'border-box',
       display: 'block',
       fill: '#000',
@@ -276,9 +276,9 @@ export default forwardRef(({
                 onClick: () => toggleSectionAt(sectionIdx),
               }, ...[
                 <label style={fixedStyles.headerLabel} dangerouslySetInnerHTML={{ __html: section.label }}/>,
-                expandIconSvg && cloneStyledElement(components.headerIcon ?? <FlatSVG svg={expandIconSvg} style={defaultStyles.headerIcon}/>, {
-                  className: classNames(fixedClassNames.headerIcon),
-                  style: styles(fixedStyles.headerIcon),
+                cloneStyledElement(components.expandIcon ?? (expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>), {
+                  className: classNames(fixedClassNames.expandIcon),
+                  style: styles(fixedStyles.expandIcon),
                 }),
               ])}
               <List
@@ -320,4 +320,4 @@ export default forwardRef(({
 
 export const AccordionHeader = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => <button {...props}/>
 
-export const AccordionHeaderIcon = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
+export const AccordionExpandIcon = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
