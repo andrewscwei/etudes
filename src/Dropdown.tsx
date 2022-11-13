@@ -194,7 +194,7 @@ export default forwardRef(({
 
   const components = asComponentDict(children, {
     toggle: DropdownToggle,
-    Dropdo: DropdownExpandIcon,
+    expandIcon: DropdownExpandIcon,
   })
 
   const fixedClassNames = asClassNameDict({
