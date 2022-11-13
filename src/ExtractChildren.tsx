@@ -1,24 +1,24 @@
-import classNames from 'classnames'
-import React, { Children, cloneElement, HTMLAttributes, isValidElement } from 'react'
+import React, { Children, HTMLAttributes, isValidElement } from 'react'
+import cloneStyledElement from './utils/cloneStyledElement'
 
-export type Props = HTMLAttributes<HTMLElement>
+export type ExtractChildrenProps = HTMLAttributes<HTMLElement>
 
 /**
  * Extracts all children of a parent component into its own component.
  */
 export default function ExtractChildren({
   children,
-  className,
   ...props
-}: Props) {
+}: ExtractChildrenProps) {
   return (
     <>
-      {Children.map(children, (child, idx) => {
+      {Children.map(children, child => {
         if (isValidElement(child)) {
-          return cloneElement(child, { className: classNames(className, child.props.className), ...props })
+          return cloneStyledElement(child, { ...props })
         }
-
-        return child
+        else {
+          return child
+        }
       })}
     </>
   )

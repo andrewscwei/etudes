@@ -3,14 +3,14 @@ import { Size } from 'spase'
 
 type ReturnedStates = {
   /**
-   * A tuple consisting of a stateful value indicating if the image is loading, and a function that
-   * updates the loading state.
+   * A tuple consisting of a stateful value indicating if the image is loading,
+   * and a function that updates the loading state.
    */
   isLoading: [boolean, Dispatch<SetStateAction<boolean>>]
 
   /**
-   * A tuple consisting of a stateful value representing the size of the image, and a function that
-   * updates the size.
+   * A tuple consisting of a stateful value representing the size of the image,
+   * and a function that updates the size.
    */
   imageSize: [Size | undefined, Dispatch<SetStateAction<Size | undefined>>]
 }
@@ -29,8 +29,8 @@ type Options = {
   onImageLoadError?: () => void
 
   /**
-   * Handler invoked when the image size changes. If there is no loaded image, the size is
-   * `undefined`.
+   * Handler invoked when the image size changes. If there is no loaded image,
+   * the size is `undefined`.
    *
    * @param size - The original image size.
    */

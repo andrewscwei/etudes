@@ -1,38 +1,26 @@
 import React, { ChangeEvent, FocusEvent, forwardRef, HTMLAttributes } from 'react'
-import styled from 'styled-components'
 
-export type Props = HTMLAttributes<HTMLInputElement> & {
+export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
   value?: string
   onFocus?: (value: string) => void
   onUnfocus?: (value: string) => void
   onValueChange?: (value: string) => void
 }
 
-export default forwardRef<HTMLInputElement, Props>(({
+export default forwardRef<HTMLInputElement, TextFieldProps>(({
   value = '',
   onFocus,
   onUnfocus,
   onValueChange,
   ...props
 }, ref) => (
-  <StyledRoot
+  <input
     {...props}
     ref={ref}
     type='text'
+    value={value}
+    onBlur={({ target }: FocusEvent<HTMLInputElement>) => onUnfocus?.(target.value)}
     onChange={({ target }: ChangeEvent<HTMLInputElement>) => onValueChange?.(target.value)}
     onFocus={({ target }: FocusEvent<HTMLInputElement>) => onFocus?.(target.value)}
-    onBlur={({ target }: FocusEvent<HTMLInputElement>) => onUnfocus?.(target.value)}
-    value={value}
   />
 ))
-
-const StyledRoot = styled.input`
-  background: #fff;
-  box-sizing: border-box;
-  color: #000;
-  display: block;
-  height: 40px;
-  padding: 0 1rem;
-  text-align: left;
-  width: 100px;
-`

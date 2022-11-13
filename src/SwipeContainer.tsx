@@ -1,8 +1,7 @@
-import React, { HTMLAttributes, useState } from 'react'
+import React, { forwardRef, HTMLAttributes, useState } from 'react'
 import { Point } from 'spase'
-import styled from 'styled-components'
 
-type Props = HTMLAttributes<HTMLDivElement> & {
+export type SwipeContainerProps = HTMLAttributes<HTMLDivElement> & {
   isEnabled?: boolean
   threshold?: number
   onSwipeDown?: () => void
@@ -12,9 +11,10 @@ type Props = HTMLAttributes<HTMLDivElement> & {
 }
 
 /**
- * An empty component with a backing `<div>` element that detects swipe gestures.
+ * An empty component with a backing `<div>` element that detects swipe
+ * gestures.
  */
-export default function SwipeContainer({
+export default forwardRef<HTMLDivElement, SwipeContainerProps>(({
   children,
   isEnabled = true,
   threshold = 0.5,
@@ -23,7 +23,7 @@ export default function SwipeContainer({
   onSwipeRight,
   onSwipeUp,
   ...props
-}: Props) {
+}, ref) => {
   const [dragStartPosition, setDragStartPosition] = useState<Point | undefined>(undefined)
   const [dragEndPosition, setDragEndPosition] = useState<Point | undefined>(undefined)
   const [dragStartTime, setDragStartTime] = useState(NaN)
@@ -90,21 +90,18 @@ export default function SwipeContainer({
   }
 
   return (
-    <StyledRoot
+    <div
       {...props}
-      onTouchStart={event => onDragStart(event.targetTouches[0].clientX, event.targetTouches[0].clientY)}
-      onTouchMove={event => onDragMove(event.targetTouches[0].clientX, event.targetTouches[0].clientY)}
-      onTouchEnd={() => onDragEnd()}
+      ref={ref}
       onMouseDown={event => onDragStart(event.clientX, event.clientY)}
+      onMouseLeave={() => onDragCancel()}
       onMouseMove={event => onDragMove(event.clientX, event.clientY)}
       onMouseUp={() => onDragEnd()}
-      onMouseLeave={() => onDragCancel()}
+      onTouchEnd={() => onDragEnd()}
+      onTouchMove={event => onDragMove(event.targetTouches[0].clientX, event.targetTouches[0].clientY)}
+      onTouchStart={event => onDragStart(event.targetTouches[0].clientX, event.targetTouches[0].clientY)}
     >
       {children}
-    </StyledRoot>
+    </div>
   )
-}
-
-const StyledRoot = styled.div`
-
-`
+})

@@ -1,6 +1,6 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import App from './containers/App'
+import App from './App'
 
 if (process.env.NODE_ENV === 'development') {
   window.localStorage.debug = 'demo*,etudes*'

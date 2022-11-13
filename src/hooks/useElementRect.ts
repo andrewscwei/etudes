@@ -3,7 +3,8 @@ import ResizeObserver from 'resize-observer-polyfill'
 import { Rect } from 'spase'
 
 /**
- * Hook for monitoring changes in and returning the size and position of the target element.
+ * Hook for monitoring changes in and returning the size and position of the
+ * target element.
  *
  * @param targetRef - Reference to the target element.
  *
@@ -15,11 +16,11 @@ export default function useElementRect(targetRef: RefObject<Element>): Rect {
 
   useEffect(() => {
     observerRef.current = new ResizeObserver(() => {
-      const rect = Rect.from(targetRef.current)
+      const newRect = Rect.from(targetRef.current)
 
-      if (!rect) return
+      if (!newRect) return
 
-      setRect(rect)
+      setRect(newRect)
     })
 
     if (observerRef.current && targetRef.current) {

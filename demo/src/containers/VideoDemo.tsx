@@ -1,49 +1,44 @@
-import { align, container } from 'promptu'
-import React, { Fragment, PureComponent } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
 import Video from '../../../lib/Video'
-import $$Video from '../assets/videos/video.mp4'
+import $$Video from '../assets/media/video.mp4'
 
-export interface Props {}
-
-export interface State {}
-
-export default class Container extends PureComponent<Props, State> {
-  render() {
-    return (
-      <Fragment>
-        <StyledRoot>
-          <StyledVideo
-            autoPlay={true}
-            autoLoop={true}
-            isCover={true}
-            src={$$Video}
-          />
-        </StyledRoot>
-        <DebugConsole
-          title='?: Video'
-          style={{
-            transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)',
-          }}
+export default function VideoDemo() {
+  return (
+    <>
+      <StyledRoot>
+        <StyledVideo
+          autoLoop={true}
+          autoPlay={true}
+          isCover={true}
+          src={$$Video}
         />
-      </Fragment>
-    )
-  }
+      </StyledRoot>
+      <DebugConsole
+        title='?: Video'
+        style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
+      />
+    </>
+  )
 }
 
 const StyledVideo = styled(Video)`
-  ${align.tl}
-  width: 100%;
   height: 100%;
+  left: 0;
+  margin: 0;
+  position: absolute;
+  top: 0;
   transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(10deg);
+  width: 100%;
 `
 
 const StyledRoot = styled.div`
-  ${container.box}
-  width: 100%;
+  box-sizing: border-box;
+  display: block;
   height: 100%;
-  padding: 3rem;
-  perspective: 80rem;
   overflow: hidden;
+  padding: 30px;
+  perspective: 800px;
+  width: 100%;
 `

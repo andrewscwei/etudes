@@ -1,8 +1,7 @@
-import React, { HTMLAttributes, ReactNode, useEffect, useState } from 'react'
-import styled from 'styled-components'
+import React, { forwardRef, HTMLAttributes, ReactNode, useEffect, useState } from 'react'
 
-export type Props = Omit<HTMLAttributes<HTMLButtonElement>, 'children'> & {
-  children?: (props: Pick<Props, 'isDeselectable' | 'isDisabled' | 'isSelected' | 'label'>) => ReactNode
+export type SelectableButtonProps = Omit<HTMLAttributes<HTMLButtonElement>, 'children'> & {
+  children?: (props: Pick<SelectableButtonProps, 'isDeselectable' | 'isDisabled' | 'isSelected' | 'label'>) => ReactNode
   isDeselectable?: boolean
   isDisabled?: boolean
   isSelected?: boolean
@@ -11,7 +10,7 @@ export type Props = Omit<HTMLAttributes<HTMLButtonElement>, 'children'> & {
   onSelect?: () => void
 }
 
-export default function SelectableButton({
+export default forwardRef<HTMLButtonElement, SelectableButtonProps>(({
   children,
   isDeselectable = false,
   isDisabled = false,
@@ -20,7 +19,7 @@ export default function SelectableButton({
   onDeselect,
   onSelect,
   ...props
-}: Props) {
+}, ref) => {
   const [isSelected, setIsSelected] = useState(externalIsSelected)
 
   const toggleSelection = () => {
@@ -42,14 +41,12 @@ export default function SelectableButton({
   }, [externalIsSelected])
 
   return (
-    <StyledRoot {...props} onClick={() => toggleSelection()} disabled={isDisabled || (isSelected && !isDeselectable)}>
+    <button
+      {...props}
+      ref={ref}
+      onClick={() => toggleSelection()} disabled={isDisabled || isSelected && !isDeselectable}
+    >
       {children?.({ isDeselectable, isDisabled, isSelected, label }) ?? label}
-    </StyledRoot>
+    </button>
   )
-}
-
-const StyledRoot = styled.button`
-  &[disabled] {
-    pointer-events: none;
-  }
-`
+})
