@@ -2,8 +2,8 @@ import { DependencyList, useEffect, useRef } from 'react'
 
 type Options = {
   /**
-   * Specifies if the handler should be invoked initially (as opposed to waiting for the specified
-   * interval for the initial invocation).
+   * Specifies if the handler should be invoked initially (as opposed to waiting
+   * for the specified interval for the initial invocation).
    */
   shouldInvokeInitially?: boolean
 }
@@ -17,7 +17,7 @@ type Options = {
  * @param deps - Dependencies that trigger this effect.
  */
 export default function useInterval(handler: () => void, timeout?: number, { shouldInvokeInitially = false }: Options = {}, deps?: DependencyList) {
-  const handlerRef = useRef<(() => void) | undefined>(undefined)
+  const handlerRef = useRef<(() => void)>()
 
   useEffect(() => {
     handlerRef.current = handler
@@ -28,6 +28,7 @@ export default function useInterval(handler: () => void, timeout?: number, { sho
 
     if (shouldInvokeInitially === true) handlerRef.current?.()
     const timer = window.setInterval(() => handlerRef.current?.(), timeout)
+
     return () => clearInterval(timer)
   }, [...deps ? deps : [], timeout])
 }

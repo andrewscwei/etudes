@@ -1,86 +1,92 @@
-import { container } from 'promptu'
 import React, { useState } from 'react'
 import { Size } from 'spase'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
 import Panorama from '../../../lib/Panorama'
 import PanoramaSlider from '../../../lib/PanoramaSlider'
-import Slider, { SliderEndingTrack, SliderKnob } from '../../../lib/Slider'
-import $$PanoramaImage from '../assets/images/panorama.jpg'
+import Slider, { SliderKnob } from '../../../lib/Slider'
+import $$PanoramaImage from '../assets/images/panorama.png'
 
-export default function() {
+export default function PanoramaDemo() {
   const [angle, setAngle] = useState(0)
   const [width, setWidth] = useState(800)
-  const [viewportSize, setViewportSize] = useState(new Size())
+  const [viewportSize, setViewportSize] = useState<Size>(new Size())
   const [zeroAnchor] = useState(0.5)
 
   return (
     <>
       <StyledRoot>
-        <Slider
+        <StyledSlider
+          isInverted={false}
           knobHeight={20}
           knobWidth={20}
-          onPositionChange={position => { setWidth(400 + position * 400) }}
           orientation='horizontal'
           position={(width - 400) / 400}
-          css={css`
-            ${SliderKnob} {
-              border-radius: 10px;
-            }
-            ${SliderEndingTrack} {
-              opacity: .6;
-            }
-          `}
-          style={{
-            transform: 'translate3d(0, 0, 0) rotateX(0deg) rotateY(-10deg)',
-            width: '40rem',
-            maxWidth: '80%',
-            marginBottom: '5rem',
-          }}
-        />
-        <Panorama
+          onPositionChange={position => { setWidth(400 + position * 400) }}
+        >
+          <SliderKnob className='knob'/>
+        </StyledSlider>
+        <StyledPanorama
+          style={{ width: `${width}px` }}
           angle={angle}
-          onAngleChange={(angle, isDragging) => { if (isDragging) setAngle(angle) }}
-          onResize={size => setViewportSize(size)}
           src={$$PanoramaImage}
           zeroAnchor={zeroAnchor}
-          style={{
-            height: '40rem',
-            transform: 'translate3d(0, 0, 0) rotateX(0deg) rotateY(-10deg)',
-            width: `${width}px`,
-            maxWidth: '80%',
-          }}
+          onAngleChange={(value, isDragging) => { if (isDragging) setAngle(value) }}
+          onResize={size => setViewportSize(size)}
         />
-        <PanoramaSlider
+        <StyledPanoramaSlider
           angle={angle}
-          onAngleChange={(angle, isDragging) => { if (isDragging) setAngle(angle) }}
           src={$$PanoramaImage}
           viewportSize={viewportSize}
           zeroAnchor={zeroAnchor}
-          style={{
-            marginTop: '3rem',
-            height: '8rem',
-            transform: 'translate3d(0, 0, 0) rotateX(0deg) rotateY(10deg)',
-          }}
+          onAngleChange={(value, isDragging) => { if (isDragging) setAngle(value) }}
         />
       </StyledRoot>
       <DebugConsole
-        title='?: Panorama+Slider'
         maxEntries={1}
         message={`Angle: ${Math.round(angle)}°`}
-        style={{
-          transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)',
-        }}
+        title='?: Panorama+Slider'
+        style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
       />
     </>
   )
 }
 
+const StyledSlider = styled(Slider)`
+  height: 4px;
+  margin-bottom: 50px;
+  max-width: 80%;
+  transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(-10deg);
+  width: 400px;
+
+  .knob {
+    background: #fff;
+    border-radius: 10px;
+  }
+`
+
+const StyledPanorama = styled(Panorama)`
+  height: 400px;
+  max-width: 80%;
+  transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(-10deg);
+`
+
+const StyledPanoramaSlider = styled(PanoramaSlider)`
+  height: 80px;
+  margin-top: 30px;
+  transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(10deg);
+`
+
 const StyledRoot = styled.div`
-  ${container.fvcc}
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
   height: 100%;
+  justify-content: center;
   overflow: hidden;
-  padding: 3rem;
-  perspective: 80rem;
+  padding: 30px;
+  perspective: 800px;
   width: 100%;
 `

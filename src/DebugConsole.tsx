@@ -1,150 +1,109 @@
-import React, { createRef, CSSProperties, PureComponent } from 'react'
-import styled from 'styled-components'
+import React, { CSSProperties, forwardRef, HTMLAttributes, useEffect, useRef, useState } from 'react'
+import Each from './Each'
+import asStyleDict from './utils/asStyleDict'
+import styles from './utils/styles'
 
-export interface Props {
-  className?: string
-  style: CSSProperties
-  margin: number
-  maxEntries: number
-  align: 'tl' | 'tc' | 'tr' | 'cl' | 'cc' | 'cr' | 'bl' | 'bc' | 'br'
+export type DebugConsoleProps = HTMLAttributes<HTMLDivElement> & {
+  align?: 'tl' | 'tc' | 'tr' | 'cl' | 'cc' | 'cr' | 'bl' | 'bc' | 'br'
+  margin?: number
+  maxEntries?: number
   message?: string
   title?: string
 }
 
-export interface State {
-  messages: string[]
-}
+export default forwardRef<HTMLDivElement, DebugConsoleProps>(({
+  align = 'br',
+  margin = 0,
+  maxEntries = -1,
+  message,
+  style = {},
+  title,
+  ...props
+}, ref) => {
+  const [messages, setMessages] = useState<string[]>([])
+  const messagesRef = useRef<HTMLDivElement>(null)
 
-export default class DebugConsole extends PureComponent<Props, State> {
-  static defaultProps: Partial<Props> = {
-    align: 'br',
-    margin: 0,
-    maxEntries: -1,
-    style: {},
-  }
-
-  nodeRefs = {
-    messages: createRef<HTMLDivElement>(),
-  }
-
-  constructor(props: Props) {
-    super(props)
-
-    this.state = {
-      messages: this.props.message ? [this.props.message] : [],
-    }
-  }
-
-  componentDidUpdate(prevProps: Props, prevState: State) {
-    if (prevProps.message !== this.props.message) {
-      this.push(this.props.message ?? '')
-    }
-
-    if (prevState.messages.length !== this.state.messages.length) {
-      const m = this.nodeRefs.messages.current?.scrollHeight ?? 0
-      this.nodeRefs.messages.current?.scrollTo(0, m)
-    }
-  }
-
-  push(message: string) {
-    if (this.props.maxEntries < 0) {
-      this.setState({
-        messages: [...this.state.messages, message],
-      })
+  useEffect(() => {
+    if (message === undefined) {
+      setMessages([])
     }
     else {
-      const n = this.state.messages.length
+      const numMessages = messages.length
 
-      this.setState({
-        messages: [...this.state.messages.slice(Math.max(0, n - (this.props.maxEntries - 1)), n), message],
-      })
+      setMessages([
+        ...maxEntries < 0
+          ? messages
+          : messages.slice(Math.max(0, numMessages - (maxEntries - 1)), numMessages),
+        message,
+      ])
     }
-  }
+  }, [message])
 
-  clear() {
-    this.setState({
-      messages: [],
-    })
-  }
+  useEffect(() => {
+    messagesRef.current?.scrollTo(0, messagesRef.current?.scrollHeight)
+  }, [messages])
 
-  render() {
-    return (
-      <StyledRoot
-        className={this.props.className}
-        style={{
-          ...this.props.style,
-          margin: 0,
-          position: 'fixed',
-          ...this.getStyleByAlignment(this.props.align),
-        }}
-      >
-        <h6>{this.props.title ?? 'Untitled'}</h6>
-        <div ref={this.nodeRefs.messages}>
-          {this.state.messages.map((v, i) => (
-            <span key={`item-${i}`} dangerouslySetInnerHTML={{ __html: v }}/>
-          ))}
-        </div>
-      </StyledRoot>
-    )
-  }
+  const fixedStyles = asStyleDict({
+    root: {
+      background: '#000',
+      fontFamily: 'monospace',
+      position: 'fixed',
+      width: '300px',
+    },
+    title: {
+      background: '#fff',
+      boxSizing: 'border-box',
+      color: '#000',
+      fontSize: '14px',
+      fontWeight: '700',
+      height: '30px',
+      lineHeight: '30px',
+      overflow: 'hidden',
+      padding: '0 10px',
+      textOverflow: 'ellipsis',
+      textTransform: 'uppercase',
+      whiteSpace: 'nowrap',
+      width: '100%',
+    },
+    messages: {
+      boxSizing: 'border-box',
+      color: '#fff',
+      fontSize: '12px',
+      lineHeight: '150%',
+      maxHeight: '200px',
+      minHeight: '100px',
+      overflowX: 'hidden',
+      overflowY: 'scroll',
+      padding: '10px',
+      WebkitOverflowScrolling: 'touch',
+      width: '100%',
+    },
+  })
 
-  private getStyleByAlignment(align: Props['align']): CSSProperties {
-    switch (align) {
-    case 'tl': return { top: `${this.props.margin}px`, left: `${this.props.margin}px` }
-    case 'tc': return { top: `${this.props.margin}px`, left: 0, right: 0, margin: '0 auto' }
-    case 'tr': return { top: `${this.props.margin}px`, right: `${this.props.margin}px` }
-    case 'cl': return { top: 0, left: `${this.props.margin}px`, bottom: 0, margin: 'auto 0' }
+  return (
+    <div
+      {...props}
+      ref={ref}
+      style={styles(style, fixedStyles.root, getStyleByAlignment(align, margin))}
+    >
+      <div style={fixedStyles.title}>{title ?? 'Untitled'}</div>
+      <div ref={messagesRef} style={fixedStyles.messages}>
+        <Each in={messages} render={msg => <div dangerouslySetInnerHTML={{ __html: msg }}/>}/>
+      </div>
+    </div>
+  )
+})
+
+function getStyleByAlignment(align: DebugConsoleProps['align'], margin: number): CSSProperties {
+  switch (align) {
+    case 'tl': return { top: `${margin}px`, left: `${margin}px` }
+    case 'tc': return { top: `${margin}px`, left: 0, right: 0, margin: '0 auto' }
+    case 'tr': return { top: `${margin}px`, right: `${margin}px` }
+    case 'cl': return { top: 0, left: `${margin}px`, bottom: 0, margin: 'auto 0' }
     case 'cc': return { top: 0, left: 0, right: 0, bottom: 0, margin: 'auto' }
-    case 'cr': return { top: 0, bottom: 0, right: `${this.props.margin}px`, margin: 'auto 0' }
-    case 'bl': return { bottom: `${this.props.margin}px`, left: `${this.props.margin}px` }
-    case 'bc': return { bottom: `${this.props.margin}px`, left: 0, right: 0, margin: '0 auto' }
-    default: return { bottom: `${this.props.margin}px`, right: `${this.props.margin}px` }
-    }
+    case 'cr': return { top: 0, bottom: 0, right: `${margin}px`, margin: 'auto 0' }
+    case 'bl': return { bottom: `${margin}px`, left: `${margin}px` }
+    case 'bc': return { bottom: `${margin}px`, left: 0, right: 0, margin: '0 auto' }
+    default: return { bottom: `${margin}px`, right: `${margin}px` }
   }
 }
-
-const StyledRoot = styled.div`
-  align-items: flex-start;
-  background: #000;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  font-family: monospace;
-  justify-content: flex-start;
-  max-height: 20rem;
-  min-height: 10rem;
-  width: 300px;
-
-  h6 {
-    background: #fff;
-    color: #000;
-    flex: 0 0 auto;
-    font-size: 20px;
-    font-weight: 700;
-    overflow: hidden;
-    padding: 10px;
-    text-overflow: ellipsis;
-    text-transform: uppercase;
-    white-space: nowrap;
-    width: 100%;
-  }
-
-  > div {
-    -webkit-overflow-scrolling: touch;
-    align-items: flex-start;
-    box-sizing: border-box;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    font-size: 14px;
-    justify-content: flex-start;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    padding: 10px 20px;
-    width: 100%;
-
-    > span:not(:last-child) {
-      margin-bottom: 2px;
-    }
-  }
-`

@@ -1,62 +1,85 @@
-import { container } from 'promptu'
-import React from 'react'
+import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
+import Each from '../../../lib/Each'
 import MasonryGrid from '../../../lib/MasonryGrid'
 
-export default function() {
-  const items = [...new Array(200)].map((v, i) => ({
+export default function MasonryGridDemo() {
+  const [itemIndex, setItemIndex] = useState(-1)
+
+  const items = useMemo(() => [...new Array(200)].map((v, i) => ({
     h: Math.floor(Math.random() * 6) + 1,
     b: Math.floor(Math.random() * 1) + 1,
-  }))
+  })), [])
 
   return (
     <>
       <StyledRoot>
-        <MasonryGrid
-          sections={6}
-          verticalSpacing={30}
+        <StyledMasonryGrid
+          horizontalSpacing={20}
           orientation='vertical'
-          horizontalSpacing={30}
-          style={{
-            width: '80%',
-            transform: 'translate3d(0, 0, 0) rotate3d(1, 1, 0, 2deg)',
-          }}
+          sections={6}
+          verticalSpacing={20}
         >
-          {items.map((v, i) => (
-            <StyledGridItem key={i} className={`h-${v.h} base-${v.b}`}>{i + 1}</StyledGridItem>
-          ))}
-        </MasonryGrid>
+          <Each in={items}>
+            {(val, idx) => (
+              <StyledGridItem className={`h-${val.h} base-${val.b}`} onClick={() => setItemIndex(idx)}>{idx + 1}</StyledGridItem>
+            )}
+          </Each>
+        </StyledMasonryGrid>
       </StyledRoot>
       <DebugConsole
+        message={itemIndex > -1 ? `You selected item <strong>#${itemIndex + 1}</strong>!` : 'No item seletected!'}
         title='?: Masonry Grid'
-        style={{
-          transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)',
-        }}
+        style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
       />
     </>
   )
 }
 
-const StyledGridItem = styled.div`
-  ${container.fvcc}
-  background: #ff0054;
-  color: #fff;
-  font-size: 2rem;
-  font-weight: 700;
+const StyledMasonryGrid = styled(MasonryGrid)`
+  transform: translate3d(0, 0, 0) rotate3d(1, 1, 0, 2deg);
+  width: 80%;
+`
 
-  &.h-1 { height: 4rem; }
-  &.h-2 { height: 8rem; }
-  &.h-3 { height: 12rem; }
-  &.h-4 { height: 16rem; }
-  &.h-5 { height: 20rem; }
-  &.h-6 { height: 24rem; }
+const StyledGridItem = styled.button`
+  align-items: center;
+  background: #fff;
+  border: none;
+  box-sizing: border-box;
+  color: #000;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  font-size: 20px;
+  font-weight: 700;
+  justify-content: center;
+  transition: all 100ms ease-out;
+
+  &.h-1 { height: 40px; }
+  &.h-2 { height: 80px; }
+  &.h-3 { height: 120px; }
+  &.h-4 { height: 160px; }
+  &.h-5 { height: 200px; }
+  &.h-6 { height: 240px; }
+
+  &:hover {
+    background: #ff0054;
+    color: #fff;
+    transform: translate3d(0, 0, 0) scale(1.1);
+  }
 `
 
 const StyledRoot = styled.div`
-  ${container.fvtc}
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
   height: 100%;
+  justify-content: flex-start;
   overflow-x: hidden;
-  perspective: 80rem;
+  perspective: 800px;
   width: 100%;
 `

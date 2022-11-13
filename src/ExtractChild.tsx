@@ -1,33 +1,33 @@
-import classNames from 'classnames'
-import _ from 'lodash'
-import React, { Children, cloneElement, forwardRef, HTMLAttributes, isValidElement } from 'react'
+import React, { Children, forwardRef, HTMLAttributes, isValidElement } from 'react'
+import cloneStyledElement from './utils/cloneStyledElement'
 
-export type Props = HTMLAttributes<HTMLElement>
+export type ExtractChildProps = HTMLAttributes<HTMLElement>
 
 /**
- * Extracts a single child of a parent component into its own component. If the parent component has
- * multiple children, only the first one will be extracted, the rest will be ignored.
+ * Extracts a single child of a parent component into its own component. If the
+ * parent component has multiple children, only the first one will be extracted,
+ * the rest will be ignored.
  */
-export default forwardRef<HTMLElement, Props>(({
+export default forwardRef<HTMLElement, ExtractChildProps>(({
   children,
-  className,
   ...props
 }, ref) => {
-  if (_.isArray(children)) {
-    /* eslint-disable-next-line no-console */
+  if (Array.isArray(children)) {
     console.error(`[etudes::ExtractChild] Only one child is expected, but found ${children.length}. Only the first child is extracted while the rest are discarded.`)
   }
 
   return (
     <>
       {Children.map(children, (child, idx) => {
-        if (idx > 0) return undefined
-
-        if (isValidElement(child)) {
-          return cloneElement(child, { className: classNames(className, child.props.className), ...props, ref })
+        if (idx > 0) {
+          return undefined
         }
-
-        return child
+        else if (isValidElement(child)) {
+          return cloneStyledElement(child, { ...props, ref } as any)
+        }
+        else {
+          return child
+        }
       })}
     </>
   )
