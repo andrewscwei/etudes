@@ -57,7 +57,6 @@ export default function WithTooltip({
   style,
   arrowHeight = 8,
   backgroundColor = '#000',
-  disabledOnTouch = true,
   gap = 5,
   hint,
   maxTextWidth = 200,
@@ -163,8 +162,11 @@ export default function WithTooltip({
 
   const fixedStyles = asStyleDict({
     dialog: {
+      background: 'none',
+      boxSizing: 'border-box',
       height: `${rect.size.height}px`,
       left: '0',
+      margin: '0',
       opacity: '0',
       position: 'absolute',
       top: '0',

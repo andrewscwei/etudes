@@ -189,6 +189,7 @@ export default forwardRef<HTMLDivElement, RangeSliderProps>(({
     },
     label: {
       pointerEvents: 'none',
+      position: 'relative',
       userSelect: 'none',
     },
   })

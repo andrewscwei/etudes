@@ -74,11 +74,6 @@ export type DropdownProps<T extends DropdownData = DropdownData> = HTMLAttribute
   orientation?: Orientation
 
   /**
-   * Color of the border of every item and the dropdown button itself.
-   */
-  borderColor?: string
-
-  /**
    * The label to appear on the dropdown button when no items are selected.
    */
   defaultLabel?: string
@@ -108,8 +103,7 @@ export default forwardRef(({
   children,
   className,
   style,
-  borderColor = '#000',
-  borderThickness = 1,
+  borderThickness = 0,
   data,
   defaultLabel = 'Select',
   expandIconSvg,
@@ -219,7 +213,7 @@ export default forwardRef(({
       collapsed: isCollapsed,
       expanded: !isCollapsed,
     }),
-    list: classNames(orientation, {
+    list: classNames({
       togglable: isTogglable,
       collapsed: isCollapsed,
       expanded: !isCollapsed,
@@ -243,6 +237,7 @@ export default forwardRef(({
       width: '100%',
     },
     toggle: {
+      borderWidth: `${borderThickness}px`,
       height: '100%',
       left: '0',
       margin: '0',

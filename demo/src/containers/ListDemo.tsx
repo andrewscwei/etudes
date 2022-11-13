@@ -1,8 +1,7 @@
-import { animations, container, selectors } from 'promptu'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
-import Dropdown, { DropdownItemProps } from '../../../lib/Dropdown'
+import Dropdown, { DropdownItemProps, DropdownToggle } from '../../../lib/Dropdown'
 import List, { ListItemProps } from '../../../lib/List'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
@@ -18,7 +17,7 @@ const ListItem = ({ data, ...props }: ListItemProps<string>) => (
   </StyledListItem>
 )
 
-export default function() {
+export default function ListDemo() {
   const [selectedItemIndex, setSelectedItemIndex] = useState(-1)
   const [selectedOrientationIndex, setSelectedOrientationIndex] = useState(0)
   const orientation = selectedOrientationIndex === 0 ? 'vertical' : 'horizontal'
@@ -38,19 +37,17 @@ export default function() {
         />
       </StyledRoot>
       <StyledDropdown
-        borderThickness={2}
         data={[{ label: 'Vertical' }, { label: 'Horizontal' }]}
         defaultLabel='Select orientation'
         expandIconSvg={$$ExpandIcon}
         isInverted={false}
         itemComponentType={DropdownItem}
-        itemPadding={10}
         maxVisibleItems={-1}
         orientation='vertical'
         selectedIndex={selectedOrientationIndex}
         onIndexChange={idx => setSelectedOrientationIndex(idx)}
       >
-        {/* <DropdownToggle className='toggle'/> */}
+        <DropdownToggle className='toggle'/>
       </StyledDropdown>
       <DebugConsole
         title='?: List+Dropdown'
@@ -62,15 +59,24 @@ export default function() {
 }
 
 const StyledDropdownItem = styled.button`
-  ${container.fvcl}
-  ${animations.transition(['background', 'color'], 100)}
+  align-items: flex-start;
   background: #fff;
-  border-style: solid;
+  border: none;
+  box-sizing: border-box;
   color: #000;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
   flex: 0 0 auto;
+  font-size: 16px;
+  font-weight: 700;
   height: 100%;
+  justify-content: center;
   padding: 0 10px;
   text-align: left;
+  text-transform: uppercase;
+  transition: all 100ms ease-out;
   width: 100%;
 
   &.selected {
@@ -78,42 +84,49 @@ const StyledDropdownItem = styled.button`
     color: #fff;
   }
 
-  ${selectors.hwot} {
+  &:hover {
     background: #ff0054;
     color: #fff;
   }
 `
 
 const StyledDropdown = styled(Dropdown)`
-  height: 6rem;
+  height: 60px;
   left: 0;
-  margin: 3rem;
+  margin: 30px;
   position: fixed;
   top: 0;
   transform: translate3d(0, 0, 0) rotateX(10deg) rotateY(20deg);
-  width: 30rem;
+  width: 300px;
   z-index: 10;
 
   .toggle {
-    ${container.fhcc}
+    align-items: center;
     background: #fff;
-    font-size: 2rem;
+    border: none;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    font-size: 16px;
     font-weight: 700;
+    justify-content: space-between;
+    padding: 10px;
     text-transform: uppercase;
-    transition: all .1s ease-out;
+    transition: all 100ms ease-out;
 
     svg * {
-      transform: fill .1s ease-out;
+      transform: fill 100ms ease-out;
       fill: #000;
     }
 
-    ${selectors.hwot} {
+    &:hover {
       color: #fff;
       background: #ff0054;
-      transform: translate3d(0, 0, 0) scale(1.2);
 
       svg * {
-        transform: fill .1s ease-out;
+        transform: fill 100ms ease-out;
         fill: #fff;
       }
     }
@@ -121,18 +134,26 @@ const StyledDropdown = styled(Dropdown)`
 `
 
 const StyledListItem = styled.button`
-  ${container.fvcc}
-  ${animations.transition('transform', 100)}
+  align-items: center;
   background: #fff;
+  box-sizing: border-box;
   color: #000;
-  font-size: 3rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  font-size: 30px;
   font-weight: 700;
+  justify-content: center;
   padding: 20px;
   transform-origin: center;
   transform: translate3d(0, 0, 0) scale(1);
+  transition: all 100ms ease-out;
   z-index: 0;
 
-  ${selectors.hwot} {
+  &:hover {
+    background: #ff0054;
+    color: #fff;
     transform: translate3d(0, 0, 0) scale(1.1);
     z-index: 1;
   }
@@ -166,18 +187,23 @@ const StyledList = styled(List<string>)`
 `
 
 const StyledRoot = styled.div`
-  padding: 10rem 3rem;
-  perspective: 80rem;
-  width: 100%;
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: nowrap;
   height: 100%;
+  justify-content: flex-start;
+  padding: 100px 30px;
+  perspective: 800px;
+  width: 100%;
 
   &.horizontal {
-    ${container.fhcl}
+    flex-direction: row;
     overflow-y: hidden;
   }
 
   &.vertical {
-    ${container.fvtc}
+    flex-direction: column;
     overflow-x: hidden;
   }
 `

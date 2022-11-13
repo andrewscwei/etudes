@@ -1,4 +1,3 @@
-import { animations, container, selectors } from 'promptu'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import Accordion, { AccordionHeader, AccordionItemProps } from '../../../lib/Accordion'
@@ -11,7 +10,7 @@ const AccordionItem = ({ data, ...props }: AccordionItemProps<string>) => (
   </StyledAccordionItem>
 )
 
-export default function() {
+export default function AccordionDemo() {
   const [itemIndex, setItemIndex] = useState(-1)
   const [sectionIndex, setSectionIndex] = useState(-1)
 
@@ -49,16 +48,23 @@ export default function() {
 }
 
 const StyledAccordionItem = styled.button`
-  ${container.fvcc}
-  ${animations.transition(['transform', 'background', 'color'], 100)}
+  align-items: flex-start;
   background: #fff;
   border-style: solid;
+  box-sizing: border-box;
   color: #000;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
   font-size: 16px;
-  padding: 20px;
+  justify-content: center;
+  padding: 10px;
+  text-align: left;
+  text-transform: uppercase;
   transform-origin: center;
   transform: translate3d(0, 0, 0) scale(1);
+  transition: all 100ms ease-out;
   z-index: 0;
 
   &.selected {
@@ -66,7 +72,7 @@ const StyledAccordionItem = styled.button`
     color: #fff;
   }
 
-  ${selectors.hwot} {
+  &:hover {
     background: #ff0054;
     color: #fff;
   }
@@ -74,23 +80,38 @@ const StyledAccordionItem = styled.button`
 
 const StyledAccordion = styled(Accordion<string>)`
   transform: translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg);
-  width: 30rem;
+  width: 300px;
 
   .header {
-    ${container.fhcs}
-    ${animations.transition('all', 100)}
+    align-items: center;
     background: #fff;
+    box-sizing: border-box;
     cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
     font-size: 16px;
     font-weight: 700;
+    cursor: pointer;
     height: 50px;
+    justify-content: space-between;
     line-height: 16px;
     padding: 10px;
     text-transform: uppercase;
+    transition: all 100ms ease-out;
 
-    ${selectors.hwot} {
-      transform: scale(1.2);
+    main {
+      transform: scale(1.1);
       z-index: 1;
+      background: #ff0054;
+      color: #fff;
+
+      svg * {
+        fill: #fff;
+      }
+    }
+
+    &:hover {
       background: #ff0054;
       color: #fff;
 
@@ -102,9 +123,14 @@ const StyledAccordion = styled(Accordion<string>)`
 `
 
 const StyledRoot = styled.div`
-  ${container.fhcc}
-  padding: 10rem 3rem;
-  perspective: 80rem;
-  width: 100%;
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   height: 100%;
+  justify-content: center;
+  padding: 100px 30px;
+  perspective: 800px;
+  width: 100%;
 `

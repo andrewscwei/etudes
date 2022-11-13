@@ -72,6 +72,7 @@ export default forwardRef<HTMLButtonElement, BurgerButtonProps>(({
 
   const fixedStyles = asStyleDict({
     root: {
+      background: 'transparent',
       border: 'none',
       display: 'block',
       height: `${height}px`,

@@ -1,11 +1,10 @@
-import { animations, container, selectors } from 'promptu'
 import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
 import Each from '../../../lib/Each'
 import MasonryGrid from '../../../lib/MasonryGrid'
 
-export default function() {
+export default function MasonryGridDemo() {
   const [itemIndex, setItemIndex] = useState(-1)
 
   const items = useMemo(() => [...new Array(200)].map((v, i) => ({
@@ -44,21 +43,28 @@ const StyledMasonryGrid = styled(MasonryGrid)`
 `
 
 const StyledGridItem = styled.button`
-  ${container.fvcc}
-  ${animations.transition(['transform', 'background', 'color'], 100)}
+  align-items: center;
   background: #fff;
+  border: none;
+  box-sizing: border-box;
   color: #000;
-  font-size: 2rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  font-size: 20px;
   font-weight: 700;
+  justify-content: center;
+  transition: all 100ms ease-out;
 
-  &.h-1 { height: 4rem; }
-  &.h-2 { height: 8rem; }
-  &.h-3 { height: 12rem; }
-  &.h-4 { height: 16rem; }
-  &.h-5 { height: 20rem; }
-  &.h-6 { height: 24rem; }
+  &.h-1 { height: 40px; }
+  &.h-2 { height: 80px; }
+  &.h-3 { height: 120px; }
+  &.h-4 { height: 160px; }
+  &.h-5 { height: 200px; }
+  &.h-6 { height: 240px; }
 
-  ${selectors.hwot} {
+  &:hover {
     background: #ff0054;
     color: #fff;
     transform: translate3d(0, 0, 0) scale(1.1);
@@ -66,9 +72,14 @@ const StyledGridItem = styled.button`
 `
 
 const StyledRoot = styled.div`
-  ${container.fvtc}
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
   height: 100%;
+  justify-content: flex-start;
   overflow-x: hidden;
-  perspective: 80rem;
+  perspective: 800px;
   width: 100%;
 `

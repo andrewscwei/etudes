@@ -280,6 +280,9 @@ export default forwardRef<HTMLDivElement, StepwiseSliderProps>(({
       width: '100%',
     },
     knobContainer: {
+      background: 'none',
+      border: 'none',
+      outline: 'none',
       position: 'absolute',
       transform: 'translate3d(-50%, -50%, 0)',
       zIndex: '1',

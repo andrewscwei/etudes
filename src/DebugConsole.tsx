@@ -52,6 +52,7 @@ export default forwardRef<HTMLDivElement, DebugConsoleProps>(({
     },
     title: {
       background: '#fff',
+      boxSizing: 'border-box',
       color: '#000',
       fontSize: '14px',
       fontWeight: '700',

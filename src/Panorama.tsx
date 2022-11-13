@@ -5,7 +5,7 @@ import useLoadImageEffect from './hooks/useLoadImageEffect'
 import useResizeEffect from './hooks/useResizeEffect'
 import asStyleDict from './utils/asStyleDict'
 
-export type PanoramaProps = HTMLAttributes<HTMLDivElement> & {
+export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'onResize'> & {
   /**
    * The current angle in degrees, 0.0 - 360.0, inclusive. When angle is 0 or
    * 360, the left bound of the image is at the center of the component.

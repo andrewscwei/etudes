@@ -1,11 +1,10 @@
-import { align, container } from 'promptu'
 import React from 'react'
 import styled from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
 import Video from '../../../lib/Video'
 import $$Video from '../assets/media/video.mp4'
 
-export default function() {
+export default function VideoDemo() {
   return (
     <>
       <StyledRoot>
@@ -25,17 +24,21 @@ export default function() {
 }
 
 const StyledVideo = styled(Video)`
-  ${align.tl}
   height: 100%;
+  left: 0;
+  margin: 0;
+  position: absolute;
+  top: 0;
   transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(10deg);
   width: 100%;
 `
 
 const StyledRoot = styled.div`
-  ${container.box}
+  box-sizing: border-box;
+  display: block;
   height: 100%;
   overflow: hidden;
-  padding: 3rem;
-  perspective: 80rem;
+  padding: 30px;
+  perspective: 800px;
   width: 100%;
 `

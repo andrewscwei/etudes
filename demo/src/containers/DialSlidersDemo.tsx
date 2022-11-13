@@ -1,13 +1,12 @@
-import { align, animations, container, selectors } from 'promptu'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
 import Dial, { DialKnob, DialTrack } from '../../../lib/Dial'
-import RangeSlider, { RangeSliderKnob, RangeSliderLabel } from '../../../lib/RangeSlider'
+import RangeSlider, { RangeSliderHighlight, RangeSliderKnob, RangeSliderLabel } from '../../../lib/RangeSlider'
 import Slider, { SliderKnob, SliderLabel, SliderTrack } from '../../../lib/Slider'
 import StepwiseSlider, { StepwiseSliderKnob, StepwiseSliderLabel, StepwiseSliderTrack } from '../../../lib/StepwiseSlider'
 
-export default function() {
+export default function DialSliders() {
   const getAngleByPosition = (position: number): number => position * (max - min) + min
 
   const [min, setMin] = useState(0)
@@ -73,6 +72,7 @@ export default function() {
         }}
       >
         <RangeSliderLabel className='label'/>
+        <RangeSliderHighlight className='highlight'/>
         <RangeSliderKnob className='knob'/>
       </StyledRangeSlider>
       <DebugConsole
@@ -86,7 +86,12 @@ export default function() {
 }
 
 const StyledDial = styled(Dial)`
-  ${align.cc}
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  right: 0;
+  top: 0;
 
   .knob {
     stroke: #fff;
@@ -99,53 +104,74 @@ const StyledDial = styled(Dial)`
 `
 
 const StyledRangeSlider = styled(RangeSlider)`
-  ${align.ftl}
   height: 4px;
+  left: 0;
+  margin: 0;
   margin: 8vh 4vw;
+  position: fixed;
+  top: 0;
   transform: translate3d(0, 0, 0) rotateX(20deg) rotateY(-20deg);
   width: 300px;
 
   .knob {
-    ${container.fvcc}
-    ${animations.transition('transform', 100)}
+    align-items: center;
     background: #fff;
     border-radius: 10px;
-    width: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
     height: 20px;
+    justify-content: center;
+    width: 20px;
 
-    ${selectors.hwot} {
-      transform: scale(1.2);
+    &:hover {
+      transform: scale(1.1);
     }
   }
 
+  .highlight {
+    background: #fff;
+  }
+
   .label {
-    ${animations.transition('opacity', 100)}
     color: #fff;
-    font-size: 2rem;
+    font-size: 20px;
     font-weight: 700;
     text-align: center;
     top: calc(100% + 10px);
+    transition: all 100ms ease-out;
   }
 `
 
 const StyledStepwiseSlider = styled(StepwiseSlider)`
-  ${align.cc}
-  height: 30rem;
-  transform: translate3d(5rem, 0, 0) rotateX(20deg) rotateY(-20deg);
+  bottom: 0;
+  height: 300px;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translate3d(50px, 0, 0) rotateX(20deg) rotateY(-20deg);
   width: 4px;
 
   .knob {
-    ${container.fvcc}
-    ${animations.transition('all', 100)}
+    align-items: center;
     background: #fff;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    transition: all 100ms ease-out;
 
-    ${selectors.hwot} {
-      transform: scale(1.2);
+    &:hover {
+      transform: scale(1.1);
     }
   }
 
   .label {
-    font-size: 1.8rem;
+    font-size: 18px;
     font-weight: 700;
   }
 
@@ -159,43 +185,56 @@ const StyledStepwiseSlider = styled(StepwiseSlider)`
 `
 
 const StyledSlider = styled(Slider)`
-  ${align.cc}
-  transform: translate3d(-5rem, 0, 0) rotateX(20deg) rotateY(-20deg);
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translate3d(-50px, 0, 0) rotateX(20deg) rotateY(-20deg);
   width: 4px;
 
   .knob {
-    ${container.fvcc}
-    ${animations.transition('all', 100)}
+    align-items: center;
     background: #fff;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
 
-    ${selectors.hwot} {
-      transform: scale(1.2);
+    &:hover {
+      transform: scale(1.1);
     }
   }
 
   .label {
-    font-size: 1.8rem;
+    font-size: 18px;
     font-weight: 700;
   }
 
   .track {
-    ${animations.transition('all', 100)}
     background: #fff;
 
     &.end {
       background: #666 !important;
     }
 
-    ${selectors.hwot} {
+    &:hover {
       transform: scale(1.1);
     }
   }
 `
 
 const StyledRoot = styled.div`
-  ${container.fhcc}
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   height: 100%;
-  padding: 10rem 3rem;
-  perspective: 80rem;
+  justify-content: center;
+  padding: 100px 30px;
+  perspective: 800px;
   width: 100%;
 `

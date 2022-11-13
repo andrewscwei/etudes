@@ -1,4 +1,3 @@
-import { container } from 'promptu'
 import React, { useState } from 'react'
 import { Size } from 'spase'
 import styled from 'styled-components'
@@ -8,10 +7,10 @@ import PanoramaSlider from '../../../lib/PanoramaSlider'
 import Slider, { SliderKnob } from '../../../lib/Slider'
 import $$PanoramaImage from '../assets/images/panorama.png'
 
-export default function() {
+export default function PanoramaDemo() {
   const [angle, setAngle] = useState(0)
   const [width, setWidth] = useState(800)
-  const [viewportSize, setViewportSize] = useState(new Size())
+  const [viewportSize, setViewportSize] = useState<Size>(new Size())
   const [zeroAnchor] = useState(0.5)
 
   return (
@@ -28,10 +27,10 @@ export default function() {
           <SliderKnob className='knob'/>
         </StyledSlider>
         <StyledPanorama
+          style={{ width: `${width}px` }}
           angle={angle}
           src={$$PanoramaImage}
           zeroAnchor={zeroAnchor}
-          style={{ width: `${width}px` }}
           onAngleChange={(value, isDragging) => { if (isDragging) setAngle(value) }}
           onResize={size => setViewportSize(size)}
         />
@@ -54,11 +53,11 @@ export default function() {
 }
 
 const StyledSlider = styled(Slider)`
-  height: .4rem;
-  margin-bottom: 5rem;
+  height: 4px;
+  margin-bottom: 50px;
   max-width: 80%;
   transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(-10deg);
-  width: 40rem;
+  width: 400px;
 
   .knob {
     background: #fff;
@@ -67,22 +66,27 @@ const StyledSlider = styled(Slider)`
 `
 
 const StyledPanorama = styled(Panorama)`
-  height: 40rem;
-  transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(-10deg);
+  height: 400px;
   max-width: 80%;
+  transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(-10deg);
 `
 
 const StyledPanoramaSlider = styled(PanoramaSlider)`
-  margin-top: 3rem;
-  height: 8rem;
+  height: 80px;
+  margin-top: 30px;
   transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(10deg);
 `
 
 const StyledRoot = styled.div`
-  ${container.fvcc}
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
   height: 100%;
+  justify-content: center;
   overflow: hidden;
-  padding: 3rem;
-  perspective: 80rem;
+  padding: 30px;
+  perspective: 800px;
   width: 100%;
 `

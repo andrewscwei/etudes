@@ -205,7 +205,7 @@ export default forwardRef<HTMLDivElement, PanoramaSliderProps>(({
       {...props}
       ref={ref}
       className={classNames(className, fixedClassNames.root)}
-      style={styles(style, fixedStyles.body)}
+      style={styles(style, fixedStyles.root)}
     >
       <Panorama
         angle={angle}
