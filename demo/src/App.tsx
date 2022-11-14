@@ -35,7 +35,7 @@ export default function App() {
           <div>
             <h1>Études</h1>
           </div>
-          <span>A study of styled React components</span>
+          <span>A study of headless React components</span>
         </StyledIntroduction>
       )
     }
