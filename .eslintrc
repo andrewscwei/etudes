@@ -94,12 +94,21 @@
     "@typescript-eslint/naming-convention": [
       "error",
       {
+        "selector" : [
+          "enumMember"
+        ],
+        "format": [
+          "UPPER_CASE"
+        ]
+      },
+      {
         "selector": [
           "variableLike",
           "property"
         ],
         "format": [
           "camelCase",
+          "snake_case",
           "PascalCase",
           "UPPER_CASE"
         ],
