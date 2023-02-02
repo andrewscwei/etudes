@@ -1,0 +1,99 @@
+import React, { createContext, PropsWithChildren, RefObject, useContext, useEffect, useState } from 'react'
+import { Point, Rect } from 'spase'
+
+type ScrollPosition = {
+  pos: Point
+  step: Point
+}
+
+type ScrollPositionContextValue = ScrollPosition & {
+  minPos: Point
+  maxPos: Point
+}
+
+type ScrollPositionProviderProps = PropsWithChildren
+
+export const ScrollPositionContext = createContext<ScrollPositionContextValue | undefined>(undefined)
+
+export default function ScrollPositionProvider({
+  children,
+}: ScrollPositionProviderProps) {
+  const [value, setValue] = useState<ScrollPositionContextValue>({
+    minPos: new Point(),
+    maxPos: new Point(),
+    pos: new Point(),
+    step: new Point(),
+  })
+
+  useEffect(() => {
+    const updateScrollPosition = () => {
+      const refRect = Rect.fromViewport()
+      const refRectMin = refRect.clone({ x: 0, y: 0 })
+      const refRectFull = Rect.from(window, { overflow: true })
+
+      if (!refRectFull) return
+
+      const refRectMax = refRectMin.clone({ x: refRectFull.width - refRect.width, y: refRectFull.height - refRect.height })
+      const step = new Point([refRect.left / refRectMax.left, refRect.top / refRectMax.top])
+
+      setValue({
+        minPos: new Point([refRectMin.left, refRectMin.top]),
+        maxPos: new Point([refRectMax.left, refRectMax.top]),
+        pos: new Point([refRect.left, refRect.top]),
+        step,
+      })
+    }
+
+    window.addEventListener('scroll', updateScrollPosition)
+    window.addEventListener('resize', updateScrollPosition)
+    window.addEventListener('orientationchange', updateScrollPosition)
+
+    updateScrollPosition()
+
+    return () => {
+      window.removeEventListener('scroll', updateScrollPosition)
+      window.removeEventListener('resize', updateScrollPosition)
+      window.removeEventListener('orientationchange', updateScrollPosition)
+    }
+  }, [])
+
+  return (
+    <ScrollPositionContext.Provider value={value}>
+      {children}
+    </ScrollPositionContext.Provider>
+  )
+}
+
+export function useScrollPosition(targetRef?: RefObject<Element>): ScrollPosition {
+  const context = useContext(ScrollPositionContext)
+  if (!context) throw Error('Cannot fetch the current scroll position context, is the corresponding provider instated?')
+
+  if (!targetRef) {
+    return {
+      pos: context.pos,
+      step: context.step,
+    }
+  }
+
+  const element = targetRef.current
+
+  const refRect = Rect.fromViewport()
+  const rect = Rect.from(element)
+
+  if (!refRect || !rect) {
+    return {
+      pos: new Point(),
+      step: new Point(),
+    }
+  }
+
+  const posX = refRect.right - rect.left
+  const posY = refRect.bottom - rect.top
+  const stepX = posX / rect.width
+  const stepY = posY / rect.height
+
+  return {
+    pos: new Point([posX, posY]),
+    step: new Point([stepX, stepY]),
+  }
+}
