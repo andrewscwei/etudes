@@ -1,6 +1,6 @@
 {
   "name": "etudes",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "A study of headless React components",
   "main": "lib",
   "scripts": {
@@ -71,7 +71,7 @@
     "interactjs": "^1.10.18",
     "react-transition-group": "^4.4.5",
     "resize-observer-polyfill": "^1.5.1",
-    "spase": "^6.5.0"
+    "spase": "^6.6.0"
   },
   "peerDependencies": {
     "react": "^18.2.0"
