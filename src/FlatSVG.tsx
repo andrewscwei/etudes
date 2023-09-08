@@ -1,4 +1,5 @@
-import React, { forwardRef, HTMLAttributes } from 'react'
+import { XMLBuilder, XMLParser } from 'fast-xml-parser'
+import React, { HTMLAttributes, forwardRef } from 'react'
 
 export type FlatSVGProps = HTMLAttributes<HTMLDivElement> & {
   /**
@@ -53,22 +54,40 @@ export default forwardRef<HTMLDivElement, FlatSVGProps>(({
   whitelistedAttributes = ['viewBox'],
   ...props
 }, ref) => {
+  const attributeNamePrefix = '@_'
+
   const sanitizedMarkup = () => {
-    const mockContainer = document.createElement('div')
-    mockContainer.innerHTML = svg
+    const parser = new XMLParser({
+      attributeNamePrefix,
+      ignoreAttributes: false,
+      ignoreDeclaration: true,
+      ignorePiTags: true,
+      removeNSPrefix: true,
+      trimValues: true,
+      updateTag: (tagName, jPath, attrs) => {
+        if (stripStyles && tagName === 'style') return false
 
-    const elements = mockContainer.getElementsByTagName('svg')
-    if (elements.length > 1) throw new Error('More than one SVG element found in provided markup')
+        const attrNames = Object.keys(attrs)
 
-    const svgElement = elements[0]
-    if (!svgElement) throw new Error('No SVG in provided markup')
+        for (const attrName of attrNames) {
+          if (stripIds && attrName.toLowerCase() === `${attributeNamePrefix}id`) delete attrs[attrName]
+          if (stripClasses && attrName.toLowerCase() === `${attributeNamePrefix}class`) delete attrs[attrName]
+          if (stripStyles && attrName.toLowerCase() === `${attributeNamePrefix}style`) delete attrs[attrName]
+        }
 
-    if (stripExtraneousAttributes) removeAttributes(svgElement, undefined, false, [...whitelistedAttributes, 'style', 'class', 'id'])
-    if (stripIds) removeAttributes(svgElement, ['id'], true)
-    if (stripClasses) removeAttributes(svgElement, ['class'], true)
-    if (stripStyles) removeStyles(svgElement)
+        return tagName
+      },
+    })
 
-    return svgElement.outerHTML
+    const builder = new XMLBuilder({
+      attributeNamePrefix,
+      format: true,
+      ignoreAttributes: false,
+    })
+
+    const xml = parser.parse(svg)
+
+    return builder.build(xml)
   }
 
   return (
@@ -79,40 +98,3 @@ export default forwardRef<HTMLDivElement, FlatSVGProps>(({
     />
   )
 })
-
-function removeStyles(element: Element) {
-  element.removeAttribute('style')
-
-  const inlineStyles = element.getElementsByTagName('style')
-  const numInlineStyles = inlineStyles.length
-
-  for (let i = 0; i < numInlineStyles; i++) {
-    const inlineStyle = inlineStyles[i]
-    inlineStyle.remove()
-  }
-
-  const numChildren = element.children.length
-
-  for (let i = 0; i < numChildren; i++) {
-    removeStyles(element.children[i])
-  }
-}
-
-function removeAttributes(element: Element, attributes: string[] | undefined = undefined, recursive = false, whitelist: string[] = []) {
-  const attrs = attributes ?? element.getAttributeNames()
-  const numAttrs = attrs.length
-
-  for (let i = 0; i < numAttrs; i++) {
-    const attr = attrs[i]
-    const keep = whitelist.indexOf(attr) > -1
-    if (!keep) element.removeAttribute(attr)
-  }
-
-  if (recursive) {
-    const numChildren = element.children.length
-
-    for (let i = 0; i < numChildren; i++) {
-      removeAttributes(element.children[i], attributes, recursive, whitelist)
-    }
-  }
-}
