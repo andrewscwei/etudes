@@ -64,8 +64,9 @@ export default function WithTooltip({
 }: WithToolTipProps) {
   const createDialog = () => {
     const dialog = document.createElement('div')
+    const dialogStyle = styles(style, fixedStyles.dialog)
     dialog.className = classNames(className)
-    Object.keys(styles(style, fixedStyles.dialog)).forEach(rule => (dialog.style as any)[rule] = (fixedStyles.dialog as any)[rule])
+    Object.keys(dialogStyle).forEach(rule => (dialog.style as any)[rule] = (dialogStyle as any)[rule])
 
     const arrow = document.createElement('div')
     Object.keys(fixedStyles.arrow).forEach(rule => (arrow.style as any)[rule] = (fixedStyles.arrow as any)[rule])
