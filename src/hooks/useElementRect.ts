@@ -6,7 +6,7 @@ import { Rect } from 'spase'
  * Hook for monitoring changes in and returning the size and position of the
  * target element.
  *
- * @param targetRef - Reference to the target element.
+ * @param targetRef Reference to the target element.
  *
  * @returns The most current {@link Rect} of the target element.
  */

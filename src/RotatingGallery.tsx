@@ -36,7 +36,7 @@ export type RotatingGalleryProps = HTMLAttributes<HTMLDivElement> & PropsWithChi
   /**
    * Handler invoked when the image index changes.
    *
-   * @param index - The current image index.
+   * @param index The current image index.
    */
   onIndexChange?: (index: number) => void
 }>
@@ -44,8 +44,8 @@ export type RotatingGalleryProps = HTMLAttributes<HTMLDivElement> & PropsWithChi
 /**
  * A component displaying rotating images.
  *
- * @exports RotatingGalleryImage - Component for each rotating image, classes:
- *                                 `entering`, `entered`, `exiting`, `exited`.
+ * @exports RotatingGalleryImage Component for each rotating image, classes:
+ *                               `entering`, `entered`, `exiting`, `exited`.
  */
 export default forwardRef<HTMLDivElement, RotatingGalleryProps>(({
   children,

@@ -233,9 +233,9 @@ export default forwardRef<HTMLDivElement, MasonryGridProps>(({
  * Computes the index and current length of the next available section for a
  * specific base value, based on a provided array of existing section lengths.
  *
- * @param currentSectionLengths - An array of the current section lengths.
- * @param base - The base value of the item to be inserted into the grid, and to
- *               be used to evaluate the next available section.
+ * @param currentSectionLengths An array of the current section lengths.
+ * @param base The base value of the item to be inserted into the grid, and to
+ *             be used to evaluate the next available section.
  *
  * @returns An array consiting of the computed section index and its to-be
  *          length if a new item were to be placed in it.
@@ -276,11 +276,11 @@ function computeNextAvailableSectionAndLengthByBase(currentSectionLengths: numbe
  * A helper function that computes the max section length of an array of section
  * lengths. Only the first n = `base` sections are inspected.
  *
- * @param currentSectionLengths - An array of section lengths.
- * @param base - The number representing the first n sections to inspect. Any
- *               non-numerical values will be ignored and return value will be
- *               based on all sections. A `base` value will be clamped between 1
- *               and the maximum length of the array of section lengths.
+ * @param currentSectionLengths An array of section lengths.
+ * @param base The number representing the first n sections to inspect. Any
+ *             non-numerical values will be ignored and return value will be
+ *             based on all sections. A `base` value will be clamped between 1
+ *             and the maximum length of the array of section lengths.
  *
  * @returns The max section length.
  */
@@ -297,8 +297,8 @@ function computeMaxLength(currentSectionLengths: number[], base?: number): numbe
 /**
  * Computes the base value of an element from its classes.
  *
- * @param element - The HTML element.
- * @param numSections - Total number of sections.
+ * @param element The HTML element.
+ * @param numSections Total number of sections.
  *
  * @returns The computed base value that is clamped between 1 and max number of
  *          sections.

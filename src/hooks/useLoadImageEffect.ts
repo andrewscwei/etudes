@@ -19,7 +19,7 @@ type Options = {
   /**
    * Handler invoked when the image is done loading.
    *
-   * @param imageElement - The loaded image element.
+   * @param imageElement The loaded image element.
    */
   onImageLoadComplete?: (imageElement: HTMLImageElement) => void
 
@@ -32,7 +32,7 @@ type Options = {
    * Handler invoked when the image size changes. If there is no loaded image,
    * the size is `undefined`.
    *
-   * @param size - The original image size.
+   * @param size The original image size.
    */
   onImageSizeChange?: (size?: Size) => void
 }
@@ -44,9 +44,9 @@ function getImageSize(imageElement: HTMLImageElement): Size {
 /**
  * Hook for preloading an image.
  *
- * @param src - The image source.
- * @param options - See {@link Options}.
- * @param deps - Additional dependencies.
+ * @param src The image source.
+ * @param options See {@link Options}.
+ * @param deps Additional dependencies.
  *
  * @returns See {@link ReturnedStates}.
  */

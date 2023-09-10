@@ -6,7 +6,7 @@ type Options = {
   /**
    * Handler invoked when the target element resizes.
    *
-   * @param size - The current size of the target element.
+   * @param size The current size of the target element.
    */
   onResize?: (size: Size) => void
 }
@@ -14,9 +14,9 @@ type Options = {
 /**
  * Hook for monitoring the resizing event of the target element.
  *
- * @param targetRef - Reference to the target element.
- * @param options - See {@link Options}.
- * @param deps - Additional dependencies.
+ * @param targetRef Reference to the target element.
+ * @param options See {@link Options}.
+ * @param deps Additional dependencies.
  *
  * @returns A tuple consisting of a stateful value indicating the size of the
  *          target ref, and a function that sets its size.

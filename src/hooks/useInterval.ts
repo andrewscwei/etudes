@@ -11,10 +11,10 @@ type Options = {
 /**
  * Hoook for invoking a method repeatedly on every set interval.
  *
- * @param handler - The method to invoke on every interval.
- * @param timeout - Time (in milliseconds) between each invocation.
- * @param options - See {@link Options}.
- * @param deps - Dependencies that trigger this effect.
+ * @param handler The method to invoke on every interval.
+ * @param timeout Time (in milliseconds) between each invocation.
+ * @param options See {@link Options}.
+ * @param deps Dependencies that trigger this effect.
  */
 export default function useInterval(handler: () => void, timeout?: number, { shouldInvokeInitially = false }: Options = {}, deps?: DependencyList) {
   const handlerRef = useRef<(() => void)>()

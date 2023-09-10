@@ -23,7 +23,7 @@ export type BurgerButtonProps = HTMLAttributes<HTMLButtonElement> & PropsWithChi
  * Three-striped burger button component that transforms into an "X" when
  * selected.
  *
- * @exports BurgerButtonBar - Component for each line on the burger button.
+ * @exports BurgerButtonBar Component for each line on the burger button.
  */
 export default forwardRef<HTMLButtonElement, BurgerButtonProps>(({
   children,

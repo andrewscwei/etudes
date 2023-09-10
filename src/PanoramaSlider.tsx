@@ -38,11 +38,11 @@ export type PanoramaSliderProps = HTMLAttributes<HTMLDivElement> & PanoramaProps
 /**
  * A slider for a {@link Panorama} component.
  *
- * @exports PanoramaSliderIndicator - The indicator that appears when the slider
- *                                    is being dragged.
- * @exports PanoramaSliderReticle - The reticle that indicates the FOV of the
- *                                  backing {@link Panorama}.
- * @exports PanoramaSliderTrack - The slide track.
+ * @exports PanoramaSliderIndicator The indicator that appears when the slider
+ *                                  is being dragged.
+ * @exports PanoramaSliderReticle The reticle that indicates the FOV of the
+ *                                backing {@link Panorama}.
+ * @exports PanoramaSliderTrack The slide track.
  */
 export default forwardRef<HTMLDivElement, PanoramaSliderProps>(({
   className,

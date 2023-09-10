@@ -20,11 +20,11 @@ type Options<T> = Omit<InteractDraggableOptions, 'onstart' | 'onmove' | 'onend'>
    * A function that transforms the drag move delta values to the associated
    * value of this hook.
    *
-   * @param currentValue - The current associated value.
-   * @param dx - The displacement on the x-axis (in pixels) since the last
-   *             emitted drag move event.
-   * @param dy - The displacement on the y-axis (in pixels) since the last
-   *             emitted drag move event.
+   * @param currentValue The current associated value.
+   * @param dx The displacement on the x-axis (in pixels) since the last emitted
+   *           drag move event.
+   * @param dy The displacement on the y-axis (in pixels) since the last emitted
+   *           drag move event.
    *
    * @returns The transformed value.
    */
@@ -38,10 +38,10 @@ type Options<T> = Omit<InteractDraggableOptions, 'onstart' | 'onmove' | 'onend'>
   /**
    * Handler invoked when dragging.
    *
-   * @param dx - The displacement on the x-axis (in pixels) since the last
-   *             emitted drag move event.
-   * @param dy - The displacement on the y-axis (in pixels) since the last
-   *             emitted drag move event.
+   * @param dx The displacement on the x-axis (in pixels) since the last emitted
+   *           drag move event.
+   * @param dy The displacement on the y-axis (in pixels) since the last emitted
+   *           drag move event.
    */
   onDragMove?: (dx: number, dy: number) => void
 
@@ -54,11 +54,11 @@ type Options<T> = Omit<InteractDraggableOptions, 'onstart' | 'onmove' | 'onend'>
 /**
  * Hook for adding effectful dragging interaction to an element.
  *
- * @param targetRef - The reference to the target element to add drag
- *                    interaction to.
- * @param options - Additional options which include options for
- *                  `module:interactjs.draggable`.
- * @param deps - Dependencies that trigger this effect.
+ * @param targetRef The reference to the target element to add drag interaction
+ *                  to.
+ * @param options Additional options which include options for
+ *                `module:interactjs.draggable`.
+ * @param deps Dependencies that trigger this effect.
  *
  * @returns The states created for this effect.
  */
@@ -76,7 +76,7 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
    * states are asynchronous by nature, this reference object is used to cache
    * time-sensitive value changes while drag event happens.
    *
-   * @param value - The value to set the associated value to.
+   * @param value The value to set the associated value to.
    *
    * @returns `true` if the value was set, `false` otherwise.
    */
