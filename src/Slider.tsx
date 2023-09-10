@@ -58,7 +58,7 @@ export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
    * A function that returns the label to be displayed at a given slider
    * position.
    *
-   * @param position - The current slider position.
+   * @param position The current slider position.
    *
    * @returns The label.
    */
@@ -71,8 +71,8 @@ export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
    * `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here is
    * still `true`.
    *
-   * @param position - The current slider position.
-   * @param isDragging - Specifies if the position change is due to dragging.
+   * @param position The current slider position.
+   * @param isDragging Specifies if the position change is due to dragging.
    */
   onPositionChange?: (position: number, isDragging: boolean) => void
 
@@ -96,10 +96,10 @@ export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
  * width and height of the knob are set via props (`knobWidth` and `knobHeight`,
  * respectively). The size of the knob does not impact the size of the slider.
  *
- * @exports SliderKnob - The component for the knob.
- * @exports SliderLabel - The component for the label on the knob.
- * @exports SliderTrack - The component for the slide track on either side of
- *                        the knob.
+ * @exports SliderKnob The component for the knob.
+ * @exports SliderLabel The component for the label on the knob.
+ * @exports SliderTrack The component for the slide track on either side of the
+ *                        knob.
  */
 export default forwardRef<HTMLDivElement, SliderProps>(({
   children,

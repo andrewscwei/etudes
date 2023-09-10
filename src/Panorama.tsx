@@ -35,8 +35,8 @@ export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'onResize'> & {
    * Handler invoked when the positionchanges. This can either be invoked from
    * the `angle` prop being changed or from the image being dragged.
    *
-   * @param position - The current position.
-   * @param isDragging - Specifies if the position change is due to dragging.
+   * @param position The current position.
+   * @param isDragging Specifies if the position change is due to dragging.
    */
   onPositionChange?: (position: number, isDragging: boolean) => void
 
@@ -46,8 +46,8 @@ export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'onResize'> & {
    * being double-binded, ensure that the value is only being set by this
    * handler when `isDragging` is `true` to avoid potential update overflow.
    *
-   * @param angle - The current angle.
-   * @param isDragging - Specifies if the angle change is due to dragging.
+   * @param angle The current angle.
+   * @param isDragging Specifies if the angle change is due to dragging.
    */
   onAngleChange?: (angle: number, isDragging: boolean) => void
 
@@ -69,7 +69,7 @@ export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'onResize'> & {
   /**
    * Handler invoked when the image is done loading.
    *
-   * @param imageElement - The loaded image element.
+   * @param imageElement The loaded image element.
    */
   onImageLoadComplete?: (imageElement: HTMLImageElement) => void
 
@@ -82,7 +82,7 @@ export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'onResize'> & {
    * Handler invoked when the image size changes. This is the actual size of the
    * loaded image. When no images are loaded yet, the size is `undefined`.
    *
-   * @param size - The actual size of the loaded iamge. If no images are loaded
+   * @param size The actual size of the loaded iamge. If no images are loaded
    *               yet, the size is `undefined`.
    */
   onImageSizeChange?: (size?: Size) => void
@@ -90,7 +90,7 @@ export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'onResize'> & {
   /**
    * Handler invoked when the size of this component changes.
    *
-   * @param size - The size of this component.
+   * @param size The size of this component.
    */
   onResize?: (size: Size) => void
 }

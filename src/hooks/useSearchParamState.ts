@@ -9,8 +9,8 @@ export type Options<T> = {
    * Function for transforming the search param value to the value of the mapped
    * state.
    *
-   * @param value - The search param value. `undefined` means the value is
-   *                unavailable.
+   * @param value The search param value. `undefined` means the value is
+   *              unavailable.
    *
    * @returns The equivalent state value.
    */
@@ -20,7 +20,7 @@ export type Options<T> = {
    * Function for transforming the value of the mapped state to the search param
    * value.
    *
-   * @param state - The state value.
+   * @param state The state value.
    *
    * @returns The equivalent search param value.
    */
@@ -31,9 +31,9 @@ export type Options<T> = {
  * Hook for mapping a search param to a state. Whenever the value of the target
  * search param changes, the mapped state will change as well, and vice versa.
  *
- * @param param - The search param key.
- * @param defaultValue - The default value of the state.
- * @param options - See {@link Options}.
+ * @param param The search param key.
+ * @param defaultValue The default value of the state.
+ * @param options See {@link Options}.
  *
  * @returns A tuple consisting of a stateful value representing the current
  *          value of the mapped state and a function that updates it.

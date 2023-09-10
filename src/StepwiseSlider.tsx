@@ -70,8 +70,8 @@ export type StepwiseSliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChil
    * A function that returns the label to be displayed at a given slider
    * position and closest step index (if steps are provided).
    *
-   * @param position - The current slider position.
-   * @param index - The nearest step index (if steps are provided), or -1 if no
+   * @param position The current slider position.
+   * @param index The nearest step index (if steps are provided), or -1 if no
    *                steps are provided.
    *
    * @returns The label.
@@ -85,8 +85,8 @@ export type StepwiseSliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChil
    * `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here is
    * still `true`. This event is emitted right after `onPositionChange`.
    *
-   * @param index - The current slider index.
-   * @param isDragging - Specifies if the index change is due to dragging.
+   * @param index The current slider index.
+   * @param isDragging Specifies if the index change is due to dragging.
    */
   onIndexChange?: (index: number, isDragging: boolean) => void
 
@@ -97,8 +97,8 @@ export type StepwiseSliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChil
    * `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here is
    * still `true`. This event is emitted right before `onIndexChange`.
    *
-   * @param position - The current slider position.
-   * @param isDragging - Specifies if the position change is due to dragging.
+   * @param position The current slider position.
+   * @param isDragging Specifies if the position change is due to dragging.
    */
   onPositionChange?: (position: number, isDragging: boolean) => void
 
@@ -126,10 +126,10 @@ export type StepwiseSliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChil
  * the slider. While dragging, the slider still emits a position change event,
  * where the position is a decimal ranging between 0.0 and 1.0, inclusive.
  *
- * @exports StepwiseSliderKnob - The component for the knob.
- * @exports StepwiseSliderLabel - The component for the label on the knob.
- * @exports StepwiseSliderTrack - The component for the slide track on either
- *                                side of the knob.
+ * @exports StepwiseSliderKnob The component for the knob.
+ * @exports StepwiseSliderLabel The component for the label on the knob.
+ * @exports StepwiseSliderTrack The component for the slide track on either side
+ *                                of the knob.
  */
 export default forwardRef<HTMLDivElement, StepwiseSliderProps>(({
   children,
@@ -397,7 +397,7 @@ export const StepwiseSliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>
 /**
  * Generates a set of steps compatible with this component.
  *
- * @param length - The number of steps. This must be at least 2 because you must
+ * @param length The number of steps. This must be at least 2 because you must
  *                 include the starting and ending points.
  *
  * @returns An array of steps.
@@ -419,8 +419,8 @@ export function generateSteps(length: number): readonly number[] {
  * Gets the index of the step of which the specified position is closest to. If
  * for whatever reason the index cannot be computed, -1 is returned.
  *
- * @param position - The position (0 - 1, inclusive).
- * @param steps - The steps.
+ * @param position - The position (0 1, inclusive).
+ * @param steps The steps.
  *
  * @returns The nearest index.
  */
@@ -447,8 +447,8 @@ function getNearestIndexByPosition(position: number, steps: readonly number[]): 
 /**
  * Gets the position by step index. This value ranges between 0 - 1, inclusive.
  *
- * @param index - The step index.
- * @param steps - The steps.
+ * @param index The step index.
+ * @param steps The steps.
  *
  * @returns The position. If for whatever reason the position cannot be
  *          determined, `NaN` is returned.

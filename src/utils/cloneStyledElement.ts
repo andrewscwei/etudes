@@ -5,11 +5,11 @@ import { cloneElement, type Attributes, type CElement, type ClassAttributes, typ
  * `style` of the cloned element with the values specified in the `props`
  * argument, they are merged instead.
  *
- * @param element - The target element to clone.
- * @param props - The props to apply to the cloned element. Overlapping props
- *                are overwritten with the exception of `className` and `style`,
- *                which are merged.
- * @param children - Optional child elements add into the cloned element.
+ * @param element The target element to clone.
+ * @param props The props to apply to the cloned element. Overlapping props are
+ *              overwritten with the exception of `className` and `style`, which
+ *              are merged.
+ * @param children Optional child elements add into the cloned element.
  *
  * @returns The cloned element.
  */
