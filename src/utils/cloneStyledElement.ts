@@ -1,4 +1,4 @@
-import { Attributes, CElement, ClassAttributes, cloneElement, Component, ComponentState, FunctionComponentElement, ReactElement, ReactNode } from 'react'
+import { cloneElement, type Attributes, type CElement, type ClassAttributes, type Component, type ComponentState, type FunctionComponentElement, type ReactElement, type ReactNode } from 'react'
 
 /**
  * Wrapper for {@link cloneElement} but instead of overwriting `className` and

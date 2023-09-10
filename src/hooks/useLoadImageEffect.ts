@@ -1,4 +1,4 @@
-import { DependencyList, Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type DependencyList, type Dispatch, type SetStateAction } from 'react'
 import { Size } from 'spase'
 
 type ReturnedStates = {

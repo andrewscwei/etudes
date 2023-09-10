@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React, { ComponentType, forwardRef, HTMLAttributes, ReactElement, Ref, useEffect, useState } from 'react'
+import React, { forwardRef, useEffect, useState, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
 import Each from './Each'
 import usePrevious from './hooks/usePrevious'
 import asClassNameDict from './utils/asClassNameDict'

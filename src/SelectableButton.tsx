@@ -1,4 +1,4 @@
-import React, { forwardRef, HTMLAttributes, ReactNode, useEffect, useState } from 'react'
+import React, { forwardRef, useEffect, useState, type HTMLAttributes, type ReactNode } from 'react'
 
 export type SelectableButtonProps = Omit<HTMLAttributes<HTMLButtonElement>, 'children'> & {
   children?: (props: Pick<SelectableButtonProps, 'isDeselectable' | 'isDisabled' | 'isSelected' | 'label'>) => ReactNode

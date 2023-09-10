@@ -1,6 +1,6 @@
 import HTMLPlugin from 'html-webpack-plugin'
 import path from 'path'
-import { Configuration } from 'webpack'
+import { type Configuration } from 'webpack'
 
 const isDev = process.env.NODE_ENV === 'development'
 const cwd = path.join(__dirname, '../')

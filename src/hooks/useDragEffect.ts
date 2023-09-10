@@ -1,6 +1,6 @@
 import isEqual from 'fast-deep-equal'
 import interact from 'interactjs'
-import { DependencyList, Dispatch, RefObject, SetStateAction, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type DependencyList, type Dispatch, type RefObject, type SetStateAction } from 'react'
 
 type ReturnedStates<T> = {
   isDragging: [boolean, Dispatch<SetStateAction<boolean>>]

@@ -1,4 +1,4 @@
-import React, { forwardRef, HTMLAttributes, PropsWithChildren, SVGAttributes } from 'react'
+import React, { forwardRef, type HTMLAttributes, type PropsWithChildren, type SVGAttributes } from 'react'
 import asComponentDict from './utils/asComponentDict'
 import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'

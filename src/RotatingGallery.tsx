@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React, { forwardRef, HTMLAttributes, PropsWithChildren, useEffect, useState } from 'react'
+import React, { forwardRef, useEffect, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { Transition } from 'react-transition-group'
 import Each from './Each'
 import useInterval from './hooks/useInterval'

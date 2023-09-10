@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
-import Dropdown, { DropdownItemProps, DropdownToggle } from '../../../lib/Dropdown'
-import List, { ListItemProps } from '../../../lib/List'
+import Dropdown, { type DropdownItemProps, DropdownToggle } from '../../../lib/Dropdown'
+import List, { type ListItemProps } from '../../../lib/List'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
 const DropdownItem = ({ data, ...props }: DropdownItemProps) => (

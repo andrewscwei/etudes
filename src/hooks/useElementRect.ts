@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import ResizeObserver from 'resize-observer-polyfill'
 import { Rect } from 'spase'
 

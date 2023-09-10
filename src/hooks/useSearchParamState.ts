@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import useDebug from '../utils/useDebug'
 

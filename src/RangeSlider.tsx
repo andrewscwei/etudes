@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import isEqual from 'fast-deep-equal'
-import React, { forwardRef, HTMLAttributes, PropsWithChildren, useEffect, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
 import useDragEffect from './hooks/useDragEffect'
 import useResizeEffect from './hooks/useResizeEffect'
 import asClassNameDict from './utils/asClassNameDict'
