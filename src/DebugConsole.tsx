@@ -1,4 +1,4 @@
-import React, { CSSProperties, forwardRef, HTMLAttributes, useEffect, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useRef, useState, type CSSProperties, type HTMLAttributes } from 'react'
 import Each from './Each'
 import asStyleDict from './utils/asStyleDict'
 import styles from './utils/styles'

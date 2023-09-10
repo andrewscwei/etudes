@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React, { CSSProperties, HTMLAttributes, MouseEvent, PropsWithChildren, useEffect, useRef } from 'react'
+import React, { useEffect, useRef, type CSSProperties, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
 import { Rect, Size } from 'spase'
 import ExtractChild from './ExtractChild'
 import useElementRect from './hooks/useElementRect'

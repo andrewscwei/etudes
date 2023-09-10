@@ -1,4 +1,4 @@
-import React, { forwardRef, HTMLAttributes, ReactEventHandler, useEffect, useRef } from 'react'
+import React, { forwardRef, useEffect, useRef, type HTMLAttributes, type ReactEventHandler } from 'react'
 import asStyleDict from './utils/asStyleDict'
 import useDebug from './utils/useDebug'
 

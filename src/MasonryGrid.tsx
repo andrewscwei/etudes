@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React, { forwardRef, HTMLAttributes, useEffect, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Rect } from 'spase'
 import useResizeEffect from './hooks/useResizeEffect'
 import asClassNameDict from './utils/asClassNameDict'

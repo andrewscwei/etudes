@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FocusEvent, forwardRef, HTMLAttributes } from 'react'
+import React, { forwardRef, type ChangeEvent, type FocusEvent, type HTMLAttributes } from 'react'
 
 export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
   value?: string

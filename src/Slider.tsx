@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React, { forwardRef, HTMLAttributes, MouseEvent, PropsWithChildren, useEffect, useRef } from 'react'
+import React, { forwardRef, useEffect, useRef, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
 import { Rect } from 'spase'
 import useDragEffect from './hooks/useDragEffect'
 import asClassNameDict from './utils/asClassNameDict'

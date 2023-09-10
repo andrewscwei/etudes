@@ -1,4 +1,4 @@
-import { Children, isValidElement, JSXElementConstructor, ReactNode } from 'react'
+import { Children, isValidElement, type JSXElementConstructor, type ReactNode } from 'react'
 
 type ComponentTypeDict = Record<string, JSXElementConstructor<any>>
 

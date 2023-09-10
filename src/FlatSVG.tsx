@@ -1,5 +1,5 @@
 import { XMLBuilder, XMLParser } from 'fast-xml-parser'
-import React, { HTMLAttributes, forwardRef } from 'react'
+import React, { forwardRef, type HTMLAttributes } from 'react'
 
 export type FlatSVGProps = HTMLAttributes<HTMLDivElement> & {
   /**

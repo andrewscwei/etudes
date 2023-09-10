@@ -1,4 +1,4 @@
-import React, { Children, forwardRef, HTMLAttributes, isValidElement } from 'react'
+import React, { Children, forwardRef, isValidElement, type HTMLAttributes } from 'react'
 import cloneStyledElement from './utils/cloneStyledElement'
 
 export type ExtractChildProps = HTMLAttributes<HTMLElement>
