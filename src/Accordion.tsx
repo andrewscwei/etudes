@@ -13,7 +13,7 @@ type Orientation = 'horizontal' | 'vertical'
 
 export type AccordionItemProps<T> = ListItemProps<T>
 
-export type SectionData<T> = {
+export type AccordionSectionData<T> = {
   label: string
   items: T[]
 }
@@ -22,7 +22,7 @@ export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & PropsWithChildr
   /**
    * Data provided to each section.
    */
-  data: SectionData<T>[]
+  data: AccordionSectionData<T>[]
 
   /**
    * Indicates if sections can be toggled, as in, once a section is expanded,
@@ -79,6 +79,11 @@ export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & PropsWithChildr
   expandIconSvg?: string
 
   /**
+   * SVG markup to be put in the section header as the collapse icon.
+   */
+  collapseIconSvg?: string
+
+  /**
    * React component type to be used for generating items inside the component.
    */
   itemComponentType: ComponentType<AccordionItemProps<T>>
@@ -102,6 +107,7 @@ export default forwardRef(({
   data,
   defaultExpandedSectionIndex = -1,
   expandIconSvg,
+  collapseIconSvg,
   isTogglable = true,
   itemComponentType,
   itemLength = 50,
@@ -139,12 +145,14 @@ export default forwardRef(({
   const components = asComponentDict(children, {
     header: AccordionHeader,
     expandIcon: AccordionExpandIcon,
+    collapseIcon: AccordionCollapseIcon,
   })
 
   const fixedClassNames = asClassNameDict({
     root: classNames(orientation),
     header: classNames(orientation),
     expandIcon: classNames(orientation),
+    collapseIcon: classNames(orientation),
   })
 
   const fixedStyles = asStyleDict({
@@ -201,6 +209,10 @@ export default forwardRef(({
       margin: '0',
       padding: '0',
     },
+    collapseIcon: {
+      margin: '0',
+      padding: '0',
+    },
     list: {
       transitionDuration: '100ms',
       transitionTimingFunction: 'ease-out',
@@ -246,6 +258,17 @@ export default forwardRef(({
       transitionTimingFunction: 'ease-out',
       width: '15px',
     },
+    collapseIcon: {
+      boxSizing: 'border-box',
+      display: 'block',
+      fill: '#000',
+      height: '15px',
+      transformOrigin: 'center',
+      transitionDuration: '100ms',
+      transitionProperty: 'transform',
+      transitionTimingFunction: 'ease-out',
+      width: '15px',
+    },
   })
 
   return (
@@ -260,6 +283,9 @@ export default forwardRef(({
           const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
           const menuLength = (itemLength - borderThickness) * numVisibleItems + itemPadding * (numVisibleItems - 1) + borderThickness
           const isCollapsed = !isSectionSelectedAt(sectionIdx)
+          const headerComponent = components.header ?? <AccordionHeader style={defaultStyles.header}/>
+          const expandIconComponent = components.expandIcon ?? (expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>)
+          const collapseIconComponent = components.collapseIcon ?? (collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles.collapseIcon}/> : expandIconComponent)
 
           return (
             <div style={styles(fixedStyles.section, orientation === 'vertical' ? {
@@ -267,7 +293,7 @@ export default forwardRef(({
             } : {
               marginLeft: sectionIdx === 0 ? '0px' : `${sectionPadding - borderThickness}px`,
             })}>
-              {cloneStyledElement(components.header ?? <AccordionHeader style={defaultStyles.header}/>, {
+              {cloneStyledElement(headerComponent, {
                 className: classNames(fixedClassNames.header, {
                   collapsed: isCollapsed,
                   expanded: !isCollapsed,
@@ -276,9 +302,9 @@ export default forwardRef(({
                 onClick: () => toggleSectionAt(sectionIdx),
               }, ...[
                 <label style={fixedStyles.headerLabel} dangerouslySetInnerHTML={{ __html: section.label }}/>,
-                cloneStyledElement(components.expandIcon ?? (expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>), {
-                  className: classNames(fixedClassNames.expandIcon),
-                  style: styles(fixedStyles.expandIcon),
+                cloneStyledElement(isCollapsed ? expandIconComponent : collapseIconComponent, {
+                  className: classNames(isCollapsed ? fixedClassNames.expandIcon : fixedClassNames.collapseIcon),
+                  style: styles(isCollapsed ? fixedStyles.expandIcon : fixedStyles.collapseIcon),
                 }),
               ])}
               <List
@@ -318,6 +344,8 @@ export default forwardRef(({
   )
 }) as <T>(props: AccordionProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
-export const AccordionHeader = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => <button {...props}/>
+export const AccordionHeader = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & PropsWithChildren) => <button {...props}>{children}</button>
 
-export const AccordionExpandIcon = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
+export const AccordionExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => <div {...props}>{children}</div>
+
+export const AccordionCollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => <div {...props}>{children}</div>

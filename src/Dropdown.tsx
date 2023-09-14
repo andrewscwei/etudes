@@ -84,6 +84,11 @@ export type DropdownProps<T extends DropdownData = DropdownData> = HTMLAttribute
   expandIconSvg?: string
 
   /**
+   * SVG markup to be put in the dropdown button as the collapse icon.
+   */
+  collapseIconSvg?: string
+
+  /**
    * React component type to be used for generating items inside the component.
    */
   itemComponentType: ComponentType<DropdownItemProps<T>>
@@ -107,6 +112,7 @@ export default forwardRef(({
   data,
   defaultLabel = 'Select',
   expandIconSvg,
+  collapseIconSvg,
   isInverted = false,
   isTogglable = false,
   itemComponentType,
@@ -195,6 +201,7 @@ export default forwardRef(({
   const components = asComponentDict(children, {
     toggle: DropdownToggle,
     expandIcon: DropdownExpandIcon,
+    collapseIcon: DropdownCollapseIcon,
   })
 
   const fixedClassNames = asClassNameDict({
@@ -209,6 +216,11 @@ export default forwardRef(({
       expanded: !isCollapsed,
     }),
     expandIcon: classNames(orientation, {
+      togglable: isTogglable,
+      collapsed: isCollapsed,
+      expanded: !isCollapsed,
+    }),
+    collapseIcon: classNames(orientation, {
       togglable: isTogglable,
       collapsed: isCollapsed,
       expanded: !isCollapsed,
@@ -255,6 +267,9 @@ export default forwardRef(({
       lineHeight: 'inherit',
     },
     expandIcon: {
+
+    },
+    collapseIcon: {
 
     },
     list: {
@@ -306,7 +321,17 @@ export default forwardRef(({
       padding: '0',
       width: '15px',
     },
+    collapseIcon: {
+      height: '15px',
+      margin: '0',
+      padding: '0',
+      width: '15px',
+    },
   })
+
+  const toggleComponent = components.toggle ?? <button style={defaultStyles.toggle}/>
+  const expandIconComponent = components.expandIcon ?? (expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>)
+  const collapseIconComponent = components.collapseIcon ?? (collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles.collapseIcon}/> : expandIconComponent)
 
   return (
     <div
@@ -316,15 +341,15 @@ export default forwardRef(({
       style={styles(style, fixedStyles.root)}
     >
       <div ref={bodyRef} style={styles(fixedStyles.body)}>
-        {cloneStyledElement(components.toggle ?? <button style={defaultStyles.toggle}/>, {
+        {cloneStyledElement(toggleComponent, {
           className: classNames(fixedClassNames.toggle),
           style: styles(fixedStyles.toggle),
           onClick: () => toggle(),
         }, ...[
           <label style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: selectedIndex === -1 ? defaultLabel : data[selectedIndex].label ?? '' }}/>,
-          cloneStyledElement(components.expandIcon ?? (expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>), {
-            className: classNames(fixedClassNames.expandIcon),
-            style: styles(fixedStyles.expandIcon),
+          cloneStyledElement(isCollapsed ? expandIconComponent : collapseIconComponent, {
+            className: classNames(isCollapsed ? fixedClassNames.expandIcon : fixedClassNames.collapseIcon),
+            style: styles(isCollapsed ? fixedStyles.expandIcon : fixedStyles.collapseIcon),
           }),
         ])}
         <List
@@ -347,6 +372,8 @@ export default forwardRef(({
   )
 }) as <T extends DropdownData = DropdownData>(props: DropdownProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
-export const DropdownToggle = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => <button {...props}/>
+export const DropdownToggle = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & PropsWithChildren) => <button {...props}>{children}</button>
 
-export const DropdownExpandIcon = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
+export const DropdownExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => <div {...props}>{children}</div>
+
+export const DropdownCollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => <div {...props}>{children}</div>
