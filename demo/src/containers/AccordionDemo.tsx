@@ -4,7 +4,7 @@ import Accordion, { AccordionHeader, type AccordionItemProps } from '../../../li
 import DebugConsole from '../../../lib/DebugConsole'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
-const AccordionItem = ({ data, ...props }: AccordionItemProps<string>) => (
+const AccordionItem = ({ data, isSelected, ...props }: AccordionItemProps<string>) => (
   <StyledAccordionItem {...props}>
     {data}
   </StyledAccordionItem>
