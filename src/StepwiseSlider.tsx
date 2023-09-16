@@ -419,7 +419,7 @@ export function generateSteps(length: number): readonly number[] {
  * Gets the index of the step of which the specified position is closest to. If
  * for whatever reason the index cannot be computed, -1 is returned.
  *
- * @param position - The position (0 1, inclusive).
+ * @param position The position (0 1, inclusive).
  * @param steps The steps.
  *
  * @returns The nearest index.
