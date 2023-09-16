@@ -18,9 +18,12 @@ export default function AccordionDemo() {
     <>
       <StyledRoot>
         <StyledAccordion
+          autoCollapse={true}
           orientation='vertical'
           expandIconSvg={$$ExpandIcon}
           itemComponentType={AccordionItem}
+          selectionMode='single'
+          isTogglable={false}
           itemLength={50}
           data={[{
             label: 'Section 1',
@@ -32,8 +35,10 @@ export default function AccordionDemo() {
             label: 'Section 3',
             items: ['foo', 'bar', 'baz'],
           }]}
-          onItemIndexChange={idx => setItemIndex(idx)}
-          onSectionIndexChange={idx => setSectionIndex(idx)}
+          onSelectAt={(sectionIdx, itemIdx) => {
+            setSectionIndex(sectionIdx)
+            setItemIndex(itemIdx)
+          }}
         >
           <AccordionHeader className='header'/>
         </StyledAccordion>

@@ -1,15 +1,14 @@
 import classNames from 'classnames'
+import isEqual from 'fast-deep-equal'
 import React, { forwardRef, useEffect, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
 import Each from './Each'
 import FlatSVG from './FlatSVG'
-import List, { type ListItemProps } from './List'
+import List, { type ListItemProps, type ListProps } from './List'
 import asClassNameDict from './utils/asClassNameDict'
 import asComponentDict from './utils/asComponentDict'
 import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
 import styles from './utils/styles'
-
-type Orientation = 'horizontal' | 'vertical'
 
 export type AccordionItemProps<T> = ListItemProps<T>
 
@@ -18,35 +17,27 @@ export type AccordionSectionData<T> = {
   items: T[]
 }
 
-export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
+export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<T>, 'data' | 'itemComponentType' | 'selectedIndices' | 'onActivateAt' | 'onSelectAt' | 'onDeselectAt'> & PropsWithChildren<{
+  /**
+   * Specifies if expanded sections should automatically collapse upon expanding
+   * another section.
+   */
+  autoCollapse?: boolean
+
   /**
    * Data provided to each section.
    */
   data: AccordionSectionData<T>[]
 
   /**
-   * Indicates if sections can be toggled, as in, once a section is expanded,
-   * it collapses when being selected again.
+   * Indices of sections that are expanded.
    */
-  isTogglable?: boolean
+  expandedSectionIndices?: number[]
 
   /**
-   * Index of the section that is selected by default. Any value less than 0
-   * indicates that no section is selected by default.
+   * Indices of selected items per section.
    */
-  defaultExpandedSectionIndex?: number
-
-  /**
-   * Length (in pixels) of each item. This does not apply to the section hedaer
-   * itself. Length refers to the height in vertical orientation and width in
-   * horizontal orientation.
-   */
-  itemLength?: number
-
-  /**
-   * Padding (in pixels) between each item.
-   */
-  itemPadding?: number
+  selectedItemIndices?: Record<number, number[]>
 
   /**
    * Padding (in pixels) between each section.
@@ -61,17 +52,6 @@ export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & PropsWithChildr
    * visible when a section expands.
    */
   maxVisibleItems?: number
-
-  /**
-   * Orientation of the component.
-   */
-  orientation?: Orientation
-
-  /**
-   * Thickness of the border (in pixels) of every item and the section header
-   * itself. 0 indicates no borders.
-   */
-  borderThickness?: number
 
   /**
    * SVG markup to be put in the section header as the expand icon.
@@ -89,58 +69,126 @@ export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & PropsWithChildr
   itemComponentType: ComponentType<AccordionItemProps<T>>
 
   /**
-   * Handler invoked when the selected item index of any section changes.
+   * Handler invoked when a section is expanded.
+   *
+   * @param sectionIndex Section index.
    */
-  onItemIndexChange?: (index: number) => void
+  onExpandSectionAt?: (sectionIndex: number) => void
 
   /**
-   * Handler invoked when the selected section index changes.
+   * Handler invoked when a section is collapsed.
+   *
+   * @param sectionIndex Section index.
    */
-  onSectionIndexChange?: (index: number) => void
+  onCollapseSectionAt?: (sectionIndex: number) => void
+
+  /**
+   * Handler invoked when an item is activated in a section.
+   *
+   * @param sectionIndex Section index.
+   * @param itemIndex Item index.
+   */
+  onActivateAt?: (sectionIndex: number, itemIndex: number) => void
+
+  /**
+   * Handler invoked when an item is selected in a section.
+   *
+   * @param sectionIndex Section index.
+   * @param itemIndex Item index.
+   */
+  onSelectAt?: (sectionIndex: number, itemIndex: number) => void
+
+  /**
+   * Handler invoked when an item is deselected in a section.
+   *
+   * @param sectionIndex Section index.
+   * @param itemIndex Item index.
+   */
+  onDeselectAt?: (sectionIndex: number, itemIndex: number) => void
 }>
 
 export default forwardRef(({
   children,
   className,
   style,
+  autoCollapse = false,
   borderThickness = 0,
-  data,
-  defaultExpandedSectionIndex = -1,
-  expandIconSvg,
   collapseIconSvg,
-  isTogglable = true,
+  data,
+  expandedSectionIndices: externalExpandedSectionIndices = [],
+  expandIconSvg,
+  isTogglable,
   itemComponentType,
   itemLength = 50,
   itemPadding = 0,
   maxVisibleItems = -1,
   orientation = 'vertical',
   sectionPadding = 0,
-  onItemIndexChange,
-  onSectionIndexChange,
+  selectedItemIndices: externalSelectedItemIndices = {},
+  selectionMode = 'single',
+  onActivateAt,
+  onSelectAt,
+  onDeselectAt,
   ...props
 }, ref) => {
-  const isSectionSelectedAt = (index: number) => expandedSectionIndex === index
+  const isSectionExpandedAt = (idx: number) => expandedSectionIndices.indexOf(idx) >= 0
 
-  const toggleSectionAt = (index: number) => {
-    if (isTogglable && isSectionSelectedAt(index)) {
-      setExpandedSectionIndex(-1)
+  const toggleSectionAt = (idx: number) => {
+    if (isSectionExpandedAt(idx)) {
+      setExpandedSectionIndices(prev => prev.filter(t => t !== idx))
+    }
+    else if (autoCollapse) {
+      setExpandedSectionIndices([idx])
     }
     else {
-      setExpandedSectionIndex(index)
+      setExpandedSectionIndices(prev => [...prev.filter(t => t !== idx), idx])
     }
   }
 
-  const [expandedSectionIndex, setExpandedSectionIndex] = useState(defaultExpandedSectionIndex)
-  const [selectedSectionIndex, setSelectedSectionIndex] = useState(-1)
-  const [selectedItemIndex, setSelectedItemIndex] = useState(-1)
+  const selectAt = (sectionIdx: number, itemIdx: number) => {
+    switch (selectionMode) {
+      case 'multiple':
+        setSelectedItemIndices(prev => ({
+          ...prev,
+          [sectionIdx]: [...(prev[sectionIdx] ?? []).filter(t => t !== itemIdx), itemIdx],
+        }))
+
+        onSelectAt?.(sectionIdx, itemIdx)
+
+        break
+      case 'single':
+        setSelectedItemIndices({ [sectionIdx]: [itemIdx] })
+        onSelectAt?.(sectionIdx, itemIdx)
+
+        break
+      default:
+        break
+    }
+  }
+
+  const deselectAt = (sectionIdx: number, itemIdx: number) => {
+    setSelectedItemIndices(prev => ({
+      ...prev,
+      [sectionIdx]: (prev[sectionIdx] ?? []).filter(t => t !== itemIdx),
+    }))
+
+    onDeselectAt?.(sectionIdx, itemIdx)
+  }
+
+  const [expandedSectionIndices, setExpandedSectionIndices] = useState(externalExpandedSectionIndices)
+  const [selectedItemIndices, setSelectedItemIndices] = useState(externalSelectedItemIndices)
 
   useEffect(() => {
-    onSectionIndexChange?.(expandedSectionIndex)
-  }, [expandedSectionIndex])
+    if (isEqual(expandedSectionIndices, expandedSectionIndices)) return
+
+    setExpandedSectionIndices(externalExpandedSectionIndices)
+  }, [JSON.stringify(externalExpandedSectionIndices)])
 
   useEffect(() => {
-    onItemIndexChange?.(selectedItemIndex)
-  }, [selectedItemIndex])
+    if (isEqual(externalSelectedItemIndices, selectedItemIndices)) return
+
+    setSelectedItemIndices(externalSelectedItemIndices)
+  }, [JSON.stringify(externalSelectedItemIndices)])
 
   const components = asComponentDict(children, {
     header: AccordionHeader,
@@ -282,7 +330,7 @@ export default forwardRef(({
           const numItems = section.items.length
           const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
           const menuLength = (itemLength - borderThickness) * numVisibleItems + itemPadding * (numVisibleItems - 1) + borderThickness
-          const isCollapsed = !isSectionSelectedAt(sectionIdx)
+          const isCollapsed = !isSectionExpandedAt(sectionIdx)
           const headerComponent = components.header ?? <AccordionHeader style={defaultStyles.header}/>
           const expandIconComponent = components.expandIcon ?? (expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>)
           const collapseIconComponent = components.collapseIcon ?? (collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles.collapseIcon}/> : expandIconComponent)
@@ -319,22 +367,16 @@ export default forwardRef(({
                 })}
                 borderThickness={borderThickness}
                 data={section.items}
-                isSelectable={true}
+                selectionMode={selectionMode}
                 isTogglable={isTogglable}
                 itemComponentType={itemComponentType}
                 itemLength={itemLength}
                 itemPadding={itemPadding}
                 orientation={orientation}
-                selectedIndex={selectedSectionIndex === sectionIdx ? selectedItemIndex : -1}
-                onDeselectAt={() => {
-                  if (selectedSectionIndex !== sectionIdx) return
-                  setSelectedSectionIndex(-1)
-                  setSelectedItemIndex(-1)
-                }}
-                onSelectAt={itemIdx => {
-                  setSelectedSectionIndex(sectionIdx)
-                  setSelectedItemIndex(itemIdx)
-                }}
+                selectedIndices={selectedItemIndices[sectionIdx] ?? []}
+                onActivateAt={itemIdx => onActivateAt?.(sectionIdx, itemIdx)}
+                onDeselectAt={itemIdx => deselectAt(sectionIdx, itemIdx)}
+                onSelectAt={itemIdx => selectAt(sectionIdx, itemIdx)}
               />
             </div>
           )
