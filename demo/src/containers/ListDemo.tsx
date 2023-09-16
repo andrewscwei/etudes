@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
-import Dropdown, { type DropdownItemProps, DropdownToggle } from '../../../lib/Dropdown'
+import Dropdown, { DropdownToggle, type DropdownItemProps } from '../../../lib/Dropdown'
 import List, { type ListItemProps } from '../../../lib/List'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
@@ -27,11 +27,11 @@ export default function ListDemo() {
       <StyledRoot className={orientation}>
         <StyledList
           data={[...new Array(60)].map((v, i) => `${i + 1}`)}
-          selectionMode='single'
           isTogglable={true}
           itemComponentType={ListItem}
           itemPadding={20}
           orientation={orientation}
+          selectionMode='single'
           onDeselectAt={idx => setSelectedItemIndex(-1)}
           onSelectAt={idx => setSelectedItemIndex(idx)}
         />
@@ -44,8 +44,8 @@ export default function ListDemo() {
         itemComponentType={DropdownItem}
         maxVisibleItems={-1}
         orientation='vertical'
-        selectedIndex={selectedOrientationIndex}
-        onIndexChange={idx => setSelectedOrientationIndex(idx)}
+        selectedIndices={[selectedOrientationIndex]}
+        onSelectAt={idx => setSelectedOrientationIndex(idx)}
       >
         <DropdownToggle className='toggle'/>
       </StyledDropdown>

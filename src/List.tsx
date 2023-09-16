@@ -39,7 +39,8 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
   itemComponentType?: ComponentType<ListItemProps<T>>
 
   /**
-   * Optional length of each item.
+   * Optional length (in pixels) of each item. Length refers to the height in
+   * vertical orientation and width in horizontal orientation.
    */
   itemLength?: number
 
@@ -49,39 +50,36 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
   itemPadding?: number
 
   /**
-   * Indicates whether selections are retained. For example, in the case of a
-   * vertical list of clickable rows, being able to retain a selection means
-   * when the row is clicked, it becomes and stays selected. Being unable to
-   * retain a selection means when the row is clicked, it does not become
-   * selected. It is simply clicked and the subsequent event is dispatched.
+   * Indicates the selection behavior:
+   *   - `none`: No selection at all.
+   *   - `single`: Only one item can be selected at a time.
+   *   - `multiple`: Multiple items can be selected at the same time.
    */
   selectionMode?: 'none' | 'single' | 'multiple'
 
   /**
-   * Indicates whether selections can be toggled. For example, in the case of a
-   * vertical list of selectable rows, being able to toggle a row means it gets
-   * deselected when selected again. Being unable to toggle the row means it
-   * does not get deselected when selected again.
+   * Indicates if items can be toggled, i.e. they can be deselected if selected
+   * again.
    */
   isTogglable?: boolean
 
   /**
-   * Orientation of the list.
+   * Orientation of the component.
    */
   orientation?: Orientation
 
   /**
-   * Handler invoked when an index is activated.
+   * Handler invoked when an item is activated.
    */
-  onActivate?: (index: number) => void
+  onActivateAt?: (index: number) => void
 
   /**
-   * Handler invoked when an index is deselected.
+   * Handler invoked when an item is deselected.
    */
   onDeselectAt?: (index: number) => void
 
   /**
-   * Handler invoked when an index is selected.
+   * Handler invoked when an item is selected.
    */
   onSelectAt?: (index: number) => void
 }
@@ -103,7 +101,7 @@ export default forwardRef(({
   itemPadding = 0,
   orientation = 'vertical',
   selectedIndices: externalSelectedIndices = [],
-  onActivate,
+  onActivateAt,
   onDeselectAt,
   onSelectAt,
   ...props
@@ -133,13 +131,13 @@ export default forwardRef(({
       case 'multiple':
         setSelectedIndices(prev => [...prev, index])
 
-        return
+        break
       case 'single':
         setSelectedIndices([index])
 
-        return
+        break
       default:
-        return
+        break
     }
   }
 
@@ -149,7 +147,7 @@ export default forwardRef(({
     setSelectedIndices(prev => prev.filter(t => t !== index))
   }
 
-  const onClick = (index: number) => {
+  const activateAt = (index: number) => {
     if (selectionMode !== 'none') {
       if (isTogglable) {
         toggleAt(index)
@@ -159,7 +157,7 @@ export default forwardRef(({
       }
     }
 
-    onActivate?.(index)
+    onActivateAt?.(index)
   }
 
   const [selectedIndices, setSelectedIndices] = useState(externalSelectedIndices)
@@ -248,7 +246,7 @@ export default forwardRef(({
               index={idx}
               isSelected={isSelectedAt(idx)}
               orientation={orientation}
-              onClick={() => onClick(idx)}
+              onClick={() => activateAt(idx)}
             />
           )}
         </Each>
