@@ -39,9 +39,7 @@ export default function AccordionDemo() {
             setSectionIndex(sectionIdx)
             setItemIndex(itemIdx)
           }}
-        >
-          <AccordionHeader className='header'/>
-        </StyledAccordion>
+        />
       </StyledRoot>
       <DebugConsole
         title='?: Accordion'
@@ -87,7 +85,7 @@ const StyledAccordion = styled(Accordion<string>)`
   transform: translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg);
   width: 300px;
 
-  .header {
+  button {
     align-items: center;
     background: #fff;
     box-sizing: border-box;
@@ -97,7 +95,6 @@ const StyledAccordion = styled(Accordion<string>)`
     flex-wrap: nowrap;
     font-size: 16px;
     font-weight: 700;
-    cursor: pointer;
     height: 50px;
     justify-content: space-between;
     line-height: 16px;
@@ -105,19 +102,8 @@ const StyledAccordion = styled(Accordion<string>)`
     text-transform: uppercase;
     transition: all 100ms ease-out;
 
-    main {
-      transform: scale(1.1);
-      z-index: 1;
-      background: #ff0054;
-      color: #fff;
-
-      svg * {
-        fill: #fff;
-      }
-    }
-
     &:hover {
-      background: #ff0054;
+      background: #ff0054 !important;
       color: #fff;
 
       svg * {

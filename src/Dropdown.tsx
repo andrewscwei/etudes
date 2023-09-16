@@ -221,6 +221,7 @@ export default forwardRef(({
       fontWeight: 'inherit',
       letterSpacing: 'inherit',
       lineHeight: 'inherit',
+      pointerEvents: 'none',
     },
     expandIcon: {
 
@@ -301,7 +302,7 @@ export default forwardRef(({
           className: classNames(fixedClassNames.toggle),
           style: styles(fixedStyles.toggle),
           onClick: () => toggle(),
-        }, ...[
+        }, ...components.toggle ? [] : [
           <label style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: selectedIndices.length > 0 ? selectedIndices.map(t => data[t].label).join(', ') : defaultLabel ?? '' }}/>,
           cloneStyledElement(isCollapsed ? expandIconComponent : collapseIconComponent, {
             className: classNames(isCollapsed ? fixedClassNames.expandIcon : fixedClassNames.collapseIcon),

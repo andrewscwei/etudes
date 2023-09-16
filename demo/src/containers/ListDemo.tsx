@@ -46,9 +46,7 @@ export default function ListDemo() {
         orientation='vertical'
         selectedIndices={[selectedOrientationIndex]}
         onSelectAt={idx => setSelectedOrientationIndex(idx)}
-      >
-        <DropdownToggle className='toggle'/>
-      </StyledDropdown>
+      />
       <DebugConsole
         title='?: List+Dropdown'
         message={selectedItemIndex > -1 ? `<strong>[${orientation.toUpperCase()}]</strong> You selected item <strong>#${selectedItemIndex + 1}</strong>!` : 'No item selected!'}
@@ -100,7 +98,7 @@ const StyledDropdown = styled(Dropdown)`
   width: 300px;
   z-index: 10;
 
-  .toggle {
+  button {
     align-items: center;
     background: #fff;
     border: none;
@@ -122,8 +120,8 @@ const StyledDropdown = styled(Dropdown)`
     }
 
     &:hover {
-      color: #fff;
-      background: #ff0054;
+      color: #fff !important;
+      background: #ff0054 !important;
 
       svg * {
         transform: fill 100ms ease-out;
