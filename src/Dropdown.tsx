@@ -84,15 +84,11 @@ export default forwardRef(({
   ...props
 }, ref) => {
   const expand = () => {
-    if (!isCollapsed) return
-
-    setIsCollapsed(false)
+    if (isCollapsed) setIsCollapsed(false)
   }
 
   const collapse = () => {
-    if (isCollapsed) return
-
-    setIsCollapsed(true)
+    if (!isCollapsed) setIsCollapsed(true)
   }
 
   const toggle = () => {

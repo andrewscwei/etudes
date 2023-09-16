@@ -28,10 +28,10 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
   data: T[]
 
   /**
-   * The selected indices. If `selectionMode` is `single`, only only the first
-   * value will be used.
+   * Indicates if items can be toggled, i.e. they can be deselected if selected
+   * again.
    */
-  selectedIndices?: number[]
+  isTogglable?: boolean
 
   /**
    * React component type to be used to generate items for this list.
@@ -50,6 +50,17 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
   itemPadding?: number
 
   /**
+   * Orientation of the component.
+   */
+  orientation?: Orientation
+
+  /**
+   * The selected indices. If `selectionMode` is `single`, only only the first
+   * value will be used.
+   */
+  selectedIndices?: number[]
+
+  /**
    * Indicates the selection behavior:
    *   - `none`: No selection at all.
    *   - `single`: Only one item can be selected at a time.
@@ -58,28 +69,23 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
   selectionMode?: 'none' | 'single' | 'multiple'
 
   /**
-   * Indicates if items can be toggled, i.e. they can be deselected if selected
-   * again.
-   */
-  isTogglable?: boolean
-
-  /**
-   * Orientation of the component.
-   */
-  orientation?: Orientation
-
-  /**
    * Handler invoked when an item is activated.
+   *
+   * @param index Item index.
    */
   onActivateAt?: (index: number) => void
 
   /**
    * Handler invoked when an item is deselected.
+   *
+   * @param index Item index.
    */
   onDeselectAt?: (index: number) => void
 
   /**
    * Handler invoked when an item is selected.
+   *
+   * @param index Item index.
    */
   onSelectAt?: (index: number) => void
 }
@@ -129,7 +135,7 @@ export default forwardRef(({
 
     switch (selectionMode) {
       case 'multiple':
-        setSelectedIndices(prev => [...prev, index])
+        setSelectedIndices(prev => [...prev.filter(t => t !== index), index])
 
         break
       case 'single':
