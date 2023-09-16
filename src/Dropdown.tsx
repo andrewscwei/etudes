@@ -206,6 +206,7 @@ export default forwardRef(({
     },
     toggle: {
       borderWidth: `${borderThickness}px`,
+      cursor: 'pointer',
       height: '100%',
       left: '0',
       margin: '0',
@@ -331,7 +332,7 @@ export default forwardRef(({
   )
 }) as <T extends DropdownData = DropdownData>(props: DropdownProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
-export const DropdownToggle = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & PropsWithChildren) => <button {...props}>{children}</button>
+export const DropdownToggle = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => <div {...props}>{children}</div>
 
 export const DropdownExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => <div {...props}>{children}</div>
 
