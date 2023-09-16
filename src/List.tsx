@@ -1,4 +1,5 @@
 import classNames from 'classnames'
+import isEqual from 'fast-deep-equal'
 import React, { forwardRef, useEffect, useState, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
 import Each from './Each'
 import usePrevious from './hooks/usePrevious'
@@ -27,10 +28,10 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
   data: T[]
 
   /**
-   * The selected index. Any value below 0 indicates that nothing is
-   * selected.
+   * The selected indices. If `selectionMode` is `single`, only only the first
+   * value will be used.
    */
-  selectedIndex?: number
+  selectedIndices?: number[]
 
   /**
    * React component type to be used to generate items for this list.
@@ -54,7 +55,7 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
    * retain a selection means when the row is clicked, it does not become
    * selected. It is simply clicked and the subsequent event is dispatched.
    */
-  isSelectable?: boolean
+  selectionMode?: 'none' | 'single' | 'multiple'
 
   /**
    * Indicates whether selections can be toggled. For example, in the case of a
@@ -95,13 +96,13 @@ export default forwardRef(({
   style,
   borderThickness = 0,
   data,
-  isSelectable,
+  selectionMode = 'none',
   isTogglable,
   itemComponentType: ItemComponentType,
   itemLength,
   itemPadding = 0,
   orientation = 'vertical',
-  selectedIndex: externalSelectedIndex = -1,
+  selectedIndices: externalSelectedIndices = [],
   onActivate,
   onDeselectAt,
   onSelectAt,
@@ -114,7 +115,7 @@ export default forwardRef(({
     return false
   }
 
-  const isSelectedAt = (index: number) => selectedIndex === index
+  const isSelectedAt = (index: number) => selectedIndices.indexOf(index) >= 0
 
   const toggleAt = (index: number) => {
     if (isSelectedAt(index)) {
@@ -127,16 +128,29 @@ export default forwardRef(({
 
   const selectAt = (index: number) => {
     if (isSelectedAt(index)) return
-    setSelectedIndex(index)
+
+    switch (selectionMode) {
+      case 'multiple':
+        setSelectedIndices(prev => [...prev, index])
+
+        return
+      case 'single':
+        setSelectedIndices([index])
+
+        return
+      default:
+        return
+    }
   }
 
   const deselectAt = (index: number) => {
     if (!isSelectedAt(index)) return
-    setSelectedIndex(-1)
+
+    setSelectedIndices(prev => prev.filter(t => t !== index))
   }
 
   const onClick = (index: number) => {
-    if (isSelectable) {
+    if (selectionMode !== 'none') {
       if (isTogglable) {
         toggleAt(index)
       }
@@ -148,20 +162,24 @@ export default forwardRef(({
     onActivate?.(index)
   }
 
-  const [selectedIndex, setSelectedIndex] = useState(externalSelectedIndex)
-  const prevSelectedIndex = usePrevious(selectedIndex)
+  const [selectedIndices, setSelectedIndices] = useState(externalSelectedIndices)
+  const prevSelectedIndices = usePrevious(selectedIndices)
 
   useEffect(() => {
-    if (externalSelectedIndex === selectedIndex) return
-    setSelectedIndex(externalSelectedIndex)
-  }, [externalSelectedIndex])
+    if (isEqual(externalSelectedIndices, selectedIndices)) return
+
+    setSelectedIndices(externalSelectedIndices)
+  }, [JSON.stringify(externalSelectedIndices)])
 
   useEffect(() => {
-    if (!isSelectable) return
+    if (selectionMode === 'none') return
 
-    if (!isIndexOutOfRange(prevSelectedIndex ?? -1)) onDeselectAt?.(prevSelectedIndex ?? -1)
-    if (!isIndexOutOfRange(selectedIndex)) onSelectAt?.(selectedIndex)
-  }, [selectedIndex])
+    const deselected = prevSelectedIndices?.filter(t => !isIndexOutOfRange(t) && selectedIndices.indexOf(t) === -1) ?? []
+    const selected = selectedIndices.filter(t => !isIndexOutOfRange(t) && prevSelectedIndices?.indexOf(t) === -1)
+
+    deselected.map(t => onDeselectAt?.(t))
+    selected.map(t => onSelectAt?.(t))
+  }, [selectedIndices])
 
   const fixedClassNames = asClassNameDict({
     root: classNames(orientation, {
