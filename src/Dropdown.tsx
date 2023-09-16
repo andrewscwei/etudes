@@ -1,7 +1,8 @@
 import classNames from 'classnames'
-import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
+import isEqual from 'fast-deep-equal'
+import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
 import FlatSVG from './FlatSVG'
-import List, { type ListItemProps } from './List'
+import List, { type ListItemProps, type ListProps } from './List'
 import useElementRect from './hooks/useElementRect'
 import asClassNameDict from './utils/asClassNameDict'
 import asComponentDict from './utils/asComponentDict'
@@ -9,21 +10,13 @@ import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
 import styles from './utils/styles'
 
-type Orientation = 'horizontal' | 'vertical'
-
 export type DropdownData = {
   label?: string
 }
 
 export type DropdownItemProps<T extends DropdownData = DropdownData> = ListItemProps<T>
 
-export type DropdownProps<T extends DropdownData = DropdownData> = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
-  /**
-   * Data of every item in the component. This is used to generate individual
-   * menu items. Data type is generic.
-   */
-  data: T[]
-
+export type DropdownProps<T extends DropdownData = DropdownData> = HTMLAttributes<HTMLDivElement> & ListProps<T> & PropsWithChildren<{
   /**
    * Indicates if the component is inverted (i.e. "dropup" instead of dropdown).
    * Supports all orientations.
@@ -31,33 +24,10 @@ export type DropdownProps<T extends DropdownData = DropdownData> = HTMLAttribute
   isInverted?: boolean
 
   /**
-   * Indicates if items can be toggled, i.e. they can be deselected if selected
-   * again.
+   * Specifies if the dropdown should be collapsed upon selection. This only
+   * works if `selectionMode` is `single`.
    */
-  isTogglable?: boolean
-
-  /**
-   * Thickness of the border (in pixels) of every item and the dropdown button
-   * itself. 0 indicates no borders.
-   */
-  borderThickness?: number
-
-  /**
-   * The index of the default selected item.
-   */
-  selectedIndex?: number
-
-  /**
-   * Length (in pixels) of each item. This does not apply to the dropdown button
-   * itself. Length refers to the height in vertical orientation and width in
-   * horizontal orientation.
-   */
-  itemLength?: number
-
-  /**
-   * Padding (in pixels) of each item.
-   */
-  itemPadding?: number
+  collapsesOnSelect?: boolean
 
   /**
    * Maximum number of items that are viside when the component expands. When a
@@ -67,11 +37,6 @@ export type DropdownProps<T extends DropdownData = DropdownData> = HTMLAttribute
    * visible when the component expands.
    */
   maxVisibleItems?: number
-
-  /**
-   * Orientation of the component.
-   */
-  orientation?: Orientation
 
   /**
    * The label to appear on the dropdown button when no items are selected.
@@ -87,16 +52,6 @@ export type DropdownProps<T extends DropdownData = DropdownData> = HTMLAttribute
    * SVG markup to be put in the dropdown button as the collapse icon.
    */
   collapseIconSvg?: string
-
-  /**
-   * React component type to be used for generating items inside the component.
-   */
-  itemComponentType: ComponentType<DropdownItemProps<T>>
-
-  /**
-   * Handler invoked whenever the selected index changes.
-   */
-  onIndexChange?: (index: number) => void
 }>
 
 /**
@@ -110,6 +65,7 @@ export default forwardRef(({
   style,
   borderThickness = 0,
   data,
+  collapsesOnSelect = true,
   defaultLabel = 'Select',
   expandIconSvg,
   collapseIconSvg,
@@ -120,22 +76,22 @@ export default forwardRef(({
   itemPadding = 0,
   maxVisibleItems = -1,
   orientation = 'vertical',
-  selectedIndex: externalSelectedIndex = -1,
-  onIndexChange,
+  selectionMode = 'single',
+  selectedIndices: externalSelectedIndices = [],
+  onActivateAt,
+  onDeselectAt,
+  onSelectAt,
   ...props
 }, ref) => {
-  const selectItemAt = (index: number) => {
-    setSelectedIndex(index)
-    setIsCollapsed(true)
-  }
-
   const expand = () => {
     if (!isCollapsed) return
+
     setIsCollapsed(false)
   }
 
   const collapse = () => {
     if (isCollapsed) return
+
     setIsCollapsed(true)
   }
 
@@ -146,6 +102,12 @@ export default forwardRef(({
     else {
       collapse()
     }
+  }
+
+  const selectAtHandler = (index: number) => {
+    onSelectAt?.(index)
+
+    if (selectionMode === 'single' && collapsesOnSelect) collapse()
   }
 
   const clickOutsideHandler = (event: MouseEvent) => {
@@ -172,7 +134,7 @@ export default forwardRef(({
   }
 
   const bodyRef = useRef<HTMLDivElement>(null)
-  const [selectedIndex, setSelectedIndex] = useState(externalSelectedIndex)
+  const [selectedIndices, setSelectedIndices] = useState(externalSelectedIndices)
   const [isCollapsed, setIsCollapsed] = useState(true)
   const rect = useElementRect(bodyRef)
 
@@ -185,13 +147,10 @@ export default forwardRef(({
   }, [isCollapsed])
 
   useEffect(() => {
-    if (externalSelectedIndex === selectedIndex) return
-    setSelectedIndex(externalSelectedIndex)
-  }, [externalSelectedIndex])
+    if (isEqual(externalSelectedIndices, selectedIndices)) return
 
-  useEffect(() => {
-    onIndexChange?.(selectedIndex)
-  }, [selectedIndex])
+    setSelectedIndices(externalSelectedIndices)
+  }, [JSON.stringify(externalSelectedIndices)])
 
   const itemLength = externalItemLength ?? (orientation === 'vertical' ? rect.height : rect.width)
   const numItems = data.length
@@ -346,7 +305,7 @@ export default forwardRef(({
           style: styles(fixedStyles.toggle),
           onClick: () => toggle(),
         }, ...[
-          <label style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: selectedIndex === -1 ? defaultLabel : data[selectedIndex].label ?? '' }}/>,
+          <label style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: selectedIndices.length > 0 ? selectedIndices.map(t => data[t].label).join(', ') : defaultLabel ?? '' }}/>,
           cloneStyledElement(isCollapsed ? expandIconComponent : collapseIconComponent, {
             className: classNames(isCollapsed ? fixedClassNames.expandIcon : fixedClassNames.collapseIcon),
             style: styles(isCollapsed ? fixedStyles.expandIcon : fixedStyles.collapseIcon),
@@ -357,15 +316,16 @@ export default forwardRef(({
           style={styles(fixedStyles.list)}
           borderThickness={borderThickness}
           data={data}
-          isSelectable={true}
-          isTogglable={false}
+          isTogglable={isTogglable}
           itemComponentType={itemComponentType}
           itemLength={itemLength}
           itemPadding={itemPadding}
           orientation={orientation}
-          selectedIndex={selectedIndex}
-          onDeselectAt={idx => selectItemAt(-1)}
-          onSelectAt={idx => selectItemAt(idx)}
+          selectedIndices={selectedIndices}
+          selectionMode={selectionMode}
+          onActivateAt={onActivateAt}
+          onDeselectAt={onDeselectAt}
+          onSelectAt={selectAtHandler}
         />
       </div>
     </div>
