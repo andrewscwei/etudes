@@ -248,6 +248,7 @@ export default forwardRef(({
     },
     header: {
       borderWidth: `${borderThickness}px`,
+      cursor: 'pointer',
       margin: '0',
       outline: 'none',
       ...orientation === 'vertical' ? {
@@ -344,7 +345,7 @@ export default forwardRef(({
           const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
           const menuLength = (itemLength - borderThickness) * numVisibleItems + itemPadding * (numVisibleItems - 1) + borderThickness
           const isCollapsed = !isSectionExpandedAt(sectionIdx)
-          const headerComponent = components.header ?? <AccordionHeader style={defaultStyles.header}/>
+          const headerComponent = components.header ?? <button style={defaultStyles.header}/>
           const expandIconComponent = components.expandIcon ?? (expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>)
           const collapseIconComponent = components.collapseIcon ?? (collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles.collapseIcon}/> : expandIconComponent)
 
@@ -399,7 +400,7 @@ export default forwardRef(({
   )
 }) as <T>(props: AccordionProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
-export const AccordionHeader = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & PropsWithChildren) => <button {...props}>{children}</button>
+export const AccordionHeader = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => <div {...props}>{children}</div>
 
 export const AccordionExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => <div {...props}>{children}</div>
 
