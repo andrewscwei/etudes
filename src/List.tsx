@@ -88,6 +88,13 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
    * @param index Item index.
    */
   onSelectAt?: (index: number) => void
+
+  /**
+   * Handler invoked when the selected items changed.
+   *
+   * @param indices Indices of selected items.
+   */
+  onSelectionChange?: (indices: number[]) => void
 }
 
 /**
@@ -110,6 +117,7 @@ export default forwardRef(({
   onActivateAt,
   onDeselectAt,
   onSelectAt,
+  onSelectionChange,
   ...props
 }, ref) => {
   const isIndexOutOfRange = (index: number) => {
@@ -183,6 +191,8 @@ export default forwardRef(({
 
     deselected.map(t => onDeselectAt?.(t))
     selected.map(t => onSelectAt?.(t))
+
+    onSelectionChange?.(selectedIndices)
   }, [selectedIndices])
 
   const fixedClassNames = asClassNameDict({
