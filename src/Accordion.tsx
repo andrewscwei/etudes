@@ -263,6 +263,7 @@ export default forwardRef(({
       fontWeight: 'inherit',
       letterSpacing: 'inherit',
       lineHeight: 'inherit',
+      pointerEvents: 'none',
       transition: 'inherit',
     },
     expandIcon: {
@@ -360,7 +361,7 @@ export default forwardRef(({
                 }),
                 style: styles(fixedStyles.header),
                 onClick: () => toggleSectionAt(sectionIdx),
-              }, ...[
+              }, ...components.header ? [] : [
                 <label style={fixedStyles.headerLabel} dangerouslySetInnerHTML={{ __html: section.label }}/>,
                 cloneStyledElement(isCollapsed ? expandIconComponent : collapseIconComponent, {
                   className: classNames(isCollapsed ? fixedClassNames.expandIcon : fixedClassNames.collapseIcon),
