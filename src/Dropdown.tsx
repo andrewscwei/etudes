@@ -81,6 +81,7 @@ export default forwardRef(({
   onActivateAt,
   onDeselectAt,
   onSelectAt,
+  onSelectionChange,
   ...props
 }, ref) => {
   const expand = () => {
@@ -322,6 +323,7 @@ export default forwardRef(({
           onActivateAt={onActivateAt}
           onDeselectAt={onDeselectAt}
           onSelectAt={selectAtHandler}
+          onSelectionChange={onSelectionChange}
         />
       </div>
     </div>

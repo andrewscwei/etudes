@@ -105,6 +105,13 @@ export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<
    * @param itemIndex Item index.
    */
   onDeselectAt?: (sectionIndex: number, itemIndex: number) => void
+
+  /**
+   * Handler invoked when selected items have changed.
+   *
+   * @param selectedIndices Dictionary of indices of selected items per section.
+   */
+  onSelectionChange?: (selectedIndices: Record<number, number[]>) => void
 }>
 
 export default forwardRef(({
@@ -129,6 +136,7 @@ export default forwardRef(({
   onActivateAt,
   onSelectAt,
   onDeselectAt,
+  onSelectionChange,
   ...props
 }, ref) => {
   const isSectionExpandedAt = (idx: number) => expandedSectionIndices.indexOf(idx) >= 0
@@ -189,6 +197,10 @@ export default forwardRef(({
 
     setSelectedItemIndices(externalSelectedItemIndices)
   }, [JSON.stringify(externalSelectedItemIndices)])
+
+  useEffect(() => {
+    onSelectionChange?.(selectedItemIndices)
+  }, [JSON.stringify(selectedItemIndices)])
 
   const components = asComponentDict(children, {
     header: AccordionHeader,
