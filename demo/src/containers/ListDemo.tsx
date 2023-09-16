@@ -5,13 +5,13 @@ import Dropdown, { DropdownToggle, type DropdownItemProps } from '../../../lib/D
 import List, { type ListItemProps } from '../../../lib/List'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
-const DropdownItem = ({ data, ...props }: DropdownItemProps) => (
+const DropdownItem = ({ data, isSelected, ...props }: DropdownItemProps) => (
   <StyledDropdownItem {...props}>
     {data.label}
   </StyledDropdownItem>
 )
 
-const ListItem = ({ data, ...props }: ListItemProps<string>) => (
+const ListItem = ({ data, isSelected, ...props }: ListItemProps<string>) => (
   <StyledListItem {...props}>
     {data}
   </StyledListItem>
