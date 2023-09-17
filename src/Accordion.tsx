@@ -4,6 +4,7 @@ import React, { forwardRef, useEffect, useState, type ComponentType, type HTMLAt
 import Each from './Each'
 import FlatSVG from './FlatSVG'
 import List, { type ListItemProps, type ListProps } from './List'
+import usePrevious from './hooks/usePrevious'
 import asClassNameDict from './utils/asClassNameDict'
 import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
@@ -198,10 +199,11 @@ export default forwardRef(({
   }
 
   const [expandedSectionIndices, setExpandedSectionIndices] = useState(externalExpandedSectionIndices)
+  const prevExpandedSectionIndices = usePrevious(expandedSectionIndices)
   const [selectedItemIndices, setSelectedItemIndices] = useState(externalSelectedItemIndices)
 
   useEffect(() => {
-    if (isEqual(expandedSectionIndices, expandedSectionIndices)) return
+    if (isEqual(externalExpandedSectionIndices, expandedSectionIndices)) return
 
     setExpandedSectionIndices(externalExpandedSectionIndices)
   }, [JSON.stringify(externalExpandedSectionIndices)])
@@ -211,6 +213,14 @@ export default forwardRef(({
 
     setSelectedItemIndices(externalSelectedItemIndices)
   }, [JSON.stringify(externalSelectedItemIndices)])
+
+  useEffect(() => {
+    const collapsed = prevExpandedSectionIndices?.filter(t => expandedSectionIndices.indexOf(t) === -1) ?? []
+    const expanded = expandedSectionIndices.filter(t => prevExpandedSectionIndices?.indexOf(t) === -1)
+
+    collapsed.map(t => onCollapseSectionAt?.(t))
+    expanded.map(t => onExpandSectionAt?.(t))
+  }, [JSON.stringify(expandedSectionIndices)])
 
   useEffect(() => {
     onSelectionChange?.(selectedItemIndices)
