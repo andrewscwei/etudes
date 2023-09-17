@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import Accordion, { AccordionHeader, type AccordionItemProps } from '../../../lib/Accordion'
+import Accordion, { type AccordionItemProps } from '../../../lib/Accordion'
 import DebugConsole from '../../../lib/DebugConsole'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
