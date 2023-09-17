@@ -23,7 +23,7 @@ export type AccordionSectionData<T> = {
   items: T[]
 }
 
-export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<T>, 'data' | 'itemComponentType' | 'selectedIndices' | 'onActivateAt' | 'onSelectAt' | 'onDeselectAt'> & PropsWithChildren<{
+export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<T>, 'data' | 'itemComponentType' | 'selectedIndices' | 'onActivateAt' | 'onSelectAt' | 'onDeselectAt' | 'onSelectionChange'> & PropsWithChildren<{
   /**
    * Specifies if expanded sections should automatically collapse upon expanding
    * another section.
