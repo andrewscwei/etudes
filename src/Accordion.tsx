@@ -5,12 +5,17 @@ import Each from './Each'
 import FlatSVG from './FlatSVG'
 import List, { type ListItemProps, type ListProps } from './List'
 import asClassNameDict from './utils/asClassNameDict'
-import asComponentDict from './utils/asComponentDict'
 import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
 import styles from './utils/styles'
 
 export type AccordionItemProps<T> = ListItemProps<T>
+
+export type AccordionHeaderProps<T> = HTMLAttributes<HTMLElement> & PropsWithChildren<{
+  data: AccordionSectionData<T>
+  index: number
+  isCollapsed: boolean
+}>
 
 export type AccordionSectionData<T> = {
   label: string
@@ -25,6 +30,11 @@ export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<
   autoCollapse?: boolean
 
   /**
+   * SVG markup to be put in the section header as the collapse icon.
+   */
+  collapseIconSvg?: string
+
+  /**
    * Data provided to each section.
    */
   data: AccordionSectionData<T>[]
@@ -35,14 +45,20 @@ export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<
   expandedSectionIndices?: number[]
 
   /**
-   * Indices of selected items per section.
+   * SVG markup to be put in the section header as the expand icon.
    */
-  selectedItemIndices?: Record<number, number[]>
+  expandIconSvg?: string
 
   /**
-   * Padding (in pixels) between each section.
+   * React component type to be used for generating headers inside the
+   * component. When absent, one will be generated automatically.
    */
-  sectionPadding?: number
+  headerComponentType?: ComponentType<AccordionHeaderProps<T>>
+
+  /**
+   * React component type to be used for generating items inside the component.
+   */
+  itemComponentType: ComponentType<AccordionItemProps<T>>
 
   /**
    * Maximum number of items that are viside when a section expands. When a
@@ -54,33 +70,14 @@ export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<
   maxVisibleItems?: number
 
   /**
-   * SVG markup to be put in the section header as the expand icon.
+   * Padding (in pixels) between each section.
    */
-  expandIconSvg?: string
+  sectionPadding?: number
 
   /**
-   * SVG markup to be put in the section header as the collapse icon.
+   * Indices of selected items per section.
    */
-  collapseIconSvg?: string
-
-  /**
-   * React component type to be used for generating items inside the component.
-   */
-  itemComponentType: ComponentType<AccordionItemProps<T>>
-
-  /**
-   * Handler invoked when a section is expanded.
-   *
-   * @param sectionIndex Section index.
-   */
-  onExpandSectionAt?: (sectionIndex: number) => void
-
-  /**
-   * Handler invoked when a section is collapsed.
-   *
-   * @param sectionIndex Section index.
-   */
-  onCollapseSectionAt?: (sectionIndex: number) => void
+  selectedItemIndices?: Record<number, number[]>
 
   /**
    * Handler invoked when an item is activated in a section.
@@ -91,12 +88,11 @@ export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<
   onActivateAt?: (sectionIndex: number, itemIndex: number) => void
 
   /**
-   * Handler invoked when an item is selected in a section.
+   * Handler invoked when a section is collapsed.
    *
    * @param sectionIndex Section index.
-   * @param itemIndex Item index.
    */
-  onSelectAt?: (sectionIndex: number, itemIndex: number) => void
+  onCollapseSectionAt?: (sectionIndex: number) => void
 
   /**
    * Handler invoked when an item is deselected in a section.
@@ -105,6 +101,21 @@ export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<
    * @param itemIndex Item index.
    */
   onDeselectAt?: (sectionIndex: number, itemIndex: number) => void
+
+  /**
+   * Handler invoked when a section is expanded.
+   *
+   * @param sectionIndex Section index.
+   */
+  onExpandSectionAt?: (sectionIndex: number) => void
+
+  /**
+   * Handler invoked when an item is selected in a section.
+   *
+   * @param sectionIndex Section index.
+   * @param itemIndex Item index.
+   */
+  onSelectAt?: (sectionIndex: number, itemIndex: number) => void
 
   /**
    * Handler invoked when selected items have changed.
@@ -124,6 +135,7 @@ export default forwardRef(({
   data,
   expandedSectionIndices: externalExpandedSectionIndices = [],
   expandIconSvg,
+  headerComponentType: HeaderComponentType,
   isTogglable,
   itemComponentType,
   itemLength = 50,
@@ -134,8 +146,10 @@ export default forwardRef(({
   selectedItemIndices: externalSelectedItemIndices = {},
   selectionMode = 'single',
   onActivateAt,
-  onSelectAt,
+  onCollapseSectionAt,
   onDeselectAt,
+  onExpandSectionAt,
+  onSelectAt,
   onSelectionChange,
   ...props
 }, ref) => {
@@ -201,12 +215,6 @@ export default forwardRef(({
   useEffect(() => {
     onSelectionChange?.(selectedItemIndices)
   }, [JSON.stringify(selectedItemIndices)])
-
-  const components = asComponentDict(children, {
-    header: AccordionHeader,
-    expandIcon: AccordionExpandIcon,
-    collapseIcon: AccordionCollapseIcon,
-  })
 
   const fixedClassNames = asClassNameDict({
     root: classNames(orientation),
@@ -345,9 +353,8 @@ export default forwardRef(({
           const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
           const menuLength = (itemLength - borderThickness) * numVisibleItems + itemPadding * (numVisibleItems - 1) + borderThickness
           const isCollapsed = !isSectionExpandedAt(sectionIdx)
-          const headerComponent = components.header ?? <button style={defaultStyles.header}/>
-          const expandIconComponent = components.expandIcon ?? (expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>)
-          const collapseIconComponent = components.collapseIcon ?? (collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles.collapseIcon}/> : expandIconComponent)
+          const expandIconComponent = expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>
+          const collapseIconComponent = collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles.collapseIcon}/> : expandIconComponent
 
           return (
             <div style={styles(fixedStyles.section, orientation === 'vertical' ? {
@@ -355,20 +362,28 @@ export default forwardRef(({
             } : {
               marginLeft: sectionIdx === 0 ? '0px' : `${sectionPadding - borderThickness}px`,
             })}>
-              {cloneStyledElement(headerComponent, {
-                className: classNames(fixedClassNames.header, {
-                  collapsed: isCollapsed,
-                  expanded: !isCollapsed,
-                }),
-                style: styles(fixedStyles.header),
-                onClick: () => toggleSectionAt(sectionIdx),
-              }, ...components.header ? [] : [
-                <label style={fixedStyles.headerLabel} dangerouslySetInnerHTML={{ __html: section.label }}/>,
-                cloneStyledElement(isCollapsed ? expandIconComponent : collapseIconComponent, {
-                  className: classNames(isCollapsed ? fixedClassNames.expandIcon : fixedClassNames.collapseIcon),
-                  style: styles(isCollapsed ? fixedStyles.expandIcon : fixedStyles.collapseIcon),
-                }),
-              ])}
+              {HeaderComponentType ? (
+                <HeaderComponentType
+                  className={classNames(fixedClassNames.header, { collapsed: isCollapsed, expanded: !isCollapsed })}
+                  style={styles(fixedStyles.header)}
+                  data={section}
+                  index={sectionIdx}
+                  isCollapsed={isCollapsed}
+                  onClick={() => toggleSectionAt(sectionIdx)}
+                />
+              ) : (
+                <button
+                  className={classNames(fixedClassNames.header, { collapsed: isCollapsed, expanded: !isCollapsed })}
+                  style={styles(fixedStyles.header, defaultStyles.header)}
+                  onClick={() => toggleSectionAt(sectionIdx)}
+                >
+                  <label style={fixedStyles.headerLabel} dangerouslySetInnerHTML={{ __html: section.label }}/>
+                  {cloneStyledElement(isCollapsed ? expandIconComponent : collapseIconComponent, {
+                    className: classNames(isCollapsed ? fixedClassNames.expandIcon : fixedClassNames.collapseIcon),
+                    style: styles(isCollapsed ? fixedStyles.expandIcon : fixedStyles.collapseIcon),
+                  })}
+                </button>
+              )}
               <List
                 style={styles(fixedStyles.list, orientation === 'vertical' ? {
                   height: isCollapsed ? '0px' : `${menuLength}px`,
@@ -399,9 +414,3 @@ export default forwardRef(({
     </div>
   )
 }) as <T>(props: AccordionProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
-
-export const AccordionHeader = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => <div {...props}>{children}</div>
-
-export const AccordionExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => <div {...props}>{children}</div>
-
-export const AccordionCollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => <div {...props}>{children}</div>
