@@ -1,11 +1,10 @@
 import classNames from 'classnames'
 import isEqual from 'fast-deep-equal'
-import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
+import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
 import FlatSVG from './FlatSVG'
 import List, { type ListItemProps, type ListProps } from './List'
 import useElementRect from './hooks/useElementRect'
 import asClassNameDict from './utils/asClassNameDict'
-import asComponentDict from './utils/asComponentDict'
 import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
 import styles from './utils/styles'
@@ -14,29 +13,21 @@ export type DropdownData = {
   label?: string
 }
 
+export type DropdownToggleProps = HTMLAttributes<HTMLElement> & PropsWithChildren
+
 export type DropdownItemProps<T extends DropdownData = DropdownData> = ListItemProps<T>
 
 export type DropdownProps<T extends DropdownData = DropdownData> = HTMLAttributes<HTMLDivElement> & ListProps<T> & PropsWithChildren<{
   /**
-   * Indicates if the component is inverted (i.e. "dropup" instead of dropdown).
-   * Supports all orientations.
+   * SVG markup to be put in the dropdown button as the collapse icon.
    */
-  isInverted?: boolean
+  collapseIconSvg?: string
 
   /**
    * Specifies if the dropdown should be collapsed upon selection. This only
    * works if `selectionMode` is `single`.
    */
   collapsesOnSelect?: boolean
-
-  /**
-   * Maximum number of items that are viside when the component expands. When a
-   * value greater than or equal to 0 is specified, only that number of items
-   * will be visible at a time, and a scrollbar will appear to scroll to
-   * remaining items. Any value less than 0 indicates that all items will be
-   * visible when the component expands.
-   */
-  maxVisibleItems?: number
 
   /**
    * The label to appear on the dropdown button when no items are selected.
@@ -49,9 +40,25 @@ export type DropdownProps<T extends DropdownData = DropdownData> = HTMLAttribute
   expandIconSvg?: string
 
   /**
-   * SVG markup to be put in the dropdown button as the collapse icon.
+   * Indicates if the component is inverted (i.e. "dropup" instead of dropdown).
+   * Supports all orientations.
    */
-  collapseIconSvg?: string
+  isInverted?: boolean
+
+  /**
+   * Maximum number of items that are viside when the component expands. When a
+   * value greater than or equal to 0 is specified, only that number of items
+   * will be visible at a time, and a scrollbar will appear to scroll to
+   * remaining items. Any value less than 0 indicates that all items will be
+   * visible when the component expands.
+   */
+  maxVisibleItems?: number
+
+  /**
+   * React component type to be used for generating the toggle element inside
+   * the component. When absent, one will be generated automatically.
+   */
+  toggleComponentType?: ComponentType<DropdownToggleProps>
 }>
 
 /**
@@ -64,11 +71,11 @@ export default forwardRef(({
   className,
   style,
   borderThickness = 0,
-  data,
+  collapseIconSvg,
   collapsesOnSelect = true,
+  data,
   defaultLabel = 'Select',
   expandIconSvg,
-  collapseIconSvg,
   isInverted = false,
   isTogglable = false,
   itemComponentType,
@@ -76,8 +83,9 @@ export default forwardRef(({
   itemPadding = 0,
   maxVisibleItems = -1,
   orientation = 'vertical',
-  selectionMode = 'single',
   selectedIndices: externalSelectedIndices = [],
+  selectionMode = 'single',
+  toggleComponentType: ToggleComponent,
   onActivateAt,
   onDeselectAt,
   onSelectAt,
@@ -153,12 +161,6 @@ export default forwardRef(({
   const numItems = data.length
   const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
   const menuLength = (itemLength - borderThickness) * numVisibleItems + itemPadding * (numVisibleItems - 1) + borderThickness
-
-  const components = asComponentDict(children, {
-    toggle: DropdownToggle,
-    expandIcon: DropdownExpandIcon,
-    collapseIcon: DropdownCollapseIcon,
-  })
 
   const fixedClassNames = asClassNameDict({
     root: classNames(orientation, {
@@ -287,9 +289,8 @@ export default forwardRef(({
     },
   })
 
-  const toggleComponent = components.toggle ?? <button style={defaultStyles.toggle}/>
-  const expandIconComponent = components.expandIcon ?? (expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>)
-  const collapseIconComponent = components.collapseIcon ?? (collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles.collapseIcon}/> : expandIconComponent)
+  const expandIconComponent = expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>
+  const collapseIconComponent = collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles.collapseIcon}/> : expandIconComponent
 
   return (
     <div
@@ -299,17 +300,25 @@ export default forwardRef(({
       style={styles(style, fixedStyles.root)}
     >
       <div ref={bodyRef} style={styles(fixedStyles.body)}>
-        {cloneStyledElement(toggleComponent, {
-          className: classNames(fixedClassNames.toggle),
-          style: styles(fixedStyles.toggle),
-          onClick: () => toggle(),
-        }, ...components.toggle ? [] : [
-          <label style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: selectedIndices.length > 0 ? selectedIndices.map(t => data[t].label).join(', ') : defaultLabel ?? '' }}/>,
-          cloneStyledElement(isCollapsed ? expandIconComponent : collapseIconComponent, {
-            className: classNames(isCollapsed ? fixedClassNames.expandIcon : fixedClassNames.collapseIcon),
-            style: styles(isCollapsed ? fixedStyles.expandIcon : fixedStyles.collapseIcon),
-          }),
-        ])}
+        {ToggleComponent ? (
+          <ToggleComponent
+            className={classNames(fixedClassNames.toggle)}
+            style={styles(fixedStyles.toggle)}
+            onClick={() => toggle()}
+          />
+        ) : (
+          <button
+            className={classNames(fixedClassNames.toggle)}
+            style={styles(fixedStyles.toggle, defaultStyles.toggle)}
+            onClick={() => toggle()}
+          >
+            <label style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: selectedIndices.length > 0 ? selectedIndices.map(t => data[t].label).join(', ') : defaultLabel ?? '' }}/>
+            {cloneStyledElement(isCollapsed ? expandIconComponent : collapseIconComponent, {
+              className: classNames(isCollapsed ? fixedClassNames.expandIcon : fixedClassNames.collapseIcon),
+              style: styles(isCollapsed ? fixedStyles.expandIcon : fixedStyles.collapseIcon),
+            })}
+          </button>
+        )}
         <List
           className={fixedClassNames.list}
           style={styles(fixedStyles.list)}
@@ -331,9 +340,3 @@ export default forwardRef(({
     </div>
   )
 }) as <T extends DropdownData = DropdownData>(props: DropdownProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
-
-export const DropdownToggle = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => <div {...props}>{children}</div>
-
-export const DropdownExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => <div {...props}>{children}</div>
-
-export const DropdownCollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => <div {...props}>{children}</div>

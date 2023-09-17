@@ -109,7 +109,7 @@ export default forwardRef(({
   data,
   selectionMode = 'none',
   isTogglable,
-  itemComponentType: ItemComponentType,
+  itemComponentType: ItemComponent,
   itemLength,
   itemPadding = 0,
   orientation = 'vertical',
@@ -193,7 +193,7 @@ export default forwardRef(({
     selected.map(t => onSelectAt?.(t))
 
     onSelectionChange?.(selectedIndices)
-  }, [selectedIndices])
+  }, [JSON.stringify(selectedIndices)])
 
   const fixedClassNames = asClassNameDict({
     root: classNames(orientation, {
@@ -233,10 +233,10 @@ export default forwardRef(({
       className={classNames(className, fixedClassNames.root)}
       style={styles(style, fixedStyles.root)}
     >
-      {ItemComponentType && (
+      {ItemComponent && (
         <Each in={data}>
           {(val, idx) => (
-            <ItemComponentType
+            <ItemComponent
               className={classNames(fixedClassNames.item, {
                 selected: isSelectedAt(idx),
               })}
