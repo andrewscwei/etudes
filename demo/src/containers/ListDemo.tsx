@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
-import Dropdown, { DropdownToggle, type DropdownItemProps } from '../../../lib/Dropdown'
+import Dropdown, { type DropdownItemProps } from '../../../lib/Dropdown'
 import List, { type ListItemProps } from '../../../lib/List'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 

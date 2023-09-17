@@ -42,7 +42,7 @@ export default function App() {
   }
 
   const [isNavActive, setIsNavActive] = useState(false)
-  const [hash, setHash] = useState<string | undefined>()
+  const [hash, setHash] = useState<string | undefined>('list')
 
   useEffect(() => {
     mapLocationToHash()

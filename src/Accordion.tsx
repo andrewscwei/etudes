@@ -136,7 +136,7 @@ export default forwardRef(({
   data,
   expandedSectionIndices: externalExpandedSectionIndices = [],
   expandIconSvg,
-  headerComponentType: HeaderComponentType,
+  headerComponentType: HeaderComponent,
   isTogglable,
   itemComponentType,
   itemLength = 50,
@@ -372,8 +372,8 @@ export default forwardRef(({
             } : {
               marginLeft: sectionIdx === 0 ? '0px' : `${sectionPadding - borderThickness}px`,
             })}>
-              {HeaderComponentType ? (
-                <HeaderComponentType
+              {HeaderComponent ? (
+                <HeaderComponent
                   className={classNames(fixedClassNames.header, { collapsed: isCollapsed, expanded: !isCollapsed })}
                   style={styles(fixedStyles.header)}
                   data={section}
