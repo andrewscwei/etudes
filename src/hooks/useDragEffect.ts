@@ -1,4 +1,4 @@
-import isEqual from 'fast-deep-equal'
+import isDeepEqual from 'fast-deep-equal/react'
 import interact from 'interactjs'
 import { useEffect, useRef, useState, type DependencyList, type Dispatch, type RefObject, type SetStateAction } from 'react'
 
@@ -81,7 +81,7 @@ export default function useDragEffect<T = [number, number]>(targetRef: RefObject
    * @returns `true` if the value was set, `false` otherwise.
    */
   const setValueRef = (value: T): boolean => {
-    if (isEqual(valueRef.current, value)) return false
+    if (isDeepEqual(valueRef.current, value)) return false
     valueRef.current = value
 
     return true

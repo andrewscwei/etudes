@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import isEqual from 'fast-deep-equal'
+import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
 import Each from './Each'
 import FlatSVG from './FlatSVG'
@@ -12,10 +12,12 @@ import styles from './utils/styles'
 
 export type AccordionItemProps<T> = ListItemProps<T>
 
-export type AccordionHeaderProps<T> = HTMLAttributes<HTMLElement> & PropsWithChildren<{
+export type AccordionHeaderProps<T, A = never> = HTMLAttributes<HTMLElement> & PropsWithChildren<{
+  attributes?: A
   data: AccordionSectionData<T>
   index: number
   isCollapsed: boolean
+  onCustomEvent?: (name: string, info?: any) => void
 }>
 
 export type AccordionSectionData<T> = {
@@ -28,7 +30,7 @@ export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<
    * Specifies if expanded sections should automatically collapse upon expanding
    * another section.
    */
-  autoCollapse?: boolean
+  autoCollapseSections?: boolean
 
   /**
    * SVG markup to be put in the section header as the collapse icon.
@@ -51,17 +53,6 @@ export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<
   expandIconSvg?: string
 
   /**
-   * React component type to be used for generating headers inside the
-   * component. When absent, one will be generated automatically.
-   */
-  headerComponentType?: ComponentType<AccordionHeaderProps<T>>
-
-  /**
-   * React component type to be used for generating items inside the component.
-   */
-  itemComponentType: ComponentType<AccordionItemProps<T>>
-
-  /**
    * Maximum number of items that are viside when a section expands. When a
    * value greater than or equal to 0 is specified, only that number of items
    * will be visible at a time, and a scrollbar will appear to scroll to
@@ -81,12 +72,23 @@ export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<
   selectedItemIndices?: Record<number, number[]>
 
   /**
+   * React component type to be used for generating headers inside the
+   * component. When absent, one will be generated automatically.
+   */
+  headerComponentType?: ComponentType<AccordionHeaderProps<T>>
+
+  /**
+   * React component type to be used for generating items inside the component.
+   */
+  itemComponentType: ComponentType<AccordionItemProps<T>>
+
+  /**
    * Handler invoked when an item is activated in a section.
    *
-   * @param sectionIndex Section index.
    * @param itemIndex Item index.
+   * @param sectionIndex Section index.
    */
-  onActivateAt?: (sectionIndex: number, itemIndex: number) => void
+  onActivateAt?: (itemIndex: number, sectionIndex: number) => void
 
   /**
    * Handler invoked when a section is collapsed.
@@ -98,10 +100,10 @@ export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<
   /**
    * Handler invoked when an item is deselected in a section.
    *
-   * @param sectionIndex Section index.
    * @param itemIndex Item index.
+   * @param sectionIndex Section index.
    */
-  onDeselectAt?: (sectionIndex: number, itemIndex: number) => void
+  onDeselectAt?: (itemIndex: number, sectionIndex: number) => void
 
   /**
    * Handler invoked when a section is expanded.
@@ -111,12 +113,21 @@ export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<
   onExpandSectionAt?: (sectionIndex: number) => void
 
   /**
+   * Handler invoked when a custom event is dispatched from a section header.
+   *
+   * @param index Index of the section header.
+   * @param eventName Name of the dispatched event.
+   * @param eventInfo Optional info of the dispatched event.
+   */
+  onHeaderCustomEvent?: (index: number, eventName: string, eventInfo?: any) => void
+
+  /**
    * Handler invoked when an item is selected in a section.
    *
-   * @param sectionIndex Section index.
    * @param itemIndex Item index.
+   * @param sectionIndex Section index.
    */
-  onSelectAt?: (sectionIndex: number, itemIndex: number) => void
+  onSelectAt?: (itemIndex: number, sectionIndex: number) => void
 
   /**
    * Handler invoked when selected items have changed.
@@ -130,15 +141,13 @@ export default forwardRef(({
   children,
   className,
   style,
-  autoCollapse = false,
+  autoCollapseSections = false,
   borderThickness = 0,
   collapseIconSvg,
   data,
   expandedSectionIndices: externalExpandedSectionIndices = [],
   expandIconSvg,
-  headerComponentType: HeaderComponent,
-  isTogglable,
-  itemComponentType,
+  isSelectionTogglable = false,
   itemLength = 50,
   itemPadding = 0,
   maxVisibleItems = -1,
@@ -146,42 +155,88 @@ export default forwardRef(({
   sectionPadding = 0,
   selectedItemIndices: externalSelectedItemIndices = {},
   selectionMode = 'single',
+  headerComponentType: HeaderComponent,
+  itemComponentType,
   onActivateAt,
   onCollapseSectionAt,
   onDeselectAt,
   onExpandSectionAt,
+  onHeaderCustomEvent,
   onSelectAt,
   onSelectionChange,
   ...props
 }, ref) => {
-  const isSectionExpandedAt = (idx: number) => expandedSectionIndices.indexOf(idx) >= 0
+  const isSectionIndexOutOfRange = (sectionIndex: number) => {
+    if (sectionIndex >= data.length) return true
+    if (sectionIndex < 0) return true
 
-  const toggleSectionAt = (idx: number) => {
-    if (isSectionExpandedAt(idx)) {
-      setExpandedSectionIndices(prev => prev.filter(t => t !== idx))
+    return false
+  }
+
+  const isItemIndexOutOfRange = (itemIndex: number, sectionIndex: number) => {
+    if (isSectionIndexOutOfRange(sectionIndex)) return true
+
+    const items = data[sectionIndex].items
+
+    if (itemIndex >= items.length) return true
+    if (itemIndex < 0) return true
+
+    return false
+  }
+
+  const sanitizeExpandedSectionIndices = (sectionIndices: number[]) => sectionIndices.sort().filter(t => !isSectionIndexOutOfRange(t))
+
+  const sanitizeSelectedItemIndices = (itemIndices: Record<number, number[]>) => {
+    const newValue: Record<number, number[]> = {}
+
+    for (const sectionIndex in itemIndices) {
+      if (!Object.prototype.hasOwnProperty.call(itemIndices, sectionIndex)) continue
+
+      const indices = itemIndices[sectionIndex]
+
+      if (!indices || !(indices instanceof Array) || indices.length === 0) continue
+
+      newValue[sectionIndex] = indices.sort().filter(t => !isItemIndexOutOfRange(t, Number(sectionIndex)))
     }
-    else if (autoCollapse) {
-      setExpandedSectionIndices([idx])
+
+    return newValue
+  }
+
+  const isSectionExpandedAt = (sectionIndex: number) => expandedSectionIndices.indexOf(sectionIndex) >= 0
+
+  const toggleSectionAt = (sectionIndex: number) => {
+    if (isSectionIndexOutOfRange(sectionIndex)) return
+
+    if (isSectionExpandedAt(sectionIndex)) {
+      setExpandedSectionIndices(prev => prev.filter(t => t !== sectionIndex))
+    }
+    else if (autoCollapseSections) {
+      setExpandedSectionIndices([sectionIndex])
     }
     else {
-      setExpandedSectionIndices(prev => [...prev.filter(t => t !== idx), idx])
+      setExpandedSectionIndices(prev => [...prev.filter(t => t !== sectionIndex), sectionIndex].sort())
     }
   }
 
-  const selectAt = (sectionIdx: number, itemIdx: number) => {
+  const selectAt = (itemIndex: number, sectionIndex: number) => {
+    if (isItemIndexOutOfRange(itemIndex, sectionIndex)) return
+
     switch (selectionMode) {
       case 'multiple':
         setSelectedItemIndices(prev => ({
           ...prev,
-          [sectionIdx]: [...(prev[sectionIdx] ?? []).filter(t => t !== itemIdx), itemIdx],
+          [sectionIndex]: [...(prev[sectionIndex] ?? []).filter(t => t !== itemIndex), itemIndex].sort(),
         }))
 
-        onSelectAt?.(sectionIdx, itemIdx)
+        onSelectAt?.(itemIndex, sectionIndex)
 
         break
       case 'single':
-        setSelectedItemIndices({ [sectionIdx]: [itemIdx] })
-        onSelectAt?.(sectionIdx, itemIdx)
+        setSelectedItemIndices({
+          [sectionIndex]: [itemIndex],
+        })
+
+        onSelectAt?.(itemIndex, sectionIndex)
 
         break
       default:
@@ -189,30 +244,28 @@ export default forwardRef(({
     }
   }
 
-  const deselectAt = (sectionIdx: number, itemIdx: number) => {
+  const deselectAt = (itemIndex: number, sectionIndex: number) => {
+    if (isItemIndexOutOfRange(itemIndex, sectionIndex)) return
+
     setSelectedItemIndices(prev => ({
       ...prev,
-      [sectionIdx]: (prev[sectionIdx] ?? []).filter(t => t !== itemIdx),
+      [sectionIndex]: (prev[sectionIndex] ?? []).filter(t => t !== itemIndex),
     }))
 
-    onDeselectAt?.(sectionIdx, itemIdx)
+    onDeselectAt?.(itemIndex, sectionIndex)
   }
 
-  const [expandedSectionIndices, setExpandedSectionIndices] = useState(externalExpandedSectionIndices)
+  const [expandedSectionIndices, setExpandedSectionIndices] = useState(sanitizeExpandedSectionIndices(externalExpandedSectionIndices))
   const prevExpandedSectionIndices = usePrevious(expandedSectionIndices)
   const [selectedItemIndices, setSelectedItemIndices] = useState(externalSelectedItemIndices)
 
   useEffect(() => {
-    if (isEqual(externalExpandedSectionIndices, expandedSectionIndices)) return
+    const newValue = sanitizeExpandedSectionIndices(externalExpandedSectionIndices)
 
-    setExpandedSectionIndices(externalExpandedSectionIndices)
-  }, [JSON.stringify(externalExpandedSectionIndices)])
+    if (isDeepEqual(newValue, expandedSectionIndices)) return
 
-  useEffect(() => {
-    if (isEqual(externalSelectedItemIndices, selectedItemIndices)) return
-
-    setSelectedItemIndices(externalSelectedItemIndices)
-  }, [JSON.stringify(externalSelectedItemIndices)])
+    setExpandedSectionIndices(newValue)
+  }, [JSON.stringify(sanitizeExpandedSectionIndices(externalExpandedSectionIndices))])
 
   useEffect(() => {
     const collapsed = prevExpandedSectionIndices?.filter(t => expandedSectionIndices.indexOf(t) === -1) ?? []
@@ -220,11 +273,19 @@ export default forwardRef(({
 
     collapsed.map(t => onCollapseSectionAt?.(t))
     expanded.map(t => onExpandSectionAt?.(t))
-  }, [JSON.stringify(expandedSectionIndices)])
+  }, [JSON.stringify(sanitizeExpandedSectionIndices(expandedSectionIndices))])
+
+  useEffect(() => {
+    const newValue = sanitizeSelectedItemIndices(externalSelectedItemIndices)
+
+    if (isDeepEqual(newValue, selectedItemIndices)) return
+
+    setSelectedItemIndices(newValue)
+  }, [JSON.stringify(sanitizeSelectedItemIndices(externalSelectedItemIndices))])
 
   useEffect(() => {
     onSelectionChange?.(selectedItemIndices)
-  }, [JSON.stringify(selectedItemIndices)])
+  }, [JSON.stringify(sanitizeSelectedItemIndices(selectedItemIndices))])
 
   const fixedClassNames = asClassNameDict({
     root: classNames(orientation),
@@ -358,34 +419,35 @@ export default forwardRef(({
       style={styles(style, fixedStyles.root)}
     >
       <Each in={data}>
-        {(section, sectionIdx) => {
+        {(section, sectionIndex) => {
           const numItems = section.items.length
           const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
           const menuLength = (itemLength - borderThickness) * numVisibleItems + itemPadding * (numVisibleItems - 1) + borderThickness
-          const isCollapsed = !isSectionExpandedAt(sectionIdx)
+          const isCollapsed = !isSectionExpandedAt(sectionIndex)
           const expandIconComponent = expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>
           const collapseIconComponent = collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles.collapseIcon}/> : expandIconComponent
 
           return (
             <div style={styles(fixedStyles.section, orientation === 'vertical' ? {
-              marginTop: sectionIdx === 0 ? '0px' : `${sectionPadding - borderThickness}px`,
+              marginTop: sectionIndex === 0 ? '0px' : `${sectionPadding - borderThickness}px`,
             } : {
-              marginLeft: sectionIdx === 0 ? '0px' : `${sectionPadding - borderThickness}px`,
+              marginLeft: sectionIndex === 0 ? '0px' : `${sectionPadding - borderThickness}px`,
             })}>
               {HeaderComponent ? (
                 <HeaderComponent
                   className={classNames(fixedClassNames.header, { collapsed: isCollapsed, expanded: !isCollapsed })}
                   style={styles(fixedStyles.header)}
                   data={section}
-                  index={sectionIdx}
+                  index={sectionIndex}
                   isCollapsed={isCollapsed}
-                  onClick={() => toggleSectionAt(sectionIdx)}
+                  onClick={() => toggleSectionAt(sectionIndex)}
+                  onCustomEvent={(name, info) => onHeaderCustomEvent?.(sectionIndex, name, info)}
                 />
               ) : (
                 <button
                   className={classNames(fixedClassNames.header, { collapsed: isCollapsed, expanded: !isCollapsed })}
                   style={styles(fixedStyles.header, defaultStyles.header)}
-                  onClick={() => toggleSectionAt(sectionIdx)}
+                  onClick={() => toggleSectionAt(sectionIndex)}
                 >
                   <label style={fixedStyles.headerLabel} dangerouslySetInnerHTML={{ __html: section.label }}/>
                   {cloneStyledElement(isCollapsed ? expandIconComponent : collapseIconComponent, {
@@ -407,15 +469,15 @@ export default forwardRef(({
                 borderThickness={borderThickness}
                 data={section.items}
                 selectionMode={selectionMode}
-                isTogglable={isTogglable}
+                isSelectionTogglable={isSelectionTogglable}
                 itemComponentType={itemComponentType}
                 itemLength={itemLength}
                 itemPadding={itemPadding}
                 orientation={orientation}
-                selectedIndices={selectedItemIndices[sectionIdx] ?? []}
-                onActivateAt={itemIdx => onActivateAt?.(sectionIdx, itemIdx)}
-                onDeselectAt={itemIdx => deselectAt(sectionIdx, itemIdx)}
-                onSelectAt={itemIdx => selectAt(sectionIdx, itemIdx)}
+                selectedIndices={selectedItemIndices[sectionIndex] ?? []}
+                onActivateAt={itemIndex => onActivateAt?.(itemIndex, sectionIndex)}
+                onDeselectAt={itemIndex => deselectAt(itemIndex, sectionIndex)}
+                onSelectAt={itemIndex => selectAt(itemIndex, sectionIndex)}
               />
             </div>
           )

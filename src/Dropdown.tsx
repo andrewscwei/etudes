@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import isEqual from 'fast-deep-equal'
+import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
 import FlatSVG from './FlatSVG'
 import List, { type ListItemProps, type ListProps } from './List'
@@ -13,7 +13,9 @@ export type DropdownData = {
   label?: string
 }
 
-export type DropdownToggleProps = HTMLAttributes<HTMLElement> & PropsWithChildren
+export type DropdownToggleProps = HTMLAttributes<HTMLElement> & {
+  onCustomEvent?: (name: string, info?: any) => void
+}
 
 export type DropdownItemProps<T extends DropdownData = DropdownData> = ListItemProps<T>
 
@@ -59,6 +61,14 @@ export type DropdownProps<T extends DropdownData = DropdownData> = HTMLAttribute
    * the component. When absent, one will be generated automatically.
    */
   toggleComponentType?: ComponentType<DropdownToggleProps>
+
+  /**
+   * Handler invoked when the toggle dispatches a custom event.
+   *
+   * @param eventName Name of the dispatched custom event.
+   * @param eventInfo Optional info of the dispatched custom event.
+   */
+  onToggleCustomEvent?: (eventName: string, eventInfo?: any) => void
 }>
 
 /**
@@ -77,7 +87,7 @@ export default forwardRef(({
   defaultLabel = 'Select',
   expandIconSvg,
   isInverted = false,
-  isTogglable = false,
+  isSelectionTogglable = false,
   itemComponentType,
   itemLength: externalItemLength,
   itemPadding = 0,
@@ -90,8 +100,18 @@ export default forwardRef(({
   onDeselectAt,
   onSelectAt,
   onSelectionChange,
+  onToggleCustomEvent,
   ...props
 }, ref) => {
+  const isIndexOutOfRange = (index: number) => {
+    if (index >= data.length) return true
+    if (index < 0) return true
+
+    return false
+  }
+
+  const sanitizeSelectedIndices = (indices: number[]) => indices.sort().filter(t => !isIndexOutOfRange(t))
+
   const expand = () => {
     if (isCollapsed) setIsCollapsed(false)
   }
@@ -113,6 +133,14 @@ export default forwardRef(({
     onSelectAt?.(index)
 
     if (selectionMode === 'single' && collapsesOnSelect) collapse()
+  }
+
+  const selectionChangeHandler = (selection: number[]) => {
+    const newValue = selection.sort()
+
+    if (isDeepEqual(newValue, selectedIndices)) return
+
+    setSelectedIndices(newValue)
   }
 
   const clickOutsideHandler = (event: MouseEvent) => {
@@ -139,7 +167,7 @@ export default forwardRef(({
   }
 
   const bodyRef = useRef<HTMLDivElement>(null)
-  const [selectedIndices, setSelectedIndices] = useState(externalSelectedIndices)
+  const [selectedIndices, setSelectedIndices] = useState(sanitizeSelectedIndices(externalSelectedIndices))
   const [isCollapsed, setIsCollapsed] = useState(true)
   const rect = useElementRect(bodyRef)
 
@@ -152,10 +180,16 @@ export default forwardRef(({
   }, [isCollapsed])
 
   useEffect(() => {
-    if (isEqual(externalSelectedIndices, selectedIndices)) return
+    const newValue = sanitizeSelectedIndices(externalSelectedIndices)
 
-    setSelectedIndices(externalSelectedIndices)
-  }, [JSON.stringify(externalSelectedIndices)])
+    if (isDeepEqual(newValue, selectedIndices)) return
+
+    setSelectedIndices(newValue)
+  }, [JSON.stringify(sanitizeSelectedIndices(externalSelectedIndices))])
+
+  useEffect(() => {
+    onSelectionChange?.(selectedIndices)
+  }, [JSON.stringify(sanitizeSelectedIndices(selectedIndices))])
 
   const itemLength = externalItemLength ?? (orientation === 'vertical' ? rect.height : rect.width)
   const numItems = data.length
@@ -164,27 +198,27 @@ export default forwardRef(({
 
   const fixedClassNames = asClassNameDict({
     root: classNames(orientation, {
-      togglable: isTogglable,
+      togglable: isSelectionTogglable,
       collapsed: isCollapsed,
       expanded: !isCollapsed,
     }),
     toggle: classNames(orientation, {
-      togglable: isTogglable,
+      togglable: isSelectionTogglable,
       collapsed: isCollapsed,
       expanded: !isCollapsed,
     }),
     expandIcon: classNames(orientation, {
-      togglable: isTogglable,
+      togglable: isSelectionTogglable,
       collapsed: isCollapsed,
       expanded: !isCollapsed,
     }),
     collapseIcon: classNames(orientation, {
-      togglable: isTogglable,
+      togglable: isSelectionTogglable,
       collapsed: isCollapsed,
       expanded: !isCollapsed,
     }),
     list: classNames({
-      togglable: isTogglable,
+      togglable: isSelectionTogglable,
       collapsed: isCollapsed,
       expanded: !isCollapsed,
     }),
@@ -305,6 +339,7 @@ export default forwardRef(({
             className={classNames(fixedClassNames.toggle)}
             style={styles(fixedStyles.toggle)}
             onClick={() => toggle()}
+            onCustomEvent={(name, info) => onToggleCustomEvent?.(name, info)}
           />
         ) : (
           <button
@@ -324,7 +359,7 @@ export default forwardRef(({
           style={styles(fixedStyles.list)}
           borderThickness={borderThickness}
           data={data}
-          isTogglable={isTogglable}
+          isSelectionTogglable={isSelectionTogglable}
           itemComponentType={itemComponentType}
           itemLength={itemLength}
           itemPadding={itemPadding}
@@ -334,7 +369,7 @@ export default forwardRef(({
           onActivateAt={onActivateAt}
           onDeselectAt={onDeselectAt}
           onSelectAt={selectAtHandler}
-          onSelectionChange={onSelectionChange}
+          onSelectionChange={selectionChangeHandler}
         />
       </div>
     </div>

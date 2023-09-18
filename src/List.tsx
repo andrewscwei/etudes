@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import isEqual from 'fast-deep-equal'
+import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useState, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
 import Each from './Each'
 import usePrevious from './hooks/usePrevious'
@@ -14,6 +14,7 @@ export type ListItemProps<T> = HTMLAttributes<HTMLElement> & {
   index: number
   isSelected: boolean
   orientation: Orientation
+  onCustomEvent?: (name: string, info?: any) => void
 }
 
 export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
@@ -28,15 +29,10 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
   data: T[]
 
   /**
-   * Indicates if items can be toggled, i.e. they can be deselected if selected
-   * again.
+   * Indicates if item selection can be toggled, i.e. they can be deselected if
+   * selected again.
    */
-  isTogglable?: boolean
-
-  /**
-   * React component type to be used to generate items for this list.
-   */
-  itemComponentType?: ComponentType<ListItemProps<T>>
+  isSelectionTogglable?: boolean
 
   /**
    * Optional length (in pixels) of each item. Length refers to the height in
@@ -69,6 +65,11 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
   selectionMode?: 'none' | 'single' | 'multiple'
 
   /**
+   * React component type to be used to generate items for this list.
+   */
+  itemComponentType?: ComponentType<ListItemProps<T>>
+
+  /**
    * Handler invoked when an item is activated.
    *
    * @param index Item index.
@@ -81,6 +82,15 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
    * @param index Item index.
    */
   onDeselectAt?: (index: number) => void
+
+  /**
+   * Handler invoked when a custom event is dispatched from the item.
+   *
+   * @param index Index of the item.
+   * @param eventName Name of the dispatched custom event.
+   * @param eventInfo Optional info of the dispatched custom event.
+   */
+  onItemCustomEvent?: (index: number, eventName: string, eventInfo?: any) => void
 
   /**
    * Handler invoked when an item is selected.
@@ -108,14 +118,15 @@ export default forwardRef(({
   borderThickness = 0,
   data,
   selectionMode = 'none',
-  isTogglable,
-  itemComponentType: ItemComponent,
+  isSelectionTogglable = false,
   itemLength,
   itemPadding = 0,
   orientation = 'vertical',
   selectedIndices: externalSelectedIndices = [],
+  itemComponentType: ItemComponent,
   onActivateAt,
   onDeselectAt,
+  onItemCustomEvent,
   onSelectAt,
   onSelectionChange,
   ...props
@@ -126,6 +137,8 @@ export default forwardRef(({
 
     return false
   }
+
+  const sanitizeSelectedIndices = (indices: number[]) => indices.sort().filter(t => !isIndexOutOfRange(t))
 
   const isSelectedAt = (index: number) => selectedIndices.indexOf(index) >= 0
 
@@ -139,11 +152,11 @@ export default forwardRef(({
   }
 
   const selectAt = (index: number) => {
-    if (isSelectedAt(index)) return
+    if (isIndexOutOfRange(index) || isSelectedAt(index)) return
 
     switch (selectionMode) {
       case 'multiple':
-        setSelectedIndices(prev => [...prev.filter(t => t !== index), index])
+        setSelectedIndices(prev => [...prev.filter(t => t !== index), index].sort())
 
         break
       case 'single':
@@ -156,14 +169,14 @@ export default forwardRef(({
   }
 
   const deselectAt = (index: number) => {
-    if (!isSelectedAt(index)) return
+    if (isIndexOutOfRange(index) || !isSelectedAt(index)) return
 
     setSelectedIndices(prev => prev.filter(t => t !== index))
   }
 
   const activateAt = (index: number) => {
     if (selectionMode !== 'none') {
-      if (isTogglable) {
+      if (isSelectionTogglable) {
         toggleAt(index)
       }
       else {
@@ -174,33 +187,35 @@ export default forwardRef(({
     onActivateAt?.(index)
   }
 
-  const [selectedIndices, setSelectedIndices] = useState(externalSelectedIndices)
+  const [selectedIndices, setSelectedIndices] = useState(sanitizeSelectedIndices(externalSelectedIndices))
   const prevSelectedIndices = usePrevious(selectedIndices)
 
   useEffect(() => {
-    if (isEqual(externalSelectedIndices, selectedIndices)) return
+    const newValue = sanitizeSelectedIndices(externalSelectedIndices)
 
-    setSelectedIndices(externalSelectedIndices)
-  }, [JSON.stringify(externalSelectedIndices)])
+    if (isDeepEqual(newValue, selectedIndices)) return
+
+    setSelectedIndices(newValue)
+  }, [JSON.stringify(sanitizeSelectedIndices(externalSelectedIndices))])
 
   useEffect(() => {
     if (selectionMode === 'none') return
 
-    const deselected = prevSelectedIndices?.filter(t => !isIndexOutOfRange(t) && selectedIndices.indexOf(t) === -1) ?? []
-    const selected = selectedIndices.filter(t => !isIndexOutOfRange(t) && prevSelectedIndices?.indexOf(t) === -1)
+    const deselected = prevSelectedIndices?.filter(t => selectedIndices.indexOf(t) === -1) ?? []
+    const selected = selectedIndices.filter(t => prevSelectedIndices?.indexOf(t) === -1)
 
     deselected.map(t => onDeselectAt?.(t))
     selected.map(t => onSelectAt?.(t))
 
     onSelectionChange?.(selectedIndices)
-  }, [JSON.stringify(selectedIndices)])
+  }, [JSON.stringify(sanitizeSelectedIndices(selectedIndices))])
 
   const fixedClassNames = asClassNameDict({
     root: classNames(orientation, {
-      togglable: isTogglable,
+      togglable: isSelectionTogglable,
     }),
     item: classNames(orientation, {
-      togglable: isTogglable,
+      togglable: isSelectionTogglable,
     }),
   })
 
@@ -241,7 +256,7 @@ export default forwardRef(({
                 selected: isSelectedAt(idx),
               })}
               style={styles(fixedStyles.item, {
-                pointerEvents: isTogglable !== true && isSelectedAt(idx) ? 'none' : 'auto',
+                pointerEvents: isSelectionTogglable !== true && isSelectedAt(idx) ? 'none' : 'auto',
                 ...orientation === 'vertical' ? {
                   height: itemLength !== undefined ? `${itemLength}px` : undefined,
                   marginTop: `${idx === 0 ? 0 : -borderThickness}px`,
@@ -262,6 +277,7 @@ export default forwardRef(({
               index={idx}
               isSelected={isSelectedAt(idx)}
               orientation={orientation}
+              onCustomEvent={(name, info) => onItemCustomEvent?.(idx, name, info)}
               onClick={() => activateAt(idx)}
             />
           )}
