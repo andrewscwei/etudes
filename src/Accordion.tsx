@@ -10,22 +10,21 @@ import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
 import styles from './utils/styles'
 
-export type AccordionItemProps<T> = ListItemProps<T>
+export type AccordionItemProps<I> = ListItemProps<I>
 
-export type AccordionHeaderProps<T, A = never> = HTMLAttributes<HTMLElement> & PropsWithChildren<{
-  attributes?: A
-  data: AccordionSectionData<T>
+export type AccordionHeaderProps<I, S extends AccordionSectionData<I> = AccordionSectionData<I>> = HTMLAttributes<HTMLElement> & PropsWithChildren<{
+  section: S
   index: number
   isCollapsed: boolean
   onCustomEvent?: (name: string, info?: any) => void
 }>
 
-export type AccordionSectionData<T> = {
+export type AccordionSectionData<I> = {
   label: string
-  items: T[]
+  items: I[]
 }
 
-export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<T>, 'data' | 'itemComponentType' | 'selectedIndices' | 'onActivateAt' | 'onSelectAt' | 'onDeselectAt' | 'onSelectionChange'> & PropsWithChildren<{
+export type AccordionProps<I, S extends AccordionSectionData<I> = AccordionSectionData<I>> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<I>, 'data' | 'itemComponentType' | 'selectedIndices' | 'onActivateAt' | 'onSelectAt' | 'onDeselectAt' | 'onSelectionChange'> & PropsWithChildren<{
   /**
    * Specifies if expanded sections should automatically collapse upon expanding
    * another section.
@@ -40,7 +39,7 @@ export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<
   /**
    * Data provided to each section.
    */
-  data: AccordionSectionData<T>[]
+  data: S[]
 
   /**
    * Indices of sections that are expanded.
@@ -75,12 +74,12 @@ export type AccordionProps<T> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<
    * React component type to be used for generating headers inside the
    * component. When absent, one will be generated automatically.
    */
-  headerComponentType?: ComponentType<AccordionHeaderProps<T>>
+  headerComponentType?: ComponentType<AccordionHeaderProps<I, S>>
 
   /**
    * React component type to be used for generating items inside the component.
    */
-  itemComponentType: ComponentType<AccordionItemProps<T>>
+  itemComponentType: ComponentType<AccordionItemProps<I>>
 
   /**
    * Handler invoked when an item is activated in a section.
@@ -437,9 +436,9 @@ export default forwardRef(({
                 <HeaderComponent
                   className={classNames(fixedClassNames.header, { collapsed: isCollapsed, expanded: !isCollapsed })}
                   style={styles(fixedStyles.header)}
-                  data={section}
                   index={sectionIndex}
                   isCollapsed={isCollapsed}
+                  section={section}
                   onClick={() => toggleSectionAt(sectionIndex)}
                   onCustomEvent={(name, info) => onHeaderCustomEvent?.(sectionIndex, name, info)}
                 />
@@ -485,4 +484,4 @@ export default forwardRef(({
       </Each>
     </div>
   )
-}) as <T>(props: AccordionProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
+}) as <I, S extends AccordionSectionData<I> = AccordionSectionData<I>>(props: AccordionProps<I, S> & { ref?: Ref<HTMLDivElement> }) => ReactElement
