@@ -27,7 +27,7 @@ export default function ListDemo() {
       <StyledRoot className={orientation}>
         <StyledList
           data={[...new Array(60)].map((v, i) => `${i + 1}`)}
-          isTogglable={true}
+          isSelectionTogglable={true}
           itemComponentType={ListItem}
           itemPadding={20}
           orientation={orientation}

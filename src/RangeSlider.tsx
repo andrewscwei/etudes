@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import isEqual from 'fast-deep-equal'
+import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
 import useDragEffect from './hooks/useDragEffect'
 import useResizeEffect from './hooks/useResizeEffect'
@@ -113,7 +113,7 @@ export default forwardRef<HTMLDivElement, RangeSliderProps>(({
   }, [endValue])
 
   useEffect(() => {
-    if (isDraggingStartKnob || isDraggingEndKnob || isEqual(externalRange, range)) return
+    if (isDraggingStartKnob || isDraggingEndKnob || isDeepEqual(externalRange, range)) return
     setRange(externalRange ?? [minValue, maxValue])
   }, [externalRange])
 
@@ -245,13 +245,13 @@ export default forwardRef<HTMLDivElement, RangeSliderProps>(({
           transitionProperty: isReleasingStartKnob ? 'opacity, transform' : 'opacity',
         })}/>, {
           ref: startKnobRef,
-          disabled: isEqual([startValue, endValue], [maxValue, maxValue]),
+          disabled: isDeepEqual([startValue, endValue], [maxValue, maxValue]),
           className: classNames(fixedClassNames.knob, {
             dragging: isDraggingStartKnob,
             releasing: isReleasingStartKnob,
           }),
           style: styles(fixedStyles.knob, {
-            pointerEvents: isEqual([startValue, endValue], [minValue, minValue]) ? 'none' : 'auto',
+            pointerEvents: isDeepEqual([startValue, endValue], [minValue, minValue]) ? 'none' : 'auto',
           }, orientation === 'horizontal' ? {
             marginLeft: `${start}px`,
           } : {
@@ -272,13 +272,13 @@ export default forwardRef<HTMLDivElement, RangeSliderProps>(({
           transitionProperty: isReleasingEndKnob ? 'opacity, transform' : 'opacity',
         })}/>, {
           ref: endKnobRef,
-          disabled: isEqual([startValue, endValue], [maxValue, maxValue]),
+          disabled: isDeepEqual([startValue, endValue], [maxValue, maxValue]),
           className: classNames(fixedClassNames.knob, {
             dragging: isDraggingEndKnob,
             releasing: isDraggingEndKnob,
           }),
           style: styles(fixedStyles.knob, {
-            pointerEvents: isEqual([startValue, endValue], [maxValue, maxValue]) ? 'none' : 'auto',
+            pointerEvents: isDeepEqual([startValue, endValue], [maxValue, maxValue]) ? 'none' : 'auto',
           }, orientation === 'horizontal' ? {
             marginLeft: `${end}px`,
           } : {
