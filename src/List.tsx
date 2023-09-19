@@ -199,7 +199,7 @@ export default forwardRef(({
 
   useEffect(() => {
     if (selectionMode === 'none') return
-    if (isDeepEqual(selectedIndices, sanitizedExternalSelectedIndices)) return
+    if (prevSelectedIndices === undefined) return
 
     const deselected = prevSelectedIndices?.filter(t => selectedIndices.indexOf(t) === -1) ?? []
     const selected = selectedIndices.filter(t => prevSelectedIndices?.indexOf(t) === -1)

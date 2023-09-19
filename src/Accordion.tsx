@@ -262,6 +262,7 @@ export default forwardRef(({
 
   const sanitizedExternalSelectedItemIndices = sanitizeSelectedItemIndices(externalSelectedItemIndices)
   const [selectedItemIndices, setSelectedItemIndices] = useState(sanitizedExternalSelectedItemIndices)
+  const prevSelectedItemIndices = usePrevious(selectedItemIndices)
 
   useEffect(() => {
     if (isDeepEqual(sanitizedExpandedSectionIndices, expandedSectionIndices)) return
@@ -286,7 +287,7 @@ export default forwardRef(({
   }, [JSON.stringify(sanitizedExternalSelectedItemIndices)])
 
   useEffect(() => {
-    if (isDeepEqual(selectedItemIndices, sanitizedExternalSelectedItemIndices)) return
+    if (prevSelectedItemIndices === undefined) return
 
     onSelectionChange?.(selectedItemIndices)
   }, [JSON.stringify(selectedItemIndices)])
