@@ -9,7 +9,7 @@ import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
 import styles from './utils/styles'
 
-export type DropdownData = {
+export type DropdownItemData = {
   label?: string
 }
 
@@ -17,9 +17,9 @@ export type DropdownToggleProps = HTMLAttributes<HTMLElement> & {
   onCustomEvent?: (name: string, info?: any) => void
 }
 
-export type DropdownItemProps<T extends DropdownData = DropdownData> = ListItemProps<T>
+export type DropdownItemProps<T extends DropdownItemData = DropdownItemData> = ListItemProps<T>
 
-export type DropdownProps<T extends DropdownData = DropdownData> = HTMLAttributes<HTMLDivElement> & ListProps<T> & PropsWithChildren<{
+export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLAttributes<HTMLDivElement> & ListProps<T> & PropsWithChildren<{
   /**
    * SVG markup to be put in the dropdown button as the collapse icon.
    */
@@ -32,9 +32,9 @@ export type DropdownProps<T extends DropdownData = DropdownData> = HTMLAttribute
   collapsesOnSelect?: boolean
 
   /**
-   * The label to appear on the dropdown button when no items are selected.
+   * The label to appear on the dropdown toggle button.
    */
-  defaultLabel?: string
+  label?: (selectedIndices: number[]) => string
 
   /**
    * SVG markup to be put in the dropdown button as the expand icon.
@@ -84,7 +84,7 @@ export default forwardRef(({
   collapseIconSvg,
   collapsesOnSelect = true,
   data,
-  defaultLabel = 'Select',
+  label,
   expandIconSvg,
   isInverted = false,
   isSelectionTogglable = false,
@@ -347,7 +347,7 @@ export default forwardRef(({
             style={styles(fixedStyles.toggle, defaultStyles.toggle)}
             onClick={() => toggle()}
           >
-            <label style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: selectedIndices.length > 0 ? selectedIndices.map(t => data[t].label).join(', ') : defaultLabel ?? '' }}/>
+            <label style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: label?.(selectedIndices) ?? (selectedIndices.length > 0 ? selectedIndices.map(t => data[t].label).join(', ') : '') }}/>
             {cloneStyledElement(isCollapsed ? expandIconComponent : collapseIconComponent, {
               className: classNames(isCollapsed ? fixedClassNames.expandIcon : fixedClassNames.collapseIcon),
               style: styles(isCollapsed ? fixedStyles.expandIcon : fixedStyles.collapseIcon),
@@ -374,4 +374,4 @@ export default forwardRef(({
       </div>
     </div>
   )
-}) as <T extends DropdownData = DropdownData>(props: DropdownProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
+}) as <T extends DropdownItemData = DropdownItemData>(props: DropdownProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
