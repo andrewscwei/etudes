@@ -38,13 +38,12 @@ export default function ListDemo() {
       </StyledRoot>
       <StyledDropdown
         data={[{ label: 'Vertical' }, { label: 'Horizontal' }]}
-        defaultLabel='Select orientation'
         expandIconSvg={$$ExpandIcon}
         isInverted={false}
-        itemComponentType={DropdownItem}
         maxVisibleItems={-1}
         orientation='vertical'
         selectedIndices={[selectedOrientationIndex]}
+        itemComponentType={DropdownItem}
         onSelectAt={idx => setSelectedOrientationIndex(idx)}
       />
       <DebugConsole
