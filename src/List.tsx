@@ -152,7 +152,7 @@ export default forwardRef(({
   }
 
   const selectAt = (index: number) => {
-    if (isIndexOutOfRange(index) || isSelectedAt(index)) return
+    if (isSelectedAt(index)) return
 
     switch (selectionMode) {
       case 'multiple':
@@ -169,7 +169,7 @@ export default forwardRef(({
   }
 
   const deselectAt = (index: number) => {
-    if (isIndexOutOfRange(index) || !isSelectedAt(index)) return
+    if (!isSelectedAt(index)) return
 
     setSelectedIndices(prev => prev.filter(t => t !== index))
   }
@@ -187,19 +187,19 @@ export default forwardRef(({
     onActivateAt?.(index)
   }
 
-  const [selectedIndices, setSelectedIndices] = useState(sanitizeSelectedIndices(externalSelectedIndices))
+  const sanitizedExternalSelectedIndices = sanitizeSelectedIndices(externalSelectedIndices)
+  const [selectedIndices, setSelectedIndices] = useState(sanitizedExternalSelectedIndices)
   const prevSelectedIndices = usePrevious(selectedIndices)
 
   useEffect(() => {
-    const newValue = sanitizeSelectedIndices(externalSelectedIndices)
+    if (isDeepEqual(sanitizedExternalSelectedIndices, selectedIndices)) return
 
-    if (isDeepEqual(newValue, selectedIndices)) return
-
-    setSelectedIndices(newValue)
-  }, [JSON.stringify(sanitizeSelectedIndices(externalSelectedIndices))])
+    setSelectedIndices(sanitizedExternalSelectedIndices)
+  }, [JSON.stringify(sanitizedExternalSelectedIndices)])
 
   useEffect(() => {
     if (selectionMode === 'none') return
+    if (isDeepEqual(selectedIndices, sanitizedExternalSelectedIndices)) return
 
     const deselected = prevSelectedIndices?.filter(t => selectedIndices.indexOf(t) === -1) ?? []
     const selected = selectedIndices.filter(t => prevSelectedIndices?.indexOf(t) === -1)
@@ -208,7 +208,7 @@ export default forwardRef(({
     selected.map(t => onSelectAt?.(t))
 
     onSelectionChange?.(selectedIndices)
-  }, [JSON.stringify(sanitizeSelectedIndices(selectedIndices))])
+  }, [JSON.stringify(selectedIndices)])
 
   const fixedClassNames = asClassNameDict({
     root: classNames(orientation, {
