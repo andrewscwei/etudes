@@ -246,45 +246,50 @@ export default forwardRef(({
   const deselectAt = (itemIndex: number, sectionIndex: number) => {
     if (isItemIndexOutOfRange(itemIndex, sectionIndex)) return
 
-    setSelectedItemIndices(prev => ({
-      ...prev,
-      [sectionIndex]: (prev[sectionIndex] ?? []).filter(t => t !== itemIndex),
-    }))
+    setSelectedItemIndices(prev => {
+      const { [sectionIndex]: indices, ...rest } = prev
+      const newIndices = (indices ?? []).filter(t => t !== itemIndex)
+
+      return newIndices.length > 0 ? { ...rest, [sectionIndex]: newIndices } : { ...rest }
+    })
 
     onDeselectAt?.(itemIndex, sectionIndex)
   }
 
-  const [expandedSectionIndices, setExpandedSectionIndices] = useState(sanitizeExpandedSectionIndices(externalExpandedSectionIndices))
+  const sanitizedExpandedSectionIndices = sanitizeExpandedSectionIndices(externalExpandedSectionIndices)
+  const [expandedSectionIndices, setExpandedSectionIndices] = useState(sanitizedExpandedSectionIndices)
   const prevExpandedSectionIndices = usePrevious(expandedSectionIndices)
-  const [selectedItemIndices, setSelectedItemIndices] = useState(externalSelectedItemIndices)
+
+  const sanitizedExternalSelectedItemIndices = sanitizeSelectedItemIndices(externalSelectedItemIndices)
+  const [selectedItemIndices, setSelectedItemIndices] = useState(sanitizedExternalSelectedItemIndices)
 
   useEffect(() => {
-    const newValue = sanitizeExpandedSectionIndices(externalExpandedSectionIndices)
+    if (isDeepEqual(sanitizedExpandedSectionIndices, expandedSectionIndices)) return
 
-    if (isDeepEqual(newValue, expandedSectionIndices)) return
-
-    setExpandedSectionIndices(newValue)
-  }, [JSON.stringify(sanitizeExpandedSectionIndices(externalExpandedSectionIndices))])
+    setExpandedSectionIndices(sanitizedExpandedSectionIndices)
+  }, [JSON.stringify(sanitizedExpandedSectionIndices)])
 
   useEffect(() => {
+    if (isDeepEqual(expandedSectionIndices, sanitizedExpandedSectionIndices)) return
+
     const collapsed = prevExpandedSectionIndices?.filter(t => expandedSectionIndices.indexOf(t) === -1) ?? []
     const expanded = expandedSectionIndices.filter(t => prevExpandedSectionIndices?.indexOf(t) === -1)
 
     collapsed.map(t => onCollapseSectionAt?.(t))
     expanded.map(t => onExpandSectionAt?.(t))
-  }, [JSON.stringify(sanitizeExpandedSectionIndices(expandedSectionIndices))])
+  }, [JSON.stringify(expandedSectionIndices)])
 
   useEffect(() => {
-    const newValue = sanitizeSelectedItemIndices(externalSelectedItemIndices)
+    if (isDeepEqual(sanitizedExternalSelectedItemIndices, selectedItemIndices)) return
 
-    if (isDeepEqual(newValue, selectedItemIndices)) return
-
-    setSelectedItemIndices(newValue)
-  }, [JSON.stringify(sanitizeSelectedItemIndices(externalSelectedItemIndices))])
+    setSelectedItemIndices(sanitizedExternalSelectedItemIndices)
+  }, [JSON.stringify(sanitizedExternalSelectedItemIndices)])
 
   useEffect(() => {
+    if (isDeepEqual(selectedItemIndices, sanitizedExternalSelectedItemIndices)) return
+
     onSelectionChange?.(selectedItemIndices)
-  }, [JSON.stringify(sanitizeSelectedItemIndices(selectedItemIndices))])
+  }, [JSON.stringify(selectedItemIndices)])
 
   const fixedClassNames = asClassNameDict({
     root: classNames(orientation),
