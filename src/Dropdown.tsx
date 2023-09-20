@@ -79,18 +79,6 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
   onToggleCustomEvent?: (eventName: string, eventInfo?: any) => void
 }>
 
-type StylesProps = {
-  borderThickness?: number
-  isCollapsed?: boolean
-  isInverted?: boolean
-  isSelectionTogglable?: boolean
-  itemPadding?: number
-  maxVisibleItems?: number
-  menuLength?: number
-  numItems?: number
-  orientation?: ListOrientation
-}
-
 /**
  * A dropdown menu component that is invertible (i.e. can "dropup" instead) and
  * supports both horizontal and vertical orientations. Provide data and item
@@ -100,11 +88,11 @@ export default forwardRef(({
   children,
   className,
   style,
-  borderThickness = 0,
   collapseIconSvg,
   collapsesOnSelect = true,
   data,
   label,
+  layout,
   expandIconSvg,
   isInverted = false,
   isSelectionTogglable = false,
@@ -112,6 +100,7 @@ export default forwardRef(({
   itemLength: externalItemLength,
   itemPadding = 0,
   maxVisibleItems = -1,
+  numSegments,
   orientation = 'vertical',
   selection: externalSelection = [],
   selectionMode = 'single',
@@ -156,8 +145,8 @@ export default forwardRef(({
     if (selectionMode === 'single' && collapsesOnSelect) collapse()
   }
 
-  const selectionChangeHandler = (selection: ListSelection) => {
-    const newValue = selection.sort()
+  const selectionChangeHandler = (value: ListSelection) => {
+    const newValue = value.sort()
 
     if (isDeepEqual(newValue, selection)) return
 
@@ -212,15 +201,15 @@ export default forwardRef(({
     if (!prevSelection) return
 
     onSelectionChange?.(selection)
-  }, [JSON.stringify(sanitizedSelection(selection))])
+  }, [JSON.stringify(selection)])
 
   const itemLength = externalItemLength ?? (orientation === 'vertical' ? rect.height : rect.width)
   const numItems = data.length
   const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
-  const menuLength = (itemLength - borderThickness) * numVisibleItems + itemPadding * (numVisibleItems - 1) + borderThickness
+  const menuLength = itemLength * numVisibleItems + itemPadding * (numVisibleItems - 1)
 
   const fixedClassNames = getFixedClassNames({ isCollapsed, isSelectionTogglable, orientation })
-  const fixedStyles = getFixedStyles({ borderThickness, isCollapsed, isInverted, itemPadding, maxVisibleItems, menuLength, numItems, orientation })
+  const fixedStyles = getFixedStyles({ isCollapsed, isInverted, itemPadding, maxVisibleItems, menuLength, numItems, orientation })
   const defaultStyles: Record<string, any> = useDefaultStyles ? getDefaultStyles({}) : {}
 
   const expandIconComponent = expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>
@@ -257,12 +246,13 @@ export default forwardRef(({
         <List
           className={fixedClassNames.list}
           style={styles(fixedStyles.list)}
-          borderThickness={borderThickness}
           data={data}
           isSelectionTogglable={isSelectionTogglable}
           itemComponentType={itemComponentType}
           itemLength={itemLength}
           itemPadding={itemPadding}
+          layout={layout}
+          numSegments={numSegments}
           orientation={orientation}
           selection={selection}
           selectionMode={selectionMode}
@@ -275,6 +265,17 @@ export default forwardRef(({
     </div>
   )
 }) as <T extends DropdownItemData = DropdownItemData>(props: DropdownProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
+
+type StylesProps = {
+  isCollapsed?: boolean
+  isInverted?: boolean
+  isSelectionTogglable?: boolean
+  itemPadding?: number
+  maxVisibleItems?: number
+  menuLength?: number
+  numItems?: number
+  orientation?: ListOrientation
+}
 
 function getFixedClassNames({ isCollapsed, isSelectionTogglable, orientation }: StylesProps) {
   return asClassNameDict({
@@ -306,7 +307,7 @@ function getFixedClassNames({ isCollapsed, isSelectionTogglable, orientation }: 
   })
 }
 
-function getFixedStyles({ borderThickness = 0, isCollapsed, isInverted, itemPadding = 0, maxVisibleItems = 0, menuLength, numItems = 0, orientation }: StylesProps) {
+function getFixedStyles({ isCollapsed, isInverted, itemPadding = 0, maxVisibleItems = 0, menuLength, numItems = 0, orientation }: StylesProps) {
   return asStyleDict({
     root: {
       alignItems: 'center',
@@ -324,7 +325,6 @@ function getFixedStyles({ borderThickness = 0, isCollapsed, isInverted, itemPadd
       width: '100%',
     },
     toggle: {
-      borderWidth: `${borderThickness}px`,
       cursor: 'pointer',
       height: '100%',
       left: '0',
@@ -357,11 +357,11 @@ function getFixedStyles({ borderThickness = 0, isCollapsed, isInverted, itemPadd
         height: isCollapsed ? '0px' : `${menuLength}px`,
         overflowY: maxVisibleItems === -1 ? 'hidden' : maxVisibleItems < numItems ? 'scroll' : 'hidden',
         ...isInverted ? {
-          marginBottom: `${itemPadding - borderThickness}px`,
+          marginBottom: `${itemPadding}px`,
           bottom: '100%',
         } : {
           top: '100%',
-          marginTop: `${itemPadding - borderThickness}px`,
+          marginTop: `${itemPadding}px`,
         },
       } : {
         transition: 'width 100ms ease-out',
@@ -369,11 +369,11 @@ function getFixedStyles({ borderThickness = 0, isCollapsed, isInverted, itemPadd
         height: '100%',
         overflowX: maxVisibleItems === -1 ? 'hidden' : maxVisibleItems < numItems ? 'scroll' : 'hidden',
         ...isInverted ? {
-          marginRight: `${itemPadding - borderThickness}px`,
+          marginRight: `${itemPadding}px`,
           right: '100%',
         } : {
           left: '100%',
-          marginLeft: `${itemPadding - borderThickness}px`,
+          marginLeft: `${itemPadding}px`,
         },
       },
     },

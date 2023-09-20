@@ -41,13 +41,25 @@ export default function ListDemo() {
   return (
     <>
       <StyledRoot className={orientation}>
-        <StyledList
+        <List
           data={[...new Array(60)].map((v, i) => `${i + 1}`)}
           isSelectionTogglable={true}
           itemComponentType={ListItem}
-          itemPadding={20}
+          itemPadding={10}
+          itemLength={50}
+          layout='grid'
+          numSegments={3}
           orientation={orientation}
           selectionMode='single'
+          style={orientation === 'horizontal' ? {
+            height: '80%',
+            minHeight: '400px',
+            transform: 'translate3d(0, 0, 0) rotate3d(1, .1, 0, 10deg)',
+          } : {
+            width: '80%',
+            minWidth: '400px',
+            transform: 'translate3d(0, 0, 0) rotate3d(1, 1, 0, 10deg)',
+          }}
           onSelectionChange={listSelectionChangeHandler}
         />
       </StyledRoot>
@@ -171,31 +183,9 @@ const StyledListItem = styled.button`
     z-index: 1;
   }
 
-  &.horizontal {
-    height: 100%;
-  }
-
-  &.vertical {
-    width: 100%;
-  }
-
   &.selected {
     background: #ff0054;
     color: #fff;
-  }
-`
-
-const StyledList = styled(List<string>)`
-  &.horizontal {
-    height: 80%;
-    min-height: 400px;
-    transform: translate3d(0, 0, 0) rotate3d(1, .1, 0, 10deg);
-  }
-
-  &.vertical {
-    width: 80%;
-    min-width: 400px;
-    transform: translate3d(0, 0, 0) rotate3d(1, 1, 0, 10deg);
   }
 `
 

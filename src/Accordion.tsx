@@ -153,7 +153,6 @@ export default forwardRef(({
   className,
   style,
   autoCollapseSections = false,
-  borderThickness = 0,
   collapseIconSvg,
   data,
   expandedSectionIndices: externalExpandedSectionIndices = [],
@@ -295,7 +294,7 @@ export default forwardRef(({
   }, [JSON.stringify(selection)])
 
   const fixedClassNames = getFixedClassNames({ orientation })
-  const fixedStyles = getFixedStyles({ borderThickness, orientation })
+  const fixedStyles = getFixedStyles({ orientation })
   const defaultStyles: Record<string, any> = useDefaultStyles ? getDefaultStyles({ orientation }) : {}
 
   return (
@@ -310,16 +309,16 @@ export default forwardRef(({
           const maxVisible = maxVisibleItems?.[sectionIndex] ?? -1
           const numItems = section.items.length
           const numVisibleItems = maxVisible < 0 ? numItems : Math.min(numItems, maxVisible)
-          const menuLength = (itemLength - borderThickness) * numVisibleItems + itemPadding * (numVisibleItems - 1) + borderThickness
+          const menuLength = itemLength * numVisibleItems + itemPadding * (numVisibleItems - 1)
           const isCollapsed = !isSectionExpandedAt(sectionIndex)
           const expandIconComponent = expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>
           const collapseIconComponent = collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles.collapseIcon}/> : expandIconComponent
 
           return (
             <div style={styles(fixedStyles.section, orientation === 'vertical' ? {
-              marginTop: sectionIndex === 0 ? '0px' : `${sectionPadding - borderThickness}px`,
+              marginTop: sectionIndex === 0 ? '0px' : `${sectionPadding}px`,
             } : {
-              marginLeft: sectionIndex === 0 ? '0px' : `${sectionPadding - borderThickness}px`,
+              marginLeft: sectionIndex === 0 ? '0px' : `${sectionPadding}px`,
             })}>
               {HeaderComponent ? (
                 <HeaderComponent
@@ -347,14 +346,13 @@ export default forwardRef(({
               <List
                 style={styles(fixedStyles.list, defaultStyles.list, orientation === 'vertical' ? {
                   height: isCollapsed ? '0px' : `${menuLength}px`,
-                  marginTop: isCollapsed ? '0px' : `${itemPadding - borderThickness}px`,
+                  marginTop: isCollapsed ? '0px' : `${itemPadding}px`,
                   overflowY: maxVisible < 0 ? 'hidden' : maxVisible < numItems ? 'scroll' : 'hidden',
                 } : {
-                  marginLeft: isCollapsed ? '0px' : `${itemPadding - borderThickness}px`,
+                  marginLeft: isCollapsed ? '0px' : `${itemPadding}px`,
                   overflowX: maxVisible < 0 ? 'hidden' : maxVisible < numItems ? 'scroll' : 'hidden',
                   width: isCollapsed ? '0px' : `${menuLength}px`,
                 })}
-                borderThickness={borderThickness}
                 data={section.items}
                 selectionMode={selectionMode}
                 isSelectionTogglable={isSelectionTogglable}
@@ -384,7 +382,7 @@ function getFixedClassNames({ orientation }: StylesProps) {
   })
 }
 
-function getFixedStyles({ borderThickness, orientation }: StylesProps) {
+function getFixedStyles({ orientation }: StylesProps) {
   return asStyleDict({
     root: {
       alignItems: 'center',
