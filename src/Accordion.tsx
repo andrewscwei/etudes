@@ -26,7 +26,7 @@ export type AccordionHeaderProps<I, S extends AccordionSectionData<I> = Accordio
   onCustomEvent?: (name: string, info?: any) => void
 }>
 
-export type AccordionProps<I, S extends AccordionSectionData<I> = AccordionSectionData<I>> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<I>, 'data' | 'itemComponentType' | 'selectedIndices' | 'onActivateAt' | 'onSelectAt' | 'onDeselectAt' | 'onSelectionChange'> & PropsWithChildren<{
+export type AccordionProps<I, S extends AccordionSectionData<I> = AccordionSectionData<I>> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<I>, 'data' | 'itemComponentType' | 'selection' | 'onActivateAt' | 'onSelectAt' | 'onDeselectAt' | 'onSelectionChange'> & PropsWithChildren<{
   /**
    * Specifies if expanded sections should automatically collapse upon expanding
    * another section.
@@ -267,7 +267,6 @@ export default forwardRef(({
 
   const sanitizedExternalSelection = sanitizeSelection(externalSelection)
   const [selection, setSelection] = useState(sanitizedExternalSelection)
-  const prevSelection = usePrevious(selection)
 
   useEffect(() => {
     if (isDeepEqual(sanitizedExpandedSectionIndices, expandedSectionIndices)) return
@@ -292,8 +291,6 @@ export default forwardRef(({
   }, [JSON.stringify(sanitizedExternalSelection)])
 
   useEffect(() => {
-    if (!prevSelection) return
-
     onSelectionChange?.(selection)
   }, [JSON.stringify(selection)])
 
@@ -365,7 +362,7 @@ export default forwardRef(({
                 itemLength={itemLength}
                 itemPadding={itemPadding}
                 orientation={orientation}
-                selectedIndices={selection[sectionIndex] ?? []}
+                selection={selection[sectionIndex] ?? []}
                 onActivateAt={itemIndex => onActivateAt?.(itemIndex, sectionIndex)}
                 onDeselectAt={itemIndex => deselectAt(itemIndex, sectionIndex)}
                 onSelectAt={itemIndex => selectAt(itemIndex, sectionIndex)}

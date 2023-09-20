@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
 import FlatSVG from './FlatSVG'
-import List, { type ListItemProps, type ListOrientation, type ListProps } from './List'
+import List, { type ListItemProps, type ListOrientation, type ListProps, type ListSelection } from './List'
 import useElementRect from './hooks/useElementRect'
 import usePrevious from './hooks/usePrevious'
 import asClassNameDict from './utils/asClassNameDict'
@@ -34,8 +34,10 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
 
   /**
    * The label to appear on the dropdown toggle button.
+   *
+   * @param selection The current selection.
    */
-  label?: (selectedIndices: number[]) => string
+  label?: (selection: ListSelection) => string
 
   /**
    * SVG markup to be put in the dropdown button as the expand icon.
@@ -111,7 +113,7 @@ export default forwardRef(({
   itemPadding = 0,
   maxVisibleItems = -1,
   orientation = 'vertical',
-  selectedIndices: externalSelectedIndices = [],
+  selection: externalSelection = [],
   selectionMode = 'single',
   useDefaultStyles = false,
   toggleComponentType: ToggleComponent,
@@ -129,7 +131,7 @@ export default forwardRef(({
     return false
   }
 
-  const sanitizeSelectedIndices = (indices: number[]) => indices.sort().filter(t => !isIndexOutOfRange(t))
+  const sanitizedSelection = (selection: ListSelection) => selection.sort().filter(t => !isIndexOutOfRange(t))
 
   const expand = () => {
     if (isCollapsed) setIsCollapsed(false)
@@ -154,12 +156,12 @@ export default forwardRef(({
     if (selectionMode === 'single' && collapsesOnSelect) collapse()
   }
 
-  const selectionChangeHandler = (selection: number[]) => {
+  const selectionChangeHandler = (selection: ListSelection) => {
     const newValue = selection.sort()
 
-    if (isDeepEqual(newValue, selectedIndices)) return
+    if (isDeepEqual(newValue, selection)) return
 
-    setSelectedIndices(newValue)
+    setSelection(newValue)
   }
 
   const clickOutsideHandler = (event: MouseEvent) => {
@@ -186,9 +188,9 @@ export default forwardRef(({
   }
 
   const bodyRef = useRef<HTMLDivElement>(null)
-  const sanitizedExternalSelectedIndices = sanitizeSelectedIndices(externalSelectedIndices)
-  const [selectedIndices, setSelectedIndices] = useState(sanitizedExternalSelectedIndices)
-  const prevSelectedIndices = usePrevious(selectedIndices)
+  const sanitizedExternalSelection = sanitizedSelection(externalSelection)
+  const [selection, setSelection] = useState(sanitizedExternalSelection)
+  const prevSelection = usePrevious(selection, { sanitizeDependency: JSON.stringify })
   const [isCollapsed, setIsCollapsed] = useState(true)
   const rect = useElementRect(bodyRef)
 
@@ -201,16 +203,16 @@ export default forwardRef(({
   }, [isCollapsed])
 
   useEffect(() => {
-    if (isDeepEqual(sanitizedExternalSelectedIndices, selectedIndices)) return
+    if (isDeepEqual(sanitizedExternalSelection, selection)) return
 
-    setSelectedIndices(sanitizedExternalSelectedIndices)
-  }, [JSON.stringify(sanitizedExternalSelectedIndices)])
+    setSelection(sanitizedExternalSelection)
+  }, [JSON.stringify(sanitizedExternalSelection)])
 
   useEffect(() => {
-    if (!prevSelectedIndices) return
+    if (!prevSelection) return
 
-    onSelectionChange?.(selectedIndices)
-  }, [JSON.stringify(sanitizeSelectedIndices(selectedIndices))])
+    onSelectionChange?.(selection)
+  }, [JSON.stringify(sanitizedSelection(selection))])
 
   const itemLength = externalItemLength ?? (orientation === 'vertical' ? rect.height : rect.width)
   const numItems = data.length
@@ -245,7 +247,7 @@ export default forwardRef(({
             style={styles(fixedStyles.toggle, defaultStyles.toggle)}
             onClick={() => toggle()}
           >
-            <label style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: label?.(selectedIndices) ?? (selectedIndices.length > 0 ? selectedIndices.map(t => data[t].label).join(', ') : '') }}/>
+            <label style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: label?.(selection) ?? (selection.length > 0 ? selection.map(t => data[t].label).join(', ') : '') }}/>
             {cloneStyledElement(isCollapsed ? expandIconComponent : collapseIconComponent, {
               className: classNames(isCollapsed ? fixedClassNames.expandIcon : fixedClassNames.collapseIcon),
               style: styles(isCollapsed ? fixedStyles.expandIcon : fixedStyles.collapseIcon),
@@ -262,7 +264,7 @@ export default forwardRef(({
           itemLength={itemLength}
           itemPadding={itemPadding}
           orientation={orientation}
-          selectedIndices={selectedIndices}
+          selection={selection}
           selectionMode={selectionMode}
           onActivateAt={onActivateAt}
           onDeselectAt={onDeselectAt}
