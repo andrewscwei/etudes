@@ -9,6 +9,8 @@ import styles from './utils/styles'
 
 export type ListOrientation = 'horizontal' | 'vertical'
 
+export type ListSelection = number[]
+
 export type ListItemProps<T> = HTMLAttributes<HTMLElement> & {
   data: T
   index: number
@@ -54,7 +56,7 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
    * The selected indices. If `selectionMode` is `single`, only only the first
    * value will be used.
    */
-  selectedIndices?: number[]
+  selection?: ListSelection
 
   /**
    * Indicates the selection behavior:
@@ -102,9 +104,9 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
   /**
    * Handler invoked when the selected items changed.
    *
-   * @param indices Indices of selected items.
+   * @param selection Indices of selected items.
    */
-  onSelectionChange?: (indices: number[]) => void
+  onSelectionChange?: (selection: ListSelection) => void
 }
 
 type StylesProps = {
@@ -128,7 +130,7 @@ export default forwardRef(({
   itemLength,
   itemPadding = 0,
   orientation = 'vertical',
-  selectedIndices: externalSelectedIndices = [],
+  selection: externalSelection = [],
   itemComponentType: ItemComponent,
   onActivateAt,
   onDeselectAt,
@@ -144,9 +146,9 @@ export default forwardRef(({
     return false
   }
 
-  const sanitizeSelectedIndices = (indices: number[]) => indices.sort().filter(t => !isIndexOutOfRange(t))
+  const sanitizeSelection = (indices: ListSelection) => indices.sort().filter(t => !isIndexOutOfRange(t))
 
-  const isSelectedAt = (index: number) => selectedIndices.indexOf(index) >= 0
+  const isSelectedAt = (index: number) => selection.indexOf(index) >= 0
 
   const toggleAt = (index: number) => {
     if (isSelectedAt(index)) {
@@ -162,11 +164,11 @@ export default forwardRef(({
 
     switch (selectionMode) {
       case 'multiple':
-        setSelectedIndices(prev => [...prev.filter(t => t !== index), index].sort())
+        setSelection(prev => [...prev.filter(t => t !== index), index].sort())
 
         break
       case 'single':
-        setSelectedIndices([index])
+        setSelection([index])
 
         break
       default:
@@ -177,7 +179,7 @@ export default forwardRef(({
   const deselectAt = (index: number) => {
     if (!isSelectedAt(index)) return
 
-    setSelectedIndices(prev => prev.filter(t => t !== index))
+    setSelection(prev => prev.filter(t => t !== index))
   }
 
   const activateAt = (index: number) => {
@@ -193,28 +195,28 @@ export default forwardRef(({
     onActivateAt?.(index)
   }
 
-  const sanitizedExternalSelectedIndices = sanitizeSelectedIndices(externalSelectedIndices)
-  const [selectedIndices, setSelectedIndices] = useState(sanitizedExternalSelectedIndices)
-  const prevSelectedIndices = usePrevious(selectedIndices)
+  const sanitizedExternalSelection = sanitizeSelection(externalSelection)
+  const [selection, setSelection] = useState(sanitizedExternalSelection)
+  const prevSelection = usePrevious(selection, { sanitizeDependency: JSON.stringify })
 
   useEffect(() => {
-    if (isDeepEqual(sanitizedExternalSelectedIndices, selectedIndices)) return
+    if (isDeepEqual(sanitizedExternalSelection, selection)) return
 
-    setSelectedIndices(sanitizedExternalSelectedIndices)
-  }, [JSON.stringify(sanitizedExternalSelectedIndices)])
+    setSelection(sanitizedExternalSelection)
+  }, [JSON.stringify(sanitizedExternalSelection)])
 
   useEffect(() => {
-    if (prevSelectedIndices === undefined) return
     if (selectionMode === 'none') return
+    if (!prevSelection) return
 
-    const deselected = prevSelectedIndices?.filter(t => selectedIndices.indexOf(t) === -1) ?? []
-    const selected = selectedIndices.filter(t => prevSelectedIndices?.indexOf(t) === -1)
+    const deselected = prevSelection?.filter(t => selection.indexOf(t) === -1) ?? []
+    const selected = selection.filter(t => prevSelection?.indexOf(t) === -1)
 
     deselected.map(t => onDeselectAt?.(t))
     selected.map(t => onSelectAt?.(t))
 
-    onSelectionChange?.(selectedIndices)
-  }, [JSON.stringify(selectedIndices)])
+    onSelectionChange?.(selection)
+  }, [JSON.stringify(selection)])
 
   const fixedClassNames = getFixedClassNames({ isSelectionTogglable, orientation })
   const fixedStyles = getFixedStyles({ borderThickness, orientation })

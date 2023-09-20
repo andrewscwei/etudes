@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
 import Dropdown, { type DropdownItemProps } from '../../../lib/Dropdown'
-import List, { type ListItemProps } from '../../../lib/List'
+import List, { type ListItemProps, type ListSelection } from '../../../lib/List'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
 const DropdownItem = ({ data, index, isSelected, onCustomEvent, ...props }: DropdownItemProps) => (
@@ -22,6 +22,22 @@ export default function ListDemo() {
   const [selectedOrientationIndex, setSelectedOrientationIndex] = useState(0)
   const orientation = selectedOrientationIndex === 0 ? 'vertical' : 'horizontal'
 
+  const dropdownSelectionChangeHandler = (selection: ListSelection) => {
+    const idx = selection[0] ?? -1
+
+    if (selectedOrientationIndex === idx) return
+
+    setSelectedOrientationIndex(idx)
+  }
+
+  const listSelectionChangeHandler = (selection: ListSelection) => {
+    const idx = selection[0] ?? -1
+
+    if (selectedItemIndex === idx) return
+
+    setSelectedItemIndex(idx)
+  }
+
   return (
     <>
       <StyledRoot className={orientation}>
@@ -32,8 +48,7 @@ export default function ListDemo() {
           itemPadding={20}
           orientation={orientation}
           selectionMode='single'
-          onDeselectAt={idx => setSelectedItemIndex(-1)}
-          onSelectAt={idx => setSelectedItemIndex(idx)}
+          onSelectionChange={listSelectionChangeHandler}
         />
       </StyledRoot>
       <StyledDropdown
@@ -42,9 +57,10 @@ export default function ListDemo() {
         isInverted={false}
         maxVisibleItems={-1}
         orientation='vertical'
-        selectedIndices={[selectedOrientationIndex]}
+        selection={[selectedOrientationIndex]}
+        useDefaultStyles={true}
         itemComponentType={DropdownItem}
-        onSelectAt={idx => setSelectedOrientationIndex(idx)}
+        onSelectionChange={dropdownSelectionChangeHandler}
       />
       <DebugConsole
         title='?: List+Dropdown'
