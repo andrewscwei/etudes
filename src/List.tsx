@@ -9,6 +9,8 @@ import styles from './utils/styles'
 
 export type ListOrientation = 'horizontal' | 'vertical'
 
+export type ListLayout = 'list' | 'grid'
+
 export type ListSelection = number[]
 
 export type ListItemProps<T> = HTMLAttributes<HTMLElement> & {
@@ -20,11 +22,6 @@ export type ListItemProps<T> = HTMLAttributes<HTMLElement> & {
 }
 
 export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
-  /**
-   * Thickness of item borders (in pixels). 0 indicates no borders.
-   */
-  borderThickness?: number
-
   /**
    * Generically typed data of each item.
    */
@@ -46,6 +43,18 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
    * Padding between every item (in pixels).
    */
   itemPadding?: number
+
+  /**
+   * Specifies the layout of this component.
+   */
+  layout?: ListLayout
+
+  /**
+   * This property is only used if the layout is set to `grid`. Specifies the
+   * number of columns if orientation is `vertical` or number of rows if
+   * orientation is `horizontal`.
+   */
+  numSegments?: number
 
   /**
    * Orientation of the component.
@@ -109,12 +118,6 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
   onSelectionChange?: (selection: ListSelection) => void
 }
 
-type StylesProps = {
-  borderThickness?: number
-  isSelectionTogglable?: boolean
-  orientation?: ListOrientation
-}
-
 /**
  * A scrollable list of selectable items. Items are generated based on the
  * provided React component type. The type of data passed to each item is
@@ -123,12 +126,13 @@ type StylesProps = {
 export default forwardRef(({
   className,
   style,
-  borderThickness = 0,
   data,
   selectionMode = 'none',
   isSelectionTogglable = false,
-  itemLength,
+  itemLength = 50,
   itemPadding = 0,
+  layout = 'list',
+  numSegments = 1,
   orientation = 'vertical',
   selection: externalSelection = [],
   itemComponentType: ItemComponent,
@@ -218,8 +222,8 @@ export default forwardRef(({
     onSelectionChange?.(selection)
   }, [JSON.stringify(selection)])
 
-  const fixedClassNames = getFixedClassNames({ isSelectionTogglable, orientation })
-  const fixedStyles = getFixedStyles({ borderThickness, orientation })
+  const fixedClassNames = getFixedClassNames({ orientation })
+  const fixedStyles = getFixedStyles({ itemLength, itemPadding, layout, numSegments, orientation })
 
   return (
     <div
@@ -232,24 +236,19 @@ export default forwardRef(({
         <Each in={data}>
           {(val, idx) => (
             <ItemComponent
-              className={classNames(fixedClassNames.item, {
+              className={classNames({
                 selected: isSelectedAt(idx),
               })}
               style={styles(fixedStyles.item, {
                 pointerEvents: isSelectionTogglable !== true && isSelectedAt(idx) ? 'none' : 'auto',
-                ...orientation === 'vertical' ? {
-                  height: itemLength !== undefined ? `${itemLength}px` : undefined,
-                  marginTop: `${idx === 0 ? 0 : -borderThickness}px`,
-                } : {
-                  marginLeft: `${idx === 0 ? 0 : -borderThickness}px`,
-                  width: itemLength !== undefined ? `${itemLength}px` : undefined,
-                },
                 ...idx >= data.length - 1 ? {} : {
-                  ...orientation === 'vertical' ? {
-                    marginBottom: `${itemPadding}px`,
-                  } : {
-                    marginRight: `${itemPadding}px`,
-                  },
+                  ...layout === 'list' ? {
+                    ...orientation === 'vertical' ? {
+                      marginBottom: `${itemPadding}px`,
+                    } : {
+                      marginRight: `${itemPadding}px`,
+                    },
+                  } : {},
                 },
               })}
               data-index={idx}
@@ -267,37 +266,58 @@ export default forwardRef(({
   )
 }) as <T>(props: ListProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
-function getFixedClassNames({ orientation, isSelectionTogglable }: StylesProps) {
+type StylesProps = {
+  itemLength?: number
+  itemPadding?: number
+  layout?: ListLayout
+  numSegments?: number
+  orientation?: ListOrientation
+}
+
+function getFixedClassNames({ orientation }: StylesProps) {
   return asClassNameDict({
-    root: classNames(orientation, {
-      togglable: isSelectionTogglable,
-    }),
-    item: classNames(orientation, {
-      togglable: isSelectionTogglable,
-    }),
+    root: classNames(orientation),
   })
 }
 
-function getFixedStyles({ borderThickness = 0, orientation }: StylesProps) {
+function getFixedStyles({ itemLength, itemPadding = 0, layout, numSegments = 1, orientation }: StylesProps) {
   return asStyleDict({
     root: {
-      alignItems: 'flex-start',
       counterReset: 'item-counter',
-      display: 'flex',
-      flex: '0 0 auto',
-      flexDirection: orientation === 'horizontal' ? 'row' : 'column',
-      justifyContent: 'flex-start',
       listStyle: 'none',
+      ...layout === 'list' ? {
+        alignItems: 'flex-start',
+        display: 'flex',
+        flex: '0 0 auto',
+        flexDirection: orientation === 'horizontal' ? 'row' : 'column',
+        justifyContent: 'flex-start',
+      } : {
+        display: 'grid',
+        gap: `${itemPadding}px`,
+        ...orientation === 'vertical' ? {
+          gridAutoRows: itemLength !== undefined ? `${itemLength}px` : undefined,
+          gridTemplateColumns: `repeat(${numSegments}, 1fr)`,
+          gridAutoFlow: 'row',
+        } : {
+          gridAutoColumns: itemLength !== undefined ? `${itemLength}px` : undefined,
+          gridTemplateRows: `repeat(${numSegments}, 1fr)`,
+          gridAutoFlow: 'column',
+        },
+      },
     },
     item: {
-      borderWidth: `${borderThickness}px`,
+      border: 'none',
       counterIncrement: 'item-counter',
       flex: '0 0 auto',
-      ...orientation === 'vertical' ? {
-        width: '100%',
-      } : {
-        height: '100%',
-      },
+      ...layout === 'list' ? {
+        ...orientation === 'vertical' ? {
+          width: '100%',
+          height: itemLength !== undefined ? `${itemLength}px` : undefined,
+        } : {
+          width: itemLength !== undefined ? `${itemLength}px` : undefined,
+          height: '100%',
+        },
+      } : {},
     },
   })
 }
