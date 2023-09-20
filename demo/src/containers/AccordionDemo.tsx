@@ -20,19 +20,21 @@ export default function AccordionDemo() {
         <StyledAccordion
           autoCollapseSections={false}
           data={[{
+            data: ['foo', 'bar', 'baz'],
             label: 'Section 1',
-            items: ['foo', 'bar', 'baz'],
+            layout: 'grid',
+            numSegments: 3,
+            itemComponentType: AccordionItem,
           }, {
+            data: ['foo', 'bar', 'baz'],
             label: 'Section 2',
-            items: ['foo', 'bar', 'baz'],
+            itemComponentType: AccordionItem,
           }, {
+            data: ['foo', 'bar', 'baz'],
             label: 'Section 3',
-            items: ['foo', 'bar', 'baz'],
+            itemComponentType: AccordionItem,
           }]}
           expandIconSvg={$$ExpandIcon}
-          isSelectionTogglable={true}
-          itemComponentType={AccordionItem}
-          itemLength={50}
           orientation='vertical'
           selectionMode='multiple'
           useDefaultStyles={true}
@@ -84,7 +86,14 @@ const StyledAccordionItem = styled.button`
 
 const StyledAccordion = styled(Accordion<string>)`
   transform: translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg);
-  width: 300px;
+
+  &.vertical {
+    width: 300px;
+  }
+
+  &.horizontal {
+    height: 300px;
+  }
 
   button {
     align-items: center;
@@ -96,7 +105,6 @@ const StyledAccordion = styled(Accordion<string>)`
     flex-wrap: nowrap;
     font-size: 16px;
     font-weight: 700;
-    height: 50px;
     justify-content: space-between;
     line-height: 16px;
     padding: 10px;

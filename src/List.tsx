@@ -11,6 +11,8 @@ export type ListOrientation = 'horizontal' | 'vertical'
 
 export type ListLayout = 'list' | 'grid'
 
+export type ListSelectionMode = 'none' | 'single' | 'multiple'
+
 export type ListSelection = number[]
 
 export type ListItemProps<T> = HTMLAttributes<HTMLElement> & {
@@ -73,7 +75,7 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
    *   - `single`: Only one item can be selected at a time.
    *   - `multiple`: Multiple items can be selected at the same time.
    */
-  selectionMode?: 'none' | 'single' | 'multiple'
+  selectionMode?: ListSelectionMode
 
   /**
    * React component type to be used to generate items for this list.

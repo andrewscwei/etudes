@@ -3,30 +3,39 @@ import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
 import Each from './Each'
 import FlatSVG from './FlatSVG'
-import List, { type ListItemProps, type ListOrientation, type ListProps } from './List'
+import List, { type ListItemProps, type ListOrientation, type ListProps, type ListSelectionMode } from './List'
 import usePrevious from './hooks/usePrevious'
 import asClassNameDict from './utils/asClassNameDict'
 import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
 import styles from './utils/styles'
 
-export type AccordionSectionData<I> = {
+export type AccordionSectionProps<I> = Omit<ListProps<I>, 'orientation' | 'selection' | 'selectionMode' | 'onActivateAt' | 'onSelectAt' | 'onDeselectAt' | 'onSelectionChange'> & {
+  /**
+   * Label for the header.
+   */
   label: string
-  items: I[]
+
+  /**
+   * Maximum number of visible rows (if section orientation is `vertical`) or
+   * columns (if section orientation is `horizontal`). If number of rows exceeds
+   * the number of visible, a scrollbar will be put in place.
+   */
+  maxVisible?: number
 }
 
 export type AccordionSelection = Record<number, number[]>
 
 export type AccordionItemProps<T> = ListItemProps<T>
 
-export type AccordionHeaderProps<I, S extends AccordionSectionData<I> = AccordionSectionData<I>> = HTMLAttributes<HTMLElement> & PropsWithChildren<{
+export type AccordionHeaderProps<I, S extends AccordionSectionProps<I> = AccordionSectionProps<I>> = HTMLAttributes<HTMLElement> & PropsWithChildren<{
   index: number
   isCollapsed: boolean
-  sectionData: S
+  section: S
   onCustomEvent?: (name: string, info?: any) => void
 }>
 
-export type AccordionProps<I, S extends AccordionSectionData<I> = AccordionSectionData<I>> = HTMLAttributes<HTMLDivElement> & Omit<ListProps<I>, 'data' | 'itemComponentType' | 'selection' | 'onActivateAt' | 'onSelectAt' | 'onDeselectAt' | 'onSelectionChange'> & PropsWithChildren<{
+export type AccordionProps<I, S extends AccordionSectionProps<I> = AccordionSectionProps<I>> = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   /**
    * Specifies if expanded sections should automatically collapse upon expanding
    * another section.
@@ -54,13 +63,9 @@ export type AccordionProps<I, S extends AccordionSectionData<I> = AccordionSecti
   expandIconSvg?: string
 
   /**
-   * Maximum number of items that are viside per section when a section expands.
-   * When a value greater than or equal to 0 is specified, only that number of
-   * items will be visible at a time, and a scrollbar will appear to scroll to
-   * remaining items. Any value less than 0 indicates that all items will be
-   * visible when a section expands.
+   * Orientation of this component.
    */
-  maxVisibleItems?: number[]
+  orientation?: ListOrientation
 
   /**
    * Padding (in pixels) between each section.
@@ -73,15 +78,15 @@ export type AccordionProps<I, S extends AccordionSectionData<I> = AccordionSecti
   selection?: AccordionSelection
 
   /**
+   * Selection mode of each section.
+   */
+  selectionMode?: ListSelectionMode
+
+  /**
    * React component type to be used for generating headers inside the
    * component. When absent, one will be generated automatically.
    */
   headerComponentType?: ComponentType<AccordionHeaderProps<I, S>>
-
-  /**
-   * React component type to be used for generating items inside the component.
-   */
-  itemComponentType: ComponentType<AccordionItemProps<I>>
 
   /**
    * Specifies if the component should use default styles.
@@ -128,6 +133,16 @@ export type AccordionProps<I, S extends AccordionSectionData<I> = AccordionSecti
   onHeaderCustomEvent?: (sectionIndex: number, eventName: string, eventInfo?: any) => void
 
   /**
+   * Handler invoked when a custom event is dispatched from an item.
+   *
+   * @param itemIndex Item index.
+   * @param sectionIndex Section index.
+   * @param eventName Name of the dispatched event.
+   * @param eventInfo Optional info of the dispatched event.
+   */
+  onItemCustomEvent?: (itemIndex: number, sectionIndex: number, eventName: string, eventInfo?: any) => void
+
+  /**
    * Handler invoked when an item is selected in a section.
    *
    * @param itemIndex Item index.
@@ -143,11 +158,6 @@ export type AccordionProps<I, S extends AccordionSectionData<I> = AccordionSecti
   onSelectionChange?: (selection: AccordionSelection) => void
 }>
 
-type StylesProps = {
-  borderThickness?: number
-  orientation?: ListOrientation
-}
-
 export default forwardRef(({
   children,
   className,
@@ -157,22 +167,18 @@ export default forwardRef(({
   data,
   expandedSectionIndices: externalExpandedSectionIndices = [],
   expandIconSvg,
-  isSelectionTogglable = false,
-  itemLength = 50,
-  itemPadding = 0,
-  maxVisibleItems,
   orientation = 'vertical',
   sectionPadding = 0,
   selection: externalSelection = {},
   selectionMode = 'single',
   useDefaultStyles = false,
   headerComponentType: HeaderComponent,
-  itemComponentType,
   onActivateAt,
   onCollapseSectionAt,
   onDeselectAt,
   onExpandSectionAt,
   onHeaderCustomEvent,
+  onItemCustomEvent,
   onSelectAt,
   onSelectionChange,
   ...props
@@ -298,18 +304,13 @@ export default forwardRef(({
   const defaultStyles: Record<string, any> = useDefaultStyles ? getDefaultStyles({ orientation }) : {}
 
   return (
-    <div
-      {...props}
-      className={classNames(className, fixedClassNames.root)}
-      style={styles(style, fixedStyles.root)}
-      ref={ref}
-    >
+    <div {...props} className={classNames(className, fixedClassNames.root)} style={styles(style, fixedStyles.root)} ref={ref}>
       <Each in={data}>
         {(section, sectionIndex) => {
-          const maxVisible = maxVisibleItems?.[sectionIndex] ?? -1
-          const numItems = section.items.length
-          const numVisibleItems = maxVisible < 0 ? numItems : Math.min(numItems, maxVisible)
-          const menuLength = itemLength * numVisibleItems + itemPadding * (numVisibleItems - 1)
+          const { data: sectionData, itemLength = 50, itemPadding = 0, isSelectionTogglable, itemComponentType, layout = 'list', maxVisible = -1, numSegments = 1 } = section
+          const allVisible = layout === 'list' ? sectionData.length : Math.ceil(sectionData.length / numSegments)
+          const numVisible = maxVisible < 0 ? allVisible : Math.min(allVisible, maxVisible)
+          const maxLength = itemLength * numVisible + itemPadding * (numVisible - 1)
           const isCollapsed = !isSectionExpandedAt(sectionIndex)
           const expandIconComponent = expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>
           const collapseIconComponent = collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles.collapseIcon}/> : expandIconComponent
@@ -326,7 +327,7 @@ export default forwardRef(({
                   style={styles(fixedStyles.header)}
                   index={sectionIndex}
                   isCollapsed={isCollapsed}
-                  sectionData={section}
+                  section={section}
                   onClick={() => toggleSectionAt(sectionIndex)}
                   onCustomEvent={(name, info) => onHeaderCustomEvent?.(sectionIndex, name, info)}
                 />
@@ -345,24 +346,31 @@ export default forwardRef(({
               )}
               <List
                 style={styles(fixedStyles.list, defaultStyles.list, orientation === 'vertical' ? {
-                  height: isCollapsed ? '0px' : `${menuLength}px`,
+                  width: '100%',
+                  top: '100%',
+                  height: isCollapsed ? '0px' : `${maxLength}px`,
                   marginTop: isCollapsed ? '0px' : `${itemPadding}px`,
-                  overflowY: maxVisible < 0 ? 'hidden' : maxVisible < numItems ? 'scroll' : 'hidden',
+                  overflowY: maxVisible < 0 ? 'hidden' : maxVisible < allVisible ? 'scroll' : 'hidden',
                 } : {
                   marginLeft: isCollapsed ? '0px' : `${itemPadding}px`,
-                  overflowX: maxVisible < 0 ? 'hidden' : maxVisible < numItems ? 'scroll' : 'hidden',
-                  width: isCollapsed ? '0px' : `${menuLength}px`,
+                  overflowX: maxVisible < 0 ? 'hidden' : maxVisible < allVisible ? 'scroll' : 'hidden',
+                  width: isCollapsed ? '0px' : `${maxLength}px`,
+                  height: '100%',
+                  left: '100%',
                 })}
-                data={section.items}
+                data={sectionData}
                 selectionMode={selectionMode}
                 isSelectionTogglable={isSelectionTogglable}
                 itemComponentType={itemComponentType}
                 itemLength={itemLength}
                 itemPadding={itemPadding}
                 orientation={orientation}
+                layout={layout}
+                numSegments={numSegments}
                 selection={selection[sectionIndex] ?? []}
                 onActivateAt={itemIndex => onActivateAt?.(itemIndex, sectionIndex)}
                 onDeselectAt={itemIndex => deselectAt(itemIndex, sectionIndex)}
+                onItemCustomEvent={(itemIndex, eventName, eventInfo) => onItemCustomEvent?.(itemIndex, sectionIndex, eventName, eventInfo)}
                 onSelectAt={itemIndex => selectAt(itemIndex, sectionIndex)}
               />
             </div>
@@ -371,7 +379,12 @@ export default forwardRef(({
       </Each>
     </div>
   )
-}) as <I, S extends AccordionSectionData<I> = AccordionSectionData<I>>(props: AccordionProps<I, S> & { ref?: Ref<HTMLDivElement> }) => ReactElement
+}) as <I, S extends AccordionSectionProps<I> = AccordionSectionProps<I>>(props: AccordionProps<I, S> & { ref?: Ref<HTMLDivElement> }) => ReactElement
+
+type StylesProps = {
+  borderThickness?: number
+  orientation?: ListOrientation
+}
 
 function getFixedClassNames({ orientation }: StylesProps) {
   return asClassNameDict({
@@ -414,8 +427,11 @@ function getFixedStyles({ orientation }: StylesProps) {
         height: '100%',
       },
     },
+    list: {
+
+    },
     header: {
-      borderWidth: `${borderThickness}px`,
+      border: 'none',
       cursor: 'pointer',
       margin: '0',
       outline: 'none',
@@ -432,15 +448,6 @@ function getFixedStyles({ orientation }: StylesProps) {
     collapseIcon: {
       margin: '0',
       padding: '0',
-    },
-    list: {
-      ...orientation === 'vertical' ? {
-        width: '100%',
-        top: '100%',
-      } : {
-        height: '100%',
-        left: '100%',
-      },
     },
   })
 }
@@ -459,7 +466,6 @@ function getDefaultStyles({ orientation }: StylesProps) {
     header: {
       alignItems: 'center',
       background: '#fff',
-      borderStyle: 'solid',
       boxSizing: 'border-box',
       display: 'flex',
       flexDirection: 'row',
