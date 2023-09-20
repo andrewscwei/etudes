@@ -2,8 +2,9 @@ import classNames from 'classnames'
 import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
 import FlatSVG from './FlatSVG'
-import List, { type ListItemProps, type ListProps } from './List'
+import List, { type ListItemProps, type ListOrientation, type ListProps } from './List'
 import useElementRect from './hooks/useElementRect'
+import usePrevious from './hooks/usePrevious'
 import asClassNameDict from './utils/asClassNameDict'
 import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
@@ -57,6 +58,11 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
   maxVisibleItems?: number
 
   /**
+   * Specifies if the component should use default styles.
+   */
+  useDefaultStyles?: boolean
+
+  /**
    * React component type to be used for generating the toggle element inside
    * the component. When absent, one will be generated automatically.
    */
@@ -70,6 +76,18 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
    */
   onToggleCustomEvent?: (eventName: string, eventInfo?: any) => void
 }>
+
+type StylesProps = {
+  borderThickness?: number
+  isCollapsed?: boolean
+  isInverted?: boolean
+  isSelectionTogglable?: boolean
+  itemPadding?: number
+  maxVisibleItems?: number
+  menuLength?: number
+  numItems?: number
+  orientation?: ListOrientation
+}
 
 /**
  * A dropdown menu component that is invertible (i.e. can "dropup" instead) and
@@ -95,6 +113,7 @@ export default forwardRef(({
   orientation = 'vertical',
   selectedIndices: externalSelectedIndices = [],
   selectionMode = 'single',
+  useDefaultStyles = false,
   toggleComponentType: ToggleComponent,
   onActivateAt,
   onDeselectAt,
@@ -167,7 +186,9 @@ export default forwardRef(({
   }
 
   const bodyRef = useRef<HTMLDivElement>(null)
-  const [selectedIndices, setSelectedIndices] = useState(sanitizeSelectedIndices(externalSelectedIndices))
+  const sanitizedExternalSelectedIndices = sanitizeSelectedIndices(externalSelectedIndices)
+  const [selectedIndices, setSelectedIndices] = useState(sanitizedExternalSelectedIndices)
+  const prevSelectedIndices = usePrevious(selectedIndices)
   const [isCollapsed, setIsCollapsed] = useState(true)
   const rect = useElementRect(bodyRef)
 
@@ -180,14 +201,14 @@ export default forwardRef(({
   }, [isCollapsed])
 
   useEffect(() => {
-    const newValue = sanitizeSelectedIndices(externalSelectedIndices)
+    if (isDeepEqual(sanitizedExternalSelectedIndices, selectedIndices)) return
 
-    if (isDeepEqual(newValue, selectedIndices)) return
-
-    setSelectedIndices(newValue)
-  }, [JSON.stringify(sanitizeSelectedIndices(externalSelectedIndices))])
+    setSelectedIndices(sanitizedExternalSelectedIndices)
+  }, [JSON.stringify(sanitizedExternalSelectedIndices)])
 
   useEffect(() => {
+    if (!prevSelectedIndices) return
+
     onSelectionChange?.(selectedIndices)
   }, [JSON.stringify(sanitizeSelectedIndices(selectedIndices))])
 
@@ -196,7 +217,65 @@ export default forwardRef(({
   const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
   const menuLength = (itemLength - borderThickness) * numVisibleItems + itemPadding * (numVisibleItems - 1) + borderThickness
 
-  const fixedClassNames = asClassNameDict({
+  const fixedClassNames = getFixedClassNames({ isCollapsed, isSelectionTogglable, orientation })
+  const fixedStyles = getFixedStyles({ borderThickness, isCollapsed, isInverted, itemPadding, maxVisibleItems, menuLength, numItems, orientation })
+  const defaultStyles: Record<string, any> = useDefaultStyles ? getDefaultStyles({}) : {}
+
+  const expandIconComponent = expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>
+  const collapseIconComponent = collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles.collapseIcon}/> : expandIconComponent
+
+  return (
+    <div
+      {...props}
+      ref={ref}
+      className={classNames(className, fixedClassNames.root)}
+      style={styles(style, fixedStyles.root)}
+    >
+      <div ref={bodyRef} style={styles(fixedStyles.body)}>
+        {ToggleComponent ? (
+          <ToggleComponent
+            className={classNames(fixedClassNames.toggle)}
+            style={styles(fixedStyles.toggle)}
+            onClick={() => toggle()}
+            onCustomEvent={(name, info) => onToggleCustomEvent?.(name, info)}
+          />
+        ) : (
+          <button
+            className={classNames(fixedClassNames.toggle)}
+            style={styles(fixedStyles.toggle, defaultStyles.toggle)}
+            onClick={() => toggle()}
+          >
+            <label style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: label?.(selectedIndices) ?? (selectedIndices.length > 0 ? selectedIndices.map(t => data[t].label).join(', ') : '') }}/>
+            {cloneStyledElement(isCollapsed ? expandIconComponent : collapseIconComponent, {
+              className: classNames(isCollapsed ? fixedClassNames.expandIcon : fixedClassNames.collapseIcon),
+              style: styles(isCollapsed ? fixedStyles.expandIcon : fixedStyles.collapseIcon),
+            })}
+          </button>
+        )}
+        <List
+          className={fixedClassNames.list}
+          style={styles(fixedStyles.list)}
+          borderThickness={borderThickness}
+          data={data}
+          isSelectionTogglable={isSelectionTogglable}
+          itemComponentType={itemComponentType}
+          itemLength={itemLength}
+          itemPadding={itemPadding}
+          orientation={orientation}
+          selectedIndices={selectedIndices}
+          selectionMode={selectionMode}
+          onActivateAt={onActivateAt}
+          onDeselectAt={onDeselectAt}
+          onSelectAt={selectAtHandler}
+          onSelectionChange={selectionChangeHandler}
+        />
+      </div>
+    </div>
+  )
+}) as <T extends DropdownItemData = DropdownItemData>(props: DropdownProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
+
+function getFixedClassNames({ isCollapsed, isSelectionTogglable, orientation }: StylesProps) {
+  return asClassNameDict({
     root: classNames(orientation, {
       togglable: isSelectionTogglable,
       collapsed: isCollapsed,
@@ -223,8 +302,10 @@ export default forwardRef(({
       expanded: !isCollapsed,
     }),
   })
+}
 
-  const fixedStyles = asStyleDict({
+function getFixedStyles({ borderThickness = 0, isCollapsed, isInverted, itemPadding = 0, maxVisibleItems = 0, menuLength, numItems = 0, orientation }: StylesProps) {
+  return asStyleDict({
     root: {
       alignItems: 'center',
       display: 'flex',
@@ -295,8 +376,10 @@ export default forwardRef(({
       },
     },
   })
+}
 
-  const defaultStyles = asStyleDict({
+function getDefaultStyles({ ...props }: StylesProps) {
+  return asStyleDict({
     toggle: {
       alignItems: 'center',
       background: '#fff',
@@ -322,56 +405,4 @@ export default forwardRef(({
       width: '15px',
     },
   })
-
-  const expandIconComponent = expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>
-  const collapseIconComponent = collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles.collapseIcon}/> : expandIconComponent
-
-  return (
-    <div
-      {...props}
-      ref={ref}
-      className={classNames(className, fixedClassNames.root)}
-      style={styles(style, fixedStyles.root)}
-    >
-      <div ref={bodyRef} style={styles(fixedStyles.body)}>
-        {ToggleComponent ? (
-          <ToggleComponent
-            className={classNames(fixedClassNames.toggle)}
-            style={styles(fixedStyles.toggle)}
-            onClick={() => toggle()}
-            onCustomEvent={(name, info) => onToggleCustomEvent?.(name, info)}
-          />
-        ) : (
-          <button
-            className={classNames(fixedClassNames.toggle)}
-            style={styles(fixedStyles.toggle, defaultStyles.toggle)}
-            onClick={() => toggle()}
-          >
-            <label style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: label?.(selectedIndices) ?? (selectedIndices.length > 0 ? selectedIndices.map(t => data[t].label).join(', ') : '') }}/>
-            {cloneStyledElement(isCollapsed ? expandIconComponent : collapseIconComponent, {
-              className: classNames(isCollapsed ? fixedClassNames.expandIcon : fixedClassNames.collapseIcon),
-              style: styles(isCollapsed ? fixedStyles.expandIcon : fixedStyles.collapseIcon),
-            })}
-          </button>
-        )}
-        <List
-          className={fixedClassNames.list}
-          style={styles(fixedStyles.list)}
-          borderThickness={borderThickness}
-          data={data}
-          isSelectionTogglable={isSelectionTogglable}
-          itemComponentType={itemComponentType}
-          itemLength={itemLength}
-          itemPadding={itemPadding}
-          orientation={orientation}
-          selectedIndices={selectedIndices}
-          selectionMode={selectionMode}
-          onActivateAt={onActivateAt}
-          onDeselectAt={onDeselectAt}
-          onSelectAt={selectAtHandler}
-          onSelectionChange={selectionChangeHandler}
-        />
-      </div>
-    </div>
-  )
-}) as <T extends DropdownItemData = DropdownItemData>(props: DropdownProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
+}

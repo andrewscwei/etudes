@@ -7,13 +7,13 @@ import asClassNameDict from './utils/asClassNameDict'
 import asStyleDict from './utils/asStyleDict'
 import styles from './utils/styles'
 
-type Orientation = 'horizontal' | 'vertical'
+export type ListOrientation = 'horizontal' | 'vertical'
 
 export type ListItemProps<T> = HTMLAttributes<HTMLElement> & {
   data: T
   index: number
   isSelected: boolean
-  orientation: Orientation
+  orientation: ListOrientation
   onCustomEvent?: (name: string, info?: any) => void
 }
 
@@ -48,7 +48,7 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
   /**
    * Orientation of the component.
    */
-  orientation?: Orientation
+  orientation?: ListOrientation
 
   /**
    * The selected indices. If `selectionMode` is `single`, only only the first
@@ -105,6 +105,12 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
    * @param indices Indices of selected items.
    */
   onSelectionChange?: (indices: number[]) => void
+}
+
+type StylesProps = {
+  borderThickness?: number
+  isSelectionTogglable?: boolean
+  orientation?: ListOrientation
 }
 
 /**
@@ -198,8 +204,8 @@ export default forwardRef(({
   }, [JSON.stringify(sanitizedExternalSelectedIndices)])
 
   useEffect(() => {
-    if (selectionMode === 'none') return
     if (prevSelectedIndices === undefined) return
+    if (selectionMode === 'none') return
 
     const deselected = prevSelectedIndices?.filter(t => selectedIndices.indexOf(t) === -1) ?? []
     const selected = selectedIndices.filter(t => prevSelectedIndices?.indexOf(t) === -1)
@@ -210,36 +216,8 @@ export default forwardRef(({
     onSelectionChange?.(selectedIndices)
   }, [JSON.stringify(selectedIndices)])
 
-  const fixedClassNames = asClassNameDict({
-    root: classNames(orientation, {
-      togglable: isSelectionTogglable,
-    }),
-    item: classNames(orientation, {
-      togglable: isSelectionTogglable,
-    }),
-  })
-
-  const fixedStyles = asStyleDict({
-    root: {
-      alignItems: 'flex-start',
-      counterReset: 'item-counter',
-      display: 'flex',
-      flex: '0 0 auto',
-      flexDirection: orientation === 'horizontal' ? 'row' : 'column',
-      justifyContent: 'flex-start',
-      listStyle: 'none',
-    },
-    item: {
-      borderWidth: `${borderThickness}px`,
-      counterIncrement: 'item-counter',
-      flex: '0 0 auto',
-      ...orientation === 'vertical' ? {
-        width: '100%',
-      } : {
-        height: '100%',
-      },
-    },
-  })
+  const fixedClassNames = getFixedClassNames({ isSelectionTogglable, orientation })
+  const fixedStyles = getFixedStyles({ borderThickness, orientation })
 
   return (
     <div
@@ -286,3 +264,38 @@ export default forwardRef(({
     </div>
   )
 }) as <T>(props: ListProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
+
+function getFixedClassNames({ orientation, isSelectionTogglable }: StylesProps) {
+  return asClassNameDict({
+    root: classNames(orientation, {
+      togglable: isSelectionTogglable,
+    }),
+    item: classNames(orientation, {
+      togglable: isSelectionTogglable,
+    }),
+  })
+}
+
+function getFixedStyles({ borderThickness = 0, orientation }: StylesProps) {
+  return asStyleDict({
+    root: {
+      alignItems: 'flex-start',
+      counterReset: 'item-counter',
+      display: 'flex',
+      flex: '0 0 auto',
+      flexDirection: orientation === 'horizontal' ? 'row' : 'column',
+      justifyContent: 'flex-start',
+      listStyle: 'none',
+    },
+    item: {
+      borderWidth: `${borderThickness}px`,
+      counterIncrement: 'item-counter',
+      flex: '0 0 auto',
+      ...orientation === 'vertical' ? {
+        width: '100%',
+      } : {
+        height: '100%',
+      },
+    },
+  })
+}
