@@ -437,10 +437,8 @@ function getFixedStyles({ orientation }: StylesProps) {
 
     },
     header: {
-      border: 'none',
       cursor: 'pointer',
       margin: '0',
-      outline: 'none',
       ...orientation === 'vertical' ? {
         width: '100%',
       } : {
@@ -470,6 +468,8 @@ function getDefaultStyles({ orientation }: StylesProps) {
       },
     },
     header: {
+      border: 'none',
+      outline: 'none',
       alignItems: 'center',
       background: '#fff',
       boxSizing: 'border-box',
