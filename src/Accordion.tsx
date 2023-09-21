@@ -193,7 +193,7 @@ export default forwardRef(({
   const isItemIndexOutOfRange = (itemIndex: number, sectionIndex: number) => {
     if (isSectionIndexOutOfRange(sectionIndex)) return true
 
-    const items = data[sectionIndex].items
+    const items = data[sectionIndex].data
 
     if (itemIndex >= items.length) return true
     if (itemIndex < 0) return true
