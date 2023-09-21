@@ -1,43 +1,45 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import Accordion, { type AccordionItemProps } from '../../../lib/Accordion'
+import Accordion, { type AccordionItemProps, type AccordionSection } from '../../../lib/Accordion'
 import DebugConsole from '../../../lib/DebugConsole'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
-const AccordionItem = ({ data, index, isSelected, onCustomEvent, ...props }: AccordionItemProps<string>) => (
+const AccordionItem = ({ item, index, isSelected, onCustomEvent, ...props }: AccordionItemProps<string>) => (
   <StyledAccordionItem {...props}>
-    {data}
+    {item}
   </StyledAccordionItem>
 )
+
+type Section = AccordionSection<string>
 
 export default function AccordionDemo() {
   const [itemIndex, setItemIndex] = useState(-1)
   const [sectionIndex, setSectionIndex] = useState(-1)
+
+  const sections: Section[] = [{
+    items: ['foo', 'bar', 'baz'],
+    label: 'Section 1',
+    layout: 'grid',
+    numSegments: 3,
+  }, {
+    items: ['foo', 'bar', 'baz'],
+    label: 'Section 2',
+  }, {
+    items: ['foo', 'bar', 'baz'],
+    label: 'Section 3',
+  }]
 
   return (
     <>
       <StyledRoot>
         <StyledAccordion
           autoCollapseSections={false}
-          data={[{
-            data: ['foo', 'bar', 'baz'],
-            label: 'Section 1',
-            layout: 'grid',
-            numSegments: 3,
-            itemComponentType: AccordionItem,
-          }, {
-            data: ['foo', 'bar', 'baz'],
-            label: 'Section 2',
-            itemComponentType: AccordionItem,
-          }, {
-            data: ['foo', 'bar', 'baz'],
-            label: 'Section 3',
-            itemComponentType: AccordionItem,
-          }]}
           expandIconSvg={$$ExpandIcon}
           orientation='vertical'
+          sections={sections}
           selectionMode='multiple'
           useDefaultStyles={true}
+          itemComponentType={AccordionItem}
           onSelectAt={(itemIdx, sectionIdx) => {
             setSectionIndex(sectionIdx)
             setItemIndex(itemIdx)
@@ -84,7 +86,7 @@ const StyledAccordionItem = styled.button`
   }
 `
 
-const StyledAccordion = styled(Accordion<string>)`
+const StyledAccordion = styled(Accordion<string, Section>)`
   transform: translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg);
 
   &.vertical {

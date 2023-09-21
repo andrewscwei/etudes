@@ -10,7 +10,9 @@ import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
 import styles from './utils/styles'
 
-export type AccordionSectionProps<I> = Omit<ListProps<I>, 'orientation' | 'selection' | 'selectionMode' | 'onActivateAt' | 'onSelectAt' | 'onDeselectAt' | 'onSelectionChange'> & {
+export type AccordionSelection = Record<number, number[]>
+
+export type AccordionSection<T> = Pick<ListProps<T>, 'isSelectionTogglable' | 'itemLength' | 'itemPadding' | 'items' | 'layout' | 'numSegments'> & {
   /**
    * Label for the header.
    */
@@ -24,18 +26,16 @@ export type AccordionSectionProps<I> = Omit<ListProps<I>, 'orientation' | 'selec
   maxVisible?: number
 }
 
-export type AccordionSelection = Record<number, number[]>
-
 export type AccordionItemProps<T> = ListItemProps<T>
 
-export type AccordionHeaderProps<I, S extends AccordionSectionProps<I> = AccordionSectionProps<I>> = HTMLAttributes<HTMLElement> & PropsWithChildren<{
+export type AccordionHeaderProps<I, S extends AccordionSection<I> = AccordionSection<I>> = HTMLAttributes<HTMLElement> & PropsWithChildren<{
   index: number
   isCollapsed: boolean
   section: S
   onCustomEvent?: (name: string, info?: any) => void
 }>
 
-export type AccordionProps<I, S extends AccordionSectionProps<I> = AccordionSectionProps<I>> = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
+export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I>> = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   /**
    * Specifies if expanded sections should automatically collapse upon expanding
    * another section.
@@ -48,11 +48,6 @@ export type AccordionProps<I, S extends AccordionSectionProps<I> = AccordionSect
   collapseIconSvg?: string
 
   /**
-   * Data provided to each section.
-   */
-  data: S[]
-
-  /**
    * Indices of sections that are expanded.
    */
   expandedSectionIndices?: number[]
@@ -63,6 +58,11 @@ export type AccordionProps<I, S extends AccordionSectionProps<I> = AccordionSect
   expandIconSvg?: string
 
   /**
+   * React component type to be used to generate items for each section.
+   */
+  itemComponentType?: ComponentType<AccordionItemProps<I>>
+
+  /**
    * Orientation of this component.
    */
   orientation?: ListOrientation
@@ -71,6 +71,11 @@ export type AccordionProps<I, S extends AccordionSectionProps<I> = AccordionSect
    * Padding (in pixels) between each section.
    */
   sectionPadding?: number
+
+  /**
+   * Data provided to each section.
+   */
+  sections: S[]
 
   /**
    * Indices of selected items per section.
@@ -164,11 +169,12 @@ export default forwardRef(({
   style,
   autoCollapseSections = false,
   collapseIconSvg,
-  data,
   expandedSectionIndices: externalExpandedSectionIndices = [],
   expandIconSvg,
+  itemComponentType,
   orientation = 'vertical',
   sectionPadding = 0,
+  sections,
   selection: externalSelection = {},
   selectionMode = 'single',
   useDefaultStyles = false,
@@ -184,7 +190,7 @@ export default forwardRef(({
   ...props
 }, ref) => {
   const isSectionIndexOutOfRange = (sectionIndex: number) => {
-    if (sectionIndex >= data.length) return true
+    if (sectionIndex >= sections.length) return true
     if (sectionIndex < 0) return true
 
     return false
@@ -193,7 +199,7 @@ export default forwardRef(({
   const isItemIndexOutOfRange = (itemIndex: number, sectionIndex: number) => {
     if (isSectionIndexOutOfRange(sectionIndex)) return true
 
-    const items = data[sectionIndex].data
+    const items = sections[sectionIndex].items
 
     if (itemIndex >= items.length) return true
     if (itemIndex < 0) return true
@@ -206,8 +212,8 @@ export default forwardRef(({
   const sanitizeSelection = (selection: AccordionSelection) => {
     const newValue: AccordionSelection = {}
 
-    for (const sectionIndex in data) {
-      if (!Object.prototype.hasOwnProperty.call(data, sectionIndex)) continue
+    for (const sectionIndex in sections) {
+      if (!Object.prototype.hasOwnProperty.call(sections, sectionIndex)) continue
 
       const indices = [...selection[sectionIndex] ?? []].sort()
 
@@ -305,10 +311,10 @@ export default forwardRef(({
 
   return (
     <div {...props} className={classNames(className, fixedClassNames.root)} style={styles(style, fixedStyles.root)} ref={ref}>
-      <Each in={data}>
+      <Each in={sections}>
         {(section, sectionIndex) => {
-          const { data: sectionData, itemLength = 50, itemPadding = 0, isSelectionTogglable, itemComponentType, layout = 'list', maxVisible = -1, numSegments = 1 } = section
-          const allVisible = layout === 'list' ? sectionData.length : Math.ceil(sectionData.length / numSegments)
+          const { items, itemLength = 50, itemPadding = 0, isSelectionTogglable, layout = 'list', maxVisible = -1, numSegments = 1 } = section
+          const allVisible = layout === 'list' ? items.length : Math.ceil(items.length / numSegments)
           const numVisible = maxVisible < 0 ? allVisible : Math.min(allVisible, maxVisible)
           const maxLength = itemLength * numVisible + itemPadding * (numVisible - 1)
           const isCollapsed = !isSectionExpandedAt(sectionIndex)
@@ -358,12 +364,12 @@ export default forwardRef(({
                   height: '100%',
                   left: '100%',
                 })}
-                data={sectionData}
                 selectionMode={selectionMode}
                 isSelectionTogglable={isSelectionTogglable}
                 itemComponentType={itemComponentType}
                 itemLength={itemLength}
                 itemPadding={itemPadding}
+                items={items}
                 orientation={orientation}
                 layout={layout}
                 numSegments={numSegments}
@@ -379,7 +385,7 @@ export default forwardRef(({
       </Each>
     </div>
   )
-}) as <I, S extends AccordionSectionProps<I> = AccordionSectionProps<I>>(props: AccordionProps<I, S> & { ref?: Ref<HTMLDivElement> }) => ReactElement
+}) as <I, S extends AccordionSection<I> = AccordionSection<I>>(props: AccordionProps<I, S> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
 type StylesProps = {
   borderThickness?: number
