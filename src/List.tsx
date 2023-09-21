@@ -16,19 +16,14 @@ export type ListSelectionMode = 'none' | 'single' | 'multiple'
 export type ListSelection = number[]
 
 export type ListItemProps<T> = HTMLAttributes<HTMLElement> & {
-  data: T
   index: number
   isSelected: boolean
+  item: T
   orientation: ListOrientation
   onCustomEvent?: (name: string, info?: any) => void
 }
 
 export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
-  /**
-   * Generically typed data of each item.
-   */
-  data: T[]
-
   /**
    * Indicates if item selection can be toggled, i.e. they can be deselected if
    * selected again.
@@ -45,6 +40,11 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
    * Padding between every item (in pixels).
    */
   itemPadding?: number
+
+  /**
+   * Generically typed data of each item.
+   */
+  items: T[]
 
   /**
    * Specifies the layout of this component.
@@ -128,15 +128,15 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
 export default forwardRef(({
   className,
   style,
-  data,
-  selectionMode = 'none',
   isSelectionTogglable = false,
   itemLength = 50,
   itemPadding = 0,
+  items,
   layout = 'list',
   numSegments = 1,
   orientation = 'vertical',
   selection: externalSelection = [],
+  selectionMode = 'none',
   itemComponentType: ItemComponent,
   onActivateAt,
   onDeselectAt,
@@ -146,7 +146,7 @@ export default forwardRef(({
   ...props
 }, ref) => {
   const isIndexOutOfRange = (index: number) => {
-    if (index >= data.length) return true
+    if (index >= items.length) return true
     if (index < 0) return true
 
     return false
@@ -235,7 +235,7 @@ export default forwardRef(({
       style={styles(style, fixedStyles.root)}
     >
       {ItemComponent && (
-        <Each in={data}>
+        <Each in={items}>
           {(val, idx) => (
             <ItemComponent
               className={classNames({
@@ -243,7 +243,7 @@ export default forwardRef(({
               })}
               style={styles(fixedStyles.item, {
                 pointerEvents: isSelectionTogglable !== true && isSelectedAt(idx) ? 'none' : 'auto',
-                ...idx >= data.length - 1 ? {} : {
+                ...idx >= items.length - 1 ? {} : {
                   ...layout === 'list' ? {
                     ...orientation === 'vertical' ? {
                       marginBottom: `${itemPadding}px`,
@@ -254,9 +254,9 @@ export default forwardRef(({
                 },
               })}
               data-index={idx}
-              data={val}
               index={idx}
               isSelected={isSelectedAt(idx)}
+              item={val}
               orientation={orientation}
               onCustomEvent={(name, info) => onItemCustomEvent?.(idx, name, info)}
               onClick={() => activateAt(idx)}

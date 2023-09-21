@@ -90,7 +90,6 @@ export default forwardRef(({
   style,
   collapseIconSvg,
   collapsesOnSelect = true,
-  data,
   label,
   layout,
   expandIconSvg,
@@ -99,6 +98,7 @@ export default forwardRef(({
   itemComponentType,
   itemLength: externalItemLength,
   itemPadding = 0,
+  items,
   maxVisibleItems = -1,
   numSegments,
   orientation = 'vertical',
@@ -114,7 +114,7 @@ export default forwardRef(({
   ...props
 }, ref) => {
   const isIndexOutOfRange = (index: number) => {
-    if (index >= data.length) return true
+    if (index >= items.length) return true
     if (index < 0) return true
 
     return false
@@ -204,7 +204,7 @@ export default forwardRef(({
   }, [JSON.stringify(selection)])
 
   const itemLength = externalItemLength ?? (orientation === 'vertical' ? rect.height : rect.width)
-  const numItems = data.length
+  const numItems = items.length
   const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
   const menuLength = itemLength * numVisibleItems + itemPadding * (numVisibleItems - 1)
 
@@ -236,7 +236,7 @@ export default forwardRef(({
             style={styles(fixedStyles.toggle, defaultStyles.toggle)}
             onClick={() => toggle()}
           >
-            <label style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: label?.(selection) ?? (selection.length > 0 ? selection.map(t => data[t].label).join(', ') : '') }}/>
+            <label style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: label?.(selection) ?? (selection.length > 0 ? selection.map(t => items[t].label).join(', ') : '') }}/>
             {cloneStyledElement(isCollapsed ? expandIconComponent : collapseIconComponent, {
               className: classNames(isCollapsed ? fixedClassNames.expandIcon : fixedClassNames.collapseIcon),
               style: styles(isCollapsed ? fixedStyles.expandIcon : fixedStyles.collapseIcon),
@@ -246,11 +246,11 @@ export default forwardRef(({
         <List
           className={fixedClassNames.list}
           style={styles(fixedStyles.list)}
-          data={data}
           isSelectionTogglable={isSelectionTogglable}
           itemComponentType={itemComponentType}
           itemLength={itemLength}
           itemPadding={itemPadding}
+          items={items}
           layout={layout}
           numSegments={numSegments}
           orientation={orientation}

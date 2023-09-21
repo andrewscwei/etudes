@@ -5,15 +5,15 @@ import Dropdown, { type DropdownItemProps } from '../../../lib/Dropdown'
 import List, { type ListItemProps, type ListSelection } from '../../../lib/List'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
-const DropdownItem = ({ data, index, isSelected, onCustomEvent, ...props }: DropdownItemProps) => (
+const DropdownItem = ({ index, isSelected, item, onCustomEvent, ...props }: DropdownItemProps) => (
   <StyledDropdownItem {...props}>
-    {data.label}
+    {item.label}
   </StyledDropdownItem>
 )
 
-const ListItem = ({ data, index, isSelected, onCustomEvent, ...props }: ListItemProps<string>) => (
+const ListItem = ({ index, isSelected, item, onCustomEvent, ...props }: ListItemProps<string>) => (
   <StyledListItem {...props}>
-    {data}
+    {item}
   </StyledListItem>
 )
 
@@ -42,11 +42,11 @@ export default function ListDemo() {
     <>
       <StyledRoot className={orientation}>
         <List
-          data={[...new Array(60)].map((v, i) => `${i + 1}`)}
           isSelectionTogglable={true}
           itemComponentType={ListItem}
           itemPadding={10}
           itemLength={50}
+          items={[...new Array(60)].map((v, i) => `${i + 1}`)}
           layout='grid'
           numSegments={3}
           orientation={orientation}
@@ -64,9 +64,9 @@ export default function ListDemo() {
         />
       </StyledRoot>
       <StyledDropdown
-        data={[{ label: 'Vertical' }, { label: 'Horizontal' }]}
         expandIconSvg={$$ExpandIcon}
         isInverted={false}
+        items={[{ label: 'Vertical' }, { label: 'Horizontal' }]}
         maxVisibleItems={-1}
         orientation='vertical'
         selection={[selectedOrientationIndex]}
