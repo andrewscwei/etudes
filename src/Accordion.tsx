@@ -58,11 +58,6 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   expandIconSvg?: string
 
   /**
-   * React component type to be used to generate items for each section.
-   */
-  itemComponentType?: ComponentType<AccordionItemProps<I>>
-
-  /**
    * Orientation of this component.
    */
   orientation?: ListOrientation
@@ -86,12 +81,6 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
    * Selection mode of each section.
    */
   selectionMode?: ListSelectionMode
-
-  /**
-   * React component type to be used for generating headers inside the
-   * component. When absent, one will be generated automatically.
-   */
-  headerComponentType?: ComponentType<AccordionHeaderProps<I, S>>
 
   /**
    * Specifies if the component should use default styles.
@@ -161,6 +150,17 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
    * @param selectedIndices Dictionary of indices of selected items per section.
    */
   onSelectionChange?: (selection: AccordionSelection) => void
+
+  /**
+   * React component type to be used for generating headers inside the
+   * component. When absent, one will be generated automatically.
+   */
+  HeaderComponent?: ComponentType<AccordionHeaderProps<I, S>>
+
+  /**
+   * React component type to be used to generate items for each section.
+   */
+  ItemComponent?: ComponentType<AccordionItemProps<I>>
 }>
 
 const Accordion = forwardRef(({
@@ -171,14 +171,12 @@ const Accordion = forwardRef(({
   collapseIconSvg,
   expandedSectionIndices: externalExpandedSectionIndices = [],
   expandIconSvg,
-  itemComponentType,
   orientation = 'vertical',
   sectionPadding = 0,
   sections,
   selection: externalSelection = {},
   selectionMode = 'single',
   useDefaultStyles = false,
-  headerComponentType: HeaderComponent,
   onActivateAt,
   onCollapseSectionAt,
   onDeselectAt,
@@ -187,6 +185,8 @@ const Accordion = forwardRef(({
   onItemCustomEvent,
   onSelectAt,
   onSelectionChange,
+  HeaderComponent,
+  ItemComponent,
   ...props
 }, ref) => {
   const isSectionIndexOutOfRange = (sectionIndex: number) => {

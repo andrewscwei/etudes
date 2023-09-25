@@ -24,15 +24,6 @@ export default function ListDemo() {
   const [selectedItemIndex, setSelectedItemIndex] = useState(-1)
   const [selectedOrientationIndex, setSelectedOrientationIndex] = useState(0)
   const orientation = selectedOrientationIndex === 0 ? 'vertical' : 'horizontal'
-  const listStyle = useMemo(() => orientation === 'horizontal' ? {
-    height: '80%',
-    minHeight: '400px',
-    transform: 'translate3d(0, 0, 0) rotate3d(1, .1, 0, 10deg)',
-  } : {
-    width: '80%',
-    minWidth: '400px',
-    transform: 'translate3d(0, 0, 0) rotate3d(1, 1, 0, 10deg)',
-  }, [orientation])
 
   const dropdownSelectionChangeHandler = (selection: ListSelection) => setSelectedOrientationIndex(selection[0])
   const listSelectionChangeHandler = (selection: ListSelection) => setSelectedItemIndex(selection[0])
@@ -41,9 +32,16 @@ export default function ListDemo() {
     <>
       <StyledRoot className={orientation}>
         <List
-          style={listStyle}
+          style={orientation === 'horizontal' ? {
+            height: '80%',
+            minHeight: '400px',
+            transform: 'translate3d(0, 0, 0) rotate3d(1, .1, 0, 10deg)',
+          } : {
+            width: '80%',
+            minWidth: '400px',
+            transform: 'translate3d(0, 0, 0) rotate3d(1, 1, 0, 10deg)',
+          }}
           isSelectionTogglable={true}
-          itemComponentType={ListItem}
           itemLength={50}
           itemPadding={10}
           items={LIST_ITEMS}
@@ -53,6 +51,7 @@ export default function ListDemo() {
           selection={[selectedItemIndex]}
           selectionMode='single'
           onSelectionChange={listSelectionChangeHandler}
+          ItemComponent={ListItem}
         />
       </StyledRoot>
       <StyledDropdown
@@ -63,8 +62,8 @@ export default function ListDemo() {
         orientation='vertical'
         selection={[selectedOrientationIndex]}
         useDefaultStyles={true}
-        itemComponentType={DropdownItem}
         onSelectionChange={dropdownSelectionChangeHandler}
+        ItemComponent={DropdownItem}
       />
       <DebugConsole
         title='?: List+Dropdown'

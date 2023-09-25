@@ -78,11 +78,6 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
   selectionMode?: ListSelectionMode
 
   /**
-   * React component type to be used to generate items for this list.
-   */
-  itemComponentType?: ComponentType<ListItemProps<T>>
-
-  /**
    * Handler invoked when an item is activated.
    *
    * @param index Item index.
@@ -118,6 +113,11 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
    * @param selection Indices of selected items.
    */
   onSelectionChange?: (selection: ListSelection) => void
+
+  /**
+   * React component type to be used to generate items for this list.
+   */
+  ItemComponent?: ComponentType<ListItemProps<T>>
 }
 
 /**
@@ -137,12 +137,12 @@ const List = forwardRef(({
   orientation = 'vertical',
   selection: externalSelection = [],
   selectionMode = 'none',
-  itemComponentType: ItemComponent,
   onActivateAt,
   onDeselectAt,
   onItemCustomEvent,
   onSelectAt,
   onSelectionChange,
+  ItemComponent,
   ...props
 }, ref) => {
   const isIndexOutOfRange = (index: number) => {

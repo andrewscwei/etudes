@@ -65,18 +65,18 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
   useDefaultStyles?: boolean
 
   /**
-   * React component type to be used for generating the toggle element inside
-   * the component. When absent, one will be generated automatically.
-   */
-  toggleComponentType?: ComponentType<DropdownToggleProps>
-
-  /**
    * Handler invoked when the toggle dispatches a custom event.
    *
    * @param eventName Name of the dispatched custom event.
    * @param eventInfo Optional info of the dispatched custom event.
    */
   onToggleCustomEvent?: (eventName: string, eventInfo?: any) => void
+
+  /**
+   * React component type to be used for generating the toggle element inside
+   * the component. When absent, one will be generated automatically.
+   */
+  ToggleComponent?: ComponentType<DropdownToggleProps>
 }>
 
 /**
@@ -95,7 +95,6 @@ const Dropdown = forwardRef(({
   expandIconSvg,
   isInverted = false,
   isSelectionTogglable = false,
-  itemComponentType,
   itemLength: externalItemLength,
   itemPadding = 0,
   items,
@@ -105,12 +104,13 @@ const Dropdown = forwardRef(({
   selection: externalSelection = [],
   selectionMode = 'single',
   useDefaultStyles = false,
-  toggleComponentType: ToggleComponent,
   onActivateAt,
   onDeselectAt,
   onSelectAt,
   onSelectionChange,
   onToggleCustomEvent,
+  ItemComponent,
+  ToggleComponent,
   ...props
 }, ref) => {
   const isIndexOutOfRange = (index: number) => {
@@ -247,7 +247,7 @@ const Dropdown = forwardRef(({
           className={fixedClassNames.list}
           style={styles(fixedStyles.list)}
           isSelectionTogglable={isSelectionTogglable}
-          itemComponentType={itemComponentType}
+          ItemComponent={ItemComponent}
           itemLength={itemLength}
           itemPadding={itemPadding}
           items={items}
