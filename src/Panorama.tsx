@@ -99,7 +99,7 @@ export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'onResize'> & {
  * A component containing a pannable 360° panorama image. The angle supports
  * two-way binding.
  */
-export default forwardRef<HTMLDivElement, PanoramaProps>(({
+const Panorama = forwardRef<HTMLDivElement, PanoramaProps>(({
   angle: externalAngle = 0,
   speed = 1,
   src,
@@ -185,6 +185,10 @@ export default forwardRef<HTMLDivElement, PanoramaProps>(({
     </div>
   )
 })
+
+Object.defineProperty(Panorama, 'displayName', { value: 'Panorama', writable: false })
+
+export default Panorama
 
 function getFilledImageSize(originalSize: Size, sizeToFill: Size): Size {
   const { width: originalWidth, height: originalHeight } = originalSize

@@ -84,7 +84,7 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
  * supports both horizontal and vertical orientations. Provide data and item
  * component type to this component to automatically generate menu items.
  */
-export default forwardRef(({
+const Dropdown = forwardRef(({
   children,
   className,
   style,
@@ -265,6 +265,10 @@ export default forwardRef(({
     </div>
   )
 }) as <T extends DropdownItemData = DropdownItemData>(props: DropdownProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
+
+Object.defineProperty(Dropdown, 'displayName', { value: 'Dropdown', writable: false })
+
+export default Dropdown
 
 type StylesProps = {
   isCollapsed?: boolean

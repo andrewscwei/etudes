@@ -47,7 +47,7 @@ export type RotatingGalleryProps = HTMLAttributes<HTMLDivElement> & PropsWithChi
  * @exports RotatingGalleryImage Component for each rotating image, classes:
  *                               `entering`, `entered`, `exiting`, `exited`.
  */
-export default forwardRef<HTMLDivElement, RotatingGalleryProps>(({
+const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(({
   children,
   index: externalIndex = 0,
   rotationDuration,
@@ -116,5 +116,9 @@ export default forwardRef<HTMLDivElement, RotatingGalleryProps>(({
     </div>
   )
 })
+
+Object.defineProperty(RotatingGallery, 'displayName', { value: 'RotatingGallery', writable: false })
+
+export default RotatingGallery
 
 export const RotatingGalleryImage = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>

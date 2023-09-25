@@ -20,7 +20,7 @@ export type VideoProps = HTMLAttributes<HTMLDivElement> & {
   onPlay?: () => void
 }
 
-export default forwardRef<HTMLDivElement, VideoProps>(({
+const Video = forwardRef<HTMLDivElement, VideoProps>(({
   autoLoop = true,
   autoPlay = true,
   hasControls = false,
@@ -131,3 +131,7 @@ export default forwardRef<HTMLDivElement, VideoProps>(({
     </div>
   )
 })
+
+Object.defineProperty(Video, 'displayName', { value: 'Video', writable: false })
+
+export default Video

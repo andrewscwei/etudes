@@ -10,7 +10,7 @@ export type SelectableButtonProps = Omit<HTMLAttributes<HTMLButtonElement>, 'chi
   onSelect?: () => void
 }
 
-export default forwardRef<HTMLButtonElement, SelectableButtonProps>(({
+const SelectableButton = forwardRef<HTMLButtonElement, SelectableButtonProps>(({
   children,
   isDeselectable = false,
   isDisabled = false,
@@ -50,3 +50,7 @@ export default forwardRef<HTMLButtonElement, SelectableButtonProps>(({
     </button>
   )
 })
+
+Object.defineProperty(SelectableButton, 'displayName', { value: 'SelectableButton', writable: false })
+
+export default SelectableButton

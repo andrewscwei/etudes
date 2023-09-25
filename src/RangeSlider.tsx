@@ -25,7 +25,7 @@ export type RangeSliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildre
   onRangeChange?: (range: Range) => void
 }>
 
-export default forwardRef<HTMLDivElement, RangeSliderProps>(({
+const RangeSlider = forwardRef<HTMLDivElement, RangeSliderProps>(({
   children,
   className,
   areLabelsVisible = true,
@@ -299,6 +299,10 @@ export default forwardRef<HTMLDivElement, RangeSliderProps>(({
     </div>
   )
 })
+
+Object.defineProperty(RangeSlider, 'displayName', { value: 'RangeSlider', writable: false })
+
+export default RangeSlider
 
 export const RangeSliderGutter = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
 

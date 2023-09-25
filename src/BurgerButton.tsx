@@ -25,7 +25,7 @@ export type BurgerButtonProps = HTMLAttributes<HTMLButtonElement> & PropsWithChi
  *
  * @exports BurgerButtonBar Component for each line on the burger button.
  */
-export default forwardRef<HTMLButtonElement, BurgerButtonProps>(({
+const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
   children,
   className,
   style,
@@ -43,9 +43,9 @@ export default forwardRef<HTMLButtonElement, BurgerButtonProps>(({
   const [isActive, setIsActive] = useState(externalIsActive)
 
   useEffect(() => {
-    if (isActive !== externalIsActive) {
-      setIsActive(externalIsActive)
-    }
+    if (isActive === externalIsActive) return
+
+    setIsActive(externalIsActive)
   }, [externalIsActive])
 
   useEffect(() => {
@@ -172,5 +172,9 @@ export default forwardRef<HTMLButtonElement, BurgerButtonProps>(({
     </button>
   )
 })
+
+Object.defineProperty(BurgerButton, 'displayName', { value: 'BurgerButton', writable: false })
+
+export default BurgerButton
 
 export const BurgerButtonBar = ({ ...props }: HTMLAttributes<HTMLSpanElement>) => <span {...props}/>
