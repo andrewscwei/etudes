@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import DebugConsole from '../../../lib/DebugConsole'
 import Dropdown, { type DropdownItemProps } from '../../../lib/Dropdown'
@@ -17,56 +17,48 @@ const ListItem = ({ index, isSelected, item, onCustomEvent, ...props }: ListItem
   </StyledListItem>
 )
 
+const DROPDOWN_ITEMS = [{ label: 'Vertical' }, { label: 'Horizontal' }]
+const LIST_ITEMS = [...new Array(60)].map((v, i) => `${i + 1}`)
+
 export default function ListDemo() {
   const [selectedItemIndex, setSelectedItemIndex] = useState(-1)
   const [selectedOrientationIndex, setSelectedOrientationIndex] = useState(0)
   const orientation = selectedOrientationIndex === 0 ? 'vertical' : 'horizontal'
+  const listStyle = useMemo(() => orientation === 'horizontal' ? {
+    height: '80%',
+    minHeight: '400px',
+    transform: 'translate3d(0, 0, 0) rotate3d(1, .1, 0, 10deg)',
+  } : {
+    width: '80%',
+    minWidth: '400px',
+    transform: 'translate3d(0, 0, 0) rotate3d(1, 1, 0, 10deg)',
+  }, [orientation])
 
-  const dropdownSelectionChangeHandler = (selection: ListSelection) => {
-    const idx = selection[0] ?? -1
-
-    if (selectedOrientationIndex === idx) return
-
-    setSelectedOrientationIndex(idx)
-  }
-
-  const listSelectionChangeHandler = (selection: ListSelection) => {
-    const idx = selection[0] ?? -1
-
-    if (selectedItemIndex === idx) return
-
-    setSelectedItemIndex(idx)
-  }
+  const dropdownSelectionChangeHandler = (selection: ListSelection) => setSelectedOrientationIndex(selection[0])
+  const listSelectionChangeHandler = (selection: ListSelection) => setSelectedItemIndex(selection[0])
 
   return (
     <>
       <StyledRoot className={orientation}>
         <List
+          style={listStyle}
           isSelectionTogglable={true}
           itemComponentType={ListItem}
-          itemPadding={10}
           itemLength={50}
-          items={[...new Array(60)].map((v, i) => `${i + 1}`)}
+          itemPadding={10}
+          items={LIST_ITEMS}
           layout='grid'
           numSegments={3}
           orientation={orientation}
+          selection={[selectedItemIndex]}
           selectionMode='single'
-          style={orientation === 'horizontal' ? {
-            height: '80%',
-            minHeight: '400px',
-            transform: 'translate3d(0, 0, 0) rotate3d(1, .1, 0, 10deg)',
-          } : {
-            width: '80%',
-            minWidth: '400px',
-            transform: 'translate3d(0, 0, 0) rotate3d(1, 1, 0, 10deg)',
-          }}
           onSelectionChange={listSelectionChangeHandler}
         />
       </StyledRoot>
       <StyledDropdown
         expandIconSvg={$$ExpandIcon}
         isInverted={false}
-        items={[{ label: 'Vertical' }, { label: 'Horizontal' }]}
+        items={DROPDOWN_ITEMS}
         maxVisibleItems={-1}
         orientation='vertical'
         selection={[selectedOrientationIndex]}
