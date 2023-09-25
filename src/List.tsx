@@ -146,6 +146,7 @@ const List = forwardRef(({
   ...props
 }, ref) => {
   const isIndexOutOfRange = (index: number) => {
+    if (isNaN(index)) return true
     if (index >= items.length) return true
     if (index < 0) return true
 
