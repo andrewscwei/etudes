@@ -247,7 +247,6 @@ const Dropdown = forwardRef(({
           className={fixedClassNames.list}
           style={styles(fixedStyles.list)}
           isSelectionTogglable={isSelectionTogglable}
-          ItemComponent={ItemComponent}
           itemLength={itemLength}
           itemPadding={itemPadding}
           items={items}
@@ -260,6 +259,7 @@ const Dropdown = forwardRef(({
           onDeselectAt={onDeselectAt}
           onSelectAt={selectAtHandler}
           onSelectionChange={selectionChangeHandler}
+          ItemComponent={ItemComponent}
         />
       </div>
     </div>
