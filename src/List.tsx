@@ -238,7 +238,7 @@ export default forwardRef(({
         <Each in={items}>
           {(val, idx) => (
             <ItemComponent
-              className={classNames({
+              className={classNames(fixedClassNames.item, {
                 selected: isSelectedAt(idx),
               })}
               style={styles(fixedStyles.item, {
@@ -278,7 +278,8 @@ type StylesProps = {
 
 function getFixedClassNames({ orientation }: StylesProps) {
   return asClassNameDict({
-    root: classNames(orientation),
+    root: classNames('list', orientation),
+    item: classNames('item', orientation),
   })
 }
 

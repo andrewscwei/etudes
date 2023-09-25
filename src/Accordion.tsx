@@ -351,9 +351,9 @@ export default forwardRef(({
                 </button>
               )}
               <List
+                className={classNames({ collapsed: isCollapsed, expanded: !isCollapsed })}
                 style={styles(fixedStyles.list, defaultStyles.list, orientation === 'vertical' ? {
                   width: '100%',
-                  top: '100%',
                   height: isCollapsed ? '0px' : `${maxLength}px`,
                   marginTop: isCollapsed ? '0px' : `${itemPadding}px`,
                   overflowY: maxVisible < 0 ? 'hidden' : maxVisible < allVisible ? 'scroll' : 'hidden',
@@ -362,7 +362,6 @@ export default forwardRef(({
                   overflowX: maxVisible < 0 ? 'hidden' : maxVisible < allVisible ? 'scroll' : 'hidden',
                   width: isCollapsed ? '0px' : `${maxLength}px`,
                   height: '100%',
-                  left: '100%',
                 })}
                 selectionMode={selectionMode}
                 isSelectionTogglable={isSelectionTogglable}
@@ -394,8 +393,8 @@ type StylesProps = {
 
 function getFixedClassNames({ orientation }: StylesProps) {
   return asClassNameDict({
-    root: classNames(orientation),
-    header: classNames(orientation),
+    root: classNames('accordion', orientation),
+    header: classNames('header', orientation),
     expandIcon: classNames(orientation),
     collapseIcon: classNames(orientation),
   })
