@@ -279,12 +279,12 @@ type StylesProps = {
 
 function getFixedClassNames({ isCollapsed, isSelectionTogglable, orientation }: StylesProps) {
   return asClassNameDict({
-    root: classNames(orientation, {
+    root: classNames('dropdown', orientation, {
       togglable: isSelectionTogglable,
       collapsed: isCollapsed,
       expanded: !isCollapsed,
     }),
-    toggle: classNames(orientation, {
+    toggle: classNames('toggle', orientation, {
       togglable: isSelectionTogglable,
       collapsed: isCollapsed,
       expanded: !isCollapsed,
