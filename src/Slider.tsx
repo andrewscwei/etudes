@@ -101,7 +101,7 @@ export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
  * @exports SliderTrack The component for the slide track on either side of the
  *                        knob.
  */
-export default forwardRef<HTMLDivElement, SliderProps>(({
+const Slider = forwardRef<HTMLDivElement, SliderProps>(({
   children,
   className,
   isInverted = false,
@@ -328,6 +328,10 @@ export default forwardRef<HTMLDivElement, SliderProps>(({
     </div>
   )
 })
+
+Object.defineProperty(Slider, 'displayName', { value: 'Slider', writable: false })
+
+export default Slider
 
 export const SliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
 

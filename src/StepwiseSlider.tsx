@@ -131,7 +131,7 @@ export type StepwiseSliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChil
  * @exports StepwiseSliderTrack The component for the slide track on either side
  *                                of the knob.
  */
-export default forwardRef<HTMLDivElement, StepwiseSliderProps>(({
+const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
   children,
   className,
   index: externalIndex = 0,
@@ -387,6 +387,10 @@ export default forwardRef<HTMLDivElement, StepwiseSliderProps>(({
     </div>
   )
 })
+
+Object.defineProperty(StepwiseSlider, 'displayName', { value: 'StepwiseSlider', writable: false })
+
+export default StepwiseSlider
 
 export const StepwiseSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
 

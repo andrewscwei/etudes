@@ -163,7 +163,7 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   onSelectionChange?: (selection: AccordionSelection) => void
 }>
 
-export default forwardRef(({
+const Accordion = forwardRef(({
   children,
   className,
   style,
@@ -385,6 +385,10 @@ export default forwardRef(({
     </div>
   )
 }) as <I, S extends AccordionSection<I> = AccordionSection<I>>(props: AccordionProps<I, S> & { ref?: Ref<HTMLDivElement> }) => ReactElement
+
+Object.defineProperty(Accordion, 'displayName', { value: 'Accordion', writable: false })
+
+export default Accordion
 
 type StylesProps = {
   borderThickness?: number

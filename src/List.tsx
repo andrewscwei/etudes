@@ -125,7 +125,7 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
  * provided React component type. The type of data passed to each item is
  * generic. This component supports both horizontal and vertical orientations.
  */
-export default forwardRef(({
+const List = forwardRef(({
   className,
   style,
   isSelectionTogglable = false,
@@ -267,6 +267,10 @@ export default forwardRef(({
     </div>
   )
 }) as <T>(props: ListProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
+
+Object.defineProperty(List, 'displayName', { value: 'List', writable: false })
+
+export default List
 
 type StylesProps = {
   itemLength?: number

@@ -38,7 +38,7 @@ const BASE_MODIFIER_CLASS_PREFIX = 'base-'
  * rows*, whereas in a horizontally oriented grid, *number of sections* refers
  * to the *number of columns*.
  */
-export default forwardRef<HTMLDivElement, MasonryGridProps>(({
+const MasonryGrid = forwardRef<HTMLDivElement, MasonryGridProps>(({
   areSectionsAligned = false,
   children,
   className,
@@ -228,6 +228,10 @@ export default forwardRef<HTMLDivElement, MasonryGridProps>(({
     </div>
   )
 })
+
+Object.defineProperty(MasonryGrid, 'displayName', { value: 'MasonryGrid', writable: false })
+
+export default MasonryGrid
 
 /**
  * Computes the index and current length of the next available section for a

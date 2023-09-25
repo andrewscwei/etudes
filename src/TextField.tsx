@@ -7,7 +7,7 @@ export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
   onValueChange?: (value: string) => void
 }
 
-export default forwardRef<HTMLInputElement, TextFieldProps>(({
+const TextField = forwardRef<HTMLInputElement, TextFieldProps>(({
   value = '',
   onFocus,
   onUnfocus,
@@ -24,3 +24,7 @@ export default forwardRef<HTMLInputElement, TextFieldProps>(({
     onFocus={({ target }: FocusEvent<HTMLInputElement>) => onFocus?.(target.value)}
   />
 ))
+
+Object.defineProperty(TextField, 'displayName', { value: 'TextField', writable: false })
+
+export default TextField

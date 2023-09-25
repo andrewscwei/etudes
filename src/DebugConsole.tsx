@@ -11,7 +11,7 @@ export type DebugConsoleProps = HTMLAttributes<HTMLDivElement> & {
   title?: string
 }
 
-export default forwardRef<HTMLDivElement, DebugConsoleProps>(({
+const DebugConsole = forwardRef<HTMLDivElement, DebugConsoleProps>(({
   align = 'br',
   margin = 0,
   maxEntries = -1,
@@ -93,6 +93,10 @@ export default forwardRef<HTMLDivElement, DebugConsoleProps>(({
     </div>
   )
 })
+
+Object.defineProperty(DebugConsole, 'displayName', { value: 'DebugConsole', writable: false })
+
+export default DebugConsole
 
 function getStyleByAlignment(align: DebugConsoleProps['align'], margin: number): CSSProperties {
   switch (align) {

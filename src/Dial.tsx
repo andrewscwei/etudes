@@ -47,7 +47,7 @@ export type DialProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
  * @exports DialKnob
  * @exports DialTrack
  */
-export default forwardRef<HTMLDivElement, DialProps>(({
+const Dial = forwardRef<HTMLDivElement, DialProps>(({
   angle = 0,
   children,
   knobLength = 30,
@@ -131,6 +131,10 @@ export default forwardRef<HTMLDivElement, DialProps>(({
     </div>
   )
 })
+
+Object.defineProperty(Dial, 'displayName', { value: 'Dial', writable: false })
+
+export default Dial
 
 export const DialTrack = ({ ...props }: SVGAttributes<SVGCircleElement>) => <circle {...props}/>
 
