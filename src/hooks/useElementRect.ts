@@ -10,7 +10,7 @@ import { Rect } from 'spase'
  *
  * @returns The most current {@link Rect} of the target element.
  */
-export default function useElementRect(targetRef: RefObject<Element>): Rect {
+export function useElementRect(targetRef: RefObject<Element>): Rect {
   const observerRef = useRef<ResizeObserver | undefined>(undefined)
   const [rect, setRect] = useState<Rect>(new Rect())
 

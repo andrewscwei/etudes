@@ -34,4 +34,4 @@ function cloneStyledElement<P, T extends Component<P, ComponentState> = never>(
   } as any, ...children)
 }
 
-export default cloneStyledElement
+export { cloneStyledElement }

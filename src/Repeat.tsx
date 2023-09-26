@@ -10,7 +10,7 @@ export type RepeatProps = {
  * A tag-less component that repeats its children, automatically assigning each
  * a unique key.
  */
-export default function Repeat({
+export function Repeat({
   count = 1,
   children,
   render,

@@ -1,12 +1,8 @@
 import classNames from 'classnames'
 import React, { forwardRef, useEffect, useRef, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
 import { Rect } from 'spase'
-import useDragEffect from './hooks/useDragEffect'
-import asClassNameDict from './utils/asClassNameDict'
-import asComponentDict from './utils/asComponentDict'
-import asStyleDict from './utils/asStyleDict'
-import cloneStyledElement from './utils/cloneStyledElement'
-import styles from './utils/styles'
+import { useDragEffect } from './hooks/useDragEffect'
+import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from './utils'
 
 type Orientation = 'horizontal' | 'vertical'
 
@@ -99,9 +95,9 @@ export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
  * @exports SliderKnob The component for the knob.
  * @exports SliderLabel The component for the label on the knob.
  * @exports SliderTrack The component for the slide track on either side of the
- *                        knob.
+ *                      knob.
  */
-const Slider = forwardRef<HTMLDivElement, SliderProps>(({
+export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
   children,
   className,
   isInverted = false,
@@ -330,8 +326,6 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(({
 })
 
 Object.defineProperty(Slider, 'displayName', { value: 'Slider', writable: false })
-
-export default Slider
 
 export const SliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
 

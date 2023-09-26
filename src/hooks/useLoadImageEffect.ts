@@ -50,7 +50,7 @@ function getImageSize(imageElement: HTMLImageElement): Size {
  *
  * @returns See {@link ReturnedStates}.
  */
-export default function useLoadImageEffect(src?: string, { onImageLoadComplete, onImageLoadError, onImageSizeChange }: Options = {}, deps?: DependencyList): ReturnedStates {
+export function useLoadImageEffect(src?: string, { onImageLoadComplete, onImageLoadError, onImageSizeChange }: Options = {}, deps?: DependencyList): ReturnedStates {
   const imageLoadCompleteHandler = (event: Event) => {
     const imageElement = event.currentTarget as HTMLImageElement
     const imageSize = getImageSize(imageElement)

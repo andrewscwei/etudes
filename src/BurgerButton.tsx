@@ -1,11 +1,7 @@
 import classNames from 'classnames'
 import React, { forwardRef, useEffect, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
-import Repeat from './Repeat'
-import asClassNameDict from './utils/asClassNameDict'
-import asComponentDict from './utils/asComponentDict'
-import asStyleDict from './utils/asStyleDict'
-import cloneStyledElement from './utils/cloneStyledElement'
-import styles from './utils/styles'
+import { Repeat } from './Repeat'
+import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from './utils'
 
 export type BurgerButtonProps = HTMLAttributes<HTMLButtonElement> & PropsWithChildren<{
   height?: number
@@ -25,7 +21,7 @@ export type BurgerButtonProps = HTMLAttributes<HTMLButtonElement> & PropsWithChi
  *
  * @exports BurgerButtonBar Component for each line on the burger button.
  */
-const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
+export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
   children,
   className,
   style,
@@ -174,7 +170,5 @@ const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
 })
 
 Object.defineProperty(BurgerButton, 'displayName', { value: 'BurgerButton', writable: false })
-
-export default BurgerButton
 
 export const BurgerButtonBar = ({ ...props }: HTMLAttributes<HTMLSpanElement>) => <span {...props}/>

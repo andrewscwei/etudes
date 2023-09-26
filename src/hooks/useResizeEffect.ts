@@ -21,7 +21,7 @@ type Options = {
  * @returns A tuple consisting of a stateful value indicating the size of the
  *          target ref, and a function that sets its size.
  */
-export default function useResizeEffect(targetRef: RefObject<Element>, { onResize }: Options = {}, deps?: DependencyList): [Size, Dispatch<SetStateAction<Size>>] {
+export function useResizeEffect(targetRef: RefObject<Element>, { onResize }: Options = {}, deps?: DependencyList): [Size, Dispatch<SetStateAction<Size>>] {
   const observerRef = useRef<ResizeObserver | undefined>(undefined)
   const [size, setSize] = useState<Size>(new Size())
 

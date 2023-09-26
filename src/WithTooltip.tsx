@@ -1,11 +1,10 @@
 import classNames from 'classnames'
 import React, { useEffect, useRef, type CSSProperties, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
 import { Rect, Size } from 'spase'
-import ExtractChild from './ExtractChild'
-import useElementRect from './hooks/useElementRect'
-import useViewportSize from './hooks/useViewportSize'
-import asStyleDict from './utils/asStyleDict'
-import styles from './utils/styles'
+import { ExtractChild } from './ExtractChild'
+import { useElementRect } from './hooks/useElementRect'
+import { useViewportSize } from './hooks/useViewportSize'
+import { asStyleDict, styles } from './utils'
 
 type Alignment = 'tl' | 'tc' | 'tr' | 'cl' | 'cr' | 'bl' | 'bc' | 'br'
 
@@ -51,7 +50,7 @@ export type WithToolTipProps = Pick<HTMLAttributes<HTMLElement>, 'className' | '
   threshold?: number
 }>
 
-export default function WithTooltip({
+export function WithTooltip({
   children,
   className,
   style,

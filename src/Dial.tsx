@@ -1,8 +1,5 @@
 import React, { forwardRef, type HTMLAttributes, type PropsWithChildren, type SVGAttributes } from 'react'
-import asComponentDict from './utils/asComponentDict'
-import asStyleDict from './utils/asStyleDict'
-import cloneStyledElement from './utils/cloneStyledElement'
-import styles from './utils/styles'
+import { asComponentDict, asStyleDict, cloneStyledElement, styles } from './utils'
 
 export type DialProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   /**
@@ -47,7 +44,7 @@ export type DialProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
  * @exports DialKnob
  * @exports DialTrack
  */
-const Dial = forwardRef<HTMLDivElement, DialProps>(({
+export const Dial = forwardRef<HTMLDivElement, DialProps>(({
   angle = 0,
   children,
   knobLength = 30,
@@ -133,8 +130,6 @@ const Dial = forwardRef<HTMLDivElement, DialProps>(({
 })
 
 Object.defineProperty(Dial, 'displayName', { value: 'Dial', writable: false })
-
-export default Dial
 
 export const DialTrack = ({ ...props }: SVGAttributes<SVGCircleElement>) => <circle {...props}/>
 

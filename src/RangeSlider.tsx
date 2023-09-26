@@ -1,13 +1,9 @@
 import classNames from 'classnames'
 import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
-import useDragEffect from './hooks/useDragEffect'
-import useResizeEffect from './hooks/useResizeEffect'
-import asClassNameDict from './utils/asClassNameDict'
-import asComponentDict from './utils/asComponentDict'
-import asStyleDict from './utils/asStyleDict'
-import cloneStyledElement from './utils/cloneStyledElement'
-import styles from './utils/styles'
+import { useDragEffect } from './hooks/useDragEffect'
+import { useResizeEffect } from './hooks/useResizeEffect'
+import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from './utils'
 
 type Orientation = 'horizontal' | 'vertical'
 
@@ -25,7 +21,7 @@ export type RangeSliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildre
   onRangeChange?: (range: Range) => void
 }>
 
-const RangeSlider = forwardRef<HTMLDivElement, RangeSliderProps>(({
+export const RangeSlider = forwardRef<HTMLDivElement, RangeSliderProps>(({
   children,
   className,
   areLabelsVisible = true,
@@ -301,8 +297,6 @@ const RangeSlider = forwardRef<HTMLDivElement, RangeSliderProps>(({
 })
 
 Object.defineProperty(RangeSlider, 'displayName', { value: 'RangeSlider', writable: false })
-
-export default RangeSlider
 
 export const RangeSliderGutter = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
 

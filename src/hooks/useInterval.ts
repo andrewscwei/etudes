@@ -16,7 +16,7 @@ type Options = {
  * @param options See {@link Options}.
  * @param deps Dependencies that trigger this effect.
  */
-export default function useInterval(handler: () => void, timeout?: number, { shouldInvokeInitially = false }: Options = {}, deps?: DependencyList) {
+export function useInterval(handler: () => void, timeout?: number, { shouldInvokeInitially = false }: Options = {}, deps?: DependencyList) {
   const handlerRef = useRef<(() => void)>()
 
   useEffect(() => {

@@ -1,12 +1,9 @@
 import classNames from 'classnames'
 import React, { forwardRef, useEffect, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { Transition } from 'react-transition-group'
-import Each from './Each'
-import useInterval from './hooks/useInterval'
-import asComponentDict from './utils/asComponentDict'
-import asStyleDict from './utils/asStyleDict'
-import cloneStyledElement from './utils/cloneStyledElement'
-import styles from './utils/styles'
+import { Each } from './Each'
+import { useInterval } from './hooks/useInterval'
+import { asComponentDict, asStyleDict, cloneStyledElement, styles } from './utils'
 
 export type RotatingGalleryProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   /**
@@ -47,7 +44,7 @@ export type RotatingGalleryProps = HTMLAttributes<HTMLDivElement> & PropsWithChi
  * @exports RotatingGalleryImage Component for each rotating image, classes:
  *                               `entering`, `entered`, `exiting`, `exited`.
  */
-const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(({
+export const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(({
   children,
   index: externalIndex = 0,
   rotationDuration,
@@ -118,7 +115,5 @@ const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(({
 })
 
 Object.defineProperty(RotatingGallery, 'displayName', { value: 'RotatingGallery', writable: false })
-
-export default RotatingGallery
 
 export const RotatingGalleryImage = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>

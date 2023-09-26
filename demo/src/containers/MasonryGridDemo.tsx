@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
-import DebugConsole from '../../../lib/DebugConsole'
-import Each from '../../../lib/Each'
-import MasonryGrid from '../../../lib/MasonryGrid'
+import { DebugConsole } from '../../../lib/DebugConsole'
+import { Each } from '../../../lib/Each'
+import { MasonryGrid } from '../../../lib/MasonryGrid'
 
-export default function MasonryGridDemo() {
+export function MasonryGridDemo() {
   const [itemIndex, setItemIndex] = useState(-1)
 
   const items = useMemo(() => [...new Array(200)].map((v, i) => ({

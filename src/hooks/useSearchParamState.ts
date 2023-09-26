@@ -1,6 +1,6 @@
 import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import useDebug from '../utils/useDebug'
+import { useDebug } from '../utils'
 
 const debug = useDebug('hooks')
 
@@ -38,7 +38,7 @@ export type Options<T> = {
  * @returns A tuple consisting of a stateful value representing the current
  *          value of the mapped state and a function that updates it.
  */
-export default function useSearchParamState<T>(param: string, defaultValue: T, { mapSearchParamToState, mapStateToSearchParam }: Options<T> = {}): [T, Dispatch<SetStateAction<T>>] {
+export function useSearchParamState<T>(param: string, defaultValue: T, { mapSearchParamToState, mapStateToSearchParam }: Options<T> = {}): [T, Dispatch<SetStateAction<T>>] {
   const defaultMapSearchParamToState = (value: string | undefined, fallback: T): T => {
     if (mapSearchParamToState) {
       return mapSearchParamToState(value)

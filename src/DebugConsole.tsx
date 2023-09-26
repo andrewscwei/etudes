@@ -1,7 +1,6 @@
 import React, { forwardRef, useEffect, useRef, useState, type CSSProperties, type HTMLAttributes } from 'react'
-import Each from './Each'
-import asStyleDict from './utils/asStyleDict'
-import styles from './utils/styles'
+import { Each } from './Each'
+import { asStyleDict, styles } from './utils'
 
 export type DebugConsoleProps = HTMLAttributes<HTMLDivElement> & {
   align?: 'tl' | 'tc' | 'tr' | 'cl' | 'cc' | 'cr' | 'bl' | 'bc' | 'br'
@@ -11,7 +10,7 @@ export type DebugConsoleProps = HTMLAttributes<HTMLDivElement> & {
   title?: string
 }
 
-const DebugConsole = forwardRef<HTMLDivElement, DebugConsoleProps>(({
+export const DebugConsole = forwardRef<HTMLDivElement, DebugConsoleProps>(({
   align = 'br',
   margin = 0,
   maxEntries = -1,
@@ -95,8 +94,6 @@ const DebugConsole = forwardRef<HTMLDivElement, DebugConsoleProps>(({
 })
 
 Object.defineProperty(DebugConsole, 'displayName', { value: 'DebugConsole', writable: false })
-
-export default DebugConsole
 
 function getStyleByAlignment(align: DebugConsoleProps['align'], margin: number): CSSProperties {
   switch (align) {

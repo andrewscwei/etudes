@@ -6,7 +6,7 @@ export type EachProps<T> = {
   render?: (value: T, index: number) => ReactNode
 }
 
-export default function Each<T>({
+export function Each<T>({
   in: array,
   children,
   render,

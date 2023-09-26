@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import DebugConsole from '../../../lib/DebugConsole'
-import Dial, { DialKnob, DialTrack } from '../../../lib/Dial'
-import RangeSlider, { RangeSliderHighlight, RangeSliderKnob, RangeSliderLabel } from '../../../lib/RangeSlider'
-import Slider, { SliderKnob, SliderLabel, SliderTrack } from '../../../lib/Slider'
-import StepwiseSlider, { StepwiseSliderKnob, StepwiseSliderLabel, StepwiseSliderTrack } from '../../../lib/StepwiseSlider'
+import { DebugConsole } from '../../../lib/DebugConsole'
+import { Dial, DialKnob, DialTrack } from '../../../lib/Dial'
+import { RangeSlider, RangeSliderHighlight, RangeSliderKnob, RangeSliderLabel } from '../../../lib/RangeSlider'
+import { Slider, SliderKnob, SliderLabel, SliderTrack } from '../../../lib/Slider'
+import { StepwiseSlider, StepwiseSliderKnob, StepwiseSliderLabel, StepwiseSliderTrack } from '../../../lib/StepwiseSlider'
 
-export default function DialSliders() {
+export function DialSlidersDemo() {
   const getAngleByPosition = (position: number): number => position * (max - min) + min
 
   const [min, setMin] = useState(0)

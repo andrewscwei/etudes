@@ -1,13 +1,10 @@
 import classNames from 'classnames'
 import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
-import Collection, { type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection'
-import Each from './Each'
-import FlatSVG from './FlatSVG'
-import asClassNameDict from './utils/asClassNameDict'
-import asStyleDict from './utils/asStyleDict'
-import cloneStyledElement from './utils/cloneStyledElement'
-import styles from './utils/styles'
+import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection'
+import { Each } from './Each'
+import { FlatSVG } from './FlatSVG'
+import { asClassNameDict, asStyleDict, cloneStyledElement, styles } from './utils'
 
 /**
  * Type describing the current item selection of {@link Accordion}, composed of
@@ -249,7 +246,7 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
  * `onSelectionChange` handler. Likewise for the omission of the expansion
  * states if `expandedSectionIndices` prop is provided.
  */
-const Accordion = forwardRef(({
+export const Accordion = forwardRef(({
   children,
   className,
   style,
@@ -518,8 +515,6 @@ const Accordion = forwardRef(({
 }) as <I, S extends AccordionSection<I> = AccordionSection<I>>(props: AccordionProps<I, S> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
 Object.defineProperty(Accordion, 'displayName', { value: 'Accordion', writable: false })
-
-export default Accordion
 
 type StylesProps = {
   borderThickness?: number

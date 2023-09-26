@@ -1,5 +1,5 @@
 import React, { Children, forwardRef, isValidElement, type HTMLAttributes } from 'react'
-import cloneStyledElement from './utils/cloneStyledElement'
+import { cloneStyledElement } from './utils'
 
 export type ExtractChildProps = HTMLAttributes<HTMLElement>
 
@@ -8,7 +8,7 @@ export type ExtractChildProps = HTMLAttributes<HTMLElement>
  * parent component has multiple children, only the first one will be extracted,
  * the rest will be ignored.
  */
-export default forwardRef<HTMLElement, ExtractChildProps>(({
+export const ExtractChild = forwardRef<HTMLElement, ExtractChildProps>(({
   children,
   ...props
 }, ref) => {

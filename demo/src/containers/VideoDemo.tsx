@@ -1,10 +1,10 @@
 import React from 'react'
 import styled from 'styled-components'
-import DebugConsole from '../../../lib/DebugConsole'
-import Video from '../../../lib/Video'
+import { DebugConsole } from '../../../lib/DebugConsole'
+import { Video } from '../../../lib/Video'
 import $$Video from '../assets/media/video.mp4'
 
-export default function VideoDemo() {
+export function VideoDemo() {
   return (
     <>
       <StyledRoot>

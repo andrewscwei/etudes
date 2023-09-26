@@ -1,13 +1,8 @@
 import classNames from 'classnames'
 import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
 import { Rect } from 'spase'
-import useDragEffect from './hooks/useDragEffect'
-import asClassNameDict from './utils/asClassNameDict'
-import asComponentDict from './utils/asComponentDict'
-import asStyleDict from './utils/asStyleDict'
-import cloneStyledElement from './utils/cloneStyledElement'
-import styles from './utils/styles'
-import useDebug from './utils/useDebug'
+import { useDragEffect } from './hooks/useDragEffect'
+import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles, useDebug } from './utils'
 
 const debug = useDebug('stepwise-slider')
 
@@ -131,7 +126,7 @@ export type StepwiseSliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChil
  * @exports StepwiseSliderTrack The component for the slide track on either side
  *                                of the knob.
  */
-const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
+export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
   children,
   className,
   index: externalIndex = 0,
@@ -389,8 +384,6 @@ const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
 })
 
 Object.defineProperty(StepwiseSlider, 'displayName', { value: 'StepwiseSlider', writable: false })
-
-export default StepwiseSlider
 
 export const StepwiseSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
 
