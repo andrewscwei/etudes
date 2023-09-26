@@ -10,11 +10,21 @@ import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
 import styles from './utils/styles'
 
+/**
+ * Type describing the current item selection of {@link Accordion}, composed of
+ * a dictionary whose key corresponds the section index and value corresponds to
+ * an array of selected item indices. If the selection mode of the
+ * {@link Accordion} is `single`, only one key will be present and one index in
+ * the array value.
+ */
 export type AccordionSelection = Record<number, number[]>
 
+/**
+ * Type describing the data of each section in {@link Accordion}.
+ */
 export type AccordionSection<T> = Pick<CollectionProps<T>, 'isSelectionTogglable' | 'itemLength' | 'itemPadding' | 'items' | 'layout' | 'numSegments'> & {
   /**
-   * Label for the header.
+   * Label for the section header.
    */
   label: string
 
@@ -26,15 +36,44 @@ export type AccordionSection<T> = Pick<CollectionProps<T>, 'isSelectionTogglable
   maxVisible?: number
 }
 
+/**
+ * Type describing the props of each `ItemComponent` provided to
+ * {@link Accordion}.
+ */
 export type AccordionItemProps<T> = CollectionItemProps<T>
 
+/**
+ * Type describing the props of each `HeaderComponent` provided to
+ * {@link Accordion}.
+ */
 export type AccordionHeaderProps<I, S extends AccordionSection<I> = AccordionSection<I>> = HTMLAttributes<HTMLElement> & PropsWithChildren<{
+  /**
+   * The index of the corresponding section.
+   */
   index: number
+
+  /**
+   * Indicates whether the corresponding section is collapsed.
+   */
   isCollapsed: boolean
+
+  /**
+   * Data provided to the corresponding section.
+   */
   section: S
+
+  /**
+   * Handler invoked to dispatch a custom event.
+   *
+   * @param name User-defined name of the custom event.
+   * @param info Optional user-defined info of the custom event.
+   */
   onCustomEvent?: (name: string, info?: any) => void
 }>
 
+/**
+ * Type describing the props of {@link Accordion}.
+ */
 export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I>> = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   /**
    * Specifies if expanded sections should automatically collapse upon expanding
@@ -43,7 +82,8 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   autoCollapseSections?: boolean
 
   /**
-   * SVG markup to be put in the section header as the collapse icon.
+   * SVG markup to use as the collapse icon when a toggle button is
+   * automatically generated (when `HeaderComponent` is absent).
    */
   collapseIconSvg?: string
 
@@ -53,12 +93,15 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   expandedSectionIndices?: number[]
 
   /**
-   * SVG markup to be put in the section header as the expand icon.
+   * SVG markup to use as the expand icon when a toggle button is automatically
+   * generated (when `HeaderComponent` is absent).
    */
   expandIconSvg?: string
 
   /**
    * Orientation of this component.
+   *
+   * @see {@link CollectionOrientation}
    */
   orientation?: CollectionOrientation
 
@@ -74,11 +117,15 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
 
   /**
    * Indices of selected items per section.
+   *
+   * @see {@link AccordionSelection}
    */
   selection?: AccordionSelection
 
   /**
    * Selection mode of each section.
+   *
+   * @see {@link CollectionSelectionMode}
    */
   selectionMode?: CollectionSelectionMode
 
@@ -121,8 +168,8 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
    * Handler invoked when a custom event is dispatched from a section header.
    *
    * @param sectionIndex Index of the section which the header belongs.
-   * @param eventName Name of the dispatched event.
-   * @param eventInfo Optional info of the dispatched event.
+   * @param eventName User-defined name of the dispatched event.
+   * @param eventInfo Optional user-defined info of the dispatched event.
    */
   onHeaderCustomEvent?: (sectionIndex: number, eventName: string, eventInfo?: any) => void
 
@@ -131,8 +178,8 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
    *
    * @param itemIndex Item index.
    * @param sectionIndex Section index.
-   * @param eventName Name of the dispatched event.
-   * @param eventInfo Optional info of the dispatched event.
+   * @param eventName User-defined name of the dispatched event.
+   * @param eventInfo Optional user-defined info of the dispatched event.
    */
   onItemCustomEvent?: (itemIndex: number, sectionIndex: number, eventName: string, eventInfo?: any) => void
 
@@ -152,13 +199,13 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   onSelectionChange?: (selection: AccordionSelection) => void
 
   /**
-   * React component type to be used for generating headers inside the
-   * component. When absent, one will be generated automatically.
+   * Component type for generating section headers inside the component. When
+   * absent, one will be generated automatically.
    */
   HeaderComponent?: ComponentType<AccordionHeaderProps<I, S>>
 
   /**
-   * React component type to be used to generate items for each section.
+   * Component type for generating items for each section.
    */
   ItemComponent?: ComponentType<AccordionItemProps<I>>
 }>
@@ -365,7 +412,6 @@ const Accordion = forwardRef(({
                 })}
                 selectionMode={selectionMode}
                 isSelectionTogglable={isSelectionTogglable}
-                itemComponentType={itemComponentType}
                 itemLength={itemLength}
                 itemPadding={itemPadding}
                 items={items}
@@ -377,6 +423,7 @@ const Accordion = forwardRef(({
                 onDeselectAt={itemIndex => deselectAt(itemIndex, sectionIndex)}
                 onItemCustomEvent={(itemIndex, eventName, eventInfo) => onItemCustomEvent?.(itemIndex, sectionIndex, eventName, eventInfo)}
                 onSelectAt={itemIndex => selectAt(itemIndex, sectionIndex)}
+                ItemComponent={ItemComponent}
               />
             </div>
           )
