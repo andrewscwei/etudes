@@ -6,8 +6,8 @@ import FlatSVG from '../../lib/FlatSVG'
 import WithTooltip from '../../lib/WithTooltip'
 import $$GithubIcon from './assets/svgs/github-icon.svg'
 import AccordionDemo from './containers/AccordionDemo'
+import CollectionDemo from './containers/CollectionDemo'
 import DialSlidersDemo from './containers/DialSlidersDemo'
-import ListDemo from './containers/ListDemo'
 import MasonryGridDemo from './containers/MasonryGridDemo'
 import PanoramaDemo from './containers/PanoramaDemo'
 import VideoDemo from './containers/VideoDemo'
@@ -25,7 +25,7 @@ export default function App() {
   const renderDemo = () => {
     switch (hash) {
       case 'masonry-grid': return <MasonryGridDemo/>
-      case 'list': return <ListDemo/>
+      case 'collection': return <CollectionDemo/>
       case 'accordion': return <AccordionDemo/>
       case 'dial+sliders': return <DialSlidersDemo/>
       case 'video': return <VideoDemo/>
@@ -62,7 +62,7 @@ export default function App() {
       <StyledHUDs>
         <StyledNav className={classNames({ active: isNavActive })}>
           <StyledNavButton className={classNames({ active: hash === 'masonry-grid' })} onClick={() => setHash('masonry-grid')}>Masonry Grid</StyledNavButton>
-          <StyledNavButton className={classNames({ active: hash === 'list' })} onClick={() => setHash('list')}>List+Dropdown</StyledNavButton>
+          <StyledNavButton className={classNames({ active: hash === 'collection' })} onClick={() => setHash('collection')}>Collection+Dropdown</StyledNavButton>
           <StyledNavButton className={classNames({ active: hash === 'accordion' })} onClick={() => setHash('accordion')}>Accordion</StyledNavButton>
           <StyledNavButton className={classNames({ active: hash === 'dial+sliders' })} onClick={() => setHash('dial+sliders')}>Dial+Sliders</StyledNavButton>
           <StyledNavButton className={classNames({ active: hash === 'video' })} onClick={() => setHash('video')}>Video</StyledNavButton>
@@ -185,7 +185,7 @@ const StyledNav = styled.nav`
   justify-content: flex-start;
   margin: 0;
   overflow-y: scroll;
-  padding: 100px 8vw 100px 0;
+  padding: 100px 5vw 100px 0;
   position: fixed;
   right: 0;
   top: 0;

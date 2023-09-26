@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
+import Collection, { type CollectionItemProps, type CollectionSelection } from '../../../lib/Collection'
 import DebugConsole from '../../../lib/DebugConsole'
 import Dropdown, { type DropdownItemProps } from '../../../lib/Dropdown'
-import List, { type ListItemProps, type ListSelection } from '../../../lib/List'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
 const DropdownItem = ({ index, isSelected, item, onCustomEvent, ...props }: DropdownItemProps) => (
@@ -11,27 +11,28 @@ const DropdownItem = ({ index, isSelected, item, onCustomEvent, ...props }: Drop
   </StyledDropdownItem>
 )
 
-const ListItem = ({ index, isSelected, item, onCustomEvent, ...props }: ListItemProps<string>) => (
-  <StyledListItem {...props}>
+const CollectionItem = ({ index, isSelected, item, onCustomEvent, ...props }: CollectionItemProps<string>) => (
+  <StyledCollectionItem {...props}>
     {item}
-  </StyledListItem>
+  </StyledCollectionItem>
 )
 
 const DROPDOWN_ITEMS = [{ label: 'Vertical' }, { label: 'Horizontal' }]
 const LIST_ITEMS = [...new Array(60)].map((v, i) => `${i + 1}`)
 
-export default function ListDemo() {
+export default function CollectionDemo() {
   const [selectedItemIndex, setSelectedItemIndex] = useState(-1)
   const [selectedOrientationIndex, setSelectedOrientationIndex] = useState(0)
   const orientation = selectedOrientationIndex === 0 ? 'vertical' : 'horizontal'
 
-  const dropdownSelectionChangeHandler = (selection: ListSelection) => setSelectedOrientationIndex(selection[0])
-  const listSelectionChangeHandler = (selection: ListSelection) => setSelectedItemIndex(selection[0])
+  const dropdownSelectionChangeHandler = (selection: CollectionSelection) => setSelectedOrientationIndex(selection[0])
+  const collectionSelectionChangeHandler = (selection: CollectionSelection) => setSelectedItemIndex(selection[0])
 
   return (
     <>
+      <button onClick={() => setSelectedItemIndex(10)}>FOO</button>
       <StyledRoot className={orientation}>
-        <List
+        <Collection
           style={orientation === 'horizontal' ? {
             height: '80%',
             minHeight: '400px',
@@ -50,8 +51,11 @@ export default function ListDemo() {
           orientation={orientation}
           selection={[selectedItemIndex]}
           selectionMode='single'
-          onSelectionChange={listSelectionChangeHandler}
-          ItemComponent={ListItem}
+          onSelectAt={t => console.log('Seleced', t)}
+          onDeselectAt={t => console.log('Deseleced', t)}
+          onActivateAt={t => console.log('Activated', t)}
+          onSelectionChange={collectionSelectionChangeHandler}
+          ItemComponent={CollectionItem}
         />
       </StyledRoot>
       <StyledDropdown
@@ -66,7 +70,7 @@ export default function ListDemo() {
         ItemComponent={DropdownItem}
       />
       <DebugConsole
-        title='?: List+Dropdown'
+        title='?: Collection+Dropdown'
         message={selectedItemIndex > -1 ? `<strong>[${orientation.toUpperCase()}]</strong> You selected item <strong>#${selectedItemIndex + 1}</strong>!` : 'No item selected!'}
         style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
       />
@@ -149,7 +153,7 @@ const StyledDropdown = styled(Dropdown)`
   }
 `
 
-const StyledListItem = styled.button`
+const StyledCollectionItem = styled.button`
   align-items: center;
   background: #fff;
   box-sizing: border-box;

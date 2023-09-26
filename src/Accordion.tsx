@@ -1,9 +1,9 @@
 import classNames from 'classnames'
 import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
+import Collection, { type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection'
 import Each from './Each'
 import FlatSVG from './FlatSVG'
-import List, { type ListItemProps, type ListOrientation, type ListProps, type ListSelectionMode } from './List'
 import usePrevious from './hooks/usePrevious'
 import asClassNameDict from './utils/asClassNameDict'
 import asStyleDict from './utils/asStyleDict'
@@ -12,7 +12,7 @@ import styles from './utils/styles'
 
 export type AccordionSelection = Record<number, number[]>
 
-export type AccordionSection<T> = Pick<ListProps<T>, 'isSelectionTogglable' | 'itemLength' | 'itemPadding' | 'items' | 'layout' | 'numSegments'> & {
+export type AccordionSection<T> = Pick<CollectionProps<T>, 'isSelectionTogglable' | 'itemLength' | 'itemPadding' | 'items' | 'layout' | 'numSegments'> & {
   /**
    * Label for the header.
    */
@@ -26,7 +26,7 @@ export type AccordionSection<T> = Pick<ListProps<T>, 'isSelectionTogglable' | 'i
   maxVisible?: number
 }
 
-export type AccordionItemProps<T> = ListItemProps<T>
+export type AccordionItemProps<T> = CollectionItemProps<T>
 
 export type AccordionHeaderProps<I, S extends AccordionSection<I> = AccordionSection<I>> = HTMLAttributes<HTMLElement> & PropsWithChildren<{
   index: number
@@ -60,7 +60,7 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   /**
    * Orientation of this component.
    */
-  orientation?: ListOrientation
+  orientation?: CollectionOrientation
 
   /**
    * Padding (in pixels) between each section.
@@ -80,7 +80,7 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   /**
    * Selection mode of each section.
    */
-  selectionMode?: ListSelectionMode
+  selectionMode?: CollectionSelectionMode
 
   /**
    * Specifies if the component should use default styles.
@@ -350,7 +350,7 @@ const Accordion = forwardRef(({
                   })}
                 </button>
               )}
-              <List
+              <Collection
                 className={classNames({ collapsed: isCollapsed, expanded: !isCollapsed })}
                 style={styles(fixedStyles.list, defaultStyles.list, orientation === 'vertical' ? {
                   width: '100%',
@@ -392,7 +392,7 @@ export default Accordion
 
 type StylesProps = {
   borderThickness?: number
-  orientation?: ListOrientation
+  orientation?: CollectionOrientation
 }
 
 function getFixedClassNames({ orientation }: StylesProps) {
