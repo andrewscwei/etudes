@@ -1,10 +1,8 @@
 import classNames from 'classnames'
 import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Rect } from 'spase'
-import useResizeEffect from './hooks/useResizeEffect'
-import asClassNameDict from './utils/asClassNameDict'
-import asStyleDict from './utils/asStyleDict'
-import useDebug from './utils/useDebug'
+import { useResizeEffect } from './hooks/useResizeEffect'
+import { asClassNameDict, asStyleDict, useDebug } from './utils'
 
 const debug = useDebug('masonry')
 
@@ -38,7 +36,7 @@ const BASE_MODIFIER_CLASS_PREFIX = 'base-'
  * rows*, whereas in a horizontally oriented grid, *number of sections* refers
  * to the *number of columns*.
  */
-const MasonryGrid = forwardRef<HTMLDivElement, MasonryGridProps>(({
+export const MasonryGrid = forwardRef<HTMLDivElement, MasonryGridProps>(({
   areSectionsAligned = false,
   children,
   className,
@@ -230,8 +228,6 @@ const MasonryGrid = forwardRef<HTMLDivElement, MasonryGridProps>(({
 })
 
 Object.defineProperty(MasonryGrid, 'displayName', { value: 'MasonryGrid', writable: false })
-
-export default MasonryGrid
 
 /**
  * Computes the index and current length of the next available section for a

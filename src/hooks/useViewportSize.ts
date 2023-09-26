@@ -6,7 +6,7 @@ import { Rect, Size } from 'spase'
  *
  * @returns The most current viewport size.
  */
-export default function useViewportSize() {
+export function useViewportSize() {
   const [size, setSize] = useState<Size>(new Size())
 
   useEffect(() => {

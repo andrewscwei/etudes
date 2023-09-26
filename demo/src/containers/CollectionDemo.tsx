@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import Collection, { type CollectionItemProps } from '../../../lib/Collection'
-import DebugConsole from '../../../lib/DebugConsole'
-import Dropdown, { type DropdownItemProps } from '../../../lib/Dropdown'
+import { Collection, type CollectionItemProps } from '../../../lib/Collection'
+import { DebugConsole } from '../../../lib/DebugConsole'
+import { Dropdown, type DropdownItemProps } from '../../../lib/Dropdown'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
 const DropdownItem = ({ index, isSelected, item, onCustomEvent, ...props }: DropdownItemProps) => (
@@ -20,7 +20,7 @@ const CollectionItem = ({ index, isSelected, item, onCustomEvent, ...props }: Co
 const DROPDOWN_ITEMS = [{ label: 'Vertical' }, { label: 'Horizontal' }]
 const LIST_ITEMS = [...new Array(60)].map((v, i) => `${i + 1}`)
 
-export default function CollectionDemo() {
+export function CollectionDemo() {
   const [selectedItemIndex, setSelectedItemIndex] = useState(-1)
   const [selectedOrientationIndex, setSelectedOrientationIndex] = useState(0)
   const orientation = selectedOrientationIndex === 0 ? 'vertical' : 'horizontal'

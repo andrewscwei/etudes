@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import Accordion, { type AccordionItemProps, type AccordionSection } from '../../../lib/Accordion'
-import DebugConsole from '../../../lib/DebugConsole'
+import { Accordion, type AccordionItemProps, type AccordionSection } from '../../../lib/Accordion'
+import { DebugConsole } from '../../../lib/DebugConsole'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
 const AccordionItem = ({ item, index, isSelected, onCustomEvent, ...props }: AccordionItemProps<string>) => (
@@ -12,7 +12,7 @@ const AccordionItem = ({ item, index, isSelected, onCustomEvent, ...props }: Acc
 
 type Section = AccordionSection<string>
 
-export default function AccordionDemo() {
+export function AccordionDemo() {
   const [itemIndex, setItemIndex] = useState(-1)
   const [sectionIndex, setSectionIndex] = useState(-1)
 

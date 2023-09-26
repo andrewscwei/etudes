@@ -1,9 +1,9 @@
 import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Size } from 'spase'
-import useDragEffect from './hooks/useDragEffect'
-import useLoadImageEffect from './hooks/useLoadImageEffect'
-import useResizeEffect from './hooks/useResizeEffect'
-import asStyleDict from './utils/asStyleDict'
+import { useDragEffect } from './hooks/useDragEffect'
+import { useLoadImageEffect } from './hooks/useLoadImageEffect'
+import { useResizeEffect } from './hooks/useResizeEffect'
+import { asStyleDict } from './utils'
 
 export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'onResize'> & {
   /**
@@ -99,7 +99,7 @@ export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'onResize'> & {
  * A component containing a pannable 360° panorama image. The angle supports
  * two-way binding.
  */
-const Panorama = forwardRef<HTMLDivElement, PanoramaProps>(({
+export const Panorama = forwardRef<HTMLDivElement, PanoramaProps>(({
   angle: externalAngle = 0,
   speed = 1,
   src,
@@ -187,8 +187,6 @@ const Panorama = forwardRef<HTMLDivElement, PanoramaProps>(({
 })
 
 Object.defineProperty(Panorama, 'displayName', { value: 'Panorama', writable: false })
-
-export default Panorama
 
 function getFilledImageSize(originalSize: Size, sizeToFill: Size): Size {
   const { width: originalWidth, height: originalHeight } = originalSize

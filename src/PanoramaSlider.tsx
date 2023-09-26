@@ -1,13 +1,9 @@
 import classNames from 'classnames'
 import React, { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { type Size } from 'spase'
-import Panorama, { type PanoramaProps } from './Panorama'
-import useResizeEffect from './hooks/useResizeEffect'
-import asClassNameDict from './utils/asClassNameDict'
-import asComponentDict from './utils/asComponentDict'
-import asStyleDict from './utils/asStyleDict'
-import cloneStyledElement from './utils/cloneStyledElement'
-import styles from './utils/styles'
+import { Panorama, type PanoramaProps } from './Panorama'
+import { useResizeEffect } from './hooks/useResizeEffect'
+import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from './utils'
 
 export type PanoramaSliderProps = HTMLAttributes<HTMLDivElement> & PanoramaProps & PropsWithChildren<{
   /**
@@ -44,7 +40,7 @@ export type PanoramaSliderProps = HTMLAttributes<HTMLDivElement> & PanoramaProps
  *                                backing {@link Panorama}.
  * @exports PanoramaSliderTrack The slide track.
  */
-const PanoramaSlider = forwardRef<HTMLDivElement, PanoramaSliderProps>(({
+export const PanoramaSlider = forwardRef<HTMLDivElement, PanoramaSliderProps>(({
   className,
   style,
   angle = 0,
@@ -248,8 +244,6 @@ const PanoramaSlider = forwardRef<HTMLDivElement, PanoramaSliderProps>(({
 })
 
 Object.defineProperty(PanoramaSlider, 'displayName', { value: 'PanoramaSlider', writable: false })
-
-export default PanoramaSlider
 
 export const PanoramaSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
 

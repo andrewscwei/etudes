@@ -1,6 +1,5 @@
 import React, { forwardRef, useEffect, useRef, type HTMLAttributes, type ReactEventHandler } from 'react'
-import asStyleDict from './utils/asStyleDict'
-import useDebug from './utils/useDebug'
+import { asStyleDict, useDebug } from './utils'
 
 const debug = useDebug('video')
 
@@ -20,7 +19,7 @@ export type VideoProps = HTMLAttributes<HTMLDivElement> & {
   onPlay?: () => void
 }
 
-const Video = forwardRef<HTMLDivElement, VideoProps>(({
+export const Video = forwardRef<HTMLDivElement, VideoProps>(({
   autoLoop = true,
   autoPlay = true,
   hasControls = false,
@@ -133,5 +132,3 @@ const Video = forwardRef<HTMLDivElement, VideoProps>(({
 })
 
 Object.defineProperty(Video, 'displayName', { value: 'Video', writable: false })
-
-export default Video

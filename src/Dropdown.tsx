@@ -1,13 +1,10 @@
 import classNames from 'classnames'
 import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
-import Collection, { type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelection } from './Collection'
-import FlatSVG from './FlatSVG'
-import useElementRect from './hooks/useElementRect'
-import usePrevious from './hooks/usePrevious'
-import asClassNameDict from './utils/asClassNameDict'
-import asStyleDict from './utils/asStyleDict'
-import cloneStyledElement from './utils/cloneStyledElement'
-import styles from './utils/styles'
+import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelection } from './Collection'
+import { FlatSVG } from './FlatSVG'
+import { useElementRect } from './hooks/useElementRect'
+import { usePrevious } from './hooks/usePrevious'
+import { asClassNameDict, asStyleDict, cloneStyledElement, styles } from './utils'
 
 /**
  * Base extendable type describing the data provided to each item in
@@ -126,7 +123,7 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
  * `onSelectionChange` handler. Likewise for the omission of the expansion state
  * if `isCollapsed` prop is provided.
  */
-const Dropdown = forwardRef(({
+export const Dropdown = forwardRef(({
   children,
   className,
   style,
@@ -342,8 +339,6 @@ const Dropdown = forwardRef(({
 }) as <T extends DropdownItemData = DropdownItemData>(props: DropdownProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
 Object.defineProperty(Dropdown, 'displayName', { value: 'Dropdown', writable: false })
-
-export default Dropdown
 
 type StylesProps = {
   isCollapsed?: boolean

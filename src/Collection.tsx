@@ -1,10 +1,8 @@
 import classNames from 'classnames'
 import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
-import Each from './Each'
-import asClassNameDict from './utils/asClassNameDict'
-import asStyleDict from './utils/asStyleDict'
-import styles from './utils/styles'
+import { Each } from './Each'
+import { asClassNameDict, asStyleDict, styles } from './utils'
 
 /**
  * Type describing the layout orientation of items in {@link Collection}.
@@ -203,7 +201,7 @@ export type CollectionProps<T> = HTMLAttributes<HTMLDivElement> & {
  * initialize the selection state. It will be up to its parent to provide item
  * selection in tandem with the component's `onSelectionChange` handler.
  */
-const Collection = forwardRef(({
+export const Collection = forwardRef(({
   className,
   style,
   isSelectionTogglable = false,
@@ -375,8 +373,6 @@ const Collection = forwardRef(({
 }) as <T>(props: CollectionProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
 Object.defineProperty(Collection, 'displayName', { value: 'Collection', writable: false })
-
-export default Collection
 
 type StylesProps = {
   itemLength?: number

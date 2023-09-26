@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 import { Size } from 'spase'
 import styled from 'styled-components'
-import DebugConsole from '../../../lib/DebugConsole'
-import Panorama from '../../../lib/Panorama'
-import PanoramaSlider from '../../../lib/PanoramaSlider'
-import Slider, { SliderKnob } from '../../../lib/Slider'
+import { DebugConsole } from '../../../lib/DebugConsole'
+import { Panorama } from '../../../lib/Panorama'
+import { PanoramaSlider } from '../../../lib/PanoramaSlider'
+import { Slider, SliderKnob } from '../../../lib/Slider'
 import $$PanoramaImage from '../assets/images/panorama.png'
 
-export default function PanoramaDemo() {
+export function PanoramaDemo() {
   const [angle, setAngle] = useState(0)
   const [width, setWidth] = useState(800)
   const [viewportSize, setViewportSize] = useState<Size>(new Size())

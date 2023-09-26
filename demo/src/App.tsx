@@ -1,18 +1,18 @@
 import classNames from 'classnames'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import BurgerButton, { BurgerButtonBar } from '../../lib/BurgerButton'
-import FlatSVG from '../../lib/FlatSVG'
-import WithTooltip from '../../lib/WithTooltip'
+import { BurgerButton, BurgerButtonBar } from '../../lib/BurgerButton'
+import { FlatSVG } from '../../lib/FlatSVG'
+import { WithTooltip } from '../../lib/WithTooltip'
 import $$GithubIcon from './assets/svgs/github-icon.svg'
-import AccordionDemo from './containers/AccordionDemo'
-import CollectionDemo from './containers/CollectionDemo'
-import DialSlidersDemo from './containers/DialSlidersDemo'
-import MasonryGridDemo from './containers/MasonryGridDemo'
-import PanoramaDemo from './containers/PanoramaDemo'
-import VideoDemo from './containers/VideoDemo'
+import { AccordionDemo } from './containers/AccordionDemo'
+import { CollectionDemo } from './containers/CollectionDemo'
+import { DialSlidersDemo } from './containers/DialSlidersDemo'
+import { MasonryGridDemo } from './containers/MasonryGridDemo'
+import { PanoramaDemo } from './containers/PanoramaDemo'
+import { VideoDemo } from './containers/VideoDemo'
 
-export default function App() {
+export function App() {
   const mapLocationToHash = () => {
     const hasHash = window.location.hash && window.location.hash !== ''
     setHash(hasHash ? window.location.hash.substring(1, window.location.hash.length) : undefined)

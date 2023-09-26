@@ -4,7 +4,7 @@ export type ConditionalProps = PropsWithChildren<{
   if: boolean | (() => boolean)
 }>
 
-export default function Conditional({ children, if: boolOrExpression }: ConditionalProps) {
+export function Conditional({ children, if: boolOrExpression }: ConditionalProps) {
   switch (typeof boolOrExpression) {
     case 'boolean':
       return boolOrExpression ? <>{children}</> : <></>
