@@ -1,7 +1,7 @@
 import classNames from 'classnames'
-import React, { forwardRef, useEffect, useState, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
+import isDeepEqual from 'fast-deep-equal/react'
+import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
 import Each from './Each'
-import usePrevious from './hooks/usePrevious'
 import asClassNameDict from './utils/asClassNameDict'
 import asStyleDict from './utils/asStyleDict'
 import styles from './utils/styles'
@@ -247,33 +247,29 @@ const Collection = forwardRef(({
   const selectAt = (index: number) => {
     if (isSelectedAt(index)) return
 
+    let transform: (val: CollectionSelection) => CollectionSelection
+
     switch (selectionMode) {
       case 'multiple': {
-        const transform = (val: CollectionSelection) => [...val.filter(t => t !== index), index].sort()
-
-        if (setSelection) {
-          setSelection(prev => transform(prev))
-        }
-        else {
-          handleSelectionChange(selection, transform(selection))
-        }
-
+        transform = val => [...val.filter(t => t !== index), index].sort()
         break
       }
       case 'single': {
-        const transform = (val: CollectionSelection) => [index]
-
-        if (setSelection) {
-          setSelection(prev => transform(prev))
-        }
-        else {
-          handleSelectionChange(selection, transform(selection))
-        }
-
+        transform = val => [index]
         break
       }
       default:
-        break
+        return
+    }
+
+    if (setSelection) {
+      setSelection(prev => transform(prev))
+    }
+    else {
+      const newValue = transform(selection)
+
+      prevSelectionRef.current = newValue
+      handleSelectionChange(selection, newValue)
     }
   }
 
@@ -286,7 +282,10 @@ const Collection = forwardRef(({
       setSelection(prev => transform(prev))
     }
     else {
-      handleSelectionChange(selection, transform(selection))
+      const newValue = transform(selection)
+
+      prevSelectionRef.current = newValue
+      handleSelectionChange(selection, newValue)
     }
   }
 
@@ -303,14 +302,16 @@ const Collection = forwardRef(({
     }
   }
 
-  const handleSelectionChange = (oldSelection: CollectionSelection | undefined, newSelection: CollectionSelection) => {
-    const deselected = oldSelection?.filter(t => newSelection.indexOf(t) === -1) ?? []
-    const selected = newSelection.filter(t => oldSelection?.indexOf(t) === -1)
+  const handleSelectionChange = (oldValue: CollectionSelection | undefined, newValue: CollectionSelection) => {
+    if (isDeepEqual(oldValue, newValue)) return
+
+    const deselected = oldValue?.filter(t => newValue.indexOf(t) === -1) ?? []
+    const selected = newValue.filter(t => oldValue?.indexOf(t) === -1)
 
     deselected.forEach(t => onDeselectAt?.(t))
     selected.forEach(t => onSelectAt?.(t))
 
-    onSelectionChange?.(newSelection)
+    onSelectionChange?.(newValue)
   }
 
   const tracksSelectionChanges = externalSelection === undefined && selectionMode !== 'none'
@@ -321,24 +322,16 @@ const Collection = forwardRef(({
   const fixedClassNames = getFixedClassNames({ orientation })
   const fixedStyles = getFixedStyles({ itemLength, itemPadding, layout, numSegments, orientation })
 
-  if (setSelection) {
-    const prevSelection = usePrevious(selection, { sanitizeDependency: JSON.stringify })
+  const prevSelectionRef = useRef<CollectionSelection>()
+  const prevSelection = prevSelectionRef.current
 
-    useEffect(() => {
-      if (!prevSelection) return
+  useEffect(() => {
+    prevSelectionRef.current = selection
 
-      handleSelectionChange(prevSelection, selection)
-    }, [JSON.stringify(selection)])
-  }
-  else {
-    const prevSelection = usePrevious(sanitizedExternalSelection, { sanitizeDependency: JSON.stringify })
+    if (prevSelection === undefined) return
 
-    useEffect(() => {
-      if (!prevSelection) return
-
-      handleSelectionChange(prevSelection, sanitizedExternalSelection)
-    }, [JSON.stringify(sanitizedExternalSelection)])
-  }
+    handleSelectionChange(prevSelection, selection)
+  }, [JSON.stringify(selection)])
 
   return (
     <div

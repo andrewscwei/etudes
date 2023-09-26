@@ -21,6 +21,7 @@ export default function AccordionDemo() {
     label: 'Section 1',
     layout: 'grid',
     numSegments: 3,
+    isSelectionTogglable: true,
   }, {
     items: ['foo', 'bar', 'baz'],
     label: 'Section 2',
@@ -37,13 +38,13 @@ export default function AccordionDemo() {
           expandIconSvg={$$ExpandIcon}
           orientation='vertical'
           sections={sections}
-          selectionMode='multiple'
+          selectionMode='single'
           useDefaultStyles={true}
-          ItemComponent={AccordionItem}
           onSelectAt={(itemIdx, sectionIdx) => {
             setSectionIndex(sectionIdx)
             setItemIndex(itemIdx)
           }}
+          ItemComponent={AccordionItem}
         />
       </StyledRoot>
       <DebugConsole

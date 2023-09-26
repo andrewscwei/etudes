@@ -1,5 +1,4 @@
 import classNames from 'classnames'
-import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
 import Collection, { type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelection } from './Collection'
 import FlatSVG from './FlatSVG'
@@ -239,23 +238,10 @@ const Dropdown = forwardRef(({
     const prevSelection = usePrevious(selection, { sanitizeDependency: JSON.stringify })
 
     useEffect(() => {
-      if (isDeepEqual(sanitizedExternalSelection, selection)) return
-
-      setSelection(sanitizedExternalSelection)
-    }, [JSON.stringify(sanitizedExternalSelection)])
-
-    useEffect(() => {
       if (prevSelection === undefined) return
 
       onSelectionChange?.(selection)
     }, [JSON.stringify(selection)])
-  }
-  else {
-    const prevSelection = usePrevious(sanitizedExternalSelection, { sanitizeDependency: JSON.stringify })
-
-    useEffect(() => {
-      if (!prevSelection) return
-    }, [JSON.stringify(sanitizedExternalSelection)])
   }
 
   if (setIsCollapsed) {

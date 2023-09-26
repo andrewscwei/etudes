@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import Collection, { type CollectionItemProps, type CollectionSelection } from '../../../lib/Collection'
+import Collection, { type CollectionItemProps } from '../../../lib/Collection'
 import DebugConsole from '../../../lib/DebugConsole'
 import Dropdown, { type DropdownItemProps } from '../../../lib/Dropdown'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
@@ -25,9 +25,6 @@ export default function CollectionDemo() {
   const [selectedOrientationIndex, setSelectedOrientationIndex] = useState(0)
   const orientation = selectedOrientationIndex === 0 ? 'vertical' : 'horizontal'
 
-  const dropdownSelectionChangeHandler = (selection: CollectionSelection) => setSelectedOrientationIndex(selection[0])
-  const collectionSelectionChangeHandler = (selection: CollectionSelection) => setSelectedItemIndex(selection[0])
-
   return (
     <>
       <StyledRoot className={orientation}>
@@ -50,7 +47,7 @@ export default function CollectionDemo() {
           orientation={orientation}
           selection={[selectedItemIndex]}
           selectionMode='single'
-          onSelectionChange={collectionSelectionChangeHandler}
+          onSelectionChange={t => setSelectedItemIndex(t[0])}
           ItemComponent={CollectionItem}
         />
       </StyledRoot>
@@ -63,7 +60,7 @@ export default function CollectionDemo() {
         orientation='vertical'
         selection={[selectedOrientationIndex]}
         useDefaultStyles={true}
-        onSelectionChange={dropdownSelectionChangeHandler}
+        onSelectionChange={t => setSelectedOrientationIndex(t[0])}
         ItemComponent={DropdownItem}
       />
       <DebugConsole
