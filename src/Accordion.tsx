@@ -88,7 +88,8 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   collapseIconSvg?: string
 
   /**
-   * Indices of sections that are expanded.
+   * Indices of sections that are expanded. If specified, the component will not
+   * manage expansion states.
    */
   expandedSectionIndices?: number[]
 
@@ -116,7 +117,8 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   sections: S[]
 
   /**
-   * Indices of selected items per section.
+   * Indices of selected items per section. If specified, the component will not
+   * manage selection state.
    *
    * @see {@link AccordionSelection}
    */
@@ -210,6 +212,18 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   ItemComponent?: ComponentType<AccordionItemProps<I>>
 }>
 
+/**
+ * A collection of selectable items laid out in sections in an accordion. Items
+ * are generated based on the provided `ItemComponent` while each section header
+ * is optionally provided by `HeaderComponent` or generated automatically.
+ *
+ * This component automatically determines if it should track selection state
+ * and expansion states internally. If the `selection` prop is provided, the
+ * component will not initialize the selection state. It will be up to its
+ * parent to provide item selection in tandem with the component's
+ * `onSelectionChange` handler. Likewise for the omission of the expansion
+ * states if `expandedSectionIndices` prop is provided.
+ */
 const Accordion = forwardRef(({
   children,
   className,

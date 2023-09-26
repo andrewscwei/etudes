@@ -66,8 +66,8 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
   expandIconSvg?: string
 
   /**
-   * Specifies if the internal collection is collapsed. If this is specified,
-   * the component will not manage expansion state.
+   * Specifies if the internal collection is collapsed. If specified, the
+   * component will not manage expansion state.
    */
   isCollapsed?: boolean
 
@@ -119,6 +119,13 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
  * A dropdown component that is invertible (i.e. can "dropup" instead) and
  * supports both horizontal and vertical orientations. Provide `items` and
  * `ItemComponent` props to populate.
+ *
+ * This component automatically determines if it should track selection state
+ * and expansion state internally. If the `selection` prop is provided, the
+ * component will not initialize the selection state. It will be up to its
+ * parent to provide item selection in tandem with the component's
+ * `onSelectionChange` handler. Likewise for the omission of the expansion state
+ * if `isCollapsed` prop is provided.
  */
 const Dropdown = forwardRef(({
   children,
