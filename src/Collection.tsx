@@ -7,23 +7,23 @@ import asClassNameDict from './utils/asClassNameDict'
 import asStyleDict from './utils/asStyleDict'
 import styles from './utils/styles'
 
-export type ListOrientation = 'horizontal' | 'vertical'
+export type CollectionOrientation = 'horizontal' | 'vertical'
 
-export type ListLayout = 'list' | 'grid'
+export type CollectionLayout = 'list' | 'grid'
 
-export type ListSelectionMode = 'none' | 'single' | 'multiple'
+export type CollectionSelectionMode = 'none' | 'single' | 'multiple'
 
-export type ListSelection = number[]
+export type CollectionSelection = number[]
 
-export type ListItemProps<T> = HTMLAttributes<HTMLElement> & {
+export type CollectionItemProps<T> = HTMLAttributes<HTMLElement> & {
   index: number
   isSelected: boolean
   item: T
-  orientation: ListOrientation
+  orientation: CollectionOrientation
   onCustomEvent?: (name: string, info?: any) => void
 }
 
-export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
+export type CollectionProps<T> = HTMLAttributes<HTMLDivElement> & {
   /**
    * Indicates if item selection can be toggled, i.e. they can be deselected if
    * selected again.
@@ -49,7 +49,7 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
   /**
    * Specifies the layout of this component.
    */
-  layout?: ListLayout
+  layout?: CollectionLayout
 
   /**
    * This property is only used if the layout is set to `grid`. Specifies the
@@ -61,13 +61,13 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
   /**
    * Orientation of the component.
    */
-  orientation?: ListOrientation
+  orientation?: CollectionOrientation
 
   /**
    * The selected indices. If `selectionMode` is `single`, only only the first
    * value will be used.
    */
-  selection?: ListSelection
+  selection?: CollectionSelection
 
   /**
    * Indicates the selection behavior:
@@ -75,7 +75,7 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
    *   - `single`: Only one item can be selected at a time.
    *   - `multiple`: Multiple items can be selected at the same time.
    */
-  selectionMode?: ListSelectionMode
+  selectionMode?: CollectionSelectionMode
 
   /**
    * Handler invoked when an item is activated.
@@ -112,20 +112,20 @@ export type ListProps<T> = HTMLAttributes<HTMLDivElement> & {
    *
    * @param selection Indices of selected items.
    */
-  onSelectionChange?: (selection: ListSelection) => void
+  onSelectionChange?: (selection: CollectionSelection) => void
 
   /**
-   * React component type to be used to generate items for this list.
+   * React component type to be used to generate items for this collection.
    */
-  ItemComponent?: ComponentType<ListItemProps<T>>
+  ItemComponent?: ComponentType<CollectionItemProps<T>>
 }
 
 /**
- * A scrollable list of selectable items. Items are generated based on the
+ * A scrollable collection of selectable items. Items are generated based on the
  * provided React component type. The type of data passed to each item is
  * generic. This component supports both horizontal and vertical orientations.
  */
-const List = forwardRef(({
+const Collection = forwardRef(({
   className,
   style,
   isSelectionTogglable = false,
@@ -153,7 +153,7 @@ const List = forwardRef(({
     return false
   }
 
-  const sanitizeSelection = (indices: ListSelection) => indices.sort().filter(t => !isIndexOutOfRange(t))
+  const sanitizeSelection = (indices: CollectionSelection) => indices.sort().filter(t => !isIndexOutOfRange(t))
 
   const isSelectedAt = (index: number) => selection.indexOf(index) >= 0
 
@@ -205,6 +205,8 @@ const List = forwardRef(({
   const sanitizedExternalSelection = sanitizeSelection(externalSelection)
   const [selection, setSelection] = useState(sanitizedExternalSelection)
   const prevSelection = usePrevious(selection, { sanitizeDependency: JSON.stringify })
+  const fixedClassNames = getFixedClassNames({ orientation })
+  const fixedStyles = getFixedStyles({ itemLength, itemPadding, layout, numSegments, orientation })
 
   useEffect(() => {
     if (isDeepEqual(sanitizedExternalSelection, selection)) return
@@ -224,9 +226,6 @@ const List = forwardRef(({
 
     onSelectionChange?.(selection)
   }, [JSON.stringify(selection)])
-
-  const fixedClassNames = getFixedClassNames({ orientation })
-  const fixedStyles = getFixedStyles({ itemLength, itemPadding, layout, numSegments, orientation })
 
   return (
     <div
@@ -267,23 +266,23 @@ const List = forwardRef(({
       )}
     </div>
   )
-}) as <T>(props: ListProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
+}) as <T>(props: CollectionProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
-Object.defineProperty(List, 'displayName', { value: 'List', writable: false })
+Object.defineProperty(Collection, 'displayName', { value: 'Collection', writable: false })
 
-export default List
+export default Collection
 
 type StylesProps = {
   itemLength?: number
   itemPadding?: number
-  layout?: ListLayout
+  layout?: CollectionLayout
   numSegments?: number
-  orientation?: ListOrientation
+  orientation?: CollectionOrientation
 }
 
 function getFixedClassNames({ orientation }: StylesProps) {
   return asClassNameDict({
-    root: classNames('list', orientation),
+    root: classNames('collection', orientation),
     item: classNames('item', orientation),
   })
 }

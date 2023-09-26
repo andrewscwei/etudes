@@ -1,8 +1,8 @@
 import classNames from 'classnames'
 import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
+import Collection, { type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelection } from './Collection'
 import FlatSVG from './FlatSVG'
-import List, { type ListItemProps, type ListOrientation, type ListProps, type ListSelection } from './List'
 import useElementRect from './hooks/useElementRect'
 import usePrevious from './hooks/usePrevious'
 import asClassNameDict from './utils/asClassNameDict'
@@ -18,9 +18,9 @@ export type DropdownToggleProps = HTMLAttributes<HTMLElement> & {
   onCustomEvent?: (name: string, info?: any) => void
 }
 
-export type DropdownItemProps<T extends DropdownItemData = DropdownItemData> = ListItemProps<T>
+export type DropdownItemProps<T extends DropdownItemData = DropdownItemData> = CollectionItemProps<T>
 
-export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLAttributes<HTMLDivElement> & ListProps<T> & PropsWithChildren<{
+export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLAttributes<HTMLDivElement> & CollectionProps<T> & PropsWithChildren<{
   /**
    * SVG markup to be put in the dropdown button as the collapse icon.
    */
@@ -37,7 +37,7 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
    *
    * @param selection The current selection.
    */
-  label?: (selection: ListSelection) => string
+  label?: (selection: CollectionSelection) => string
 
   /**
    * SVG markup to be put in the dropdown button as the expand icon.
@@ -120,7 +120,7 @@ const Dropdown = forwardRef(({
     return false
   }
 
-  const sanitizedSelection = (selection: ListSelection) => selection.sort().filter(t => !isIndexOutOfRange(t))
+  const sanitizedSelection = (selection: CollectionSelection) => selection.sort().filter(t => !isIndexOutOfRange(t))
 
   const expand = () => {
     if (isCollapsed) setIsCollapsed(false)
@@ -145,7 +145,7 @@ const Dropdown = forwardRef(({
     if (selectionMode === 'single' && collapsesOnSelect) collapse()
   }
 
-  const selectionChangeHandler = (value: ListSelection) => {
+  const selectionChangeHandler = (value: CollectionSelection) => {
     const newValue = value.sort()
 
     if (isDeepEqual(newValue, selection)) return
@@ -243,7 +243,7 @@ const Dropdown = forwardRef(({
             })}
           </button>
         )}
-        <List
+        <Collection
           className={fixedClassNames.list}
           style={styles(fixedStyles.list)}
           isSelectionTogglable={isSelectionTogglable}
@@ -278,7 +278,7 @@ type StylesProps = {
   maxVisibleItems?: number
   menuLength?: number
   numItems?: number
-  orientation?: ListOrientation
+  orientation?: CollectionOrientation
 }
 
 function getFixedClassNames({ isCollapsed, isSelectionTogglable, orientation }: StylesProps) {
