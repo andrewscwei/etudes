@@ -1,5 +1,4 @@
 import classNames from 'classnames'
-import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useState, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
 import Each from './Each'
 import usePrevious from './hooks/usePrevious'
@@ -9,20 +8,65 @@ import styles from './utils/styles'
 
 export type CollectionOrientation = 'horizontal' | 'vertical'
 
+/**
+ * Type describing the layout appearance of {@link Collection}:
+ *   - `list`: Items will be laid out in a list.
+ *   - `grid`: Items will be laid out in a grid.
+ */
 export type CollectionLayout = 'list' | 'grid'
 
+/**
+ *  Type describing the item selection behavior of {@link Collection}:
+ *    - `none`: No selection permitted at all.
+ *    - `single`: Only one item can be selected at a time (the previously
+ *                selected item will be automatically deselected).
+ *    - `multiple`: Multiple items can be selected simultaneously.
+ */
 export type CollectionSelectionMode = 'none' | 'single' | 'multiple'
 
+/**
+ * Type describing the current item selection of {@link Collection}, composed of
+ * an array of indices of items that are selected. If the selection mode of the
+ * {@link Collection} is `single`, only one index is expected in this array.
+ */
 export type CollectionSelection = number[]
 
+/**
+ * Type describing the props of `ItemComponent` provided to {@link Collection}.
+ */
 export type CollectionItemProps<T> = HTMLAttributes<HTMLElement> & {
+  /**
+   * The index of the item.
+   */
   index: number
+
+  /**
+   * Indicates whether the item is selected.
+   */
   isSelected: boolean
+
+  /**
+   * Data provided to thse item.
+   */
   item: T
+
+  /**
+   * Orientation of the parent collection.
+   */
   orientation: CollectionOrientation
+
+  /**
+   * Handler invoked to dispatch a custom event.
+   *
+   * @param name User-defined name of the custom event.
+   * @param info Optional user-defined info of the custom event.
+   */
   onCustomEvent?: (name: string, info?: any) => void
 }
 
+/**
+ * Type describing the props of {@link Collection}.
+ */
 export type CollectionProps<T> = HTMLAttributes<HTMLDivElement> & {
   /**
    * Indicates if item selection can be toggled, i.e. they can be deselected if
@@ -47,45 +91,61 @@ export type CollectionProps<T> = HTMLAttributes<HTMLDivElement> & {
   items: T[]
 
   /**
-   * Specifies the layout of this component.
+   * Specifies the layout appearance of this component.
+   *
+   * @see {@link CollectionLayout}
    */
   layout?: CollectionLayout
 
   /**
-   * This property is only used if the layout is set to `grid`. Specifies the
-   * number of columns if orientation is `vertical` or number of rows if
-   * orientation is `horizontal`.
+   * Specifies the number of columns of this collection if the orientation is
+   * `vertical` or number of rows if the orientation is `horizontal`. This
+   * property is only used if the layout is set to `grid`.
    */
   numSegments?: number
 
   /**
    * Orientation of the component.
+   *
+   * @see {@link CollectionOrientation}
    */
   orientation?: CollectionOrientation
 
   /**
    * The selected indices. If `selectionMode` is `single`, only only the first
-   * value will be used.
+   * value will be used. If specified, the component will not manage selection
+   * state.
+   *
+   * @see {@link CollectionSelection}
    */
   selection?: CollectionSelection
 
   /**
-   * Indicates the selection behavior:
-   *   - `none`: No selection at all.
-   *   - `single`: Only one item can be selected at a time.
-   *   - `multiple`: Multiple items can be selected at the same time.
+   * The item selection behavior.
+   *
+   * @see {@link CollectionSelectionMode}
    */
   selectionMode?: CollectionSelectionMode
 
   /**
-   * Handler invoked when an item is activated.
+   * Handler invoked when an item is activated (i.e. clicked). The order of
+   * handlers invoked when any selection changes take place is:
+   *   1. `onActivateAt`
+   *   2. `onDeselectAt`
+   *   3. `onSelectAt`
+   *   4. `onSelectionChange`
    *
    * @param index Item index.
    */
   onActivateAt?: (index: number) => void
 
   /**
-   * Handler invoked when an item is deselected.
+   * Handler invoked when an item is deselected. The order of handlers invoked
+   * when any selection changes take place is:
+   *   1. `onActivateAt`
+   *   2. `onDeselectAt`
+   *   3. `onSelectAt`
+   *   4. `onSelectionChange`
    *
    * @param index Item index.
    */
@@ -95,35 +155,50 @@ export type CollectionProps<T> = HTMLAttributes<HTMLDivElement> & {
    * Handler invoked when a custom event is dispatched from the item.
    *
    * @param index Index of the item.
-   * @param eventName Name of the dispatched custom event.
-   * @param eventInfo Optional info of the dispatched custom event.
+   * @param eventName User-defined name of the dispatched custom event.
+   * @param eventInfo Optional user-defined info of the dispatched custom event.
    */
   onItemCustomEvent?: (index: number, eventName: string, eventInfo?: any) => void
 
   /**
-   * Handler invoked when an item is selected.
+   * Handler invoked when an item is selected. The order of handlers invoked
+   * when any selection changes take place is:
+   *   1. `onActivateAt`
+   *   2. `onDeselectAt`
+   *   3. `onSelectAt`
+   *   4. `onSelectionChange`
    *
    * @param index Item index.
    */
   onSelectAt?: (index: number) => void
 
   /**
-   * Handler invoked when the selected items changed.
+   * Handler invoked when the selected items changed. The order of handlers
+   * invoked when any selection changes take place is:
+   *   1. `onActivateAt`
+   *   2. `onDeselectAt`
+   *   3. `onSelectAt`
+   *   4. `onSelectionChange`
    *
    * @param selection Indices of selected items.
    */
   onSelectionChange?: (selection: CollectionSelection) => void
 
   /**
-   * React component type to be used to generate items for this collection.
+   * Component type for generating items in this collection.
    */
   ItemComponent?: ComponentType<CollectionItemProps<T>>
 }
 
 /**
- * A scrollable collection of selectable items. Items are generated based on the
- * provided React component type. The type of data passed to each item is
- * generic. This component supports both horizontal and vertical orientations.
+ * A collection of selectable items with generic data. Items are generated based
+ * on the provided `ItemComponent`. This component supports different layouts in
+ * both horizontal and vertical orientations.
+ *
+ * This component automatically determines if it should track selection state
+ * internally. If the `selection` prop is provided, the component will not
+ * initialize the selection state. It will be up to its parent to provide item
+ * selection in tandem with the component's `onSelectionChange` handler.
  */
 const Collection = forwardRef(({
   className,
@@ -135,7 +210,7 @@ const Collection = forwardRef(({
   layout = 'list',
   numSegments = 1,
   orientation = 'vertical',
-  selection: externalSelection = [],
+  selection: externalSelection,
   selectionMode = 'none',
   onActivateAt,
   onDeselectAt,
@@ -170,14 +245,30 @@ const Collection = forwardRef(({
     if (isSelectedAt(index)) return
 
     switch (selectionMode) {
-      case 'multiple':
-        setSelection(prev => [...prev.filter(t => t !== index), index].sort())
+      case 'multiple': {
+        const transform = (val: CollectionSelection) => [...val.filter(t => t !== index), index].sort()
+
+        if (setSelection) {
+          setSelection(prev => transform(prev))
+        }
+        else {
+          handleSelectionChange(selection, transform(selection))
+        }
 
         break
-      case 'single':
-        setSelection([index])
+      }
+      case 'single': {
+        const transform = (val: CollectionSelection) => [index]
+
+        if (setSelection) {
+          setSelection(prev => transform(prev))
+        }
+        else {
+          handleSelectionChange(selection, transform(selection))
+        }
 
         break
+      }
       default:
         break
     }
@@ -186,46 +277,65 @@ const Collection = forwardRef(({
   const deselectAt = (index: number) => {
     if (!isSelectedAt(index)) return
 
-    setSelection(prev => prev.filter(t => t !== index))
+    const transform = (val: CollectionSelection) => val.filter(t => t !== index)
+
+    if (setSelection) {
+      setSelection(prev => transform(prev))
+    }
+    else {
+      handleSelectionChange(selection, transform(selection))
+    }
   }
 
   const activateAt = (index: number) => {
-    if (selectionMode !== 'none') {
-      if (isSelectionTogglable) {
-        toggleAt(index)
-      }
-      else {
-        selectAt(index)
-      }
-    }
-
     onActivateAt?.(index)
+
+    if (selectionMode === 'none') return
+
+    if (isSelectionTogglable) {
+      toggleAt(index)
+    }
+    else {
+      selectAt(index)
+    }
   }
 
-  const sanitizedExternalSelection = sanitizeSelection(externalSelection)
-  const [selection, setSelection] = useState(sanitizedExternalSelection)
-  const prevSelection = usePrevious(selection, { sanitizeDependency: JSON.stringify })
+  const handleSelectionChange = (oldSelection: CollectionSelection | undefined, newSelection: CollectionSelection) => {
+    const deselected = oldSelection?.filter(t => newSelection.indexOf(t) === -1) ?? []
+    const selected = newSelection.filter(t => oldSelection?.indexOf(t) === -1)
+
+    deselected.forEach(t => onDeselectAt?.(t))
+    selected.forEach(t => onSelectAt?.(t))
+
+    onSelectionChange?.(newSelection)
+  }
+
+  const tracksSelectionChanges = externalSelection === undefined && selectionMode !== 'none'
+
+  const sanitizedExternalSelection = sanitizeSelection(externalSelection ?? [])
+  const [selection, setSelection] = tracksSelectionChanges ? useState(sanitizedExternalSelection) : [sanitizedExternalSelection]
+
   const fixedClassNames = getFixedClassNames({ orientation })
   const fixedStyles = getFixedStyles({ itemLength, itemPadding, layout, numSegments, orientation })
 
-  useEffect(() => {
-    if (isDeepEqual(sanitizedExternalSelection, selection)) return
+  if (setSelection) {
+    const prevSelection = usePrevious(selection, { sanitizeDependency: JSON.stringify })
 
-    setSelection(sanitizedExternalSelection)
-  }, [JSON.stringify(sanitizedExternalSelection)])
+    useEffect(() => {
+      if (!prevSelection) return
 
-  useEffect(() => {
-    if (selectionMode === 'none') return
-    if (!prevSelection) return
+      handleSelectionChange(prevSelection, selection)
+    }, [JSON.stringify(selection)])
+  }
+  else {
+    const prevSelection = usePrevious(sanitizedExternalSelection, { sanitizeDependency: JSON.stringify })
 
-    const deselected = prevSelection?.filter(t => selection.indexOf(t) === -1) ?? []
-    const selected = selection.filter(t => prevSelection?.indexOf(t) === -1)
+    useEffect(() => {
+      if (!prevSelection) return
 
-    deselected.map(t => onDeselectAt?.(t))
-    selected.map(t => onSelectAt?.(t))
-
-    onSelectionChange?.(selection)
-  }, [JSON.stringify(selection)])
+      handleSelectionChange(prevSelection, sanitizedExternalSelection)
+    }, [JSON.stringify(sanitizedExternalSelection)])
+  }
 
   return (
     <div

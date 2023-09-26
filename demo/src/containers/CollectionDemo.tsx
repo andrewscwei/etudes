@@ -30,7 +30,6 @@ export default function CollectionDemo() {
 
   return (
     <>
-      <button onClick={() => setSelectedItemIndex(10)}>FOO</button>
       <StyledRoot className={orientation}>
         <Collection
           style={orientation === 'horizontal' ? {
@@ -51,9 +50,6 @@ export default function CollectionDemo() {
           orientation={orientation}
           selection={[selectedItemIndex]}
           selectionMode='single'
-          onSelectAt={t => console.log('Seleced', t)}
-          onDeselectAt={t => console.log('Deseleced', t)}
-          onActivateAt={t => console.log('Activated', t)}
           onSelectionChange={collectionSelectionChangeHandler}
           ItemComponent={CollectionItem}
         />
@@ -61,6 +57,7 @@ export default function CollectionDemo() {
       <StyledDropdown
         expandIconSvg={$$ExpandIcon}
         isInverted={false}
+        itemLength={50}
         items={DROPDOWN_ITEMS}
         maxVisibleItems={-1}
         orientation='vertical'
