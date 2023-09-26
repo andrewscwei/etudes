@@ -6,6 +6,9 @@ import asClassNameDict from './utils/asClassNameDict'
 import asStyleDict from './utils/asStyleDict'
 import styles from './utils/styles'
 
+/**
+ * Type describing the layout orientation of items in {@link Collection}.
+ */
 export type CollectionOrientation = 'horizontal' | 'vertical'
 
 /**
@@ -46,7 +49,7 @@ export type CollectionItemProps<T> = HTMLAttributes<HTMLElement> & {
   isSelected: boolean
 
   /**
-   * Data provided to thse item.
+   * Data provided to the item.
    */
   item: T
 

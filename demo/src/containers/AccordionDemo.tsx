@@ -39,7 +39,7 @@ export default function AccordionDemo() {
           sections={sections}
           selectionMode='multiple'
           useDefaultStyles={true}
-          itemComponentType={AccordionItem}
+          ItemComponent={AccordionItem}
           onSelectAt={(itemIdx, sectionIdx) => {
             setSectionIndex(sectionIdx)
             setItemIndex(itemIdx)
