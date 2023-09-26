@@ -1,10 +1,9 @@
 import classNames from 'classnames'
 import isDeepEqual from 'fast-deep-equal/react'
-import React, { forwardRef, useEffect, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
+import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
 import Collection, { type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection'
 import Each from './Each'
 import FlatSVG from './FlatSVG'
-import usePrevious from './hooks/usePrevious'
 import asClassNameDict from './utils/asClassNameDict'
 import asStyleDict from './utils/asStyleDict'
 import cloneStyledElement from './utils/cloneStyledElement'
@@ -137,7 +136,12 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   useDefaultStyles?: boolean
 
   /**
-   * Handler invoked when an item is activated in a section.
+   * Handler invoked when an item is activated in a section. The order of
+   * handlers invoked when any selection changes take place is:
+   *   1. `onActivateAt`
+   *   2. `onDeselectAt`
+   *   3. `onSelectAt`
+   *   4. `onSelectionChange`
    *
    * @param itemIndex Item index.
    * @param sectionIndex Section index.
@@ -145,14 +149,22 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   onActivateAt?: (itemIndex: number, sectionIndex: number) => void
 
   /**
-   * Handler invoked when a section is collapsed.
+   * Handler invoked when a section is collapsed. The order of handlers invoked
+   * when any section expansion changes take place is:
+   *   1. `onCollapseSectionAt`
+   *   2. `onExpandSectionAt`
    *
    * @param sectionIndex Section index.
    */
   onCollapseSectionAt?: (sectionIndex: number) => void
 
   /**
-   * Handler invoked when an item is deselected in a section.
+   * Handler invoked when an item is deselected in a section. The order of
+   * handlers invoked when any selection changes take place is:
+   *   1. `onActivateAt`
+   *   2. `onDeselectAt`
+   *   3. `onSelectAt`
+   *   4. `onSelectionChange`
    *
    * @param itemIndex Item index.
    * @param sectionIndex Section index.
@@ -160,7 +172,10 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   onDeselectAt?: (itemIndex: number, sectionIndex: number) => void
 
   /**
-   * Handler invoked when a section is expanded.
+   * Handler invoked when a section is expanded. The order of handlers invoked
+   * when any section expansion changes take place is:
+   *   1. `onCollapseSectionAt`
+   *   2. `onExpandSectionAt`
    *
    * @param sectionIndex Section index.
    */
@@ -186,7 +201,12 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   onItemCustomEvent?: (itemIndex: number, sectionIndex: number, eventName: string, eventInfo?: any) => void
 
   /**
-   * Handler invoked when an item is selected in a section.
+   * Handler invoked when an item is selected in a section. The order of
+   * handlers invoked when any selection changes take place is:
+   *   1. `onActivateAt`
+   *   2. `onDeselectAt`
+   *   3. `onSelectAt`
+   *   4. `onSelectionChange`
    *
    * @param itemIndex Item index.
    * @param sectionIndex Section index.
@@ -194,7 +214,12 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   onSelectAt?: (itemIndex: number, sectionIndex: number) => void
 
   /**
-   * Handler invoked when selected items have changed.
+   * Handler invoked when selected items have changed. The order of handlers
+   * invoked when any selection changes take place is:
+   *   1. `onActivateAt`
+   *   2. `onDeselectAt`
+   *   3. `onSelectAt`
+   *   4. `onSelectionChange`
    *
    * @param selectedIndices Dictionary of indices of selected items per section.
    */
@@ -230,12 +255,12 @@ const Accordion = forwardRef(({
   style,
   autoCollapseSections = false,
   collapseIconSvg,
-  expandedSectionIndices: externalExpandedSectionIndices = [],
+  expandedSectionIndices: externalExpandedSectionIndices,
   expandIconSvg,
   orientation = 'vertical',
   sectionPadding = 0,
   sections,
-  selection: externalSelection = {},
+  selection: externalSelection,
   selectionMode = 'single',
   useDefaultStyles = false,
   onActivateAt,
@@ -268,6 +293,8 @@ const Accordion = forwardRef(({
     return false
   }
 
+  const isSelectedAt = (itemIndex: number, sectionIndex: number) => (selection[sectionIndex]?.indexOf(itemIndex) ?? -1) >= 0
+
   const sanitizeExpandedSectionIndices = (sectionIndices: number[]) => sectionIndices.sort().filter(t => !isSectionIndexOutOfRange(t))
 
   const sanitizeSelection = (selection: AccordionSelection) => {
@@ -287,88 +314,131 @@ const Accordion = forwardRef(({
   const isSectionExpandedAt = (sectionIndex: number) => expandedSectionIndices.indexOf(sectionIndex) >= 0
 
   const toggleSectionAt = (sectionIndex: number) => {
+    let transform: (val: number[]) => number[]
+
     if (isSectionExpandedAt(sectionIndex)) {
-      setExpandedSectionIndices(prev => prev.filter(t => t !== sectionIndex))
+      transform = val => val.filter(t => t !== sectionIndex)
     }
     else if (autoCollapseSections) {
-      setExpandedSectionIndices([sectionIndex])
+      transform = val => [sectionIndex]
     }
     else {
-      setExpandedSectionIndices(prev => [...prev.filter(t => t !== sectionIndex), sectionIndex])
+      transform = val => [...val.filter(t => t !== sectionIndex), sectionIndex]
+    }
+
+    if (setExpandedSectionIndices) {
+      setExpandedSectionIndices(prev => transform(prev))
+    }
+    else {
+      handleExpandedSectionsChange(expandedSectionIndices, transform(expandedSectionIndices))
     }
   }
 
-  const selectAt = (itemIndex: number, sectionIndex: number) => {
+  const handleSelectAt = (itemIndex: number, sectionIndex: number) => {
+    if (isSelectedAt(itemIndex, sectionIndex)) return
+
+    let transform: (val: AccordionSelection) => AccordionSelection
+
     switch (selectionMode) {
       case 'multiple':
-        setSelection(prev => ({
-          ...prev,
-          [sectionIndex]: [...(prev[sectionIndex] ?? []).filter(t => t !== itemIndex), itemIndex].sort(),
-        }))
-
-        onSelectAt?.(itemIndex, sectionIndex)
-
+        transform = val => ({
+          ...val,
+          [sectionIndex]: [...(val[sectionIndex] ?? []).filter(t => t !== itemIndex), itemIndex].sort(),
+        })
         break
       case 'single':
-        setSelection({
+        transform = val => ({
           [sectionIndex]: [itemIndex],
         })
-
-        onSelectAt?.(itemIndex, sectionIndex)
-
         break
       default:
-        break
+        return
+    }
+
+    if (setSelection) {
+      setSelection(prev => transform(prev))
+    }
+    else {
+      const newValue = transform(selection)
+
+      prevSelectionRef.current = newValue
+      handleSelectionChange(selection, newValue)
     }
   }
 
-  const deselectAt = (itemIndex: number, sectionIndex: number) => {
-    setSelection(prev => {
-      const newValue = { ...prev }
-      newValue[sectionIndex] = prev[sectionIndex].filter(t => t !== itemIndex)
+  const handleDeselectAt = (itemIndex: number, sectionIndex: number) => {
+    if (!isSelectedAt(itemIndex, sectionIndex)) return
 
-      return newValue
+    const transform = (val: AccordionSelection) => ({
+      ...val,
+      [sectionIndex]: (val[sectionIndex] ?? []).filter(t => t !== itemIndex),
     })
 
-    onDeselectAt?.(itemIndex, sectionIndex)
+    if (setSelection) {
+      setSelection(prev => transform(prev))
+    }
+    else {
+      const newValue = transform(selection)
+
+      prevSelectionRef.current = newValue
+      handleSelectionChange(selection, newValue)
+    }
   }
 
-  const sanitizedExpandedSectionIndices = sanitizeExpandedSectionIndices(externalExpandedSectionIndices)
-  const [expandedSectionIndices, setExpandedSectionIndices] = useState(sanitizedExpandedSectionIndices)
-  const prevExpandedSectionIndices = usePrevious(expandedSectionIndices)
+  const handleExpandedSectionsChange = (oldValue: number[] | undefined, newValue: number[]) => {
+    const collapsed = oldValue?.filter(t => newValue.indexOf(t) === -1) ?? []
+    const expanded = newValue.filter(t => oldValue?.indexOf(t) === -1)
 
-  const sanitizedExternalSelection = sanitizeSelection(externalSelection)
-  const [selection, setSelection] = useState(sanitizedExternalSelection)
+    collapsed.forEach(t => onCollapseSectionAt?.(t))
+    expanded.forEach(t => onExpandSectionAt?.(t))
+  }
 
-  useEffect(() => {
-    if (isDeepEqual(sanitizedExpandedSectionIndices, expandedSectionIndices)) return
+  const handleSelectionChange = (oldValue: AccordionSelection | undefined, newValue: AccordionSelection) => {
+    if (isDeepEqual(oldValue, newValue)) return
 
-    setExpandedSectionIndices(sanitizedExpandedSectionIndices)
-  }, [JSON.stringify(sanitizedExpandedSectionIndices)])
+    const numSections = sections.length
 
-  useEffect(() => {
-    if (!prevExpandedSectionIndices) return
+    let allDeselected: number[][] = []
+    let allSelected: number[][] = []
 
-    const collapsed = prevExpandedSectionIndices?.filter(t => expandedSectionIndices.indexOf(t) === -1) ?? []
-    const expanded = expandedSectionIndices.filter(t => prevExpandedSectionIndices?.indexOf(t) === -1)
+    for (let i = 0; i < numSections; i++) {
+      const oldSection = oldValue?.[i] ?? []
+      const newSection = newValue[i] ?? []
+      const deselected = oldSection.filter(t => newSection.indexOf(t) === -1)
+      const selected = newSection.filter(t => oldSection?.indexOf(t) === -1)
 
-    collapsed.map(t => onCollapseSectionAt?.(t))
-    expanded.map(t => onExpandSectionAt?.(t))
-  }, [JSON.stringify(expandedSectionIndices)])
+      allDeselected = [...allDeselected, ...deselected.map(t => [t, i])]
+      allSelected = [...allSelected, ...selected.map(t => [t, i])]
+    }
 
-  useEffect(() => {
-    if (isDeepEqual(sanitizedExternalSelection, selection)) return
+    allDeselected.forEach(t => onDeselectAt?.(t[0], t[1]))
+    allSelected.forEach(t => onSelectAt?.(t[0], t[1]))
 
-    setSelection(sanitizedExternalSelection)
-  }, [JSON.stringify(sanitizedExternalSelection)])
+    onSelectionChange?.(newValue)
+  }
 
-  useEffect(() => {
-    onSelectionChange?.(selection)
-  }, [JSON.stringify(selection)])
+  const tracksSelectionChanges = externalSelection === undefined && selectionMode !== 'none'
+  const tracksExpansionChanges = externalExpandedSectionIndices === undefined
+
+  const sanitizedExternalSelection = sanitizeSelection(externalSelection ?? {})
+  const [selection, setSelection] = tracksSelectionChanges ? useState(sanitizedExternalSelection) : [sanitizedExternalSelection]
+  const sanitizedExternalExpandedSectionIndices = sanitizeExpandedSectionIndices(externalExpandedSectionIndices ?? [])
+  const [expandedSectionIndices, setExpandedSectionIndices] = tracksExpansionChanges ? useState(sanitizedExternalExpandedSectionIndices) : [sanitizedExternalExpandedSectionIndices]
 
   const fixedClassNames = getFixedClassNames({ orientation })
   const fixedStyles = getFixedStyles({ orientation })
   const defaultStyles: Record<string, any> = useDefaultStyles ? getDefaultStyles({ orientation }) : {}
+
+  const prevSelectionRef = useRef<AccordionSelection>()
+  const prevSelection = prevSelectionRef.current
+
+  useEffect(() => {
+    prevSelectionRef.current = selection
+
+    if (prevSelection === undefined) return
+
+    handleSelectionChange(prevSelection, selection)
+  }, [JSON.stringify(selection)])
 
   return (
     <div {...props} className={classNames(className, fixedClassNames.root)} style={styles(style, fixedStyles.root)} ref={ref}>
@@ -434,9 +504,9 @@ const Accordion = forwardRef(({
                 numSegments={numSegments}
                 selection={selection[sectionIndex] ?? []}
                 onActivateAt={itemIndex => onActivateAt?.(itemIndex, sectionIndex)}
-                onDeselectAt={itemIndex => deselectAt(itemIndex, sectionIndex)}
-                onItemCustomEvent={(itemIndex, eventName, eventInfo) => onItemCustomEvent?.(itemIndex, sectionIndex, eventName, eventInfo)}
-                onSelectAt={itemIndex => selectAt(itemIndex, sectionIndex)}
+                onDeselectAt={itemIndex => handleDeselectAt?.(itemIndex, sectionIndex)}
+                onItemCustomEvent={(itemIndex, name, info) => onItemCustomEvent?.(itemIndex, sectionIndex, name, info)}
+                onSelectAt={itemIndex => handleSelectAt?.(itemIndex, sectionIndex)}
                 ItemComponent={ItemComponent}
               />
             </div>
