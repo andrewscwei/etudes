@@ -20,6 +20,11 @@ export type AccordionSelection = Record<number, number[]>
  */
 export type AccordionSection<T> = Pick<CollectionProps<T>, 'isSelectionTogglable' | 'itemLength' | 'itemPadding' | 'items' | 'layout' | 'numSegments'> & {
   /**
+   * Padding (in pixels) between the sectionheader and the internal collection.
+   */
+  collectionPadding?: number
+
+  /**
    * Label for the section header.
    */
   label: string
@@ -441,7 +446,7 @@ export const Accordion = forwardRef(({
     <div {...props} className={classNames(className, fixedClassNames.root)} style={styles(style, fixedStyles.root)} ref={ref}>
       <Each in={sections}>
         {(section, sectionIndex) => {
-          const { items, itemLength = 50, itemPadding = 0, isSelectionTogglable, layout = 'list', maxVisible = -1, numSegments = 1 } = section
+          const { collectionPadding = 0, items, itemLength = 50, itemPadding = 0, isSelectionTogglable, layout = 'list', maxVisible = -1, numSegments = 1 } = section
           const allVisible = layout === 'list' ? items.length : Math.ceil(items.length / numSegments)
           const numVisible = maxVisible < 0 ? allVisible : Math.min(allVisible, maxVisible)
           const maxLength = itemLength * numVisible + itemPadding * (numVisible - 1)
@@ -483,10 +488,10 @@ export const Accordion = forwardRef(({
                 style={styles(fixedStyles.list, defaultStyles.list, orientation === 'vertical' ? {
                   width: '100%',
                   height: isCollapsed ? '0px' : `${maxLength}px`,
-                  marginTop: isCollapsed ? '0px' : `${itemPadding}px`,
+                  marginTop: isCollapsed ? '0px' : `${collectionPadding}px`,
                   overflowY: maxVisible < 0 ? 'hidden' : maxVisible < allVisible ? 'scroll' : 'hidden',
                 } : {
-                  marginLeft: isCollapsed ? '0px' : `${itemPadding}px`,
+                  marginLeft: isCollapsed ? '0px' : `${collectionPadding}px`,
                   overflowX: maxVisible < 0 ? 'hidden' : maxVisible < allVisible ? 'scroll' : 'hidden',
                   width: isCollapsed ? '0px' : `${maxLength}px`,
                   height: '100%',

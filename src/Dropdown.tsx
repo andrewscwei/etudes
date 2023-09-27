@@ -49,6 +49,11 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
   collapsesOnSelect?: boolean
 
   /**
+   * Padding (in pixels) between the toggle button and the internal collection.
+   */
+  collectionPadding?: number
+
+  /**
    * The label to appear on the toggle button.
    *
    * @param selection The current selection.
@@ -129,6 +134,7 @@ export const Dropdown = forwardRef(({
   style,
   collapseIconSvg,
   collapsesOnSelect = true,
+  collectionPadding = 0,
   expandIconSvg,
   isCollapsed: externalIsCollapsed,
   isInverted = false,
@@ -316,8 +322,8 @@ export const Dropdown = forwardRef(({
           </button>
         )}
         <Collection
-          className={fixedClassNames.list}
-          style={styles(fixedStyles.list)}
+          className={fixedClassNames.collection}
+          style={styles(fixedStyles.collection)}
           isSelectionTogglable={isSelectionTogglable}
           itemLength={itemLength}
           itemPadding={itemPadding}
@@ -341,6 +347,7 @@ export const Dropdown = forwardRef(({
 Object.defineProperty(Dropdown, 'displayName', { value: 'Dropdown', writable: false })
 
 type StylesProps = {
+  collectionPadding?: number
   isCollapsed?: boolean
   isInverted?: boolean
   isSelectionTogglable?: boolean
@@ -373,7 +380,7 @@ function getFixedClassNames({ isCollapsed, isSelectionTogglable, orientation }: 
       collapsed: isCollapsed,
       expanded: !isCollapsed,
     }),
-    list: classNames({
+    collection: classNames({
       togglable: isSelectionTogglable,
       collapsed: isCollapsed,
       expanded: !isCollapsed,
@@ -381,7 +388,7 @@ function getFixedClassNames({ isCollapsed, isSelectionTogglable, orientation }: 
   })
 }
 
-function getFixedStyles({ isCollapsed, isInverted, itemPadding = 0, maxVisibleItems = 0, menuLength, numItems = 0, orientation }: StylesProps) {
+function getFixedStyles({ isCollapsed, isInverted, collectionPadding = 0, maxVisibleItems = 0, menuLength, numItems = 0, orientation }: StylesProps) {
   return asStyleDict({
     root: {
       alignItems: 'center',
@@ -423,7 +430,7 @@ function getFixedStyles({ isCollapsed, isInverted, itemPadding = 0, maxVisibleIt
     collapseIcon: {
 
     },
-    list: {
+    collection: {
       position: 'absolute',
       ...orientation === 'vertical' ? {
         transition: 'height 100ms ease-out',
@@ -431,11 +438,11 @@ function getFixedStyles({ isCollapsed, isInverted, itemPadding = 0, maxVisibleIt
         height: isCollapsed ? '0px' : `${menuLength}px`,
         overflowY: maxVisibleItems === -1 ? 'hidden' : maxVisibleItems < numItems ? 'scroll' : 'hidden',
         ...isInverted ? {
-          marginBottom: `${itemPadding}px`,
+          marginBottom: `${collectionPadding}px`,
           bottom: '100%',
         } : {
           top: '100%',
-          marginTop: `${itemPadding}px`,
+          marginTop: `${collectionPadding}px`,
         },
       } : {
         transition: 'width 100ms ease-out',
@@ -443,11 +450,11 @@ function getFixedStyles({ isCollapsed, isInverted, itemPadding = 0, maxVisibleIt
         height: '100%',
         overflowX: maxVisibleItems === -1 ? 'hidden' : maxVisibleItems < numItems ? 'scroll' : 'hidden',
         ...isInverted ? {
-          marginRight: `${itemPadding}px`,
+          marginRight: `${collectionPadding}px`,
           right: '100%',
         } : {
           left: '100%',
-          marginLeft: `${itemPadding}px`,
+          marginLeft: `${collectionPadding}px`,
         },
       },
     },
