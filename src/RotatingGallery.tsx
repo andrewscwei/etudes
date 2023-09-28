@@ -1,9 +1,14 @@
 import classNames from 'classnames'
-import React, { forwardRef, useEffect, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
-import { Transition } from 'react-transition-group'
+import React, { forwardRef, useEffect, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { Each } from './Each'
 import { useInterval } from './hooks/useInterval'
-import { asComponentDict, asStyleDict, cloneStyledElement, styles } from './utils'
+import { asClassNameDict, asStyleDict, styles } from './utils'
+
+export type RotatingGalleryImageProps = HTMLAttributes<HTMLElement> & {
+  index: number
+  isVisible: boolean
+  src: string
+}
 
 export type RotatingGalleryProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   /**
@@ -14,9 +19,9 @@ export type RotatingGalleryProps = HTMLAttributes<HTMLDivElement> & PropsWithChi
   index?: number
 
   /**
-   * An array of image paths.
+   * Specifies if lazy loading of images should be enabled.
    */
-  srcs?: string[]
+  lazy?: boolean
 
   /**
    * The duration of one rotation in milliseconds (how long one image stays
@@ -26,9 +31,19 @@ export type RotatingGalleryProps = HTMLAttributes<HTMLDivElement> & PropsWithChi
   rotationDuration?: number
 
   /**
+   * An array of image paths.
+   */
+  srcs?: string[]
+
+  /**
    * The duration of an image transition in milliseconds.
    */
   transitionDuration?: number
+
+  /**
+   * Specifies if the component should use default styles.
+   */
+  useDefaultStyles?: boolean
 
   /**
    * Handler invoked when the image index changes.
@@ -36,6 +51,11 @@ export type RotatingGalleryProps = HTMLAttributes<HTMLDivElement> & PropsWithChi
    * @param index The current image index.
    */
   onIndexChange?: (index: number) => void
+
+  /**
+   * Component type for generating images in this collection.
+   */
+  ImageComponent?: ComponentType<RotatingGalleryImageProps>
 }>
 
 /**
@@ -46,36 +66,92 @@ export type RotatingGalleryProps = HTMLAttributes<HTMLDivElement> & PropsWithChi
  */
 export const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(({
   children,
-  index: externalIndex = 0,
-  rotationDuration,
+  className,
+  index: externalIndex,
+  lazy = true,
+  rotationDuration = 5000,
   srcs = [],
   transitionDuration = 500,
+  useDefaultStyles = true,
   onIndexChange,
+  ImageComponent,
   ...props
 }, ref) => {
-  const [index, setIndex] = useState(externalIndex)
+  const handleIndexChange = (newValue: number) => {
+    if (setIndex) {
+      setIndex(newValue)
+    }
+    else {
+      onIndexChange?.(newValue)
+    }
+  }
+
+  const tracksIndexChanges = externalIndex === undefined
+  const [index, setIndex] = tracksIndexChanges ? useState(0) : [externalIndex]
+  const fixedClassNames = getFixedClassNames()
+  const fixedStyles = getFixedStyles({ transitionDuration })
+  const defaultStyles: Record<string, any> = useDefaultStyles ? getDefaultStyles() : {}
 
   useInterval(() => {
-    setIndex((index + 1) % srcs.length)
-  }, rotationDuration, undefined, [index])
-
-  useEffect(() => {
-    if (externalIndex === index) return
-    setIndex(externalIndex)
-  }, [externalIndex])
+    handleIndexChange((index + 1) % srcs.length)
+  }, rotationDuration, undefined, [JSON.stringify(srcs), index])
 
   useEffect(() => {
     onIndexChange?.(index)
   }, [index])
 
-  const components = asComponentDict(children, {
-    image: RotatingGalleryImage,
-  })
+  return (
+    <div {...props} className={classNames(className, fixedClassNames.root)} ref={ref}>
+      <Each in={srcs}>
+        {(src, idx) => {
+          const isVisible = idx === index
 
-  const fixedStyles = asStyleDict({
+          return ImageComponent ? (
+            <ImageComponent
+              className={classNames(fixedClassNames.image)}
+              style={styles(
+                fixedStyles.image,
+                defaultStyles.image,
+                useDefaultStyles ? {
+                  opacity: isVisible ? '1' : '0',
+                } : {},
+              )}
+              isVisible={isVisible}
+              index={idx}
+              src={src}
+            />
+          ) : (
+            <img
+              className={classNames(fixedClassNames.image)}
+              loading={lazy ? 'lazy' : 'eager'}
+              style={styles(
+                fixedStyles.image,
+                defaultStyles.image,
+                useDefaultStyles ? {
+                  opacity: isVisible ? '1' : '0',
+                } : {},
+              )}
+              src={src}
+            />
+          )
+        }}
+      </Each>
+    </div>
+  )
+})
+
+Object.defineProperty(RotatingGallery, 'displayName', { value: 'RotatingGallery', writable: false })
+
+function getFixedClassNames() {
+  return asClassNameDict({
+    root: classNames('rotating-gallery'),
+    image: classNames('image'),
+  })
+}
+
+function getFixedStyles({ transitionDuration = 0 }) {
+  return asStyleDict({
     image: {
-      backgroundRepeat: 'no-repeat',
-      backgroundSize: 'cover',
       height: '100%',
       left: '0',
       position: 'absolute',
@@ -84,36 +160,13 @@ export const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(
       transitionDuration: `${transitionDuration}ms`,
     },
   })
+}
 
-  const defaultStyles = asStyleDict({
+function getDefaultStyles() {
+  return asStyleDict({
     image: {
       transitionProperty: 'opacity',
-      transitionTimingFunction: 'ease-out',
+      transitionTimingFunction: 'linear',
     },
   })
-
-  return (
-    <div {...props} ref={ref}>
-      <Each in={srcs}>
-        {(src, idx) => (
-          <Transition in={idx === index} timeout={transitionDuration}>
-            {state => cloneStyledElement(components.image ?? <RotatingGalleryImage style={styles(
-              defaultStyles.image,
-              state === 'entering' && { opacity: '1' },
-              state === 'exiting' && { opacity: '0' },
-            )}/>, {
-              className: classNames(state),
-              style: styles(fixedStyles.image, {
-                backgroundImage: `url(${src})`,
-              }),
-            })}
-          </Transition>
-        )}
-      </Each>
-    </div>
-  )
-})
-
-Object.defineProperty(RotatingGallery, 'displayName', { value: 'RotatingGallery', writable: false })
-
-export const RotatingGalleryImage = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
+}
