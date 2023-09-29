@@ -174,6 +174,13 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   onDeselectAt?: (itemIndex: number, sectionIndex: number) => void
 
   /**
+   * Handler invoked when the expansion state of any section changes.
+   *
+   * @param expandedSectionIndices Indices of sections that are expanded.
+   */
+  onExpandedSectionsChange?: (expandedSectionIndices: number[]) => void
+
+  /**
    * Handler invoked when a section is expanded. The order of handlers invoked
    * when any section expansion changes take place is:
    *   1. `onCollapseSectionAt`
@@ -268,6 +275,7 @@ export const Accordion = forwardRef(({
   onActivateAt,
   onCollapseSectionAt,
   onDeselectAt,
+  onExpandedSectionsChange,
   onExpandSectionAt,
   onHeaderCustomEvent,
   onItemCustomEvent,
@@ -388,11 +396,15 @@ export const Accordion = forwardRef(({
   }
 
   const handleExpandedSectionsChange = (oldValue: number[] | undefined, newValue: number[]) => {
+    if (isDeepEqual(oldValue, newValue)) return
+
     const collapsed = oldValue?.filter(t => newValue.indexOf(t) === -1) ?? []
     const expanded = newValue.filter(t => oldValue?.indexOf(t) === -1)
 
     collapsed.forEach(t => onCollapseSectionAt?.(t))
     expanded.forEach(t => onExpandSectionAt?.(t))
+
+    onExpandedSectionsChange?.(newValue)
   }
 
   const handleSelectionChange = (oldValue: AccordionSelection | undefined, newValue: AccordionSelection) => {
