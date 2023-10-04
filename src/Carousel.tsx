@@ -52,14 +52,15 @@ export const Carousel = forwardRef(({
 
       const element = event.currentTarget as HTMLElement
       const newValue = orientation === 'horizontal' ? Math.round(element.scrollLeft / element.clientWidth) : Math.round(element.scrollTop / element.clientHeight)
+      const clampedValue = Math.min(items.length - 1, Math.max(0, newValue))
 
-      if (newValue === index) return
+      if (clampedValue === index) return
 
       // Set previous index ref here to avoid the side-effect of handling index
       // changes from prop/state.
-      prevIndexRef.current = newValue
+      prevIndexRef.current = clampedValue
 
-      handleIndexChange(newValue)
+      handleIndexChange(clampedValue)
     }
 
     scrollerElement.addEventListener('scroll', scrollHandler)
