@@ -1,7 +1,6 @@
-import classNames from 'classnames'
 import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type ForwardedRef, type HTMLAttributes, type ReactElement } from 'react'
 import { Each } from './Each'
-import { asClassNameDict, asStyleDict, styles } from './utils'
+import { asStyleDict, styles } from './utils'
 
 export type CarouselOrientation = 'horizontal' | 'vertical'
 
@@ -15,7 +14,6 @@ export type CarouselProps<I> = HTMLAttributes<HTMLElement> & {
 }
 
 export const Carousel = forwardRef(({
-  className,
   style,
   items = [],
   index: externalIndex = 0,
@@ -40,7 +38,6 @@ export const Carousel = forwardRef(({
   const isInitialRender = prevIndexRef.current === undefined
   const scrollerRef = useRef<HTMLDivElement>(null)
   const autoScrollTimeoutRef = useRef<NodeJS.Timeout | undefined>()
-  const fixedClassNames = getFixedClassNames()
   const fixedStyles = getFixedStyles({ orientation })
 
   useEffect(() => {
@@ -102,20 +99,20 @@ export const Carousel = forwardRef(({
   return (
     <div
       {...props}
+      data-component='carousel'
       ref={ref}
-      className={classNames(className, fixedClassNames.root)}
       style={styles(style, fixedStyles.root)}
     >
       <div
+        data-child='viewport'
         ref={scrollerRef}
-        className={classNames(fixedClassNames.scroller)}
-        style={styles(fixedStyles.scroller)}
+        style={styles(fixedStyles.viewport)}
       >
         <Each in={items}>
-          {({ className: itemClassName, style: itemStyle, ...itemProps }) => (
+          {({ style: itemStyle, ...itemProps }) => (
             <div style={styles(fixedStyles.itemContainer)}>
               <ItemComponent
-                className={classNames(itemClassName)}
+                data-child='item'
                 style={styles(itemStyle, fixedStyles.item)}
                 {...itemProps as any}
               />
@@ -129,14 +126,7 @@ export const Carousel = forwardRef(({
 
 Object.defineProperty(Carousel, 'displayName', { value: 'Carousel', writable: false })
 
-function getFixedClassNames() {
-  return asClassNameDict({
-    root: classNames('carousel'),
-    scroller: classNames('scroller'),
-  })
-}
-
-function getFixedStyles({ orientation = 'horizontal' as CarouselOrientation }) {
+function getFixedStyles({ orientation = 'horizontal' }) {
   return asStyleDict({
     root: {
     },
@@ -152,7 +142,7 @@ function getFixedStyles({ orientation = 'horizontal' as CarouselOrientation }) {
       scrollSnapStop: 'always',
       width: '100%',
     },
-    scroller: {
+    viewport: {
       width: '100%',
       height: '100%',
       display: 'flex',

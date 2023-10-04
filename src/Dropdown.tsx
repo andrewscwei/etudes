@@ -1,10 +1,10 @@
 import classNames from 'classnames'
 import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
-import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelection } from './Collection'
+import { Collection, type CollectionItemProps, type CollectionProps, type CollectionSelection } from './Collection'
 import { FlatSVG } from './FlatSVG'
 import { useElementRect } from './hooks/useElementRect'
 import { usePrevious } from './hooks/usePrevious'
-import { asClassNameDict, asStyleDict, cloneStyledElement, styles } from './utils'
+import { asStyleDict, cloneStyledElement, styles } from './utils'
 
 /**
  * Base extendable type describing the data provided to each item in
@@ -230,12 +230,11 @@ export const Dropdown = forwardRef(({
   const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
   const menuLength = itemLength * numVisibleItems + itemPadding * (numVisibleItems - 1)
 
-  const fixedClassNames = getFixedClassNames({ isCollapsed, isSelectionTogglable, orientation })
-  const fixedStyles = getFixedStyles({ isCollapsed, isInverted, itemPadding, maxVisibleItems, menuLength, numItems, orientation })
-  const defaultStyles: Record<string, any> = useDefaultStyles ? getDefaultStyles({}) : {}
+  const fixedStyles = getFixedStyles({ isCollapsed, isInverted, maxVisibleItems, menuLength, numItems, orientation })
+  const defaultStyles = useDefaultStyles ? getDefaultStyles({ orientation }) : undefined
 
-  const ExpandIcon = expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>
-  const CollapseIcon = collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles.collapseIcon}/> : ExpandIcon
+  const ExpandIcon = expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles?.expandIcon}/> : <></>
+  const CollapseIcon = collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles?.collapseIcon}/> : ExpandIcon
 
   if (setSelection) {
     const prevSelection = usePrevious(selection, { sanitizeDependency: JSON.stringify })
@@ -296,34 +295,32 @@ export const Dropdown = forwardRef(({
   return (
     <div
       {...props}
+      data-component='dropdown'
       ref={ref}
-      className={classNames(className, fixedClassNames.root)}
+      className={classNames(className, { collapsed: isCollapsed, expanded: !isCollapsed })}
       style={styles(style, fixedStyles.root)}
     >
       <div ref={bodyRef} style={styles(fixedStyles.body)}>
         {ToggleComponent ? (
           <ToggleComponent
-            className={classNames(fixedClassNames.toggle)}
+            data-child='toggle'
             style={styles(fixedStyles.toggle)}
             onClick={() => toggle()}
             onCustomEvent={(name, info) => onToggleCustomEvent?.(name, info)}
           />
         ) : (
           <button
-            className={classNames(fixedClassNames.toggle)}
-            style={styles(fixedStyles.toggle, defaultStyles.toggle)}
+            data-child='toggle'
+            style={styles(fixedStyles.toggle, defaultStyles?.toggle)}
             onClick={() => toggle()}
           >
-            <label style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: label?.(selection) ?? (selection.length > 0 ? selection.map(t => items[t].label).join(', ') : '') }}/>
-            {cloneStyledElement(isCollapsed ? ExpandIcon : CollapseIcon, {
-              className: classNames(isCollapsed ? fixedClassNames.expandIcon : fixedClassNames.collapseIcon),
-              style: styles(isCollapsed ? fixedStyles.expandIcon : fixedStyles.collapseIcon),
-            })}
+            <span style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: label?.(selection) ?? (selection.length > 0 ? selection.map(t => items[t].label).join(', ') : '') }}/>
+            {cloneStyledElement(isCollapsed ? ExpandIcon : CollapseIcon)}
           </button>
         )}
         <Collection
-          className={fixedClassNames.collection}
-          style={styles(fixedStyles.collection)}
+          data-child='collection'
+          style={styles(fixedStyles.collection, defaultStyles?.collection)}
           isSelectionTogglable={isSelectionTogglable}
           itemLength={itemLength}
           itemPadding={itemPadding}
@@ -346,49 +343,7 @@ export const Dropdown = forwardRef(({
 
 Object.defineProperty(Dropdown, 'displayName', { value: 'Dropdown', writable: false })
 
-type StylesProps = {
-  collectionPadding?: number
-  isCollapsed?: boolean
-  isInverted?: boolean
-  isSelectionTogglable?: boolean
-  itemPadding?: number
-  maxVisibleItems?: number
-  menuLength?: number
-  numItems?: number
-  orientation?: CollectionOrientation
-}
-
-function getFixedClassNames({ isCollapsed, isSelectionTogglable, orientation }: StylesProps) {
-  return asClassNameDict({
-    root: classNames('dropdown', orientation, {
-      togglable: isSelectionTogglable,
-      collapsed: isCollapsed,
-      expanded: !isCollapsed,
-    }),
-    toggle: classNames('toggle', orientation, {
-      togglable: isSelectionTogglable,
-      collapsed: isCollapsed,
-      expanded: !isCollapsed,
-    }),
-    expandIcon: classNames(orientation, {
-      togglable: isSelectionTogglable,
-      collapsed: isCollapsed,
-      expanded: !isCollapsed,
-    }),
-    collapseIcon: classNames(orientation, {
-      togglable: isSelectionTogglable,
-      collapsed: isCollapsed,
-      expanded: !isCollapsed,
-    }),
-    collection: classNames({
-      togglable: isSelectionTogglable,
-      collapsed: isCollapsed,
-      expanded: !isCollapsed,
-    }),
-  })
-}
-
-function getFixedStyles({ isCollapsed, isInverted, collectionPadding = 0, maxVisibleItems = 0, menuLength, numItems = 0, orientation }: StylesProps) {
+function getFixedStyles({ isCollapsed = true, isInverted = false, collectionPadding = 0, maxVisibleItems = 0, menuLength = NaN, numItems = 0, orientation = 'vertical' }) {
   return asStyleDict({
     root: {
       alignItems: 'center',
@@ -406,11 +361,9 @@ function getFixedStyles({ isCollapsed, isInverted, collectionPadding = 0, maxVis
       width: '100%',
     },
     toggle: {
-      cursor: 'pointer',
       height: '100%',
       left: '0',
       margin: '0',
-      outline: 'none',
       position: 'absolute',
       top: '0',
       width: '100%',
@@ -422,18 +375,10 @@ function getFixedStyles({ isCollapsed, isInverted, collectionPadding = 0, maxVis
       fontWeight: 'inherit',
       letterSpacing: 'inherit',
       lineHeight: 'inherit',
-      pointerEvents: 'none',
-    },
-    expandIcon: {
-
-    },
-    collapseIcon: {
-
     },
     collection: {
       position: 'absolute',
       ...orientation === 'vertical' ? {
-        transition: 'height 100ms ease-out',
         width: '100%',
         height: isCollapsed ? '0px' : `${menuLength}px`,
         overflowY: maxVisibleItems === -1 ? 'hidden' : maxVisibleItems < numItems ? 'scroll' : 'hidden',
@@ -445,7 +390,6 @@ function getFixedStyles({ isCollapsed, isInverted, collectionPadding = 0, maxVis
           marginTop: `${collectionPadding}px`,
         },
       } : {
-        transition: 'width 100ms ease-out',
         width: isCollapsed ? '0px' : `${menuLength}px`,
         height: '100%',
         overflowX: maxVisibleItems === -1 ? 'hidden' : maxVisibleItems < numItems ? 'scroll' : 'hidden',
@@ -461,7 +405,7 @@ function getFixedStyles({ isCollapsed, isInverted, collectionPadding = 0, maxVis
   })
 }
 
-function getDefaultStyles({ ...props }: StylesProps) {
+function getDefaultStyles({ orientation = 'vertical' }) {
   return asStyleDict({
     toggle: {
       alignItems: 'center',
@@ -486,6 +430,13 @@ function getDefaultStyles({ ...props }: StylesProps) {
       margin: '0',
       padding: '0',
       width: '15px',
+    },
+    collection: {
+      ...orientation === 'vertical' ? {
+        transition: 'height 100ms ease-out',
+      } : {
+        transition: 'width 100ms ease-out',
+      },
     },
   })
 }

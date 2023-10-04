@@ -149,6 +149,7 @@ const StyledDropdown = styled(Dropdown)`
 
 const StyledCollectionItem = styled.button`
   align-items: center;
+  border: none;
   background: #fff;
   box-sizing: border-box;
   color: #000;

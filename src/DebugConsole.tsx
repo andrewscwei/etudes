@@ -42,51 +42,15 @@ export const DebugConsole = forwardRef<HTMLDivElement, DebugConsoleProps>(({
     messagesRef.current?.scrollTo(0, messagesRef.current?.scrollHeight)
   }, [messages])
 
-  const fixedStyles = asStyleDict({
-    root: {
-      background: '#000',
-      fontFamily: 'monospace',
-      position: 'fixed',
-      width: '300px',
-    },
-    title: {
-      background: '#fff',
-      boxSizing: 'border-box',
-      color: '#000',
-      fontSize: '14px',
-      fontWeight: '700',
-      height: '30px',
-      lineHeight: '30px',
-      overflow: 'hidden',
-      padding: '0 10px',
-      textOverflow: 'ellipsis',
-      textTransform: 'uppercase',
-      whiteSpace: 'nowrap',
-      width: '100%',
-    },
-    messages: {
-      boxSizing: 'border-box',
-      color: '#fff',
-      fontSize: '12px',
-      lineHeight: '150%',
-      maxHeight: '200px',
-      minHeight: '100px',
-      overflowX: 'hidden',
-      overflowY: 'scroll',
-      padding: '10px',
-      WebkitOverflowScrolling: 'touch',
-      width: '100%',
-    },
-  })
-
   return (
     <div
       {...props}
+      data-component='debug-console'
       ref={ref}
-      style={styles(style, fixedStyles.root, getStyleByAlignment(align, margin))}
+      style={styles(style, FIXED_STYLES.root, getStyleByAlignment(align, margin))}
     >
-      <div style={fixedStyles.title}>{title ?? 'Untitled'}</div>
-      <div ref={messagesRef} style={fixedStyles.messages}>
+      <div data-child='header' style={FIXED_STYLES.title}>{title ?? 'Untitled'}</div>
+      <div data-child='messages' ref={messagesRef} style={FIXED_STYLES.messages}>
         <Each in={messages} render={msg => <div dangerouslySetInnerHTML={{ __html: msg }}/>}/>
       </div>
     </div>
@@ -108,3 +72,40 @@ function getStyleByAlignment(align: DebugConsoleProps['align'], margin: number):
     default: return { bottom: `${margin}px`, right: `${margin}px` }
   }
 }
+
+const FIXED_STYLES = asStyleDict({
+  root: {
+    background: '#000',
+    fontFamily: 'monospace',
+    position: 'fixed',
+    width: '300px',
+  },
+  title: {
+    background: '#fff',
+    boxSizing: 'border-box',
+    color: '#000',
+    fontSize: '14px',
+    fontWeight: '700',
+    height: '30px',
+    lineHeight: '30px',
+    overflow: 'hidden',
+    padding: '0 10px',
+    textOverflow: 'ellipsis',
+    textTransform: 'uppercase',
+    whiteSpace: 'nowrap',
+    width: '100%',
+  },
+  messages: {
+    boxSizing: 'border-box',
+    color: '#fff',
+    fontSize: '12px',
+    lineHeight: '150%',
+    maxHeight: '200px',
+    minHeight: '100px',
+    overflowX: 'hidden',
+    overflowY: 'scroll',
+    padding: '10px',
+    WebkitOverflowScrolling: 'touch',
+    width: '100%',
+  },
+})

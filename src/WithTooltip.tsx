@@ -326,3 +326,5 @@ function makeArrowPositionStyle(alignment: Alignment, arrowHeight: number, gap: 
     }
   }
 }
+
+Object.defineProperty(WithTooltip, 'displayName', { value: 'WithTooltip', writable: false })

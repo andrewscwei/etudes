@@ -25,3 +25,5 @@ export function Repeat({
     </>
   )
 }
+
+Object.defineProperty(Repeat, 'displayName', { value: 'Repeat', writable: false })
