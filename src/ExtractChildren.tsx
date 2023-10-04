@@ -23,3 +23,5 @@ export function ExtractChildren({
     </>
   )
 }
+
+Object.defineProperty(ExtractChildren, 'displayName', { value: 'ExtractChildren', writable: false })

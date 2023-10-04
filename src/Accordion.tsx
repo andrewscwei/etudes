@@ -4,7 +4,7 @@ import React, { forwardRef, useEffect, useRef, useState, type ComponentType, typ
 import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection'
 import { Each } from './Each'
 import { FlatSVG } from './FlatSVG'
-import { asClassNameDict, asStyleDict, cloneStyledElement, styles } from './utils'
+import { asStyleDict, cloneStyledElement, styles } from './utils'
 
 /**
  * Type describing the current item selection of {@link Accordion}, composed of
@@ -260,7 +260,6 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
  */
 export const Accordion = forwardRef(({
   children,
-  className,
   style,
   autoCollapseSections = false,
   collapseIconSvg,
@@ -439,9 +438,8 @@ export const Accordion = forwardRef(({
   const sanitizedExternalExpandedSectionIndices = sanitizeExpandedSectionIndices(externalExpandedSectionIndices ?? [])
   const [expandedSectionIndices, setExpandedSectionIndices] = tracksExpansionChanges ? useState(sanitizedExternalExpandedSectionIndices) : [sanitizedExternalExpandedSectionIndices]
 
-  const fixedClassNames = getFixedClassNames({ orientation })
   const fixedStyles = getFixedStyles({ orientation })
-  const defaultStyles: Record<string, any> = useDefaultStyles ? getDefaultStyles({ orientation }) : {}
+  const defaultStyles = useDefaultStyles ? getDefaultStyles({ orientation }) : undefined
 
   const prevSelectionRef = useRef<AccordionSelection>()
   const prevSelection = prevSelectionRef.current
@@ -455,7 +453,7 @@ export const Accordion = forwardRef(({
   }, [JSON.stringify(selection)])
 
   return (
-    <div {...props} className={classNames(className, fixedClassNames.root)} style={styles(style, fixedStyles.root)} ref={ref}>
+    <div {...props} data-component='accordion' style={styles(style, fixedStyles.root)} ref={ref}>
       <Each in={sections}>
         {(section, sectionIndex) => {
           const { collectionPadding = 0, items, itemLength = 50, itemPadding = 0, isSelectionTogglable, layout = 'list', maxVisible = -1, numSegments = 1 } = section
@@ -463,8 +461,8 @@ export const Accordion = forwardRef(({
           const numVisible = maxVisible < 0 ? allVisible : Math.min(allVisible, maxVisible)
           const maxLength = itemLength * numVisible + itemPadding * (numVisible - 1)
           const isCollapsed = !isSectionExpandedAt(sectionIndex)
-          const expandIconComponent = expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles.expandIcon}/> : <></>
-          const collapseIconComponent = collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles.collapseIcon}/> : expandIconComponent
+          const expandIconComponent = expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles?.expandIcon}/> : <></>
+          const collapseIconComponent = collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles?.collapseIcon}/> : expandIconComponent
 
           return (
             <div style={styles(fixedStyles.section, orientation === 'vertical' ? {
@@ -474,7 +472,8 @@ export const Accordion = forwardRef(({
             })}>
               {HeaderComponent ? (
                 <HeaderComponent
-                  className={classNames(fixedClassNames.header, { collapsed: isCollapsed, expanded: !isCollapsed })}
+                  data-child='header'
+                  className={classNames({ collapsed: isCollapsed, expanded: !isCollapsed })}
                   style={styles(fixedStyles.header)}
                   index={sectionIndex}
                   isCollapsed={isCollapsed}
@@ -484,20 +483,21 @@ export const Accordion = forwardRef(({
                 />
               ) : (
                 <button
-                  className={classNames(fixedClassNames.header, { collapsed: isCollapsed, expanded: !isCollapsed })}
-                  style={styles(fixedStyles.header, defaultStyles.header)}
+                  data-child='header'
+                  className={classNames({ collapsed: isCollapsed, expanded: !isCollapsed })}
+                  style={styles(fixedStyles.header, defaultStyles?.header)}
                   onClick={() => toggleSectionAt(sectionIndex)}
                 >
-                  <label style={styles(defaultStyles.headerLabel)} dangerouslySetInnerHTML={{ __html: section.label }}/>
+                  <span style={styles(defaultStyles?.headerLabel)} dangerouslySetInnerHTML={{ __html: section.label }}/>
                   {cloneStyledElement(isCollapsed ? expandIconComponent : collapseIconComponent, {
-                    className: classNames(isCollapsed ? fixedClassNames.expandIcon : fixedClassNames.collapseIcon),
                     style: styles(isCollapsed ? fixedStyles.expandIcon : fixedStyles.collapseIcon),
                   })}
                 </button>
               )}
               <Collection
+                data-child='collection'
                 className={classNames({ collapsed: isCollapsed, expanded: !isCollapsed })}
-                style={styles(fixedStyles.list, defaultStyles.list, orientation === 'vertical' ? {
+                style={styles(fixedStyles.list, defaultStyles?.collection, orientation === 'vertical' ? {
                   width: '100%',
                   height: isCollapsed ? '0px' : `${maxLength}px`,
                   marginTop: isCollapsed ? '0px' : `${collectionPadding}px`,
@@ -533,21 +533,7 @@ export const Accordion = forwardRef(({
 
 Object.defineProperty(Accordion, 'displayName', { value: 'Accordion', writable: false })
 
-type StylesProps = {
-  borderThickness?: number
-  orientation?: CollectionOrientation
-}
-
-function getFixedClassNames({ orientation }: StylesProps) {
-  return asClassNameDict({
-    root: classNames('accordion', orientation),
-    header: classNames('header', orientation),
-    expandIcon: classNames(orientation),
-    collapseIcon: classNames(orientation),
-  })
-}
-
-function getFixedStyles({ orientation }: StylesProps) {
+function getFixedStyles({ orientation = 'vertical' }) {
   return asStyleDict({
     root: {
       alignItems: 'center',
@@ -602,9 +588,9 @@ function getFixedStyles({ orientation }: StylesProps) {
   })
 }
 
-function getDefaultStyles({ orientation }: StylesProps) {
+function getDefaultStyles({ orientation = 'vertical' }) {
   return asStyleDict({
-    list: {
+    collection: {
       transitionDuration: '100ms',
       transitionTimingFunction: 'ease-out',
       ...orientation === 'vertical' ? {

@@ -32,3 +32,5 @@ export const ExtractChild = forwardRef<HTMLElement, ExtractChildProps>(({
     </>
   )
 })
+
+Object.defineProperty(ExtractChild, 'displayName', { value: 'ExtractChild', writable: false })

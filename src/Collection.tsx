@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
 import { Each } from './Each'
-import { asClassNameDict, asStyleDict, styles } from './utils'
+import { asStyleDict, styles } from './utils'
 
 /**
  * Type describing the layout orientation of items in {@link Collection}.
@@ -205,7 +205,7 @@ export const Collection = forwardRef(({
   className,
   style,
   isSelectionTogglable = false,
-  itemLength = 50,
+  itemLength,
   itemPadding = 0,
   items,
   layout = 'list',
@@ -317,7 +317,6 @@ export const Collection = forwardRef(({
   const sanitizedExternalSelection = sanitizeSelection(externalSelection ?? [])
   const [selection, setSelection] = tracksSelectionChanges ? useState(sanitizedExternalSelection) : [sanitizedExternalSelection]
 
-  const fixedClassNames = getFixedClassNames({ orientation })
   const fixedStyles = getFixedStyles({ itemLength, itemPadding, layout, numSegments, orientation })
 
   const prevSelectionRef = useRef<CollectionSelection>()
@@ -334,17 +333,17 @@ export const Collection = forwardRef(({
   return (
     <div
       {...props}
+      data-component='collection'
       ref={ref}
-      className={classNames(className, fixedClassNames.root)}
+      className={classNames(className)}
       style={styles(style, fixedStyles.root)}
     >
       {ItemComponent && (
         <Each in={items}>
           {(val, idx) => (
             <ItemComponent
-              className={classNames(fixedClassNames.item, {
-                selected: isSelectedAt(idx),
-              })}
+              data-child='item'
+              className={classNames({ selected: isSelectedAt(idx) })}
               style={styles(fixedStyles.item, {
                 pointerEvents: isSelectionTogglable !== true && isSelectedAt(idx) ? 'none' : 'auto',
                 ...idx >= items.length - 1 ? {} : {
@@ -374,22 +373,7 @@ export const Collection = forwardRef(({
 
 Object.defineProperty(Collection, 'displayName', { value: 'Collection', writable: false })
 
-type StylesProps = {
-  itemLength?: number
-  itemPadding?: number
-  layout?: CollectionLayout
-  numSegments?: number
-  orientation?: CollectionOrientation
-}
-
-function getFixedClassNames({ orientation }: StylesProps) {
-  return asClassNameDict({
-    root: classNames('collection', orientation),
-    item: classNames('item', orientation),
-  })
-}
-
-function getFixedStyles({ itemLength, itemPadding = 0, layout, numSegments = 1, orientation }: StylesProps) {
+function getFixedStyles({ itemLength = NaN, itemPadding = 0, layout = 'collection', numSegments = 1, orientation = 'vertical' }) {
   return asStyleDict({
     root: {
       counterReset: 'item-counter',
@@ -404,26 +388,25 @@ function getFixedStyles({ itemLength, itemPadding = 0, layout, numSegments = 1, 
         display: 'grid',
         gap: `${itemPadding}px`,
         ...orientation === 'vertical' ? {
-          gridAutoRows: itemLength !== undefined ? `${itemLength}px` : undefined,
+          gridAutoRows: isNaN(itemLength) ? undefined : `${itemLength}px`,
           gridTemplateColumns: `repeat(${numSegments}, 1fr)`,
           gridAutoFlow: 'row',
         } : {
-          gridAutoColumns: itemLength !== undefined ? `${itemLength}px` : undefined,
+          gridAutoColumns: isNaN(itemLength) ? undefined : `${itemLength}px`,
           gridTemplateRows: `repeat(${numSegments}, 1fr)`,
           gridAutoFlow: 'column',
         },
       },
     },
     item: {
-      border: 'none',
       counterIncrement: 'item-counter',
       flex: '0 0 auto',
       ...layout === 'list' ? {
         ...orientation === 'vertical' ? {
           width: '100%',
-          height: itemLength !== undefined ? `${itemLength}px` : undefined,
+          height: isNaN(itemLength) ? undefined : `${itemLength}px`,
         } : {
-          width: itemLength !== undefined ? `${itemLength}px` : undefined,
+          width: isNaN(itemLength) ? undefined : `${itemLength}px`,
           height: '100%',
         },
       } : {},

@@ -59,7 +59,7 @@ export function AccordionDemo() {
 const StyledAccordionItem = styled.button`
   align-items: flex-start;
   background: #fff;
-  border-style: solid;
+  border: none;
   box-sizing: border-box;
   color: #000;
   cursor: pointer;
@@ -89,14 +89,7 @@ const StyledAccordionItem = styled.button`
 
 const StyledAccordion = styled(Accordion<string, Section>)`
   transform: translate3d(0, 0, 0) rotateX(10deg) rotateY(-20deg);
-
-  &.vertical {
-    width: 300px;
-  }
-
-  &.horizontal {
-    height: 300px;
-  }
+  width: 300px;
 
   button {
     align-items: center;

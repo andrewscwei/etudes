@@ -16,3 +16,5 @@ export function Conditional({ children, if: boolOrExpression }: ConditionalProps
       return <></>
   }
 }
+
+Object.defineProperty(Conditional, 'displayName', { value: 'Conditional', writable: false })

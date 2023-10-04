@@ -3,7 +3,7 @@ import { cloneElement, type Attributes, type CElement, type ClassAttributes, typ
 /**
  * Wrapper for {@link cloneElement} but instead of overwriting `className` and
  * `style` of the cloned element with the values specified in the `props`
- * argument, they are merged instead.
+ * argument, they are merged.
  *
  * @param element The target element to clone.
  * @param props The props to apply to the cloned element. Overlapping props are
@@ -22,14 +22,15 @@ function cloneStyledElement<P, T extends Component<P, ComponentState> = never>(
   ...children: ReactNode[]
 ) {
   const { className, style, ...otherProps } = props as any
-  const elementProps = element.props as any
+  const { className: elementClassName, style: elementStyle, ...otherElementProps } = element.props as any
 
   return cloneElement(element, {
-    className: `${elementProps.className ?? ''} ${className ?? ''}`.split(' ').filter(Boolean).join(' '),
+    className: `${elementClassName ?? ''} ${className ?? ''}`.split(' ').filter(Boolean).join(' '),
     style: {
-      ...elementProps.style ?? {},
+      ...elementStyle ?? {},
       ...style ?? {},
     },
+    ...otherElementProps,
     ...otherProps,
   } as any, ...children)
 }
