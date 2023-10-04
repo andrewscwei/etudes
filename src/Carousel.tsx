@@ -8,6 +8,7 @@ export type CarouselProps<I> = HTMLAttributes<HTMLElement> & {
   index?: number
   items?: I[]
   lazy?: boolean
+  showsScrollbar?: boolean
   orientation?: CarouselOrientation
   onIndexChange?: (index: number) => void
   ItemComponent: ComponentType<I>
@@ -19,6 +20,7 @@ export const Carousel = forwardRef(({
   index: externalIndex = 0,
   lazy = true,
   orientation = 'horizontal',
+  showsScrollbar = false,
   onIndexChange,
   ItemComponent,
   ...props
@@ -38,7 +40,7 @@ export const Carousel = forwardRef(({
   const isInitialRender = prevIndexRef.current === undefined
   const scrollerRef = useRef<HTMLDivElement>(null)
   const autoScrollTimeoutRef = useRef<NodeJS.Timeout | undefined>()
-  const fixedStyles = getFixedStyles({ orientation })
+  const fixedStyles = getFixedStyles({ orientation, showsScrollbar })
 
   useEffect(() => {
     const scrollerElement = scrollerRef.current
@@ -126,7 +128,7 @@ export const Carousel = forwardRef(({
 
 Object.defineProperty(Carousel, 'displayName', { value: 'Carousel', writable: false })
 
-function getFixedStyles({ orientation = 'horizontal' }) {
+function getFixedStyles({ orientation = 'horizontal', showsScrollbar = false }) {
   return asStyleDict({
     root: {
     },
@@ -148,6 +150,10 @@ function getFixedStyles({ orientation = 'horizontal' }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'flex-start',
+      ...showsScrollbar ? {} : {
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
+      },
       WebkitOverflowScrolling: 'touch',
       ...orientation === 'horizontal' ? {
         flexDirection: 'row',
