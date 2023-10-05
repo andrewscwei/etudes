@@ -1,5 +1,7 @@
 import classNames from 'classnames'
-import React, { forwardRef, useEffect, type HTMLAttributes } from 'react'
+import React, { forwardRef, type HTMLAttributes } from 'react'
+import { type Size } from 'spase'
+import { useLoadImageEffect } from './hooks/useLoadImageEffect'
 import { useDebug } from './utils'
 import { asClassNameDict } from './utils/asClassNameDict'
 import { asStyleDict } from './utils/asStyleDict'
@@ -8,30 +10,37 @@ import { styles } from './utils/styles'
 const debug = useDebug('image')
 
 export type ImageProps = HTMLAttributes<HTMLElement> & {
-  loading?: 'none' | 'lazy' | 'preload'
   alt?: string
+  loadingMode?: 'none' | 'lazy' | 'preload'
   src?: string
+  onImageLoadComplete?: () => void
+  onImageLoadError?: () => void
+  onImageSizeChange?: (size?: Size) => void
 }
 
 export const Image = forwardRef<HTMLImageElement, ImageProps>(({
   className,
   style,
   alt,
-  loading = 'preload',
+  loadingMode = 'preload',
   src,
+  onImageLoadComplete,
+  onImageLoadError,
+  onImageSizeChange,
   ...props
 }, ref) => {
   const fixedClassNames = getFixedClassNames()
   const fixedStyles = getFixedStyles()
 
-  useEffect(() => {
-    if (!src || loading !== 'preload') return
-
+  if (loadingMode === 'preload') {
     debug('Initiating preload for image...', 'OK', src)
 
-    const preloadImage = new window.Image()
-    preloadImage.src = src
-  }, [src])
+    useLoadImageEffect(src, {
+      onImageLoadComplete,
+      onImageLoadError,
+      onImageSizeChange,
+    })
+  }
 
   return (
     <img
@@ -39,7 +48,7 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(({
       ref={ref}
       className={classNames(className, fixedClassNames.root)}
       style={styles(style, fixedStyles.root)}
-      loading={loading === 'lazy' ? 'lazy' : 'eager'}
+      loading={loadingMode === 'lazy' ? 'lazy' : 'eager'}
       src={src}
       alt={alt}
     />
