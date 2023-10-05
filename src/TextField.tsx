@@ -1,6 +1,7 @@
 import React, { forwardRef, useEffect, useState, type ChangeEvent, type FocusEvent, type HTMLAttributes } from 'react'
 import { usePrevious } from './hooks/usePrevious'
-import { asStyleDict, styles } from './utils'
+import { asStyleDict } from './utils/asStyleDict'
+import { styles } from './utils/styles'
 
 export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
   emptyValue?: string
@@ -47,30 +48,24 @@ export const TextField = forwardRef<HTMLDivElement, TextFieldProps>(({
   }, [value])
 
   return (
-    <div
+    <input
       {...props}
       data-component='text-field'
-      ref={ref}
-      style={style}
-    >
-      <input
-        data-child='input'
-        style={styles(FIXED_STYLES.input)}
-        type='text'
-        value={value}
-        disabled={isDisabled}
-        onBlur={({ target }: FocusEvent<HTMLInputElement>) => onUnfocus?.(target.value)}
-        onChange={({ target }: ChangeEvent<HTMLInputElement>) => handleValueChange(target.value)}
-        onFocus={({ target }: FocusEvent<HTMLInputElement>) => onFocus?.(target.value)}
-      />
-    </div>
+      style={styles(style, FIXED_STYLES.root)}
+      type='text'
+      value={value}
+      disabled={isDisabled}
+      onBlur={({ target }: FocusEvent<HTMLInputElement>) => onUnfocus?.(target.value)}
+      onChange={({ target }: ChangeEvent<HTMLInputElement>) => handleValueChange(target.value)}
+      onFocus={({ target }: FocusEvent<HTMLInputElement>) => onFocus?.(target.value)}
+    />
   )
 })
 
 Object.defineProperty(TextField, 'displayName', { value: 'TextField', writable: false })
 
 const FIXED_STYLES = asStyleDict({
-  input: {
+  root: {
     width: '100%',
   },
 })
