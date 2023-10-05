@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type RefObject } from 'react'
+import { useEffect, useRef, useState, type DependencyList, type RefObject } from 'react'
 import ResizeObserver from 'resize-observer-polyfill'
 import { Rect } from 'spase'
 
@@ -10,7 +10,7 @@ import { Rect } from 'spase'
  *
  * @returns The most current {@link Rect} of the target element.
  */
-export function useElementRect(targetRef: RefObject<Element>): Rect {
+export function useElementRect(targetRef: RefObject<Element>, deps?: DependencyList): Rect {
   const observerRef = useRef<ResizeObserver | undefined>(undefined)
   const [rect, setRect] = useState<Rect>(new Rect())
 
@@ -32,7 +32,7 @@ export function useElementRect(targetRef: RefObject<Element>): Rect {
         observerRef.current.unobserve(targetRef.current)
       }
     }
-  }, [targetRef])
+  }, [...deps ?? []])
 
   return rect
 }

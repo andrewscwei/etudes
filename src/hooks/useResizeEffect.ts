@@ -46,7 +46,7 @@ export function useResizeEffect(targetRef: RefObject<Element>, { onResize }: Opt
         observerRef.current.unobserve(targetRef.current)
       }
     }
-  }, [targetRef, ...deps ? deps : []])
+  }, [...deps ? deps : []])
 
   return [size, setSize]
 }
