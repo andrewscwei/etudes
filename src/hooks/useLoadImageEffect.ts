@@ -17,6 +17,16 @@ type ReturnedStates = {
 
 type Options = {
   /**
+   * `srcset` attribute of the image.
+   */
+  srcSet?: string
+
+  /**
+   * `sizes` attribute of the image.
+   */
+  sizes?: string
+
+  /**
    * Handler invoked when the image is done loading.
    *
    * @param imageElement The loaded image element.
@@ -50,7 +60,16 @@ function getImageSize(imageElement: HTMLImageElement): Size {
  *
  * @returns See {@link ReturnedStates}.
  */
-export function useLoadImageEffect(src?: string, { onImageLoadComplete, onImageLoadError, onImageSizeChange }: Options = {}, deps?: DependencyList): ReturnedStates {
+export function useLoadImageEffect(
+  src?: string, {
+    srcSet,
+    sizes,
+    onImageLoadComplete,
+    onImageLoadError,
+    onImageSizeChange,
+  }: Options = {},
+  deps?: DependencyList,
+): ReturnedStates {
   const imageLoadCompleteHandler = (event: Event) => {
     const imageElement = event.currentTarget as HTMLImageElement
     const imageSize = getImageSize(imageElement)
@@ -79,6 +98,8 @@ export function useLoadImageEffect(src?: string, { onImageLoadComplete, onImageL
 
     imageRef.current = new Image()
     imageRef.current.src = src
+    if (srcSet) imageRef.current.srcset = srcSet
+    if (sizes) imageRef.current.sizes = sizes
     imageRef.current.addEventListener('load', imageLoadCompleteHandler)
     imageRef.current.addEventListener('error', imageLoadErrorHandler)
 
