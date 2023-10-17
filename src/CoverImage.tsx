@@ -1,18 +1,19 @@
-import React, { forwardRef, useRef, useState } from 'react'
+import React, { forwardRef, useRef, useState, type PropsWithChildren } from 'react'
 import { Size } from 'spase'
 import { Image, type ImageProps } from './Image'
 import { useElementRect } from './hooks/useElementRect'
 import { asStyleDict, styles } from './utils'
 
-type Props = ImageProps & {
+type Props = ImageProps & PropsWithChildren<{
   /**
    * The known aspect ratio of the image, expressed by width / height. If
    * unprovided, it will be inferred after loading the image.
    */
   aspectRatio?: number
-}
+}>
 
 export const CoverImage = forwardRef<HTMLDivElement, Props>(({
+  children,
   style,
   alt,
   aspectRatio: externalAspectRatio = NaN,
@@ -39,16 +40,22 @@ export const CoverImage = forwardRef<HTMLDivElement, Props>(({
   ])
 
   return (
-    <div ref={ref ?? rootRef} {...props} style={styles(style, FIXED_STYLES.root)}>
-      <Image
-        style={{
-          width: `${imageSize.width}px`,
-          height: `${imageSize.height}px`,
-        }}
-        alt={alt}
-        source={source}
-        onImageSizeChange={size => handleImageSizeChange(size)}
-      />
+    <div ref={ref ?? rootRef} {...props} style={styles(style, FIXED_STYLES.root)} data-component='cover-image'>
+      <div data-child='container' style={styles(FIXED_STYLES.container)}>
+        <Image
+          style={{
+            width: `${imageSize.width}px`,
+            height: `${imageSize.height}px`,
+          }}
+          alt={alt}
+          source={source}
+          data-child='image'
+          onImageSizeChange={size => handleImageSizeChange(size)}
+        />
+        <div data-child='content' style={styles(FIXED_STYLES.content)}>
+          {children}
+        </div>
+      </div>
     </div>
   )
 })
@@ -57,10 +64,21 @@ Object.defineProperty(CoverImage, 'displayName', { value: 'CoverImage', writable
 
 const FIXED_STYLES = asStyleDict({
   root: {
-    alignItems: 'center',
-    display: 'flex',
-    justifyContent: 'center',
+    position: 'absolute',
     overflow: 'hidden',
+  },
+  container: {
     fontSize: '0',
+    left: '50%',
+    position: 'absolute',
+    top: '50%',
+    transform: 'translate(-50%, -50%)',
+  },
+  content: {
+    height: '100%',
+    left: '0',
+    position: 'absolute',
+    top: '0',
+    width: '100%',
   },
 })
