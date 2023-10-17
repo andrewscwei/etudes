@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
 import { Rect } from 'spase'
-import { useDragEffect } from './hooks/useDragEffect'
+import { useDragValueEffect } from './hooks/useDragValueEffect'
 import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles, useDebug } from './utils'
 
 const debug = useDebug('stepwise-slider')
@@ -183,7 +183,7 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
   const knobContainerRef = useRef<HTMLButtonElement>(null)
   const [index, setIndex] = useState(externalIndex)
 
-  const { isDragging: [isDragging], isReleasing: [isReleasing], value: [position, setPosition] } = useDragEffect(knobContainerRef, {
+  const { isDragging: [isDragging], isReleasing: [isReleasing], value: [position, setPosition] } = useDragValueEffect(knobContainerRef, {
     initialValue: getPositionAt(externalIndex, steps),
     transform: mapDragValueToPosition,
     onDragStart,

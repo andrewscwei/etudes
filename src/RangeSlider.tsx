@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
-import { useDragEffect } from './hooks/useDragEffect'
+import { useDragValueEffect } from './hooks/useDragValueEffect'
 import { useResizeEffect } from './hooks/useResizeEffect'
 import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from './utils'
 
@@ -68,7 +68,7 @@ export const RangeSlider = forwardRef<HTMLDivElement, RangeSliderProps>(({
 
   const [range, setRange] = useState<Range>(externalRange ?? [minValue, maxValue])
 
-  const { isDragging: [isDraggingStartKnob], isReleasing: [isReleasingStartKnob], value: [startValue, setStartValue] } = useDragEffect(startKnobRef, {
+  const { isDragging: [isDraggingStartKnob], isReleasing: [isReleasingStartKnob], value: [startValue, setStartValue] } = useDragValueEffect(startKnobRef, {
     initialValue: externalRange?.[0] ?? minValue,
     transform: (value: number, dx: number, dy: number) => {
       const delta = orientation === 'horizontal' ? dx : dy
@@ -80,7 +80,7 @@ export const RangeSlider = forwardRef<HTMLDivElement, RangeSliderProps>(({
     },
   }, [minValue, orientation, size, range[1]])
 
-  const { isDragging: [isDraggingEndKnob], isReleasing: [isReleasingEndKnob], value: [endValue, setEndValue] } = useDragEffect(endKnobRef, {
+  const { isDragging: [isDraggingEndKnob], isReleasing: [isReleasingEndKnob], value: [endValue, setEndValue] } = useDragValueEffect(endKnobRef, {
     initialValue: externalRange?.[1] ?? maxValue,
     transform: (value: number, dx: number, dy: number) => {
       const delta = orientation === 'horizontal' ? dx : dy
