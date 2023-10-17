@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import React, { forwardRef, useEffect, useRef, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
 import { Rect } from 'spase'
-import { useDragEffect } from './hooks/useDragEffect'
+import { useDragValueEffect } from './hooks/useDragValueEffect'
 import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from './utils'
 
 type Orientation = 'horizontal' | 'vertical'
@@ -150,7 +150,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
   const bodyRef = useRef<HTMLDivElement>(null)
   const knobContainerRef = useRef<HTMLButtonElement>(null)
 
-  const { isDragging: [isDragging], isReleasing: [isReleasing], value: [position, setPosition] } = useDragEffect(knobContainerRef, {
+  const { isDragging: [isDragging], isReleasing: [isReleasing], value: [position, setPosition] } = useDragValueEffect(knobContainerRef, {
     initialValue: externalPosition,
     transform: mapDragValueToPosition,
     onDragStart,

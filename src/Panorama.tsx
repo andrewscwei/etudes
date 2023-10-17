@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Size } from 'spase'
-import { useDragEffect } from './hooks/useDragEffect'
+import { useDragValueEffect } from './hooks/useDragValueEffect'
 import { useLoadImageEffect } from './hooks/useLoadImageEffect'
 import { useResizeEffect } from './hooks/useResizeEffect'
 import { asStyleDict } from './utils'
@@ -131,7 +131,7 @@ export const Panorama = forwardRef<HTMLDivElement, PanoramaProps>(({
     onImageSizeChange,
   })
 
-  const { isDragging: [isDragging], value: [displacement, setDisplacement] } = useDragEffect(bodyRef, {
+  const { isDragging: [isDragging], value: [displacement, setDisplacement] } = useDragValueEffect(bodyRef, {
     initialValue: 0,
     transform: mapDragPositionToDisplacement,
     onDragStart,
