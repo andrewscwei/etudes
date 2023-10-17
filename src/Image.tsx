@@ -56,14 +56,15 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(({
   onImageSizeChange,
   ...props
 }, ref) => {
+  const srcSet = source.constraints?.map(({ slotWidth, maxWidth, width, src }) => `${src} ${width ?? slotWidth ?? maxWidth}w`).join(', ')
+  const sizes = source.constraints?.map(({ maxWidth, slotWidth }) => `(max-width: ${maxWidth}px) ${slotWidth ?? maxWidth}px`).join(', ')
+
   if (loadingMode === 'preload') {
     debug('Initiating preload for image...', 'OK', source)
 
-    for (const constraint of source.constraints ?? []) {
-      useLoadImageEffect(constraint.src)
-    }
-
     useLoadImageEffect(source.fallback, {
+      srcSet,
+      sizes,
       onImageLoadComplete,
       onImageLoadError,
       onImageSizeChange,
@@ -76,8 +77,8 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(({
       ref={ref}
       alt={alt}
       loading={loadingMode === 'lazy' ? 'lazy' : 'eager'}
-      srcSet={source.constraints?.map(({ slotWidth, maxWidth, width, src }) => `${src} ${width ?? slotWidth ?? maxWidth}w`).join(', ')}
-      sizes={source.constraints?.map(({ maxWidth, slotWidth }) => `(max-width: ${maxWidth}px) ${slotWidth ?? maxWidth}px`).join(', ')}
+      srcSet={srcSet}
+      sizes={sizes}
       src={source.fallback}
     />
   )
