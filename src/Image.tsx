@@ -76,6 +76,7 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(({
       {...props}
       ref={ref}
       alt={alt}
+      data-component='image'
       loading={loadingMode === 'lazy' ? 'lazy' : 'eager'}
       srcSet={srcSet}
       sizes={sizes}
