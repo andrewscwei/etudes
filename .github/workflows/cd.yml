@@ -18,6 +18,7 @@ jobs:
       artifacts-name: ${{ needs.build.outputs.artifacts-name }}
       artifacts-path: ${{ needs.build.outputs.artifacts-path }}
       create-release: true
+      predeploy-command: cp -r lib/ .
     secrets:
       npm-auth-token: ${{ secrets.NPM_AUTH }}
   deploy-pages:
