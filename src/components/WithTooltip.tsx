@@ -1,10 +1,10 @@
 import classNames from 'classnames'
 import React, { useEffect, useRef, type CSSProperties, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
 import { Rect, Size } from 'spase'
-import { ExtractChild } from './ExtractChild'
-import { useElementRect } from './hooks/useElementRect'
-import { useViewportSize } from './hooks/useViewportSize'
-import { asStyleDict, styles } from './utils'
+import { useElementRect } from '../hooks/useElementRect'
+import { useViewportSize } from '../hooks/useViewportSize'
+import { ExtractChild } from '../operators/ExtractChild'
+import { asStyleDict, styles } from '../utils'
 
 type Alignment = 'tl' | 'tc' | 'tr' | 'cl' | 'cr' | 'bl' | 'bc' | 'br'
 

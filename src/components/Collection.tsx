@@ -1,8 +1,8 @@
 import classNames from 'classnames'
 import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
-import { Each } from './Each'
-import { asStyleDict, styles } from './utils'
+import { Each } from '../operators/Each'
+import { asStyleDict, styles } from '../utils'
 
 /**
  * Type describing the layout orientation of items in {@link Collection}.

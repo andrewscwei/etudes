@@ -1,8 +1,8 @@
 import React, { forwardRef, useRef, useState, type PropsWithChildren } from 'react'
 import { Size } from 'spase'
+import { useElementRect } from '../hooks/useElementRect'
+import { asStyleDict, styles } from '../utils'
 import { Image, type ImageProps } from './Image'
-import { useElementRect } from './hooks/useElementRect'
-import { asStyleDict, styles } from './utils'
 
 export type CoverImageProps = ImageProps & PropsWithChildren<{
   /**

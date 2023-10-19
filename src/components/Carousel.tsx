@@ -1,9 +1,9 @@
 import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type ForwardedRef, type HTMLAttributes, type ReactElement } from 'react'
 import { Rect, type Point } from 'spase'
-import { Each } from './Each'
-import { useDragEffect } from './hooks/useDragEffect'
-import { useTimeout } from './hooks/useTimeout'
-import { asStyleDict, styles } from './utils'
+import { useDragEffect } from '../hooks/useDragEffect'
+import { useTimeout } from '../hooks/useTimeout'
+import { Each } from '../operators/Each'
+import { asStyleDict, styles } from '../utils'
 
 export type CarouselOrientation = 'horizontal' | 'vertical'
 

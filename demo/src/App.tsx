@@ -1,9 +1,9 @@
 import classNames from 'classnames'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { BurgerButton, BurgerButtonBar } from '../../lib/BurgerButton'
-import { FlatSVG } from '../../lib/FlatSVG'
-import { WithTooltip } from '../../lib/WithTooltip'
+import { BurgerButton, BurgerButtonBar } from '../../lib/components/BurgerButton'
+import { FlatSVG } from '../../lib/components/FlatSVG'
+import { WithTooltip } from '../../lib/components/WithTooltip'
 import $$GithubIcon from './assets/svgs/github-icon.svg'
 import { AccordionDemo } from './containers/AccordionDemo'
 import { CollectionDemo } from './containers/CollectionDemo'
@@ -42,7 +42,7 @@ export function App() {
   }
 
   const [isNavActive, setIsNavActive] = useState(false)
-  const [hash, setHash] = useState<string | undefined>('accordion')
+  const [hash, setHash] = useState<string | undefined>('')
 
   useEffect(() => {
     mapLocationToHash()
@@ -156,7 +156,7 @@ const StyledNavButton = styled.button`
   border: none;
   color: #000;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   text-align: right;
   text-transform: uppercase;

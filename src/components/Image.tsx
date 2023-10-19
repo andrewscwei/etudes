@@ -1,7 +1,7 @@
 import React, { forwardRef, type HTMLAttributes } from 'react'
 import { type Size } from 'spase'
-import { useLoadImageEffect } from './hooks/useLoadImageEffect'
-import { useDebug } from './utils'
+import { useLoadImageEffect } from '../hooks/useLoadImageEffect'
+import { useDebug } from '../utils'
 
 const debug = useDebug('image')
 

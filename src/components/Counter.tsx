@@ -1,9 +1,9 @@
 import classNames from 'classnames'
 import React, { forwardRef, useEffect, useState, type ComponentType, type HTMLAttributes } from 'react'
+import { usePrevious } from '../hooks/usePrevious'
+import { asStyleDict } from '../utils/asStyleDict'
+import { styles } from '../utils/styles'
 import { TextField } from './TextField'
-import { usePrevious } from './hooks/usePrevious'
-import { asStyleDict } from './utils/asStyleDict'
-import { styles } from './utils/styles'
 
 type Props = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & {
   min?: number

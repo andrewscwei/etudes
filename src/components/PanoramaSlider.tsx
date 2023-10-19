@@ -1,9 +1,9 @@
 import classNames from 'classnames'
 import React, { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { type Size } from 'spase'
+import { useResizeEffect } from '../hooks/useResizeEffect'
+import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils'
 import { Panorama, type PanoramaProps } from './Panorama'
-import { useResizeEffect } from './hooks/useResizeEffect'
-import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from './utils'
 
 export type PanoramaSliderProps = HTMLAttributes<HTMLDivElement> & PanoramaProps & PropsWithChildren<{
   /**

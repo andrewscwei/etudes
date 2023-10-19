@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useState, type ChangeEvent, type FocusEvent, type HTMLAttributes } from 'react'
-import { usePrevious } from './hooks/usePrevious'
-import { asStyleDict } from './utils/asStyleDict'
-import { styles } from './utils/styles'
+import { usePrevious } from '../hooks/usePrevious'
+import { asStyleDict } from '../utils/asStyleDict'
+import { styles } from '../utils/styles'
 
 export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
   emptyValue?: string

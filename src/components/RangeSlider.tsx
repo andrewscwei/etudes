@@ -1,9 +1,9 @@
 import classNames from 'classnames'
 import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
-import { useDragValueEffect } from './hooks/useDragValueEffect'
-import { useResizeEffect } from './hooks/useResizeEffect'
-import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from './utils'
+import { useDragValueEffect } from '../hooks/useDragValueEffect'
+import { useResizeEffect } from '../hooks/useResizeEffect'
+import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils'
 
 type Orientation = 'horizontal' | 'vertical'
 

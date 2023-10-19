@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Size } from 'spase'
 import styled from 'styled-components'
-import { DebugConsole } from '../../../lib/DebugConsole'
-import { Panorama } from '../../../lib/Panorama'
-import { PanoramaSlider } from '../../../lib/PanoramaSlider'
-import { Slider, SliderKnob } from '../../../lib/Slider'
+import { DebugConsole } from '../../../lib/components/DebugConsole'
+import { Panorama } from '../../../lib/components/Panorama'
+import { PanoramaSlider } from '../../../lib/components/PanoramaSlider'
+import { Slider, SliderKnob } from '../../../lib/components/Slider'
 import $$PanoramaImage from '../assets/images/panorama.png'
 
 export function PanoramaDemo() {

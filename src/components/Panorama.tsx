@@ -1,9 +1,9 @@
 import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Size } from 'spase'
-import { useDragValueEffect } from './hooks/useDragValueEffect'
-import { useLoadImageEffect } from './hooks/useLoadImageEffect'
-import { useResizeEffect } from './hooks/useResizeEffect'
-import { asStyleDict } from './utils'
+import { useDragValueEffect } from '../hooks/useDragValueEffect'
+import { useLoadImageEffect } from '../hooks/useLoadImageEffect'
+import { useResizeEffect } from '../hooks/useResizeEffect'
+import { asStyleDict } from '../utils'
 
 export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'onResize'> & {
   /**

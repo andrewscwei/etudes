@@ -1,8 +1,8 @@
 import classNames from 'classnames'
 import React, { forwardRef, useEffect, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren } from 'react'
-import { Each } from './Each'
-import { useInterval } from './hooks/useInterval'
-import { asClassNameDict, asStyleDict, styles } from './utils'
+import { useInterval } from '../hooks/useInterval'
+import { Each } from '../operators/Each'
+import { asClassNameDict, asStyleDict, styles } from '../utils'
 
 export type RotatingGalleryImageProps = HTMLAttributes<HTMLElement> & {
   index: number
