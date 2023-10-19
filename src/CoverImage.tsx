@@ -4,20 +4,27 @@ import { Image, type ImageProps } from './Image'
 import { useElementRect } from './hooks/useElementRect'
 import { asStyleDict, styles } from './utils'
 
-type Props = ImageProps & PropsWithChildren<{
+export type CoverImageProps = ImageProps & PropsWithChildren<{
   /**
    * The known aspect ratio of the image, expressed by width / height. If
    * unprovided, it will be inferred after loading the image.
    */
   aspectRatio?: number
+
+  /**
+   * Content to render in the full-sized viewport (same size as the cover
+   * image).
+   */
+  renderViewportContent?: () => JSX.Element
 }>
 
-export const CoverImage = forwardRef<HTMLDivElement, Props>(({
+export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
   children,
   style,
   alt,
   aspectRatio: externalAspectRatio = NaN,
   source,
+  renderViewportContent,
   ...props
 }, ref) => {
   const handleImageSizeChange = (size?: Size) => {
@@ -41,21 +48,29 @@ export const CoverImage = forwardRef<HTMLDivElement, Props>(({
 
   return (
     <div ref={ref ?? rootRef} {...props} style={styles(style, FIXED_STYLES.root)} data-component='cover-image'>
-      <div data-child='container' style={styles(FIXED_STYLES.container)}>
-        <Image
-          style={{
-            width: `${imageSize.width}px`,
+      <Image
+        style={styles(FIXED_STYLES.viewport, {
+          width: `${imageSize.width}px`,
+          height: `${imageSize.height}px`,
+        })}
+        alt={alt}
+        source={source}
+        data-child='image'
+        onImageSizeChange={size => handleImageSizeChange(size)}
+      />
+      {renderViewportContent && (
+        <div
+          data-child='viewport'
+          style={styles(FIXED_STYLES.viewport, {
             height: `${imageSize.height}px`,
-          }}
-          alt={alt}
-          source={source}
-          data-child='image'
-          onImageSizeChange={size => handleImageSizeChange(size)}
-        />
-        <div data-child='content' style={styles(FIXED_STYLES.content)}>
-          {children}
+            pointerEvents: 'none',
+            width: `${imageSize.width}px`,
+          })}
+        >
+          {renderViewportContent()}
         </div>
-      </div>
+      )}
+      {children}
     </div>
   )
 })
@@ -64,17 +79,16 @@ Object.defineProperty(CoverImage, 'displayName', { value: 'CoverImage', writable
 
 const FIXED_STYLES = asStyleDict({
   root: {
-    position: 'absolute',
     overflow: 'hidden',
   },
-  container: {
+  viewport: {
     fontSize: '0',
     left: '50%',
     position: 'absolute',
     top: '50%',
     transform: 'translate(-50%, -50%)',
   },
-  content: {
+  viewportContent: {
     height: '100%',
     left: '0',
     position: 'absolute',

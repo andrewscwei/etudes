@@ -12,11 +12,11 @@ type Options = {
  * Hoook for invoking a method repeatedly on every set interval.
  *
  * @param handler The method to invoke on every interval.
- * @param timeout Time (in milliseconds) between each invocation.
+ * @param interval Time (in milliseconds) between each invocation.
  * @param options See {@link Options}.
  * @param deps Dependencies that trigger this effect.
  */
-export function useInterval(handler: () => void, timeout?: number, { shouldInvokeInitially = false }: Options = {}, deps?: DependencyList) {
+export function useInterval(handler: () => void, interval?: number, { shouldInvokeInitially = false }: Options = {}, deps?: DependencyList) {
   const handlerRef = useRef<(() => void)>()
 
   useEffect(() => {
@@ -24,11 +24,11 @@ export function useInterval(handler: () => void, timeout?: number, { shouldInvok
   }, [handler])
 
   useEffect(() => {
-    if (timeout === undefined) return
+    if (interval === undefined || interval <= 0) return
 
     if (shouldInvokeInitially === true) handlerRef.current?.()
-    const timer = window.setInterval(() => handlerRef.current?.(), timeout)
+    const timer = window.setInterval(() => handlerRef.current?.(), interval)
 
     return () => clearInterval(timer)
-  }, [...deps ? deps : [], timeout])
+  }, [...deps ? deps : [], interval])
 }

@@ -2,27 +2,79 @@ import React, { forwardRef, useEffect, useRef, useState, type ComponentType, typ
 import { Rect, type Point } from 'spase'
 import { Each } from './Each'
 import { useDragEffect } from './hooks/useDragEffect'
+import { useTimeout } from './hooks/useTimeout'
 import { asStyleDict, styles } from './utils'
 
 export type CarouselOrientation = 'horizontal' | 'vertical'
 
 export type CarouselProps<I> = HTMLAttributes<HTMLElement> & {
+  /**
+   * Current item index.
+   */
   index?: number
+
+  /**
+   * The interval in milliseconds to wait before automatically advancing to the
+   * next item (auto loops).
+   */
+  autoAdvanceInterval?: number
+
+  /**
+   * Whether the carousel is draggable.
+   */
   isDragEnabled?: boolean
+
+  /**
+   * Props for each item component
+   */
   items?: Omit<I, 'exposure'>[]
+
+  /**
+   * Orientation of the carousel.
+   */
   orientation?: CarouselOrientation
+
+  /**
+   * Whether to track item exposure (0-1, 0 meaning the item is fully scrolled
+   * out of view, 1 meaning the item is fully scrolled into view).
+   */
   tracksItemExposure?: boolean
+
+  /**
+   * Handler invoked when auto advance pauses. This is invoked only when
+   * {@link autoAdvanceInterval} is greater than 0.
+   */
+  onAutoAdvancePause?: () => void
+
+  /**
+   * Handler invoked when auto advance resumes. This is invoked only when
+   * {@link autoAdvanceInterval} is greater than 0.
+   */
+  onAutoAdvanceResume?: () => void
+
+  /**
+   * Handler invoked when the item index changes.
+   *
+   * @param index The item index.
+   */
   onIndexChange?: (index: number) => void
+
+  /**
+   * The component to render for each item.
+   */
   ItemComponent: ComponentType<I>
 }
 
 export const Carousel = forwardRef(({
   style,
+  autoAdvanceInterval = 0,
   index: externalIndex = 0,
   isDragEnabled = true,
   items = [],
   orientation = 'horizontal',
   tracksItemExposure = false,
+  onAutoAdvancePause,
+  onAutoAdvanceResume,
   onIndexChange,
   ItemComponent,
   ...props
@@ -72,7 +124,7 @@ export const Carousel = forwardRef(({
   const viewportRef = useRef<HTMLDivElement>(null)
   const [index, setIndex] = tracksIndexChanges ? useState(0) : [externalIndex]
   const [exposures, setExposures] = tracksItemExposure ? useState<number[] | undefined>(getItemExposures()) : []
-  const autoScrollTimeoutRef = useRef<NodeJS.Timeout | undefined>()
+  const autoScrollTimeoutRef = useRef<NodeJS.Timeout>()
   const [isDragging, setIsDragging] = useState(false)
 
   useEffect(() => {
@@ -123,26 +175,32 @@ export const Carousel = forwardRef(({
     const viewportElement = viewportRef.current
     if (!viewportElement) return
 
-    const marginOfError = 5
-    const delayMs = 50
+    const delayMs = 500
     const top = orientation === 'horizontal' ? 0 : viewportElement.clientHeight * index
     const left = orientation === 'horizontal' ? viewportElement.clientWidth * index : 0
 
     viewportElement.scrollTo({ top, left, behavior: 'smooth' })
 
-    clearInterval(autoScrollTimeoutRef.current)
-    autoScrollTimeoutRef.current = setInterval(() => {
-      if (Math.abs(viewportElement.scrollTop - top) > marginOfError || Math.abs(viewportElement.scrollLeft - left) > marginOfError) return
-
-      clearInterval(autoScrollTimeoutRef.current)
+    clearTimeout(autoScrollTimeoutRef.current)
+    autoScrollTimeoutRef.current = setTimeout(() => {
+      clearTimeout(autoScrollTimeoutRef.current)
       autoScrollTimeoutRef.current = undefined
     }, delayMs)
   }, [index, orientation])
 
-  if (isDragEnabled) {
+  useEffect(() => {
+    if (autoAdvanceInterval <= 0) return
+
+    if (isDragging) {
+      onAutoAdvancePause?.()
+    }
+    else {
+      onAutoAdvanceResume?.()
+    }
+  }, [isDragging])
+
+  if (isDragEnabled && items.length > 1) {
     useDragEffect(viewportRef, {
-      onDragStart: () => setIsDragging(true),
-      onDragEnd: () => setIsDragging(false),
       onDragMove: (displacement: Point) => {
         switch (orientation) {
           case 'horizontal':
@@ -166,6 +224,14 @@ export const Carousel = forwardRef(({
     })
   }
 
+  if (autoAdvanceInterval > 0) {
+    useTimeout(
+      () => handleIndexChange((index + items.length + 1) % items.length),
+      isDragging ? 0 : autoAdvanceInterval,
+      [isDragging, index, items.length],
+    )
+  }
+
   const fixedStyles = getFixedStyles({ isDragging, orientation })
 
   return (
@@ -174,6 +240,9 @@ export const Carousel = forwardRef(({
       data-component='carousel'
       ref={ref}
       style={styles(style, fixedStyles.root)}
+      onPointerDown={() => setIsDragging(true)}
+      onPointerUp={() => setIsDragging(false)}
+      onPointerLeave={() => setIsDragging(false)}
     >
       <div
         data-child='viewport'
