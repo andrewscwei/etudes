@@ -1,8 +1,8 @@
 import classNames from 'classnames'
 import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Rect } from 'spase'
-import { useResizeEffect } from './hooks/useResizeEffect'
-import { asClassNameDict, asStyleDict, useDebug } from './utils'
+import { useResizeEffect } from '../hooks/useResizeEffect'
+import { asClassNameDict, asStyleDict, useDebug } from '../utils'
 
 const debug = useDebug('masonry')
 

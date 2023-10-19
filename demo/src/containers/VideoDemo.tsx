@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
-import { DebugConsole } from '../../../lib/DebugConsole'
-import { Video } from '../../../lib/Video'
+import { DebugConsole } from '../../../lib/components/DebugConsole'
+import { Video } from '../../../lib/components/Video'
 import $$Video from '../assets/media/video.mp4'
 
 export function VideoDemo() {

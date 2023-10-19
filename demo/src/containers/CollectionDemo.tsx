@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { Collection, type CollectionItemProps } from '../../../lib/Collection'
-import { DebugConsole } from '../../../lib/DebugConsole'
-import { Dropdown, type DropdownItemProps } from '../../../lib/Dropdown'
+import { Collection, type CollectionItemProps } from '../../../lib/components/Collection'
+import { DebugConsole } from '../../../lib/components/DebugConsole'
+import { Dropdown, type DropdownItemProps } from '../../../lib/components/Dropdown'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
 const DropdownItem = ({ index, isSelected, item, onCustomEvent, ...props }: DropdownItemProps) => (

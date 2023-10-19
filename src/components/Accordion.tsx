@@ -1,10 +1,10 @@
 import classNames from 'classnames'
 import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
+import { Each } from '../operators/Each'
+import { asStyleDict, cloneStyledElement, styles } from '../utils'
 import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection'
-import { Each } from './Each'
 import { FlatSVG } from './FlatSVG'
-import { asStyleDict, cloneStyledElement, styles } from './utils'
 
 /**
  * Type describing the current item selection of {@link Accordion}, composed of

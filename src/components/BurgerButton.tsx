@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import React, { forwardRef, useEffect, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
-import { Repeat } from './Repeat'
-import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from './utils'
+import { Repeat } from '../operators/Repeat'
+import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils'
 
 export type BurgerButtonProps = HTMLAttributes<HTMLButtonElement> & PropsWithChildren<{
   height?: number

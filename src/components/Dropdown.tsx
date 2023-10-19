@@ -1,10 +1,10 @@
 import classNames from 'classnames'
 import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
+import { useElementRect } from '../hooks/useElementRect'
+import { usePrevious } from '../hooks/usePrevious'
+import { asStyleDict, cloneStyledElement, styles } from '../utils'
 import { Collection, type CollectionItemProps, type CollectionProps, type CollectionSelection } from './Collection'
 import { FlatSVG } from './FlatSVG'
-import { useElementRect } from './hooks/useElementRect'
-import { usePrevious } from './hooks/usePrevious'
-import { asStyleDict, cloneStyledElement, styles } from './utils'
 
 /**
  * Base extendable type describing the data provided to each item in

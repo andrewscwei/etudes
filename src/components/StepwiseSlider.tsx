@@ -1,12 +1,14 @@
 import classNames from 'classnames'
-import React, { forwardRef, useEffect, useRef, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
+import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
 import { Rect } from 'spase'
-import { useDragValueEffect } from './hooks/useDragValueEffect'
-import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from './utils'
+import { useDragValueEffect } from '../hooks/useDragValueEffect'
+import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles, useDebug } from '../utils'
+
+const debug = useDebug('stepwise-slider')
 
 type Orientation = 'horizontal' | 'vertical'
 
-export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
+export type StepwiseSliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   /**
    * By default the position is a value from 0 - 1, 0 being the start of the
    * slider and 1 being the end. Switching on this flag inverts this behavior,
@@ -20,8 +22,9 @@ export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   isTrackInteractive?: boolean
 
   /**
-   * Indicates if position change events are dispatched only when dragging ends.
-   * When disabled, aforementioned events are fired repeatedly while dragging.
+   * Indicates if position/index change events are dispatched only when dragging
+   * ends. When disabled, aforementioned events are fired repeatedly while
+   * dragging.
    */
   onlyDispatchesOnDragEnd?: boolean
 
@@ -46,26 +49,48 @@ export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   orientation?: Orientation
 
   /**
-   * The current position.
+   * An array of step descriptors. A step is a position (0 - 1 inclusive) on the
+   * track where the knob should snap to if dragging stops near it. Ensure that
+   * there are at least two steps: one for the start of the track and one for
+   * the end.
    */
-  position?: number
+  steps?: readonly number[]
+
+  /**
+   * The current index.
+   */
+  index?: number
 
   /**
    * A function that returns the label to be displayed at a given slider
-   * position.
+   * position and closest step index (if steps are provided).
    *
    * @param position The current slider position.
+   * @param index The nearest step index (if steps are provided), or -1 if no
+   *                steps are provided.
    *
    * @returns The label.
    */
-  labelProvider?: (position: number) => string
+  labelProvider?: (position: number, index: number) => string
+
+  /**
+   * Handler invoked when index changes. This can either be invoked from the
+   * `index` prop being changed or from the slider being dragged. Note that if
+   * the event is emitted at the end of dragging due to
+   * `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here is
+   * still `true`. This event is emitted right after `onPositionChange`.
+   *
+   * @param index The current slider index.
+   * @param isDragging Specifies if the index change is due to dragging.
+   */
+  onIndexChange?: (index: number, isDragging: boolean) => void
 
   /**
    * Handler invoked when position changes. This can either be invoked from the
-   * `position` prop being changed or from the slider being dragged. Note that
-   * if the event is emitted at the end of dragging due to
+   * `index` prop being changed or from the slider being dragged. Note that if
+   * the event is emitted at the end of dragging due to
    * `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here is
-   * still `true`.
+   * still `true`. This event is emitted right before `onIndexChange`.
    *
    * @param position The current slider position.
    * @param isDragging Specifies if the position change is due to dragging.
@@ -84,22 +109,27 @@ export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
 }>
 
 /**
- * A slider component supporting both horizontal and vertical orientations whose
- * sliding position (a decimal between 0.0 and 1.0, inclusive) can be two-way
- * binded. The component consists of three customizable elements: a draggable
- * knob, a label on the knob, and a scroll track on either side of the knob.
- * While the width and height of the slider is inferred from its CSS rules, the
- * width and height of the knob are set via props (`knobWidth` and `knobHeight`,
- * respectively). The size of the knob does not impact the size of the slider.
+ * A "stepwise" slider component supporting both horizontal and vertical
+ * orientations that automatically snaps to a set of predefined points on the
+ * slider when dragged. These points are referred to as "steps", indexed by an
+ * integer referred to as "index". This index can be two-way binded. The
+ * component consists of four customizable elements: a draggable knob, a label
+ * on the knob, a scroll track before the knob and a scroll track after the
+ * knob. While the width and height of the slider is inferred from its CSS
+ * rules, the width and height of the knob are set via props (`knobWidth` and
+ * `knobHeight`, respectively). The size of the knob does not impact the size of
+ * the slider. While dragging, the slider still emits a position change event,
+ * where the position is a decimal ranging between 0.0 and 1.0, inclusive.
  *
- * @exports SliderKnob The component for the knob.
- * @exports SliderLabel The component for the label on the knob.
- * @exports SliderTrack The component for the slide track on either side of the
- *                      knob.
+ * @exports StepwiseSliderKnob The component for the knob.
+ * @exports StepwiseSliderLabel The component for the label on the knob.
+ * @exports StepwiseSliderTrack The component for the slide track on either side
+ *                                of the knob.
  */
-export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
+export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
   children,
   className,
+  index: externalIndex = 0,
   isInverted = false,
   isTrackInteractive = true,
   knobHeight = 30,
@@ -107,10 +137,11 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
   labelProvider,
   onlyDispatchesOnDragEnd = false,
   orientation = 'vertical',
-  position: externalPosition = 0,
+  steps = generateSteps(10),
   trackPadding = 0,
   onDragEnd,
   onDragStart,
+  onIndexChange,
   onPositionChange,
   ...props
 }, ref) => {
@@ -143,15 +174,17 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
         setPosition(normalizedPosition)
         break
       }
-      default: break
+      default:
+        break
     }
   }
 
   const bodyRef = useRef<HTMLDivElement>(null)
   const knobContainerRef = useRef<HTMLButtonElement>(null)
+  const [index, setIndex] = useState(externalIndex)
 
   const { isDragging: [isDragging], isReleasing: [isReleasing], value: [position, setPosition] } = useDragValueEffect(knobContainerRef, {
-    initialValue: externalPosition,
+    initialValue: getPositionAt(externalIndex, steps),
     transform: mapDragValueToPosition,
     onDragStart,
     onDragEnd,
@@ -164,24 +197,49 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
   const isAtStart = isInverted ? position === 1 : position === 0
 
   useEffect(() => {
-    if (isDragging || externalPosition === position) return
-    setPosition(externalPosition)
-  }, [externalPosition])
+    if (isDragging) return
+
+    const newPosition = getPositionAt(externalIndex, steps)
+
+    if (position !== newPosition) {
+      debug('Updating drag effect value from index prop...', 'OK', `prop=${newPosition}, effect=${position}`)
+      setPosition(newPosition)
+    }
+
+    if (externalIndex !== index) {
+      setIndex(externalIndex)
+    }
+  }, [externalIndex])
 
   useEffect(() => {
     if (isDragging && onlyDispatchesOnDragEnd) return
+
     onPositionChange?.(position, isDragging)
+
+    const newIndex = getNearestIndexByPosition(position, steps)
+    if (index !== newIndex) setIndex(newIndex)
   }, [position])
 
   useEffect(() => {
-    if (isDragging || !onlyDispatchesOnDragEnd) return
-    onPositionChange?.(position, true)
+    onIndexChange?.(index, isDragging)
+  }, [index])
+
+  useEffect(() => {
+    if (isDragging) return
+
+    const nearestIndex = getNearestIndexByPosition(position, steps)
+    const nearestPosition = getPositionAt(nearestIndex, steps)
+
+    if (nearestPosition !== position || onlyDispatchesOnDragEnd) {
+      setPosition(nearestPosition)
+      onPositionChange?.(nearestPosition, true)
+    }
   }, [isDragging])
 
   const components = asComponentDict(children, {
-    knob: SliderKnob,
-    label: SliderLabel,
-    track: SliderTrack,
+    knob: StepwiseSliderKnob,
+    label: StepwiseSliderLabel,
+    track: StepwiseSliderTrack,
   })
 
   const fixedClassNames = asClassNameDict({
@@ -289,7 +347,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
   return (
     <div {...props} ref={ref} className={classNames(className, fixedClassNames.root)}>
       <div ref={bodyRef} style={fixedStyles.body}>
-        {cloneStyledElement(components.track ?? <SliderTrack style={defaultStyles.track}/>, {
+        {cloneStyledElement(components.track ?? <StepwiseSliderTrack style={defaultStyles.track}/>, {
           className: classNames('start', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
             height: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
@@ -300,7 +358,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
           }),
           onClick: trackClickHandler,
         }, <div style={fixedStyles.trackHitbox}/>)}
-        {cloneStyledElement(components.track ?? <SliderTrack style={defaultStyles.track}/>, {
+        {cloneStyledElement(components.track ?? <StepwiseSliderTrack style={defaultStyles.track}/>, {
           className: classNames('end', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
             bottom: '0',
@@ -312,23 +370,88 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
           onClick: trackClickHandler,
         }, <div style={fixedStyles.trackHitbox}/>)}
         <button ref={knobContainerRef} style={fixedStyles.knobContainer}>
-          {cloneStyledElement(components.knob ?? <SliderKnob style={defaultStyles.knob}/>, {
+          {cloneStyledElement(components.knob ?? <StepwiseSliderKnob style={defaultStyles.knob}/>, {
             className: classNames(fixedClassNames.knob),
             style: styles(fixedStyles.knob),
-          }, labelProvider && cloneStyledElement(components.label ?? <SliderLabel style={defaultStyles.label}/>, {
+          }, steps && labelProvider && cloneStyledElement(components.label ?? <StepwiseSliderLabel style={defaultStyles.label}/>, {
             className: classNames(fixedClassNames.label),
             style: styles(fixedStyles.label),
-          }, labelProvider(position)))}
+          }, labelProvider(position, getNearestIndexByPosition(position, steps))))}
         </button>
       </div>
     </div>
   )
 })
 
-Object.defineProperty(Slider, 'displayName', { value: 'Slider', writable: false })
+Object.defineProperty(StepwiseSlider, 'displayName', { value: 'StepwiseSlider', writable: false })
 
-export const SliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
+export const StepwiseSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
 
-export const SliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
+export const StepwiseSliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
 
-export const SliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
+export const StepwiseSliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
+
+/**
+ * Generates a set of steps compatible with this component.
+ *
+ * @param length The number of steps. This must be at least 2 because you must
+ *                 include the starting and ending points.
+ *
+ * @returns An array of steps.
+ */
+export function generateSteps(length: number): readonly number[] {
+  if (length <= 1) throw new Error('`length` value must be greater than or equal to 2')
+  if (Math.round(length) !== length) throw new Error('`length` value must be an integer')
+
+  const interval = 1 / (length - 1)
+
+  return Array(length).fill(null).map((v, i) => {
+    const position = interval * i
+
+    return position
+  })
+}
+
+/**
+ * Gets the index of the step of which the specified position is closest to. If
+ * for whatever reason the index cannot be computed, -1 is returned.
+ *
+ * @param position The position (0 1, inclusive).
+ * @param steps The steps.
+ *
+ * @returns The nearest index.
+ */
+function getNearestIndexByPosition(position: number, steps: readonly number[]): number {
+  let index = -1
+  let minDelta = NaN
+
+  for (let i = 0, n = steps.length; i < n; i++) {
+    const step = getPositionAt(i, steps)
+
+    if (isNaN(step)) continue
+
+    const delta = Math.abs(position - step)
+
+    if (isNaN(minDelta) || delta < minDelta) {
+      minDelta = delta
+      index = i
+    }
+  }
+
+  return index
+}
+
+/**
+ * Gets the position by step index. This value ranges between 0 - 1, inclusive.
+ *
+ * @param index The step index.
+ * @param steps The steps.
+ *
+ * @returns The position. If for whatever reason the position cannot be
+ *          determined, `NaN` is returned.
+ */
+function getPositionAt(index: number, steps: readonly number[]): number {
+  if (index >= steps.length) return NaN
+
+  return steps[index]
+}

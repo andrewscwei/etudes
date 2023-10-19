@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useRef, type HTMLAttributes, type ReactEventHandler } from 'react'
-import { asStyleDict, useDebug } from './utils'
+import { asStyleDict, useDebug } from '../utils'
 
 const debug = useDebug('video')
 
