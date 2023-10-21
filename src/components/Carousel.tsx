@@ -92,9 +92,9 @@ export const Carousel = forwardRef(({
     return exposures
   }
 
-  const getItemExposureAt = (index: number) => {
+  const getItemExposureAt = (idx: number) => {
     const viewportElement = viewportRef.current
-    const child = viewportElement?.children[index]
+    const child = viewportElement?.children[idx]
     if (!child) return 0
 
     const intersection = Rect.intersecting(child, viewportElement)
@@ -119,12 +119,41 @@ export const Carousel = forwardRef(({
     }
   }
 
+  const handlePointerDown = () => {
+    if (!isDragEnabled) return
+
+    setIsDragging(true)
+  }
+
+  const handlePointerUp = () => {
+    if (!isDragEnabled) return
+
+    setIsDragging(false)
+  }
+
+  const autoScrollToCurrentIndex = () => {
+    const viewportElement = viewportRef.current
+    if (!viewportElement) return
+
+    const top = orientation === 'horizontal' ? 0 : viewportElement.clientHeight * index
+    const left = orientation === 'horizontal' ? viewportElement.clientWidth * index : 0
+
+    viewportElement.scrollTo({ top, left, behavior: 'smooth' })
+
+    clearTimeout(autoScrollTimeoutRef.current)
+    autoScrollTimeoutRef.current = setTimeout(() => {
+      clearTimeout(autoScrollTimeoutRef.current)
+      autoScrollTimeoutRef.current = undefined
+    }, autoScrollTimeoutMs)
+  }
+
   const tracksIndexChanges = externalIndex === undefined
   const prevIndexRef = useRef<number>()
   const viewportRef = useRef<HTMLDivElement>(null)
   const [index, setIndex] = tracksIndexChanges ? useState(0) : [externalIndex]
   const [exposures, setExposures] = tracksItemExposure ? useState<number[] | undefined>(getItemExposures()) : []
   const autoScrollTimeoutRef = useRef<NodeJS.Timeout>()
+  const autoScrollTimeoutMs = 1000
   const [isDragging, setIsDragging] = useState(false)
 
   useEffect(() => {
@@ -171,21 +200,7 @@ export const Carousel = forwardRef(({
     if (isInitialRender) return
 
     handleIndexChange(index)
-
-    const viewportElement = viewportRef.current
-    if (!viewportElement) return
-
-    const delayMs = 500
-    const top = orientation === 'horizontal' ? 0 : viewportElement.clientHeight * index
-    const left = orientation === 'horizontal' ? viewportElement.clientWidth * index : 0
-
-    viewportElement.scrollTo({ top, left, behavior: 'smooth' })
-
-    clearTimeout(autoScrollTimeoutRef.current)
-    autoScrollTimeoutRef.current = setTimeout(() => {
-      clearTimeout(autoScrollTimeoutRef.current)
-      autoScrollTimeoutRef.current = undefined
-    }, delayMs)
+    autoScrollToCurrentIndex()
   }, [index, orientation])
 
   useEffect(() => {
@@ -240,9 +255,9 @@ export const Carousel = forwardRef(({
       data-component='carousel'
       ref={ref}
       style={styles(style, fixedStyles.root)}
-      onPointerDown={() => setIsDragging(true)}
-      onPointerUp={() => setIsDragging(false)}
-      onPointerLeave={() => setIsDragging(false)}
+      onPointerDown={() => handlePointerDown()}
+      onPointerUp={() => handlePointerUp()}
+      onPointerLeave={() => handlePointerUp()}
     >
       <div
         data-child='viewport'
