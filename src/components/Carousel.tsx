@@ -102,9 +102,9 @@ export const Carousel = forwardRef(({
 
     switch (orientation) {
       case 'horizontal':
-        return Math.max(0, Math.min(1, intersection.width / viewportElement.clientWidth))
+        return Math.max(0, Math.min(1, Math.round((intersection.width / viewportElement.clientWidth + Number.EPSILON) * 1000) / 1000))
       case 'vertical':
-        return Math.max(0, Math.min(1, intersection.height / viewportElement.clientHeight))
+        return Math.max(0, Math.min(1, Math.round((intersection.height / viewportElement.clientHeight + Number.EPSILON) * 1000) / 1000))
       default:
         throw new Error(`Unsupported orientation '${orientation}'`)
     }
