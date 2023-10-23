@@ -13,7 +13,7 @@ export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
   onValueChange?: (value: string) => void
 }
 
-export const TextField = forwardRef<HTMLDivElement, TextFieldProps>(({
+export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(({
   style,
   emptyValue = '',
   isDisabled = false,
