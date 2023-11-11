@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useRef, type HTMLAttributes, type ReactEventHandler, type RefObject } from 'react'
 import { type Size } from 'spase'
 import { useVideoSize } from '../hooks/useVideoSize'
-import { asStyleDict, useDebug } from '../utils'
+import { useDebug } from '../utils'
 
 const debug = useDebug('video')
 
@@ -9,7 +9,6 @@ export type VideoProps = Omit<HTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'pl
   autoLoop?: boolean
   autoPlay?: boolean
   hasControls?: boolean
-  isCover?: boolean
   isMuted?: boolean
   playsInline?: boolean
   posterSrc?: string
@@ -26,7 +25,6 @@ export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
   autoLoop = true,
   autoPlay = true,
   hasControls = false,
-  isCover = true,
   isMuted = true,
   playsInline = true,
   posterSrc,
@@ -110,19 +108,10 @@ export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
     videoRef.current.pause()
   }
 
-  const fixedStyles = asStyleDict({
-    body: {
-      height: '100%',
-      width: '100%',
-      objectFit: isCover ? 'cover' : 'fill',
-    },
-  })
-
   return (
     <video
       {...props}
       ref={ref}
-      style={fixedStyles.body}
       data-component='video'
       autoPlay={autoPlay}
       controls={hasControls}
