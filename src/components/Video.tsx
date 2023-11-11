@@ -1,9 +1,9 @@
-import React, { forwardRef, useEffect, useRef, type HTMLAttributes, type ReactEventHandler } from 'react'
+import React, { forwardRef, useEffect, useRef, type HTMLAttributes, type ReactEventHandler, type RefObject } from 'react'
 import { asStyleDict, useDebug } from '../utils'
 
 const debug = useDebug('video')
 
-export type VideoProps = HTMLAttributes<HTMLDivElement> & {
+export type VideoProps = Omit<HTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'playsInline' | 'onCanPlay' | 'onPause' | 'onPlay'> & {
   autoLoop?: boolean
   autoPlay?: boolean
   hasControls?: boolean
@@ -19,7 +19,7 @@ export type VideoProps = HTMLAttributes<HTMLDivElement> & {
   onPlay?: () => void
 }
 
-export const Video = forwardRef<HTMLDivElement, VideoProps>(({
+export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
   autoLoop = true,
   autoPlay = true,
   hasControls = false,
@@ -35,28 +35,28 @@ export const Video = forwardRef<HTMLDivElement, VideoProps>(({
   onPlay,
   ...props
 }, ref) => {
-  const bodyRef = useRef<HTMLVideoElement>(null)
-  const isPaused = bodyRef.current?.paused ?? false
+  const videoRef = ref as RefObject<HTMLVideoElement> ?? useRef<HTMLVideoElement>(null)
+  const isPaused = videoRef.current?.paused ?? false
 
   useEffect(() => {
     debug(`Initializing video with src <${src}>...`, 'OK')
 
-    if (!bodyRef.current) return
+    if (!videoRef.current) return
 
-    bodyRef.current.muted = isMuted
-    bodyRef.current.load()
-    bodyRef.current.addEventListener('webkitfullscreenchange', fullscreenChangeHandler)
-    bodyRef.current.addEventListener('mozfullscreenchange', fullscreenChangeHandler)
-    bodyRef.current.addEventListener('fullscreenchange', fullscreenChangeHandler)
+    videoRef.current.muted = isMuted
+    videoRef.current.load()
+    videoRef.current.addEventListener('webkitfullscreenchange', fullscreenChangeHandler)
+    videoRef.current.addEventListener('mozfullscreenchange', fullscreenChangeHandler)
+    videoRef.current.addEventListener('fullscreenchange', fullscreenChangeHandler)
 
     return () => {
       debug(`Deinitializing video with src <${src}>...`, 'OK')
 
       pause()
 
-      bodyRef.current?.removeEventListener('webkitfullscreenchange', fullscreenChangeHandler)
-      bodyRef.current?.removeEventListener('mozfullscreenchange', fullscreenChangeHandler)
-      bodyRef.current?.removeEventListener('fullscreenchange', fullscreenChangeHandler)
+      videoRef.current?.removeEventListener('webkitfullscreenchange', fullscreenChangeHandler)
+      videoRef.current?.removeEventListener('mozfullscreenchange', fullscreenChangeHandler)
+      videoRef.current?.removeEventListener('fullscreenchange', fullscreenChangeHandler)
     }
   }, [src])
 
@@ -92,13 +92,13 @@ export const Video = forwardRef<HTMLDivElement, VideoProps>(({
   }
 
   const play = () => {
-    if (!bodyRef.current) return
-    bodyRef.current.play()
+    if (!videoRef.current) return
+    videoRef.current.play()
   }
 
   const pause = () => {
-    if (!bodyRef.current) return
-    bodyRef.current.pause()
+    if (!videoRef.current) return
+    videoRef.current.pause()
   }
 
   const fixedStyles = asStyleDict({
@@ -110,24 +110,24 @@ export const Video = forwardRef<HTMLDivElement, VideoProps>(({
   })
 
   return (
-    <div {...props} ref={ref}>
-      <video
-        ref={bodyRef}
-        style={fixedStyles.body}
-        autoPlay={autoPlay}
-        controls={hasControls}
-        loop={autoLoop}
-        muted={isMuted}
-        playsInline={playsInline}
-        poster={posterSrc}
-        onCanPlay={canPlayHandler}
-        onEnded={endHandler}
-        onPause={pauseHandler}
-        onPlay={playHandler}
-      >
-        <source src={src}/>
-      </video>
-    </div>
+    <video
+      {...props}
+      ref={ref}
+      style={fixedStyles.body}
+      data-component='video'
+      autoPlay={autoPlay}
+      controls={hasControls}
+      loop={autoLoop}
+      muted={isMuted}
+      playsInline={playsInline}
+      poster={posterSrc}
+      onCanPlay={canPlayHandler}
+      onEnded={endHandler}
+      onPause={pauseHandler}
+      onPlay={playHandler}
+    >
+      <source src={src}/>
+    </video>
   )
 })
 
