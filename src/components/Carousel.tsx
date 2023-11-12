@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type ForwardedRef, type HTMLAttributes, type ReactElement } from 'react'
+import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type ForwardedRef, type HTMLAttributes, type PointerEvent, type ReactElement } from 'react'
 import { Rect, type Point } from 'spase'
 import { useDragEffect } from '../hooks/useDragEffect'
 import { useTimeout } from '../hooks/useTimeout'
@@ -119,14 +119,16 @@ export const Carousel = forwardRef(({
     }
   }
 
-  const handlePointerDown = () => {
+  const handlePointerDown = (event: PointerEvent) => {
     if (!isDragEnabled) return
 
     setIsDragging(true)
   }
 
-  const handlePointerUp = () => {
+  const handlePointerUp = (event: PointerEvent) => {
     if (!isDragEnabled) return
+
+    event.stopPropagation()
 
     setIsDragging(false)
   }
@@ -255,9 +257,9 @@ export const Carousel = forwardRef(({
       data-component='carousel'
       ref={ref}
       style={styles(style, fixedStyles.root)}
-      onPointerDown={() => handlePointerDown()}
-      onPointerUp={() => handlePointerUp()}
-      onPointerLeave={() => handlePointerUp()}
+      onPointerDown={event => handlePointerDown(event)}
+      onPointerUp={event => handlePointerUp(event)}
+      onPointerLeave={event => handlePointerUp(event)}
     >
       <div
         data-child='viewport'
