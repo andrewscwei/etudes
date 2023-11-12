@@ -1,5 +1,5 @@
-import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type ForwardedRef, type HTMLAttributes, type PointerEvent, type ReactElement } from 'react'
-import { Rect, type Point } from 'spase'
+import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type ForwardedRef, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactElement } from 'react'
+import { Point, Rect } from 'spase'
 import { useDragEffect } from '../hooks/useDragEffect'
 import { useTimeout } from '../hooks/useTimeout'
 import { Each } from '../operators/Each'
@@ -120,17 +120,32 @@ export const Carousel = forwardRef(({
   }
 
   const handlePointerDown = (event: PointerEvent) => {
-    if (!isDragEnabled) return
+    pointerDownPositionRef.current = new Point([event.clientX, event.clientY])
 
-    setIsDragging(true)
+    setIsPointerDown(true)
   }
 
   const handlePointerUp = (event: PointerEvent) => {
-    if (!isDragEnabled) return
+    pointerUpPositionRef.current = new Point([event.clientX, event.clientY])
 
-    event.stopPropagation()
+    setIsPointerDown(false)
+  }
 
-    setIsDragging(false)
+  const handleClick = (event: MouseEvent) => {
+    const downPosition = pointerDownPositionRef.current
+    const upPosition = pointerUpPositionRef.current
+
+    if (!downPosition || !upPosition) return
+
+    const threshold = 5
+    const delta = downPosition.subtract(upPosition)
+
+    if (Math.abs(delta.x) > threshold || Math.abs(delta.y) > threshold) {
+      event.stopPropagation()
+    }
+
+    pointerDownPositionRef.current = undefined
+    pointerUpPositionRef.current = undefined
   }
 
   const autoScrollToCurrentIndex = () => {
@@ -152,11 +167,13 @@ export const Carousel = forwardRef(({
   const tracksIndexChanges = externalIndex === undefined
   const prevIndexRef = useRef<number>()
   const viewportRef = useRef<HTMLDivElement>(null)
+  const pointerDownPositionRef = useRef<Point | undefined>()
+  const pointerUpPositionRef = useRef<Point | undefined>()
   const [index, setIndex] = tracksIndexChanges ? useState(0) : [externalIndex]
   const [exposures, setExposures] = tracksItemExposure ? useState<number[] | undefined>(getItemExposures()) : []
   const autoScrollTimeoutRef = useRef<NodeJS.Timeout>()
   const autoScrollTimeoutMs = 1000
-  const [isDragging, setIsDragging] = useState(false)
+  const [isPointerDown, setIsPointerDown] = useState(false)
 
   useEffect(() => {
     const viewportElement = viewportRef.current
@@ -208,13 +225,13 @@ export const Carousel = forwardRef(({
   useEffect(() => {
     if (autoAdvanceInterval <= 0) return
 
-    if (isDragging) {
+    if (isPointerDown) {
       onAutoAdvancePause?.()
     }
     else {
       onAutoAdvanceResume?.()
     }
-  }, [isDragging])
+  }, [isPointerDown])
 
   if (isDragEnabled && items.length > 1) {
     useDragEffect(viewportRef, {
@@ -244,12 +261,12 @@ export const Carousel = forwardRef(({
   if (autoAdvanceInterval > 0) {
     useTimeout(
       () => handleIndexChange((index + items.length + 1) % items.length),
-      isDragging ? 0 : autoAdvanceInterval,
-      [isDragging, index, items.length],
+      isPointerDown ? -1 : autoAdvanceInterval,
+      [isPointerDown, index, items.length],
     )
   }
 
-  const fixedStyles = getFixedStyles({ isDragging, orientation })
+  const fixedStyles = getFixedStyles({ isPointerDown, orientation })
 
   return (
     <div
@@ -260,6 +277,7 @@ export const Carousel = forwardRef(({
       onPointerDown={event => handlePointerDown(event)}
       onPointerUp={event => handlePointerUp(event)}
       onPointerLeave={event => handlePointerUp(event)}
+      onClick={event => handleClick(event)}
     >
       <div
         data-child='viewport'
@@ -285,7 +303,7 @@ export const Carousel = forwardRef(({
 
 Object.defineProperty(Carousel, 'displayName', { value: 'Carousel', writable: false })
 
-function getFixedStyles({ isDragging = false, orientation = 'horizontal' }) {
+function getFixedStyles({ isPointerDown = false, orientation = 'horizontal' }) {
   return asStyleDict({
     root: {
     },
@@ -293,22 +311,22 @@ function getFixedStyles({ isDragging = false, orientation = 'horizontal' }) {
       alignItems: 'center',
       display: 'flex',
       height: '100%',
-      userSelect: isDragging ? 'none' : 'auto',
+      userSelect: isPointerDown ? 'none' : 'auto',
       justifyContent: 'flex-start',
-      scrollBehavior: isDragging ? 'auto' : 'smooth',
-      scrollSnapStop: isDragging ? 'unset' : 'always',
+      scrollBehavior: isPointerDown ? 'auto' : 'smooth',
+      scrollSnapStop: isPointerDown ? 'unset' : 'always',
       WebkitOverflowScrolling: 'touch',
       width: '100%',
       ...orientation === 'horizontal' ? {
         flexDirection: 'row',
         overflowX: 'scroll',
         overflowY: 'hidden',
-        scrollSnapType: isDragging ? 'none' : 'x mandatory',
+        scrollSnapType: isPointerDown ? 'none' : 'x mandatory',
       } : {
         flexDirection: 'column',
         overflowX: 'hidden',
         overflowY: 'scroll',
-        scrollSnapType: isDragging ? 'none' : 'y mandatory',
+        scrollSnapType: isPointerDown ? 'none' : 'y mandatory',
       },
     },
     itemContainer: {
