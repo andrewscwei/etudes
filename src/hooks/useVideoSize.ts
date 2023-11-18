@@ -1,77 +1,60 @@
-import { useEffect, useRef, useState, type DependencyList } from 'react'
+import { useState } from 'react'
 import { Size } from 'spase'
+import { useLoadVideoMetadataEffect, type UseLoadVideoMetadataEffectOptions, type UseLoadVideoMetadataEffectParams } from './useLoadVideoMetadataEffect'
 
-type Options = {
+type Params = UseLoadVideoMetadataEffectParams
+
+type Options = UseLoadVideoMetadataEffectOptions & {
   /**
-   * Handler invoked when the video metadata starts loading.
+   * If `false`, the size will be reset to `undefined` when the video begins
+   * loading or when an error occurs. Defaults to `true`.
    */
-  onLoad?: () => void
-
-  /**
-   * Handler invoked when the video is done loading its metadata.
-   *
-   * @param videoElement The video element.
-   */
-  onLoadComplete?: (videoElement: HTMLVideoElement) => void
-
-  /**
-   * Handler invoked when there is an error loading the video metadata.
-   */
-  onLoadError?: () => void
-}
-
-function getVideoSize(videoElement?: HTMLVideoElement): Size | undefined {
-  if (!videoElement) return undefined
-  if (typeof videoElement.videoWidth !== 'number') return undefined
-  if (typeof videoElement.videoHeight !== 'number') return undefined
-
-  return new Size([videoElement.videoWidth, videoElement.videoHeight])
+  preservesSizeBetweenLoads?: boolean
 }
 
 /**
- * Hook for dynamically returning the size of a video.
+ * Hook for retrieving the size of a video.
  *
- * @param src The video source.
+ * @param params See {@link Params}.
  * @param options See {@link Options}.
- * @param deps Additional dependencies.
  *
- * @returns See {@link ReturnedState}.
+ * @returns The actual size of the video if loading was successful, `undefined`
+ *          otherwise.
  */
-export function useVideoSize(src?: string, { onLoad, onLoadComplete, onLoadError }: Options = {}, deps?: DependencyList): Size | undefined {
-  const loadCompleteHandler = (event: Event) => {
-    const videoElement = event.currentTarget as HTMLVideoElement
-    const videoSize = getVideoSize(videoElement)
+export function useVideoSize({ src }: Params, { preservesSizeBetweenLoads = true, onLoad, onLoadComplete, onLoadError }: Options = {}): Size | undefined {
+  const handleLoad = (element: HTMLVideoElement) => {
+    if (!preservesSizeBetweenLoads) setSize(undefined)
 
-    setVideoSize(videoSize)
-
-    onLoadComplete?.(videoElement)
+    onLoad?.(element)
   }
 
-  const loadErrorHandler = (event: Event) => {
-    setVideoSize(undefined)
+  const handleLoadComplete = (element: HTMLVideoElement) => {
+    setSize(getSize(element))
 
-    onLoadError?.()
+    onLoadComplete?.(element)
   }
 
-  const videoRef = useRef<HTMLVideoElement | undefined>(undefined)
-  const [videoSize, setVideoSize] = useState<Size | undefined>(undefined)
+  const handleLoadError = (element: HTMLVideoElement) => {
+    if (!preservesSizeBetweenLoads) setSize(undefined)
 
-  useEffect(() => {
-    if (!src) return
+    onLoadError?.(element)
+  }
 
-    onLoad?.()
+  const [size, setSize] = useState<Size | undefined>(undefined)
 
-    videoRef.current = document.createElement('video')
-    videoRef.current.src = src
-    videoRef.current.addEventListener('loadedmetadata', loadCompleteHandler)
-    videoRef.current.addEventListener('error', loadErrorHandler)
+  useLoadVideoMetadataEffect({ src }, {
+    onLoad: t => handleLoad(t),
+    onLoadComplete: t => handleLoadComplete(t),
+    onLoadError: t => handleLoadError(t),
+  })
 
-    return () => {
-      videoRef.current?.removeEventListener('loadedmetadata', loadCompleteHandler)
-      videoRef.current?.removeEventListener('error', loadErrorHandler)
-      videoRef.current = undefined
-    }
-  }, [src, ...deps ? deps : []])
+  return size
+}
 
-  return videoSize
+function getSize(element?: HTMLVideoElement): Size | undefined {
+  if (!element) return undefined
+  if (typeof element.videoWidth !== 'number') return undefined
+  if (typeof element.videoHeight !== 'number') return undefined
+
+  return new Size([element.videoWidth, element.videoHeight])
 }

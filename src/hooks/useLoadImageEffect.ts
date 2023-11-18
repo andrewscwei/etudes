@@ -1,21 +1,11 @@
-import { useEffect, useRef, useState, type DependencyList, type Dispatch, type SetStateAction } from 'react'
-import { Size } from 'spase'
+import { useEffect, useRef, type DependencyList } from 'react'
 
-type ReturnedStates = {
+export type UseLoadImageEffectParams = {
   /**
-   * A tuple consisting of a stateful value indicating if the image is loading,
-   * and a function that updates the loading state.
+   * `src` attribute of the image.
    */
-  isLoading: [boolean, Dispatch<SetStateAction<boolean>>]
+  src?: string
 
-  /**
-   * A tuple consisting of a stateful value representing the size of the image,
-   * and a function that updates the size.
-   */
-  imageSize: [Size | undefined, Dispatch<SetStateAction<Size | undefined>>]
-}
-
-type Options = {
   /**
    * `srcset` attribute of the image.
    */
@@ -25,81 +15,61 @@ type Options = {
    * `sizes` attribute of the image.
    */
   sizes?: string
+}
+
+export type UseLoadImageEffectOptions = {
+  /**
+   * Handler invoked when the image starts loading.
+   *
+   * @param element The target image element.
+   */
+  onLoad?: (element: HTMLImageElement) => void
 
   /**
    * Handler invoked when the image is done loading.
    *
-   * @param imageElement The loaded image element.
+   * @param element The target image element.
    */
-  onImageLoadComplete?: (imageElement: HTMLImageElement) => void
+  onLoadComplete?: (element: HTMLImageElement) => void
 
   /**
    * Handler invoked when there is an error loading the image.
-   */
-  onImageLoadError?: () => void
-
-  /**
-   * Handler invoked when the image size changes. If there is no loaded image,
-   * the size is `undefined`.
    *
-   * @param size The original image size.
+   * @param element The target image element.
    */
-  onImageSizeChange?: (size?: Size) => void
-}
-
-function getImageSize(imageElement: HTMLImageElement): Size {
-  return new Size([imageElement.width, imageElement.height])
+  onLoadError?: (element: HTMLImageElement) => void
 }
 
 /**
  * Hook for preloading an image.
  *
- * @param src The image source.
- * @param options See {@link Options}.
+ * @param params See {@link UseLoadImageEffectParams}.
+ * @param options See {@link UseLoadImageEffectOptions}.
  * @param deps Additional dependencies.
- *
- * @returns See {@link ReturnedStates}.
  */
-export function useLoadImageEffect(
-  src?: string, {
-    srcSet,
-    sizes,
-    onImageLoadComplete,
-    onImageLoadError,
-    onImageSizeChange,
-  }: Options = {},
-  deps?: DependencyList,
-): ReturnedStates {
+export function useLoadImageEffect({ src, srcSet, sizes }: UseLoadImageEffectParams, { onLoad, onLoadComplete, onLoadError }: UseLoadImageEffectOptions = {}, deps: DependencyList = []) {
   const imageLoadCompleteHandler = (event: Event) => {
-    const imageElement = event.currentTarget as HTMLImageElement
-    const imageSize = getImageSize(imageElement)
+    const element = event.currentTarget as HTMLImageElement
 
-    setIsLoading(false)
-    setImageSize(imageSize)
-
-    onImageLoadComplete?.(imageElement)
+    onLoadComplete?.(element)
   }
 
   const imageLoadErrorHandler = (event: Event) => {
-    setIsLoading(false)
-    setImageSize(undefined)
+    const element = event.currentTarget as HTMLImageElement
 
-    onImageLoadError?.()
+    onLoadError?.(element)
   }
 
   const imageRef = useRef<HTMLImageElement | undefined>(undefined)
-  const [isLoading, setIsLoading] = useState(true)
-  const [imageSize, setImageSize] = useState<Size | undefined>(undefined)
 
   useEffect(() => {
-    if (!src) return
-
-    setIsLoading(true)
-
     imageRef.current = new Image()
-    imageRef.current.src = src
+    if (src) imageRef.current.src = src
     if (srcSet) imageRef.current.srcset = srcSet
     if (sizes) imageRef.current.sizes = sizes
+
+    onLoad?.(imageRef.current)
+
     imageRef.current.addEventListener('load', imageLoadCompleteHandler)
     imageRef.current.addEventListener('error', imageLoadErrorHandler)
 
@@ -108,14 +78,5 @@ export function useLoadImageEffect(
       imageRef.current?.removeEventListener('error', imageLoadErrorHandler)
       imageRef.current = undefined
     }
-  }, [src, ...deps ? deps : []])
-
-  useEffect(() => {
-    onImageSizeChange?.(imageSize)
-  }, [imageSize])
-
-  return {
-    isLoading: [isLoading, setIsLoading],
-    imageSize: [imageSize, setImageSize],
-  }
+  }, [src, srcSet, sizes, ...deps])
 }

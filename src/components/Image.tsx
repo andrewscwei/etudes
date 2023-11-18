@@ -1,75 +1,149 @@
-import React, { forwardRef, type HTMLAttributes } from 'react'
+import React, { forwardRef, useEffect, type HTMLAttributes } from 'react'
 import { type Size } from 'spase'
-import { useLoadImageEffect } from '../hooks/useLoadImageEffect'
-import { useDebug } from '../utils'
+import { useImageSize } from '../hooks/useImageSize'
 
-const debug = useDebug('image')
+export type ImageHTMLAttributes = Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'srcSet' | 'sizes' | 'src' | 'loading'>
 
-export type ImageSourceDescriptor = {
-  constraints?: {
+export type ImageProps = {
+  /**
+   * Optional alt text.
+   */
+  alt?: string
+
+  /**
+   * Loading mode for the image.
+   */
+  loadingMode?: 'none' | 'lazy' | 'preload'
+
+  /**
+   * Descriptor for the `srcset` attribute of the `<img>` element. If `sizes` is
+   * also provided, then each entry in this list must have a `width` value and
+   * no `pixelDensity` value.
+   */
+  srcSet?: {
     /**
-     * The image's actual width, falls back to the slot width.
-     */
-    width?: number
-
-    /**
-     * The image's slot width associated with the media query satisfying the
-     * specified max width. If the width of the viewport is equal to or less
-     * than this value, the current src will be used. Otherwise, a src defined
-     * for a constraint with a higher width will be used. Falls back to the max
-     * width.
-     */
-    slotWidth?: number
-
-    /**
-     * URL of the image for the current constraint.
+     * A URL specifying an image location.
      */
     src: string
 
     /**
-     * The max width to use as the media query condition.
+     * Optional intrinsic width (in pixels) of the image expressed as a positive
+     * integer. If set, leave `pixelDensity` unspecified (only one of `width` or
+     * `pixelDensity` can be specified).
      */
-    maxWidth: number
+    width?: number
+
+    /**
+     * Optional pixel density of the image expressed as a positive floating
+     * number. If set, leave `width` unspecified (only one of `width` or
+     * `pixelDensity` can be specified.
+     */
+    pixelDensity?: number
+  }[]
+
+  /**
+   * Descriptor for the `sizes` attribute of the `<img>` element.
+   */
+  sizes?: {
+    /**
+     * Optional media query condition (without brackets, i.e. `max-width:
+     * 100px`). Note that this must be omitted for the last item in this list of
+     * sizes.
+     */
+    mediaCondition?: string
+
+    /**
+     * A CSS size value indicating the size of the image's slot on the page,
+     * i.e. `100px`, `100vw`, `50%`, etc.
+     */
+    width: string
   }[]
 
   /**
    * Fallback image URL for browsers that do not support the `srcset` attribute.
    */
-  fallback: string
+  src?: string
+
+  /**
+   * Handler invoked when image load begins.
+   */
+  onLoad?: () => void
+
+  /**
+   * Handler invoked when image load completes.
+   */
+  onLoadComplete?: () => void
+
+  /**
+   * Handler invoked when image load encounters an error.
+   */
+  onLoadError?: () => void
+
+  /**
+   * Handler invoked when the size of the loaded image changes.
+   *
+   * @param size Size of the loaded image.
+   */
+  onSizeChange?: (size?: Size) => void
 }
 
-export type ImageProps = HTMLAttributes<HTMLElement> & {
-  alt?: string
-  loadingMode?: 'none' | 'lazy' | 'preload'
-  source: ImageSourceDescriptor
-  onImageLoadComplete?: () => void
-  onImageLoadError?: () => void
-  onImageSizeChange?: (size?: Size) => void
-}
-
-export const Image = forwardRef<HTMLImageElement, ImageProps>(({
+export const Image = forwardRef<HTMLImageElement, ImageHTMLAttributes & ImageProps>(({
   alt,
   loadingMode = 'preload',
-  source,
-  onImageLoadComplete,
-  onImageLoadError,
-  onImageSizeChange,
+  sizes,
+  src: fallbackSrc,
+  srcSet,
+  onLoad,
+  onLoadComplete,
+  onLoadError,
+  onSizeChange,
   ...props
 }, ref) => {
-  const srcSet = source.constraints?.map(({ slotWidth, maxWidth, width, src }) => `${src} ${width ?? slotWidth ?? maxWidth}w`).join(', ')
-  const sizes = source.constraints?.map(({ maxWidth, slotWidth }) => `(max-width: ${maxWidth}px) ${slotWidth ?? maxWidth}px`).join(', ')
+  const srcSetValue = srcSet?.map(({ pixelDensity, src, width }) => {
+    if (sizes && width === undefined) throw Error('`width` must be specified if `sizes` is specified')
+    if (width !== undefined && pixelDensity !== undefined) throw Error('Only one of `width` or `pixelDensity` can be specified.')
 
-  if (loadingMode === 'preload') {
-    debug('Initiating preload for image...', 'OK', source)
+    let t = src
 
-    useLoadImageEffect(source.fallback, {
-      srcSet,
-      sizes,
-      onImageLoadComplete,
-      onImageLoadError,
-      onImageSizeChange,
-    })
-  }
+    if (width !== undefined) {
+      const w = Math.floor(width)
+
+      if (!isFinite(w) || String(w) !== String(width) || w <= 0) throw Error('The specified width must be a positive integer greater than 0')
+
+      t += ` ${w}w`
+    }
+    else if (pixelDensity !== undefined) {
+      if (!isFinite(pixelDensity) || pixelDensity <= 0) throw Error('The specified pixel density must be a positive floating number than 0')
+
+      t += ` ${pixelDensity}x`
+    }
+
+    return t
+  }).join(', ')
+
+  const sizesValue = sizes?.map(({ mediaCondition, width }, idx) => {
+    const isLast = idx === sizes.length - 1
+    let t = width
+
+    if (isLast && mediaCondition) throw Error('The last item in `sizes` must not have a `mediaCondition` specified.')
+    if (mediaCondition) t = `${mediaCondition} ${t}`
+
+    return t
+  }).join(', ')
+
+  const size = (onSizeChange || onLoad || onLoadComplete || onLoadError || loadingMode === 'preload') ? useImageSize({
+    src: fallbackSrc,
+    srcSet: srcSetValue,
+    sizes: sizesValue,
+  }, {
+    onLoad,
+    onLoadComplete,
+    onLoadError,
+  }) : undefined
+
+  useEffect(() => {
+    onSizeChange?.(size)
+  }, [size])
 
   return (
     <img
@@ -78,9 +152,9 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(({
       alt={alt}
       data-component='image'
       loading={loadingMode === 'lazy' ? 'lazy' : 'eager'}
-      srcSet={srcSet}
-      sizes={sizes}
-      src={source.fallback}
+      srcSet={srcSetValue}
+      sizes={sizesValue}
+      src={fallbackSrc}
     />
   )
 })

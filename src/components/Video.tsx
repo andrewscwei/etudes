@@ -5,44 +5,57 @@ import { useDebug } from '../utils'
 
 const debug = useDebug('video')
 
-export type VideoProps = Omit<HTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'playsInline' | 'onCanPlay' | 'onPause' | 'onPlay'> & {
+export type VideoHTMLAttributes = Omit<HTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'controls' | 'loop' | 'muted' | 'playsInline' | 'poster' | 'onCanPlay' | 'onEnded' | 'onPause' | 'onPlay'>
+
+export type VideoProps = {
   autoLoop?: boolean
   autoPlay?: boolean
   hasControls?: boolean
   isMuted?: boolean
   playsInline?: boolean
   posterSrc?: string
-  source: string
+  src: string
   onCanPlay?: () => void
   onEnd?: () => void
   onFullscreenChange?: (isFullscreen: boolean) => void
+  onLoadMetadata?: () => void
+  onLoadMetadataComplete?: () => void
+  onLoadMetadataError?: () => void
   onPause?: () => void
   onPlay?: () => void
   onSizeChange?: (size?: Size) => void
 }
 
-export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
+export const Video = forwardRef<HTMLVideoElement, VideoHTMLAttributes & VideoProps>(({
   autoLoop = true,
   autoPlay = true,
   hasControls = false,
   isMuted = true,
   playsInline = true,
   posterSrc,
-  source,
+  src,
   onCanPlay,
   onEnd,
   onFullscreenChange,
+  onLoadMetadata,
+  onLoadMetadataComplete,
+  onLoadMetadataError,
   onPause,
   onPlay,
   onSizeChange,
   ...props
 }, ref) => {
   const videoRef = ref as RefObject<HTMLVideoElement> ?? useRef<HTMLVideoElement>(null)
-  const videoSize = useVideoSize(source)
-  const isPaused = videoRef.current?.paused ?? false
+  const size = (onLoadMetadata || onLoadMetadataComplete || onLoadMetadataError || onSizeChange) ? useVideoSize({
+    src,
+  }, {
+    onLoad: onLoadMetadata,
+    onLoadComplete: onLoadMetadataComplete,
+    onLoadError: onLoadMetadataError,
+  }) : undefined
 
   useEffect(() => {
-    debug(`Initializing video with source <${source}>...`, 'OK')
+    debug(`Initializing video with source <${src}>...`, 'OK')
 
     if (!videoRef.current) return
 
@@ -53,7 +66,7 @@ export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
     videoRef.current.addEventListener('fullscreenchange', fullscreenChangeHandler)
 
     return () => {
-      debug(`Deinitializing video with source <${source}>...`, 'OK')
+      debug(`Deinitializing video with source <${src}>...`, 'OK')
 
       pause()
 
@@ -61,11 +74,11 @@ export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
       videoRef.current?.removeEventListener('mozfullscreenchange', fullscreenChangeHandler)
       videoRef.current?.removeEventListener('fullscreenchange', fullscreenChangeHandler)
     }
-  }, [source])
+  }, [src])
 
   useEffect(() => {
-    onSizeChange?.(videoSize)
-  }, [videoSize])
+    onSizeChange?.(size)
+  }, [size])
 
   const fullscreenChangeHandler = (event: Event) => {
     const isFullscreen: boolean | undefined = (document as any).fullScreen || (document as any).mozFullScreen || (document as any).webkitIsFullScreen
@@ -76,7 +89,7 @@ export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
   const canPlayHandler: ReactEventHandler<HTMLVideoElement> = event => {
     debug('Checking if video is ready to play...', 'OK')
 
-    if (autoPlay && isPaused) {
+    if (autoPlay && (videoRef.current?.paused ?? false)) {
       play()
     }
 
@@ -124,7 +137,7 @@ export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
       onPause={pauseHandler}
       onPlay={playHandler}
     >
-      <source src={source}/>
+      <source src={src}/>
     </video>
   )
 })
