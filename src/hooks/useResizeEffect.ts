@@ -1,14 +1,13 @@
-import { useEffect, useRef, useState, type DependencyList, type Dispatch, type RefObject, type SetStateAction } from 'react'
+import { useEffect, useRef, type DependencyList, type RefObject } from 'react'
 import ResizeObserver from 'resize-observer-polyfill'
-import { Rect, Size } from 'spase'
 
-type Options = {
+export type UseResizeEffectOptions = {
   /**
    * Handler invoked when the target element resizes.
    *
-   * @param size The current size of the target element.
+   * @param element The target element.
    */
-  onResize?: (size: Size) => void
+  onResize?: (element: HTMLElement) => void
 }
 
 /**
@@ -17,24 +16,16 @@ type Options = {
  * @param targetRef Reference to the target element.
  * @param options See {@link Options}.
  * @param deps Additional dependencies.
- *
- * @returns A tuple consisting of a stateful value indicating the size of the
- *          target ref, and a function that sets its size.
  */
-export function useResizeEffect(targetRef: RefObject<Element>, { onResize }: Options = {}, deps?: DependencyList): [Size, Dispatch<SetStateAction<Size>>] {
+export function useResizeEffect(targetRef: RefObject<HTMLElement>, { onResize }: UseResizeEffectOptions = {}, deps: DependencyList = []) {
   const observerRef = useRef<ResizeObserver | undefined>(undefined)
-  const [size, setSize] = useState<Size>(new Size())
 
   useEffect(() => {
     observerRef.current = new ResizeObserver(() => {
-      const rect = Rect.from(targetRef.current)
+      const element = targetRef.current
+      if (!element) return
 
-      if (!rect) return
-
-      const newSize = rect.size
-
-      setSize(newSize)
-      onResize?.(newSize)
+      onResize?.(element)
     })
 
     if (observerRef.current && targetRef.current) {
@@ -46,7 +37,5 @@ export function useResizeEffect(targetRef: RefObject<Element>, { onResize }: Opt
         observerRef.current.unobserve(targetRef.current)
       }
     }
-  }, [...deps ? deps : []])
-
-  return [size, setSize]
+  }, [targetRef.current, ...deps])
 }

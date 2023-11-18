@@ -1,21 +1,24 @@
 import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Size } from 'spase'
 import { useDragValueEffect } from '../hooks/useDragValueEffect'
-import { useLoadImageEffect } from '../hooks/useLoadImageEffect'
-import { useResizeEffect } from '../hooks/useResizeEffect'
+import { useImageSize } from '../hooks/useImageSize'
+import { useRect } from '../hooks/useRect'
 import { asStyleDict } from '../utils'
 
-export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'onResize'> & {
+export type PanoramaHTMLAttributes = Omit<HTMLAttributes<HTMLDivElement>, 'onResize'>
+
+export type PanoramaProps = {
   /**
    * The current angle in degrees, 0.0 - 360.0, inclusive. When angle is 0 or
-   * 360, the left bound of the image is at the center of the component.
+   * 360, the `zeroAnchor` position of the image is at the left bound of the
+   * component.
    */
   angle?: number
 
   /**
-   * The panning speed. This is a multiplier to the number of pixels dragged,
-   * i.e. when set to 1, the image will shift the same amount of pixels that
-   * were dragged.
+   * The panning speed. This is expressed a multiplier of the number of pixels
+   * dragged, i.e. when set to 1, the image will shift the same amount of pixels
+   * that were dragged.
    */
   speed?: number
 
@@ -25,7 +28,7 @@ export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'onResize'> & {
   src?: string
 
   /**
-   * A decimal percentage of the component width indicating where 0° should be,
+   * A decimal percentage of the image width indicating where 0° should be,
    * i.e. if `zeroAnchor` is `0`, the `angle` would be 0° when the left edge of
    * the image is at the left edge of the component.
    */
@@ -64,19 +67,17 @@ export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'onResize'> & {
   /**
    * Handler invoked when the image begins loading.
    */
-  onImageLoadStart?: () => void
+  onLoadImageStart?: () => void
 
   /**
    * Handler invoked when the image is done loading.
-   *
-   * @param imageElement The loaded image element.
    */
-  onImageLoadComplete?: (imageElement: HTMLImageElement) => void
+  onLoadImageComplete?: () => void
 
   /**
    * Handler invoked when there is an error loading the image.
    */
-  onImageLoadError?: () => void
+  onLoadImageError?: () => void
 
   /**
    * Handler invoked when the image size changes. This is the actual size of the
@@ -86,20 +87,12 @@ export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'onResize'> & {
    *               yet, the size is `undefined`.
    */
   onImageSizeChange?: (size?: Size) => void
-
-  /**
-   * Handler invoked when the size of this component changes.
-   *
-   * @param size The size of this component.
-   */
-  onResize?: (size: Size) => void
 }
 
 /**
- * A component containing a pannable 360° panorama image. The angle supports
- * two-way binding.
+ * A component containing a pannable 360° panorama image. The angle supports two-way binding.
  */
-export const Panorama = forwardRef<HTMLDivElement, PanoramaProps>(({
+export const Panorama = forwardRef<HTMLDivElement, PanoramaHTMLAttributes & PanoramaProps>(({
   angle: externalAngle = 0,
   speed = 1,
   src,
@@ -108,11 +101,10 @@ export const Panorama = forwardRef<HTMLDivElement, PanoramaProps>(({
   onPositionChange,
   onDragStart,
   onDragEnd,
-  onImageLoadStart,
-  onImageLoadComplete,
-  onImageLoadError,
+  onLoadImageStart,
+  onLoadImageComplete,
+  onLoadImageError,
   onImageSizeChange,
-  onResize,
   ...props
 }, ref) => {
   const mapDragPositionToDisplacement = (currentPosition: number, dx: number, dy: number): number => {
@@ -122,14 +114,13 @@ export const Panorama = forwardRef<HTMLDivElement, PanoramaProps>(({
   }
 
   const bodyRef = useRef<HTMLDivElement>(null)
-  const [size] = useResizeEffect(bodyRef, { onResize })
-  const [angle, setAngle] = useState(externalAngle)
-
-  const { isLoading: [isLoading], imageSize: [imageSize] } = useLoadImageEffect(src, {
-    onImageLoadComplete,
-    onImageLoadError,
-    onImageSizeChange,
+  const bodyRect = useRect(bodyRef)
+  const imageSize = useImageSize({ src }, {
+    onLoadStart: onLoadImageStart,
+    onLoadComplete: onLoadImageComplete,
+    onLoadError: onLoadImageError,
   })
+  const [angle, setAngle] = useState(externalAngle)
 
   const { isDragging: [isDragging], value: [displacement, setDisplacement] } = useDragValueEffect(bodyRef, {
     initialValue: 0,
@@ -139,9 +130,9 @@ export const Panorama = forwardRef<HTMLDivElement, PanoramaProps>(({
   })
 
   useEffect(() => {
-    if (isDragging || isLoading || !imageSize) return
+    if (isDragging || !imageSize) return
 
-    const newDisplacement = getDisplacementFromAngle(externalAngle, imageSize, size, zeroAnchor)
+    const newDisplacement = getDisplacementFromAngle(externalAngle, imageSize, bodyRect.size, zeroAnchor)
 
     if (newDisplacement !== displacement) {
       setDisplacement(newDisplacement)
@@ -150,24 +141,40 @@ export const Panorama = forwardRef<HTMLDivElement, PanoramaProps>(({
     if (externalAngle !== angle) {
       setAngle(externalAngle)
     }
-  }, [externalAngle, isLoading, imageSize, size, zeroAnchor])
+  }, [externalAngle, imageSize, bodyRect.width, bodyRect.height, zeroAnchor])
 
   useEffect(() => {
     if (!isDragging || !imageSize) return
 
-    const newAngle = getAngleFromDisplacement(displacement, imageSize, size, zeroAnchor)
+    const newAngle = getAngleFromDisplacement(displacement, imageSize, bodyRect.size, zeroAnchor)
 
     if (angle !== newAngle) {
       setAngle(newAngle)
     }
-  }, [displacement, imageSize, size, zeroAnchor])
+  }, [displacement, imageSize, bodyRect.width, bodyRect.height, zeroAnchor])
 
   useEffect(() => {
     onAngleChange?.(angle, isDragging)
     onPositionChange?.(angle / 360, isDragging)
   }, [angle])
 
-  const fixedStyles = asStyleDict({
+  useEffect(() => {
+    onImageSizeChange?.(imageSize)
+  }, [imageSize?.width, imageSize?.height])
+
+  const fixedStyles = getFixedStyles({ src, displacement })
+
+  return (
+    <div {...props} ref={ref} data-component='panorama'>
+      <div ref={bodyRef} style={fixedStyles.body}/>
+    </div>
+  )
+})
+
+Object.defineProperty(Panorama, 'displayName', { value: 'Panorama', writable: false })
+
+function getFixedStyles({ src = '', displacement = NaN } = {}) {
+  return asStyleDict({
     body: {
       backgroundImage: `url(${src})`,
       backgroundPositionX: `${-displacement}px`,
@@ -178,15 +185,7 @@ export const Panorama = forwardRef<HTMLDivElement, PanoramaProps>(({
       width: '100%',
     },
   })
-
-  return (
-    <div {...props} ref={ref}>
-      <div ref={bodyRef} style={fixedStyles.body}/>
-    </div>
-  )
-})
-
-Object.defineProperty(Panorama, 'displayName', { value: 'Panorama', writable: false })
+}
 
 function getFilledImageSize(originalSize: Size, sizeToFill: Size): Size {
   const { width: originalWidth, height: originalHeight } = originalSize

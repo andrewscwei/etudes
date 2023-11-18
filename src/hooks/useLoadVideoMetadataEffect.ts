@@ -13,7 +13,7 @@ export type UseLoadVideoMetadataEffectOptions = {
    *
    * @param element The target video element.
    */
-  onLoad?: (element: HTMLVideoElement) => void
+  onLoadStart?: (element: HTMLVideoElement) => void
 
   /**
    * Handler invoked when the video is done loading its metadata.
@@ -37,7 +37,7 @@ export type UseLoadVideoMetadataEffectOptions = {
  * @param options See {@link UseLoadVideoMetadataEffectOptions}.
  * @param deps Additional dependencies.
  */
-export function useLoadVideoMetadataEffect({ src }: UseLoadVideoMetadataEffectParams, { onLoad, onLoadComplete, onLoadError }: UseLoadVideoMetadataEffectOptions = {}, deps: DependencyList = []) {
+export function useLoadVideoMetadataEffect({ src }: UseLoadVideoMetadataEffectParams, { onLoadStart, onLoadComplete, onLoadError }: UseLoadVideoMetadataEffectOptions = {}, deps: DependencyList = []) {
   const loadCompleteHandler = (event: Event) => {
     const element = event.currentTarget as HTMLVideoElement
 
@@ -58,7 +58,7 @@ export function useLoadVideoMetadataEffect({ src }: UseLoadVideoMetadataEffectPa
     ref.current.addEventListener('loadedmetadata', loadCompleteHandler)
     ref.current.addEventListener('error', loadErrorHandler)
 
-    onLoad?.(ref.current)
+    onLoadStart?.(ref.current)
 
     return () => {
       ref.current?.removeEventListener('loadedmetadata', loadCompleteHandler)

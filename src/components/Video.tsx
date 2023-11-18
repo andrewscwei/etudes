@@ -49,7 +49,7 @@ export const Video = forwardRef<HTMLVideoElement, VideoHTMLAttributes & VideoPro
   const size = (onLoadMetadata || onLoadMetadataComplete || onLoadMetadataError || onSizeChange) ? useVideoSize({
     src,
   }, {
-    onLoad: onLoadMetadata,
+    onLoadStart: onLoadMetadata,
     onLoadComplete: onLoadMetadataComplete,
     onLoadError: onLoadMetadataError,
   }) : undefined

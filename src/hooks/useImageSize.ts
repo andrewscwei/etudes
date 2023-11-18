@@ -21,11 +21,11 @@ type Options = UseLoadImageEffectOptions & {
  * @returns The actual size of the image if loading was successful, `undefined`
  *          otherwise.
  */
-export function useImageSize({ src, srcSet, sizes }: Params, { preservesSizeBetweenLoads = true, onLoad, onLoadComplete, onLoadError }: Options = {}): Size | undefined {
+export function useImageSize({ src, srcSet, sizes }: Params, { preservesSizeBetweenLoads = true, onLoadStart, onLoadComplete, onLoadError }: Options = {}): Size | undefined {
   const handleLoad = (element: HTMLImageElement) => {
     if (!preservesSizeBetweenLoads) setImageSize(undefined)
 
-    onLoad?.(element)
+    onLoadStart?.(element)
   }
 
   const handleLoadComplete = (element: HTMLImageElement) => {
@@ -43,7 +43,7 @@ export function useImageSize({ src, srcSet, sizes }: Params, { preservesSizeBetw
   const [size, setImageSize] = useState<Size | undefined>()
 
   useLoadImageEffect({ src, srcSet, sizes }, {
-    onLoad: t => handleLoad(t),
+    onLoadStart: t => handleLoad(t),
     onLoadComplete: t => handleLoadComplete(t),
     onLoadError: t => handleLoadError(t),
   })

@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
-import { Rect } from 'spase'
+import { Rect, Size } from 'spase'
 import { useResizeEffect } from '../hooks/useResizeEffect'
 import { asClassNameDict, asStyleDict, useDebug } from '../utils'
 
@@ -8,7 +8,7 @@ const debug = useDebug('masonry')
 
 type Orientation = 'horizontal' | 'vertical'
 
-export type MasonryGridProps = HTMLAttributes<HTMLDivElement> & {
+export type MasonryGridProps = {
   areSectionsAligned?: boolean
   horizontalSpacing?: number
   isReversed?: boolean
@@ -36,7 +36,7 @@ const BASE_MODIFIER_CLASS_PREFIX = 'base-'
  * rows*, whereas in a horizontally oriented grid, *number of sections* refers
  * to the *number of columns*.
  */
-export const MasonryGrid = forwardRef<HTMLDivElement, MasonryGridProps>(({
+export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & MasonryGridProps>(({
   areSectionsAligned = false,
   children,
   className,
@@ -173,7 +173,8 @@ export const MasonryGrid = forwardRef<HTMLDivElement, MasonryGridProps>(({
   }
 
   useResizeEffect(bodyRef, {
-    onResize: maxSize => {
+    onResize: element => {
+      const maxSize = Rect.from(element)?.size ?? new Size()
       const currWidth = getCurrentWidth()
       const currHeight = getCurrentHeight()
 
@@ -200,26 +201,11 @@ export const MasonryGrid = forwardRef<HTMLDivElement, MasonryGridProps>(({
     }
   }, [children])
 
-  const fixedClassNames = asClassNameDict({
-    root: classNames(orientation),
-  })
-
-  const fixedStyles = asStyleDict({
-    body: {
-      height: orientation === 'horizontal' ? '100%' : 'auto',
-      minHeight: orientation === 'vertical' && !isNaN(minHeight) ? `${minHeight}px` : '',
-      minWidth: orientation === 'horizontal' && !isNaN(minWidth) ? `${minWidth}px` : '',
-      padding: '0',
-      width: orientation === 'horizontal' ? 'auto' : '100%',
-    },
-  })
+  const fixedClassNames = getFixedClassNames({ orientation })
+  const fixedStyles = getFixedStyles({ orientation, minHeight, minWidth })
 
   return (
-    <div
-      {...props}
-      ref={ref}
-      className={classNames(className, fixedClassNames.root)}
-    >
+    <div {...props} ref={ref} className={classNames(className, fixedClassNames.root)} data-component='masonry-grid'>
       <div ref={bodyRef} style={fixedStyles.body}>
         {children}
       </div>
@@ -228,6 +214,24 @@ export const MasonryGrid = forwardRef<HTMLDivElement, MasonryGridProps>(({
 })
 
 Object.defineProperty(MasonryGrid, 'displayName', { value: 'MasonryGrid', writable: false })
+
+function getFixedClassNames({ orientation = 'horizontal' } = {}) {
+  return asClassNameDict({
+    root: classNames(orientation),
+  })
+}
+
+function getFixedStyles({ orientation = 'horizontal', minHeight = NaN, minWidth = NaN } = {}) {
+  return asStyleDict({
+    body: {
+      height: orientation === 'horizontal' ? '100%' : 'auto',
+      minHeight: orientation === 'vertical' && !isNaN(minHeight) ? `${minHeight}px` : '',
+      minWidth: orientation === 'horizontal' && !isNaN(minWidth) ? `${minWidth}px` : '',
+      padding: '0',
+      width: orientation === 'horizontal' ? 'auto' : '100%',
+    },
+  })
+}
 
 /**
  * Computes the index and current length of the next available section for a

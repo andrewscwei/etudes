@@ -1,6 +1,6 @@
 import React, { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { Size } from 'spase'
-import { useElementRect } from '../hooks/useElementRect'
+import { useRect } from '../hooks/useRect'
 import { asStyleDict, styles } from '../utils'
 import { Image, type ImageProps } from './Image'
 
@@ -28,7 +28,7 @@ export const CoverImage = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEleme
   sizes,
   src,
   srcSet,
-  onLoad,
+  onLoadStart,
   onLoadComplete,
   onLoadError,
   onSizeChange,
@@ -42,7 +42,7 @@ export const CoverImage = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEleme
 
   const rootRef = ref ?? useRef<HTMLDivElement>(null)
   const [aspectRatio, setAspectRatio] = !isNaN(externalAspectRatio) ? [externalAspectRatio] : useState(NaN)
-  const rootRect = useElementRect(rootRef as any)
+  const rootRect = useRect(rootRef as any)
   const rootAspectRatio = rootRect.width / rootRect.height
   const imageSize = new Size([
     rootAspectRatio > 1
@@ -64,7 +64,7 @@ export const CoverImage = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEleme
         src={src}
         srcSet={srcSet}
         sizes={sizes}
-        onLoad={onLoad}
+        onLoadStart={onLoadStart}
         onLoadComplete={onLoadComplete}
         onLoadError={onLoadError}
         data-child='image'

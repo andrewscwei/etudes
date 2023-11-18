@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import React, { useEffect, useRef, type CSSProperties, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
 import { Rect, Size } from 'spase'
-import { useElementRect } from '../hooks/useElementRect'
+import { useRect } from '../hooks/useRect'
 import { useViewportSize } from '../hooks/useViewportSize'
 import { ExtractChild } from '../operators/ExtractChild'
 import { asStyleDict, styles } from '../utils'
@@ -144,7 +144,7 @@ export function WithTooltip({
 
   const rootRef = useRef<HTMLElement>(null)
   const dialogRef = useRef<HTMLDivElement>()
-  const rect = useElementRect(rootRef)
+  const rect = useRect(rootRef)
   const viewportSize = useViewportSize()
   const alignment = computeAlignment()
   const textSize = computeTextSize()

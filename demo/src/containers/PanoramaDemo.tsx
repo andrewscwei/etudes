@@ -1,17 +1,24 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Size } from 'spase'
 import styled from 'styled-components'
 import { DebugConsole } from '../../../lib/components/DebugConsole'
 import { Panorama } from '../../../lib/components/Panorama'
 import { PanoramaSlider } from '../../../lib/components/PanoramaSlider'
 import { Slider, SliderKnob } from '../../../lib/components/Slider'
+import { useSize } from '../../../lib/hooks/useSize'
 import $$PanoramaImage from '../assets/images/panorama.png'
 
 export function PanoramaDemo() {
   const [angle, setAngle] = useState(0)
   const [width, setWidth] = useState(800)
-  const [viewportSize, setViewportSize] = useState<Size>(new Size())
+  const [viewportSize, setViewportSize] = useState(new Size())
   const [zeroAnchor] = useState(0.5)
+  const panoramaRef = useRef<HTMLDivElement>(null)
+  const panoramaSize = useSize(panoramaRef)
+
+  useEffect(() => {
+    setViewportSize(panoramaSize)
+  }, [panoramaSize.width, panoramaSize.height])
 
   return (
     <>
@@ -27,12 +34,12 @@ export function PanoramaDemo() {
           <SliderKnob className='knob'/>
         </StyledSlider>
         <StyledPanorama
+          ref={panoramaRef}
           style={{ width: `${width}px` }}
           angle={angle}
           src={$$PanoramaImage}
           zeroAnchor={zeroAnchor}
           onAngleChange={(value, isDragging) => { if (isDragging) setAngle(value) }}
-          onResize={size => setViewportSize(size)}
         />
         <StyledPanoramaSlider
           angle={angle}

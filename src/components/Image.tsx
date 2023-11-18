@@ -67,7 +67,7 @@ export type ImageProps = {
   /**
    * Handler invoked when image load begins.
    */
-  onLoad?: () => void
+  onLoadStart?: () => void
 
   /**
    * Handler invoked when image load completes.
@@ -93,7 +93,7 @@ export const Image = forwardRef<HTMLImageElement, ImageHTMLAttributes & ImagePro
   sizes,
   src: fallbackSrc,
   srcSet,
-  onLoad,
+  onLoadStart,
   onLoadComplete,
   onLoadError,
   onSizeChange,
@@ -131,12 +131,12 @@ export const Image = forwardRef<HTMLImageElement, ImageHTMLAttributes & ImagePro
     return t
   }).join(', ')
 
-  const size = (onSizeChange || onLoad || onLoadComplete || onLoadError || loadingMode === 'preload') ? useImageSize({
+  const size = (onSizeChange || onLoadStart || onLoadComplete || onLoadError || loadingMode === 'preload') ? useImageSize({
     src: fallbackSrc,
     srcSet: srcSetValue,
     sizes: sizesValue,
   }, {
-    onLoad,
+    onLoadStart,
     onLoadComplete,
     onLoadError,
   }) : undefined

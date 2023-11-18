@@ -1,11 +1,11 @@
 import classNames from 'classnames'
 import React, { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
-import { type Size } from 'spase'
-import { useResizeEffect } from '../hooks/useResizeEffect'
-import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils'
+import { Rect, type Size } from 'spase'
+import { useRect } from '../hooks/useRect'
+import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils'
 import { Panorama, type PanoramaProps } from './Panorama'
 
-export type PanoramaSliderProps = HTMLAttributes<HTMLDivElement> & PanoramaProps & PropsWithChildren<{
+export type PanoramaSliderProps = PanoramaProps & PropsWithChildren<{
   /**
    * Field-of-view (0.0 - 360.0 degrees, inclusive) that represents the size of
    * the reticle. 360 indicates the reticle covers the entire image. If this is
@@ -40,7 +40,7 @@ export type PanoramaSliderProps = HTMLAttributes<HTMLDivElement> & PanoramaProps
  *                                backing {@link Panorama}.
  * @exports PanoramaSliderTrack The slide track.
  */
-export const PanoramaSlider = forwardRef<HTMLDivElement, PanoramaSliderProps>(({
+export const PanoramaSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & PanoramaSliderProps>(({
   className,
   style,
   angle = 0,
@@ -54,12 +54,11 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, PanoramaSliderProps>(({
   onAngleChange,
   onDragEnd,
   onDragStart,
-  onImageLoadComplete,
-  onImageLoadError,
-  onImageLoadStart,
+  onLoadImageComplete,
+  onLoadImageError,
+  onLoadImageStart,
   onImageSizeChange,
   onPositionChange,
-  onResize,
   ...props
 }, ref) => {
   const getAspectRatio = () => {
@@ -73,13 +72,13 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, PanoramaSliderProps>(({
   const getReticleWidth = () => {
     const deg = Math.min(360, Math.max(0, fov ?? (viewportSize ? viewportSize.width / (viewportSize.height * aspectRatio) * 360 : 0)))
 
-    return size.width * (deg / 360)
+    return panoramaRect.width * (deg / 360)
   }
 
   const getAdjustedZeroAnchor = () => {
-    if (size.width <= 0) return zeroAnchor
+    if (panoramaRect.width <= 0) return zeroAnchor
 
-    return ((size.width - reticleWidth) * 0.5 + zeroAnchor * reticleWidth) / size.width
+    return ((panoramaRect.width - reticleWidth) * 0.5 + zeroAnchor * reticleWidth) / panoramaRect.width
   }
 
   const dragStartHandler = () => {
@@ -93,11 +92,10 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, PanoramaSliderProps>(({
   }
 
   const panoramaRef = useRef<HTMLDivElement>(null)
+  const panoramaRect = useRect(panoramaRef)
 
-  const [imageSize, setImageSize] = useState<Size | undefined>(undefined)
+  const [imageSize, setImageSize] = useState<Size | undefined>()
   const [isDragging, setIsDragging] = useState(false)
-
-  const [size] = useResizeEffect(panoramaRef, { onResize })
 
   const aspectRatio = getAspectRatio()
   const reticleWidth = getReticleWidth()
@@ -109,27 +107,93 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, PanoramaSliderProps>(({
     indicator: PanoramaSliderIndicator,
   })
 
-  const fixedClassNames = asClassNameDict({
-    root: classNames({
-      dragging: isDragging,
-    }),
-    track: classNames({
-      dragging: isDragging,
-    }),
-    reticle: classNames({
-      dragging: isDragging,
-    }),
-    indicator: classNames({
-      dragging: isDragging,
-    }),
-  })
+  const fixedStyles = getFixedStyles({ autoDimension, panoramaRect, aspectRatio, reticleWidth })
+  const defaultStyles = getDefaultStyles({ isDragging })
 
-  const fixedStyles = asStyleDict({
+  return (
+    <div {...props} ref={ref} className={classNames(className, { dragging: isDragging })} style={styles(style, fixedStyles.root)} data-component='panorama-slider'>
+      <Panorama
+        angle={angle}
+        ref={panoramaRef}
+        speed={speed}
+        src={src}
+        style={fixedStyles.panorama}
+        zeroAnchor={adjustedZeroAnchor}
+        onAngleChange={onAngleChange}
+        onDragEnd={dragEndHandler}
+        onDragStart={dragStartHandler}
+        onLoadImageComplete={onLoadImageComplete}
+        onLoadImageError={onLoadImageError}
+        onLoadImageStart={onLoadImageStart}
+        onImageSizeChange={setImageSize}
+        onPositionChange={onPositionChange}
+      />
+      <div style={fixedStyles.body}>
+        <div style={fixedStyles.controls}>
+          {cloneStyledElement(components.track ?? <PanoramaSliderTrack style={defaultStyles.track}/>, {
+            style: styles(fixedStyles.track),
+          })}
+          {cloneStyledElement(components.reticle ?? <PanoramaSliderReticle style={defaultStyles.reticle}/>, {
+            style: styles(fixedStyles.reticle),
+          })}
+          {cloneStyledElement(components.track ?? <PanoramaSliderTrack style={defaultStyles.track}/>, {
+            style: styles(fixedStyles.track),
+          })}
+        </div>
+      </div>
+      {cloneStyledElement(components.indicator ?? <PanoramaSliderIndicator style={defaultStyles.indicator}/>, {
+        style: styles(fixedStyles.indicator),
+      })}
+    </div>
+  )
+})
+
+Object.defineProperty(PanoramaSlider, 'displayName', { value: 'PanoramaSlider', writable: false })
+
+export const PanoramaSliderTrack = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => <div {...props} ref={ref} data-child='track'/>)
+
+export const PanoramaSliderReticle = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => <div {...props} ref={ref} data-child='reticle'/>)
+
+export const PanoramaSliderIndicator = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => <div {...props} ref={ref} data-child='indicator'/>)
+
+function getDefaultStyles({ isDragging = false } = {}) {
+  return asStyleDict({
+    track: {
+      background: 'rgba(0, 0, 0, .7)',
+      height: '100%',
+    },
+    reticle: {
+      background: `rgba(0, 0, 0, ${isDragging ? 0 : 0.3})`,
+      flex: '0 0 auto',
+      height: '100%',
+      transitionDuration: '100ms',
+      transitionProperty: 'background',
+      transitionTimingFunction: 'ease-out',
+    },
+    indicator: {
+      background: '#fff',
+      borderRadius: '2px',
+      bottom: '-10px',
+      boxSizing: 'border-box',
+      display: 'block',
+      height: '2px',
+      left: '0',
+      margin: '0 auto',
+      opacity: isDragging ? 1 : 0,
+      position: 'absolute',
+      right: '0',
+      transition: 'opacity .3s ease-out',
+    },
+  })
+}
+
+function getFixedStyles({ autoDimension = 'width', panoramaRect = new Rect(), aspectRatio = 0, reticleWidth = 0 } = {}) {
+  return asStyleDict({
     root: {
       ...autoDimension === 'width' ? {
-        width: `${size.height * aspectRatio}px`,
+        width: `${panoramaRect.height * aspectRatio}px`,
       } : {
-        height: `${size.width / aspectRatio}px`,
+        height: `${panoramaRect.width / aspectRatio}px`,
       },
     },
     body: {
@@ -166,87 +230,4 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, PanoramaSliderProps>(({
       width: `${reticleWidth}px`,
     },
   })
-
-  const defaultStyles = asStyleDict({
-    track: {
-      background: 'rgba(0, 0, 0, .7)',
-      height: '100%',
-    },
-    reticle: {
-      background: `rgba(0, 0, 0, ${isDragging ? 0 : 0.3})`,
-      flex: '0 0 auto',
-      height: '100%',
-      transitionDuration: '100ms',
-      transitionProperty: 'background',
-      transitionTimingFunction: 'ease-out',
-    },
-    indicator: {
-      background: '#fff',
-      borderRadius: '2px',
-      bottom: '-10px',
-      boxSizing: 'border-box',
-      display: 'block',
-      height: '2px',
-      left: '0',
-      margin: '0 auto',
-      opacity: isDragging ? 1 : 0,
-      position: 'absolute',
-      right: '0',
-      transition: 'opacity .3s ease-out',
-    },
-  })
-
-  return (
-    <div
-      {...props}
-      ref={ref}
-      className={classNames(className, fixedClassNames.root)}
-      style={styles(style, fixedStyles.root)}
-    >
-      <Panorama
-        angle={angle}
-        ref={panoramaRef}
-        speed={speed}
-        src={src}
-        style={fixedStyles.panorama}
-        zeroAnchor={adjustedZeroAnchor}
-        onAngleChange={onAngleChange}
-        onDragEnd={dragEndHandler}
-        onDragStart={dragStartHandler}
-        onImageLoadComplete={onImageLoadComplete}
-        onImageLoadError={onImageLoadError}
-        onImageLoadStart={onImageLoadStart}
-        onImageSizeChange={setImageSize}
-        onPositionChange={onPositionChange}
-      />
-      <div style={fixedStyles.body}>
-        <div style={fixedStyles.controls}>
-          {cloneStyledElement(components.track ?? <PanoramaSliderTrack style={defaultStyles.track}/>, {
-            className: classNames(fixedClassNames.track),
-            style: styles(fixedStyles.track),
-          })}
-          {cloneStyledElement(components.reticle ?? <PanoramaSliderReticle style={defaultStyles.reticle}/>, {
-            className: classNames(fixedClassNames.reticle),
-            style: styles(fixedStyles.reticle),
-          })}
-          {cloneStyledElement(components.track ?? <PanoramaSliderTrack style={defaultStyles.track}/>, {
-            className: classNames(fixedClassNames.track),
-            style: styles(fixedStyles.track),
-          })}
-        </div>
-      </div>
-      {cloneStyledElement(components.indicator ?? <PanoramaSliderIndicator style={defaultStyles.indicator}/>, {
-        className: classNames(fixedClassNames.indicator),
-        style: styles(fixedStyles.indicator),
-      })}
-    </div>
-  )
-})
-
-Object.defineProperty(PanoramaSlider, 'displayName', { value: 'PanoramaSlider', writable: false })
-
-export const PanoramaSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
-
-export const PanoramaSliderReticle = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
-
-export const PanoramaSliderIndicator = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
+}
