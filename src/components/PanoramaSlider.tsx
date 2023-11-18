@@ -156,7 +156,7 @@ export const PanoramaSliderReticle = forwardRef<HTMLDivElement, HTMLAttributes<H
 
 export const PanoramaSliderIndicator = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => <div {...props} ref={ref} data-child='indicator'/>)
 
-function getDefaultStyles({ isDragging = false } = {}) {
+function getDefaultStyles({ isDragging = false }) {
   return asStyleDict({
     track: {
       background: 'rgba(0, 0, 0, .7)',
@@ -187,7 +187,7 @@ function getDefaultStyles({ isDragging = false } = {}) {
   })
 }
 
-function getFixedStyles({ autoDimension = 'width', panoramaRect = new Rect(), aspectRatio = 0, reticleWidth = 0 } = {}) {
+function getFixedStyles({ autoDimension = 'width', panoramaRect = new Rect(), aspectRatio = 0, reticleWidth = 0 }) {
   return asStyleDict({
     root: {
       ...autoDimension === 'width' ? {
