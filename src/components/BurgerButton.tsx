@@ -10,6 +10,7 @@ export type BurgerButtonProps = HTMLAttributes<HTMLButtonElement> & PropsWithChi
   isLastBarHalfWidth?: boolean
   thickness?: number
   transitionDuration?: number
+  usesDefaultStyles?: boolean
   width?: number
   onActivate?: () => void
   onDeactivate?: () => void
@@ -31,6 +32,7 @@ export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
   isLastBarHalfWidth = false,
   thickness = 2,
   transitionDuration = 200,
+  usesDefaultStyles = false,
   width = 20,
   onActivate,
   onDeactivate,
@@ -66,7 +68,41 @@ export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
     }),
   })
 
-  const fixedStyles = asStyleDict({
+  const fixedStyles = getFixedStyles({ height, width, isDoubleJointed, thickness, isActive, isLastBarHalfWidth })
+  const defaultStyles = usesDefaultStyles ? getDefaultStyles() : undefined
+
+  return (
+    <button
+      {...props}
+      ref={ref}
+      className={classNames(className, fixedClassNames.root)}
+      style={styles(style, fixedStyles.root)}
+      data-component='burger-button'
+      onClick={() => setIsActive(!isActive)}
+    >
+      <Repeat count={isDoubleJointed ? 2 : 1}>
+        {j => (
+          <div style={styles(fixedStyles.joint, (fixedStyles as any)[`joint${j}`])} data-child='joint'>
+            <Repeat count={3}>
+              {i => cloneStyledElement(components.bar ?? <BurgerButtonBar style={defaultStyles?.bar}/>, {
+                'className': classNames(fixedClassNames.bar),
+                'style': styles(fixedStyles.bar, (fixedStyles as any)[`bar${j}${i}`]),
+                'data-index': i,
+              })}
+            </Repeat>
+          </div>
+        )}
+      </Repeat>
+    </button>
+  )
+})
+
+Object.defineProperty(BurgerButton, 'displayName', { value: 'BurgerButton', writable: false })
+
+export const BurgerButtonBar = ({ ...props }: HTMLAttributes<HTMLSpanElement>) => <span {...props} data-child='bar'/>
+
+function getFixedStyles({ height = 0, width = 0, isDoubleJointed = false, thickness = 0, isActive = false, isLastBarHalfWidth = false } = {}) {
+  return asStyleDict({
     root: {
       background: 'transparent',
       border: 'none',
@@ -134,8 +170,10 @@ export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
       width: isLastBarHalfWidth && !isActive ? '0' : '100%',
     },
   })
+}
 
-  const defaultStyles = asStyleDict({
+function getDefaultStyles() {
+  return asStyleDict({
     bar: {
       background: '#fff',
       transitionDuration: '100ms',
@@ -143,32 +181,4 @@ export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
       transitionTimingFunction: 'ease-out',
     },
   })
-
-  return (
-    <button
-      {...props}
-      ref={ref}
-      className={classNames(className, fixedClassNames.root)}
-      style={styles(style, fixedStyles.root)}
-      onClick={() => setIsActive(!isActive)}
-    >
-      <Repeat count={isDoubleJointed ? 2 : 1}>
-        {j => (
-          <div style={styles(fixedStyles.joint, (fixedStyles as any)[`joint${j}`])}>
-            <Repeat count={3}>
-              {i => cloneStyledElement(components.bar ?? <BurgerButtonBar style={defaultStyles.bar}/>, {
-                'className': classNames(fixedClassNames.bar),
-                'style': styles(fixedStyles.bar, (fixedStyles as any)[`bar${j}${i}`]),
-                'data-index': i,
-              })}
-            </Repeat>
-          </div>
-        )}
-      </Repeat>
-    </button>
-  )
-})
-
-Object.defineProperty(BurgerButton, 'displayName', { value: 'BurgerButton', writable: false })
-
-export const BurgerButtonBar = ({ ...props }: HTMLAttributes<HTMLSpanElement>) => <span {...props}/>
+}
