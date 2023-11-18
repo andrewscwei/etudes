@@ -21,11 +21,11 @@ type Options = UseLoadVideoMetadataEffectOptions & {
  * @returns The actual size of the video if loading was successful, `undefined`
  *          otherwise.
  */
-export function useVideoSize({ src }: Params, { preservesSizeBetweenLoads = true, onLoad, onLoadComplete, onLoadError }: Options = {}): Size | undefined {
+export function useVideoSize({ src }: Params, { preservesSizeBetweenLoads = true, onLoadStart, onLoadComplete, onLoadError }: Options = {}): Size | undefined {
   const handleLoad = (element: HTMLVideoElement) => {
     if (!preservesSizeBetweenLoads) setSize(undefined)
 
-    onLoad?.(element)
+    onLoadStart?.(element)
   }
 
   const handleLoadComplete = (element: HTMLVideoElement) => {
@@ -43,7 +43,7 @@ export function useVideoSize({ src }: Params, { preservesSizeBetweenLoads = true
   const [size, setSize] = useState<Size | undefined>(undefined)
 
   useLoadVideoMetadataEffect({ src }, {
-    onLoad: t => handleLoad(t),
+    onLoadStart: t => handleLoad(t),
     onLoadComplete: t => handleLoadComplete(t),
     onLoadError: t => handleLoadError(t),
   })

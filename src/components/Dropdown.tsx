@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
-import { useElementRect } from '../hooks/useElementRect'
 import { usePrevious } from '../hooks/usePrevious'
+import { useRect } from '../hooks/useRect'
 import { asStyleDict, cloneStyledElement, styles } from '../utils'
 import { Collection, type CollectionItemProps, type CollectionProps, type CollectionSelection } from './Collection'
 import { FlatSVG } from './FlatSVG'
@@ -225,7 +225,7 @@ export const Dropdown = forwardRef(({
   const [selection, setSelection] = tracksSelectionChanges ? useState(sanitizedExternalSelection) : [sanitizedExternalSelection]
   const [isCollapsed, setIsCollapsed] = tracksExpansionChanges ? useState(true) : [externalIsCollapsed]
 
-  const itemLength = externalItemLength ?? (orientation === 'vertical' ? useElementRect(bodyRef).height : useElementRect(bodyRef).width)
+  const itemLength = externalItemLength ?? (orientation === 'vertical' ? useRect(bodyRef).height : useRect(bodyRef).width)
   const numItems = items.length
   const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
   const menuLength = itemLength * numVisibleItems + itemPadding * (numVisibleItems - 1)

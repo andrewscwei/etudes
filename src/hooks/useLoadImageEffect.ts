@@ -23,7 +23,7 @@ export type UseLoadImageEffectOptions = {
    *
    * @param element The target image element.
    */
-  onLoad?: (element: HTMLImageElement) => void
+  onLoadStart?: (element: HTMLImageElement) => void
 
   /**
    * Handler invoked when the image is done loading.
@@ -47,7 +47,7 @@ export type UseLoadImageEffectOptions = {
  * @param options See {@link UseLoadImageEffectOptions}.
  * @param deps Additional dependencies.
  */
-export function useLoadImageEffect({ src, srcSet, sizes }: UseLoadImageEffectParams, { onLoad, onLoadComplete, onLoadError }: UseLoadImageEffectOptions = {}, deps: DependencyList = []) {
+export function useLoadImageEffect({ src, srcSet, sizes }: UseLoadImageEffectParams, { onLoadStart, onLoadComplete, onLoadError }: UseLoadImageEffectOptions = {}, deps: DependencyList = []) {
   const imageLoadCompleteHandler = (event: Event) => {
     const element = event.currentTarget as HTMLImageElement
 
@@ -68,7 +68,7 @@ export function useLoadImageEffect({ src, srcSet, sizes }: UseLoadImageEffectPar
     if (srcSet) imageRef.current.srcset = srcSet
     if (sizes) imageRef.current.sizes = sizes
 
-    onLoad?.(imageRef.current)
+    onLoadStart?.(imageRef.current)
 
     imageRef.current.addEventListener('load', imageLoadCompleteHandler)
     imageRef.current.addEventListener('error', imageLoadErrorHandler)

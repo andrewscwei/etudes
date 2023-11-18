@@ -11,7 +11,6 @@ export function VideoDemo() {
         <StyledVideo
           autoLoop={true}
           autoPlay={true}
-          isCover={true}
           src={$$Video}
         />
       </StyledRoot>
@@ -27,6 +26,7 @@ const StyledVideo = styled(Video)`
   height: 100%;
   left: 0;
   margin: 0;
+  object-fit: cover;
   position: absolute;
   top: 0;
   transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(10deg);

@@ -1,6 +1,6 @@
 import React, { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { Size } from 'spase'
-import { useElementRect } from '../hooks/useElementRect'
+import { useRect } from '../hooks/useRect'
 import { asStyleDict, styles } from '../utils'
 import { Video, type VideoProps } from './Video'
 
@@ -50,7 +50,7 @@ export const CoverVideo = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEleme
 
   const rootRef = ref ?? useRef<HTMLDivElement>(null)
   const [aspectRatio, setAspectRatio] = !isNaN(externalAspectRatio) ? [externalAspectRatio] : useState(NaN)
-  const rootRect = useElementRect(rootRef as any)
+  const rootRect = useRect(rootRef as any)
   const rootAspectRatio = rootRect.width / rootRect.height
   const videoSize = new Size([
     rootAspectRatio > 1
