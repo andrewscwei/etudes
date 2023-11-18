@@ -173,7 +173,7 @@ export const Panorama = forwardRef<HTMLDivElement, PanoramaHTMLAttributes & Pano
 
 Object.defineProperty(Panorama, 'displayName', { value: 'Panorama', writable: false })
 
-function getFixedStyles({ src = '', displacement = NaN } = {}) {
+function getFixedStyles({ src = '', displacement = NaN }) {
   return asStyleDict({
     body: {
       backgroundImage: `url(${src})`,

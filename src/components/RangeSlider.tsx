@@ -209,7 +209,7 @@ export const RangeSliderHighlight = forwardRef<HTMLDivElement, HTMLAttributes<HT
 
 export const RangeSliderKnob = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => <div {...props} ref={ref} data-child='knob'/>)
 
-function getFixedStyles({ orientation = 'horizontal', highlightLength = 0, start = 0, knobPadding = 0 } = {}) {
+function getFixedStyles({ orientation = 'horizontal', highlightLength = 0, start = 0, knobPadding = 0 }) {
   return asStyleDict({
     body: {
       height: '100%',
@@ -263,7 +263,7 @@ function getFixedStyles({ orientation = 'horizontal', highlightLength = 0, start
   })
 }
 
-function getDefaultStyles({ isReleasingStartKnob = false, isReleasingEndKnob = false, orientation = 'horizontal' } = {}) {
+function getDefaultStyles({ isReleasingStartKnob = false, isReleasingEndKnob = false, orientation = 'horizontal' }) {
   return asStyleDict({
     gutter: {
       background: 'rgba(255, 255, 255, .2)',

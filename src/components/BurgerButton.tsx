@@ -101,7 +101,7 @@ Object.defineProperty(BurgerButton, 'displayName', { value: 'BurgerButton', writ
 
 export const BurgerButtonBar = ({ ...props }: HTMLAttributes<HTMLSpanElement>) => <span {...props} data-child='bar'/>
 
-function getFixedStyles({ height = 0, width = 0, isDoubleJointed = false, thickness = 0, isActive = false, isLastBarHalfWidth = false } = {}) {
+function getFixedStyles({ height = 0, width = 0, isDoubleJointed = false, thickness = 0, isActive = false, isLastBarHalfWidth = false }) {
   return asStyleDict({
     root: {
       background: 'transparent',

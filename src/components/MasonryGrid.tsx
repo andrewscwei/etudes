@@ -215,13 +215,13 @@ export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
 
 Object.defineProperty(MasonryGrid, 'displayName', { value: 'MasonryGrid', writable: false })
 
-function getFixedClassNames({ orientation = 'horizontal' } = {}) {
+function getFixedClassNames({ orientation = 'horizontal' }) {
   return asClassNameDict({
     root: classNames(orientation),
   })
 }
 
-function getFixedStyles({ orientation = 'horizontal', minHeight = NaN, minWidth = NaN } = {}) {
+function getFixedStyles({ orientation = 'horizontal', minHeight = NaN, minWidth = NaN }) {
   return asStyleDict({
     body: {
       height: orientation === 'horizontal' ? '100%' : 'auto',
