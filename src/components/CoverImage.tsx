@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef, useState, type PropsWithChildren } from 'react'
+import React, { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { Size } from 'spase'
 import { useElementRect } from '../hooks/useElementRect'
 import { asStyleDict, styles } from '../utils'
@@ -18,19 +18,26 @@ export type CoverImageProps = ImageProps & PropsWithChildren<{
   renderViewportContent?: () => JSX.Element
 }>
 
-export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
+export const CoverImage = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & CoverImageProps>(({
   children,
   style,
   alt,
   aspectRatio: externalAspectRatio = NaN,
-  source,
+  loadingMode,
   renderViewportContent,
+  sizes,
+  src,
+  srcSet,
+  onLoad,
+  onLoadComplete,
+  onLoadError,
+  onSizeChange,
   ...props
 }, ref) => {
-  const handleImageSizeChange = (size?: Size) => {
-    if (!size || !setAspectRatio) return
+  const handleSizeChange = (size?: Size) => {
+    if (setAspectRatio) setAspectRatio(size ? size.width / size.height : NaN)
 
-    setAspectRatio(size.width / size.height)
+    onSizeChange?.(size)
   }
 
   const rootRef = ref ?? useRef<HTMLDivElement>(null)
@@ -54,9 +61,14 @@ export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
           height: `${imageSize.height}px`,
         })}
         alt={alt}
-        source={source}
+        src={src}
+        srcSet={srcSet}
+        sizes={sizes}
+        onLoad={onLoad}
+        onLoadComplete={onLoadComplete}
+        onLoadError={onLoadError}
         data-child='image'
-        onImageSizeChange={size => handleImageSizeChange(size)}
+        onSizeChange={size => handleSizeChange(size)}
       />
       {renderViewportContent && (
         <div

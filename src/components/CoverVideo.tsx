@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef, useState, type PropsWithChildren } from 'react'
+import React, { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { Size } from 'spase'
 import { useElementRect } from '../hooks/useElementRect'
 import { asStyleDict, styles } from '../utils'
@@ -18,19 +18,34 @@ export type CoverVideoProps = VideoProps & PropsWithChildren<{
   renderViewportContent?: () => JSX.Element
 }>
 
-export const CoverVideo = forwardRef<HTMLDivElement, CoverVideoProps>(({
+export const CoverVideo = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & CoverVideoProps>(({
   className,
   children,
   style,
   aspectRatio: externalAspectRatio = NaN,
-  source,
+  autoLoop,
+  autoPlay,
+  hasControls,
+  isMuted,
+  playsInline,
+  posterSrc,
   renderViewportContent,
+  src,
+  onCanPlay,
+  onEnd,
+  onFullscreenChange,
+  onLoadMetadata,
+  onLoadMetadataComplete,
+  onLoadMetadataError,
+  onPause,
+  onPlay,
+  onSizeChange,
   ...props
 }, ref) => {
   const handleSizeChange = (size?: Size) => {
-    if (!size || !setAspectRatio) return
+    if (setAspectRatio) setAspectRatio(size ? size.width / size.height : NaN)
 
-    setAspectRatio(size.width / size.height)
+    onSizeChange?.(size)
   }
 
   const rootRef = ref ?? useRef<HTMLDivElement>(null)
@@ -47,15 +62,28 @@ export const CoverVideo = forwardRef<HTMLDivElement, CoverVideoProps>(({
   ])
 
   return (
-    <div ref={ref ?? rootRef} className={className} style={styles(style, FIXED_STYLES.root)} data-component='cover-video'>
+    <div {...props} ref={rootRef} className={className} style={styles(style, FIXED_STYLES.root)} data-component='cover-video'>
       <Video
-        {...props}
         style={styles(FIXED_STYLES.viewport, {
           width: `${videoSize.width}px`,
           height: `${videoSize.height}px`,
         })}
-        source={source}
         data-child='video'
+        autoLoop={autoLoop}
+        autoPlay={autoPlay}
+        hasControls={hasControls}
+        isMuted={isMuted}
+        playsInline={playsInline}
+        posterSrc={posterSrc}
+        src={src}
+        onCanPlay={onCanPlay}
+        onEnd={onEnd}
+        onFullscreenChange={onFullscreenChange}
+        onLoadMetadata={onLoadMetadata}
+        onLoadMetadataComplete={onLoadMetadataComplete}
+        onLoadMetadataError={onLoadMetadataError}
+        onPause={onPause}
+        onPlay={onPlay}
         onSizeChange={size => handleSizeChange(size)}
       />
       {renderViewportContent && (
