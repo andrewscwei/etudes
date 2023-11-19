@@ -45,9 +45,9 @@ export const DebugConsole = forwardRef<HTMLDivElement, DebugConsoleProps>(({
   return (
     <div
       {...props}
-      data-component='debug-console'
       ref={ref}
       style={styles(style, FIXED_STYLES.root, getStyleByAlignment(align, margin))}
+      data-component='debug-console'
     >
       <div data-child='header' style={FIXED_STYLES.title}>{title ?? 'Untitled'}</div>
       <div data-child='messages' ref={messagesRef} style={FIXED_STYLES.messages}>

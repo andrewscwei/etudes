@@ -1,4 +1,4 @@
-import { useEffect, useRef, type DependencyList } from 'react'
+import { useEffect, useRef } from 'react'
 
 type Options = {
   /**
@@ -14,9 +14,8 @@ type Options = {
  * @param handler The method to invoke on every interval.
  * @param interval Time (in milliseconds) between each invocation.
  * @param options See {@link Options}.
- * @param deps Dependencies that trigger this effect.
  */
-export function useInterval(handler: () => void, interval?: number, { shouldInvokeInitially = false }: Options = {}, deps?: DependencyList) {
+export function useInterval(handler: () => void, interval?: number, { shouldInvokeInitially = false }: Options = {}) {
   const handlerRef = useRef<(() => void)>()
 
   useEffect(() => {
@@ -30,5 +29,5 @@ export function useInterval(handler: () => void, interval?: number, { shouldInvo
     const timer = window.setInterval(() => handlerRef.current?.(), interval)
 
     return () => clearInterval(timer)
-  }, [...deps ? deps : [], interval])
+  }, [interval])
 }

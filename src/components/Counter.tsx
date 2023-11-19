@@ -9,7 +9,7 @@ type Props = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & {
   min?: number
   max?: number
   quantity?: number
-  allowInput?: boolean
+  allowsInput?: boolean
   usesDefaultStyles?: boolean
   onChange?: (quantity: number) => void
   AddButtonComponent?: ComponentType<HTMLAttributes<HTMLElement>>
@@ -20,7 +20,7 @@ export const Counter = forwardRef<HTMLDivElement, Props>(({
   style,
   min = NaN,
   max = NaN,
-  allowInput = true,
+  allowsInput = true,
   quantity: externalQuantity,
   usesDefaultStyles = true,
   onChange,
@@ -105,7 +105,7 @@ export const Counter = forwardRef<HTMLDivElement, Props>(({
       <TextField
         data-child='text-field'
         value={quantity.toString()}
-        isDisabled={!allowInput}
+        isDisabled={!allowsInput}
         formatter={(oldValue, newValue) => isNaN(Number(`0${newValue}`)) ? oldValue : newValue }
         style={styles(FIXED_STYLES.text, defaultStyles?.text)}
       />

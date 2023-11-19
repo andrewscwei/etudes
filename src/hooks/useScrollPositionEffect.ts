@@ -12,7 +12,7 @@ type Props = {
   onChange: (newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void
 }
 
-export function useScrollPositionEffect({ onChange }: Props, deps?: DependencyList) {
+export function useScrollPositionEffect({ onChange }: Props, deps: DependencyList = []) {
   const handleScrollPositionChange = () => {
     const newValue = getScrollPositionInfo()
     if (!newValue) return
@@ -54,5 +54,5 @@ export function useScrollPositionEffect({ onChange }: Props, deps?: DependencyLi
       window.removeEventListener('resize', handleScrollPositionChange)
       window.removeEventListener('orientationchange', handleScrollPositionChange)
     }
-  }, [...deps ?? []])
+  }, [...deps])
 }

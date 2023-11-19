@@ -1,6 +1,6 @@
 import { useEffect, type DependencyList, type RefObject } from 'react'
 
-export function useClickOutsideEffect(ref: RefObject<HTMLElement>, handler: () => void, deps?: DependencyList) {
+export function useClickOutsideEffect(targetRef: RefObject<HTMLElement>, handler: () => void, deps: DependencyList = []) {
   useEffect(() => {
     const clickOutsideHandler = (event: MouseEvent) => {
       if (!(event.target instanceof Node)) return
@@ -9,7 +9,7 @@ export function useClickOutsideEffect(ref: RefObject<HTMLElement>, handler: () =
       let node = event.target
 
       while (node) {
-        if (node === ref.current) {
+        if (node === targetRef.current) {
           isOutside = false
           break
         }
@@ -29,5 +29,5 @@ export function useClickOutsideEffect(ref: RefObject<HTMLElement>, handler: () =
     return () => {
       window.removeEventListener('click', clickOutsideHandler, true)
     }
-  }, [...deps ?? []])
+  }, [...deps])
 }

@@ -44,6 +44,7 @@ export const SelectableButton = forwardRef<HTMLButtonElement, SelectableButtonPr
     <button
       {...props}
       ref={ref}
+      data-component='selectable-button'
       onClick={() => toggleSelection()} disabled={isDisabled || isSelected && !isDeselectable}
     >
       {children?.({ isDeselectable, isDisabled, isSelected, label }) ?? label}

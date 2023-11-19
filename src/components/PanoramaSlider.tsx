@@ -29,6 +29,11 @@ export type PanoramaSliderProps = PanoramaProps & PropsWithChildren<{
    * is, this prop is ignored.
    */
   viewportSize?: Size
+
+  /**
+   * Specifies if the component should use default styles.
+   */
+  usesDefaultStyles?: boolean
 }>
 
 /**
@@ -49,6 +54,7 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
   fov,
   speed = 1,
   src,
+  usesDefaultStyles = false,
   viewportSize,
   zeroAnchor = 0,
   onAngleChange,
@@ -108,7 +114,7 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
   })
 
   const fixedStyles = getFixedStyles({ autoDimension, panoramaRect, aspectRatio, reticleWidth })
-  const defaultStyles = getDefaultStyles({ isDragging })
+  const defaultStyles = usesDefaultStyles ? getDefaultStyles({ isDragging }) : undefined
 
   return (
     <div {...props} ref={ref} className={classNames(className, { dragging: isDragging })} style={styles(style, fixedStyles.root)} data-component='panorama-slider'>
@@ -130,18 +136,18 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
       />
       <div style={fixedStyles.body}>
         <div style={fixedStyles.controls}>
-          {cloneStyledElement(components.track ?? <PanoramaSliderTrack style={defaultStyles.track}/>, {
+          {cloneStyledElement(components.track ?? <PanoramaSliderTrack style={defaultStyles?.track}/>, {
             style: styles(fixedStyles.track),
           })}
-          {cloneStyledElement(components.reticle ?? <PanoramaSliderReticle style={defaultStyles.reticle}/>, {
+          {cloneStyledElement(components.reticle ?? <PanoramaSliderReticle style={defaultStyles?.reticle}/>, {
             style: styles(fixedStyles.reticle),
           })}
-          {cloneStyledElement(components.track ?? <PanoramaSliderTrack style={defaultStyles.track}/>, {
+          {cloneStyledElement(components.track ?? <PanoramaSliderTrack style={defaultStyles?.track}/>, {
             style: styles(fixedStyles.track),
           })}
         </div>
       </div>
-      {cloneStyledElement(components.indicator ?? <PanoramaSliderIndicator style={defaultStyles.indicator}/>, {
+      {cloneStyledElement(components.indicator ?? <PanoramaSliderIndicator style={defaultStyles?.indicator}/>, {
         style: styles(fixedStyles.indicator),
       })}
     </div>

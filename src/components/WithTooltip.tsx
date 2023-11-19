@@ -65,6 +65,7 @@ export function WithTooltip({
     const dialog = document.createElement('div')
     const dialogStyle = styles(style, fixedStyles.dialog)
     dialog.className = classNames(className)
+    dialog.setAttribute('data-component', 'tool-tip')
     Object.keys(dialogStyle).forEach(rule => (dialog.style as any)[rule] = (dialogStyle as any)[rule])
 
     const arrow = document.createElement('div')
@@ -148,6 +149,7 @@ export function WithTooltip({
   const viewportSize = useViewportSize()
   const alignment = computeAlignment()
   const textSize = computeTextSize()
+  const fixedStyles = getFixedStyles({ rect, arrowHeight, alignment, backgroundColor, maxTextWidth, textSize, gap })
 
   useEffect(() => {
     const dialogNode = createDialog()
@@ -159,51 +161,6 @@ export function WithTooltip({
       rootRef.current?.removeChild(dialogNode)
     }
   }, [rect, viewportSize])
-
-  const fixedStyles = asStyleDict({
-    dialog: {
-      background: 'none',
-      boxSizing: 'border-box',
-      height: `${rect.size.height}px`,
-      left: '0',
-      margin: '0',
-      opacity: '0',
-      position: 'absolute',
-      top: '0',
-      width: `${rect.size.width}px`,
-      zIndex: '10000',
-    },
-    arrow: {
-      borderStyle: 'solid',
-      borderWidth: `${arrowHeight}px`,
-      height: '0',
-      pointerEvents: 'none',
-      position: 'absolute',
-      width: '0',
-      ...makeDisplacementStyle(alignment, arrowHeight, gap),
-      ...makeArrowPositionStyle(alignment, arrowHeight, gap, backgroundColor),
-    },
-    content: {
-      background: backgroundColor,
-      boxSizing: 'content-box',
-      color: 'inherit',
-      fontFamily: 'inherit',
-      fontSize: 'inherit',
-      fontWeight: 'inherit',
-      letterSpacing: 'inherit',
-      lineHeight: 'inherit',
-      maxWidth: `${maxTextWidth}px`,
-      overflow: 'hidden',
-      padding: 'inherit',
-      pointerEvents: 'none',
-      position: 'absolute',
-      textAlign: 'inherit',
-      transition: 'inherit',
-      width: textSize.width > 0 ? `${textSize.width}px` : 'auto',
-      ...makeDisplacementStyle(alignment, arrowHeight, gap),
-      ...makeContentPositionStyle(alignment, arrowHeight, gap),
-    },
-  })
 
   return (
     <ExtractChild
@@ -325,4 +282,51 @@ function makeArrowPositionStyle(alignment: Alignment, arrowHeight: number, gap: 
 
     }
   }
+}
+
+function getFixedStyles({ rect = new Rect(), arrowHeight = 0, alignment = 'tl' as Alignment, backgroundColor = '', maxTextWidth = 0, textSize = new Size(), gap = 0 }) {
+  return asStyleDict({
+    dialog: {
+      background: 'none',
+      boxSizing: 'border-box',
+      height: `${rect.size.height}px`,
+      left: '0',
+      margin: '0',
+      opacity: '0',
+      position: 'absolute',
+      top: '0',
+      width: `${rect.size.width}px`,
+      zIndex: '10000',
+    },
+    arrow: {
+      borderStyle: 'solid',
+      borderWidth: `${arrowHeight}px`,
+      height: '0',
+      pointerEvents: 'none',
+      position: 'absolute',
+      width: '0',
+      ...makeDisplacementStyle(alignment, arrowHeight, gap),
+      ...makeArrowPositionStyle(alignment, arrowHeight, gap, backgroundColor),
+    },
+    content: {
+      background: backgroundColor,
+      boxSizing: 'content-box',
+      color: 'inherit',
+      fontFamily: 'inherit',
+      fontSize: 'inherit',
+      fontWeight: 'inherit',
+      letterSpacing: 'inherit',
+      lineHeight: 'inherit',
+      maxWidth: `${maxTextWidth}px`,
+      overflow: 'hidden',
+      padding: 'inherit',
+      pointerEvents: 'none',
+      position: 'absolute',
+      textAlign: 'inherit',
+      transition: 'inherit',
+      width: textSize.width > 0 ? `${textSize.width}px` : 'auto',
+      ...makeDisplacementStyle(alignment, arrowHeight, gap),
+      ...makeContentPositionStyle(alignment, arrowHeight, gap),
+    },
+  })
 }
