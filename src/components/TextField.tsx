@@ -1,7 +1,5 @@
 import React, { forwardRef, useEffect, useState, type ChangeEvent, type FocusEvent, type HTMLAttributes } from 'react'
 import { usePrevious } from '../hooks/usePrevious'
-import { asStyleDict } from '../utils/asStyleDict'
-import { styles } from '../utils/styles'
 
 export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
   emptyValue?: string
@@ -14,7 +12,6 @@ export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
 }
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(({
-  style,
   emptyValue = '',
   isDisabled = false,
   value: externalValue,
@@ -50,8 +47,8 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(({
   return (
     <input
       {...props}
+      ref={ref}
       data-component='text-field'
-      style={styles(style, FIXED_STYLES.root)}
       type='text'
       value={value}
       disabled={isDisabled}
@@ -63,9 +60,3 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(({
 })
 
 Object.defineProperty(TextField, 'displayName', { value: 'TextField', writable: false })
-
-const FIXED_STYLES = asStyleDict({
-  root: {
-    width: '100%',
-  },
-})

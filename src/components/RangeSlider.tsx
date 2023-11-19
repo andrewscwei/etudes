@@ -18,6 +18,7 @@ export type RangeSliderProps = PropsWithChildren<{
   orientation?: Orientation
   range?: Range
   steps?: number
+  usesDefaultStyles?: boolean
   onRangeChange?: (range: Range) => void
 }>
 
@@ -32,6 +33,7 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
   orientation = 'vertical',
   range: externalRange,
   steps = -1,
+  usesDefaultStyles = false,
   onRangeChange,
   ...props
 }, ref) => {
@@ -129,18 +131,18 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
   })
 
   const fixedStyles = getFixedStyles({ orientation, highlightLength, start, knobPadding })
-  const defaultStyles = getDefaultStyles({ isReleasingStartKnob, isReleasingEndKnob, orientation })
+  const defaultStyles = usesDefaultStyles ? getDefaultStyles({ isReleasingStartKnob, isReleasingEndKnob, orientation }) : undefined
 
   return (
     <div {...props} ref={ref} className={classNames(className, orientation)} data-component='range-slider'>
       <div ref={bodyRef} style={fixedStyles.body}>
-        {cloneStyledElement(components.gutter ?? <RangeSliderGutter style={defaultStyles.gutter}/>, {
+        {cloneStyledElement(components.gutter ?? <RangeSliderGutter style={defaultStyles?.gutter}/>, {
           style: styles(fixedStyles.gutter),
         })}
-        {cloneStyledElement(components.highlight ?? <RangeSliderHighlight style={defaultStyles.highlight}/>, {
+        {cloneStyledElement(components.highlight ?? <RangeSliderHighlight style={defaultStyles?.highlight}/>, {
           style: styles(fixedStyles.highlight),
         })}
-        {cloneStyledElement(components.knob ?? <RangeSliderKnob style={styles(defaultStyles.knob, {
+        {cloneStyledElement(components.knob ?? <RangeSliderKnob style={styles(defaultStyles?.knob, {
           transitionProperty: isReleasingStartKnob ? 'opacity, transform' : 'opacity',
         })}/>, {
           ref: startKnobRef,
@@ -157,7 +159,7 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
             marginTop: `${start}px`,
           }),
         }, <div style={fixedStyles.knobHitbox}/>, areLabelsVisible &&
-          cloneStyledElement(components.label ?? <RangeSliderLabel style={styles(defaultStyles.label, {
+          cloneStyledElement(components.label ?? <RangeSliderLabel style={styles(defaultStyles?.label, {
             transitionProperty: isReleasingStartKnob ? 'opacity, transform' : 'opacity',
           })}/>, {
             className: classNames({
@@ -167,7 +169,7 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
             style: styles(fixedStyles.label),
           }, Number(startValue.toFixed(decimalPlaces)).toLocaleString())
         )}
-        {cloneStyledElement(components.knob ?? <RangeSliderKnob style={styles(defaultStyles.knob, {
+        {cloneStyledElement(components.knob ?? <RangeSliderKnob style={styles(defaultStyles?.knob, {
           transitionProperty: isReleasingEndKnob ? 'opacity, transform' : 'opacity',
         })}/>, {
           ref: endKnobRef,
@@ -184,7 +186,7 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
             marginTop: `${end}px`,
           }),
         }, <div style={fixedStyles.knobHitbox}/>, areLabelsVisible &&
-          cloneStyledElement(components.label ?? <RangeSliderLabel style={styles(defaultStyles.label, {
+          cloneStyledElement(components.label ?? <RangeSliderLabel style={styles(defaultStyles?.label, {
             transitionProperty: isReleasingEndKnob ? 'opacity, transform' : 'opacity',
           })}/>, {
             className: classNames({

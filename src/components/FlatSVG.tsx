@@ -11,30 +11,30 @@ export type FlatSVGProps = HTMLAttributes<HTMLDivElement> & {
    * Specifies whether the 'class' should be removed in the SVG root node and
    * all of its child nodes.
    */
-  stripClasses?: boolean
+  shouldStripClasses?: boolean
 
   /**
    * Specifies whether extraneous attributes should be removed from the SVG root
    * node. The `whitelistedAttributes` prop defines what attributes should be
    * kept.
    */
-  stripExtraneousAttributes?: boolean
+  shouldStripExtraneousAttributes?: boolean
 
   /**
    * Specifies whether the 'id' attribute should be removed in the SVG root node
    * and all of its child nodes.
    */
-  stripIds?: boolean
+  shouldStripIds?: boolean
 
   /**
    * Specifies whether the 'style' atribute and any <style> nodes should be
    * removed in the SVG root node and all of its child nodes.
    */
-  stripStyles?: boolean
+  shouldStripStyles?: boolean
 
   /**
    * Specifies attribute names to exclude from being stripped if
-   * `stripExtraneousAttributes` is enabled. By default, only `viewBox` is
+   * `shouldStripExtraneousAttributes` is enabled. By default, only `viewBox` is
    * whitelisted.
    */
   whitelistedAttributes?: string[]
@@ -47,10 +47,10 @@ export type FlatSVGProps = HTMLAttributes<HTMLDivElement> & {
  */
 export const FlatSVG = forwardRef<HTMLDivElement, FlatSVGProps>(({
   svg,
-  stripClasses = true,
-  stripExtraneousAttributes = true,
-  stripIds = true,
-  stripStyles = true,
+  shouldStripClasses = true,
+  shouldStripExtraneousAttributes = true,
+  shouldStripIds = true,
+  shouldStripStyles = true,
   whitelistedAttributes = ['viewBox'],
   ...props
 }, ref) => {
@@ -65,14 +65,14 @@ export const FlatSVG = forwardRef<HTMLDivElement, FlatSVGProps>(({
       removeNSPrefix: true,
       trimValues: true,
       updateTag: (tagName, jPath, attrs) => {
-        if (stripStyles && tagName === 'style') return false
+        if (shouldStripStyles && tagName === 'style') return false
 
         const attrNames = Object.keys(attrs)
 
         for (const attrName of attrNames) {
-          if (stripIds && attrName.toLowerCase() === `${attributeNamePrefix}id`) delete attrs[attrName]
-          if (stripClasses && attrName.toLowerCase() === `${attributeNamePrefix}class`) delete attrs[attrName]
-          if (stripStyles && attrName.toLowerCase() === `${attributeNamePrefix}style`) delete attrs[attrName]
+          if (shouldStripIds && attrName.toLowerCase() === `${attributeNamePrefix}id`) delete attrs[attrName]
+          if (shouldStripClasses && attrName.toLowerCase() === `${attributeNamePrefix}class`) delete attrs[attrName]
+          if (shouldStripStyles && attrName.toLowerCase() === `${attributeNamePrefix}style`) delete attrs[attrName]
         }
 
         return tagName

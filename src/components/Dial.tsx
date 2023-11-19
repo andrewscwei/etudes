@@ -25,17 +25,20 @@ export type DialProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
 
   /**
    * The thickness of the knob, which is equivalent to the `stroke-width` of the
-   * `<path>` element. Note that this overwrites the `stroke-width` set inside
-   * `cssKnob`.
+   * `<path>` element.
    */
   knobThickness?: number
 
   /**
    * The thickness of the circular track, which is equivalent to the
-   * `stroke-width` of the `<circle>` element. Note that this overwrites the
-   * `stroke-width` set inside `cssTrack`.
+   * `stroke-width` of the `<circle>` element.
    */
   trackThickness?: number
+
+  /**
+   * Specifies if the component should use default styles.
+   */
+  usesDefaultStyles?: boolean
 }>
 
 /**
@@ -45,13 +48,14 @@ export type DialProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
  * @exports DialTrack
  */
 export const Dial = forwardRef<HTMLDivElement, DialProps>(({
-  angle = 0,
   children,
+  style,
+  angle = 0,
   knobLength = 30,
   knobThickness = 10,
   radius = 50,
   trackThickness = 2,
-  style,
+  usesDefaultStyles = false,
   ...props
 }, ref) => {
   const diameter = radius * 2
@@ -62,7 +66,71 @@ export const Dial = forwardRef<HTMLDivElement, DialProps>(({
     knob: DialKnob,
   })
 
-  const fixedStyles = asStyleDict({
+  const fixedStyles = getFixedStyles({ angle, diameter })
+  const defaultStyles = usesDefaultStyles ? getDefaultStyles() : undefined
+
+  return (
+    <div {...props} ref={ref} style={styles(style, fixedStyles.root)} data-component='dial'>
+      <div style={fixedStyles.trackContainer}>
+        <svg width={diameter} height={diameter} viewBox={`0 0 ${diameter} ${diameter}`} style={fixedStyles.svgContainer}>
+          {cloneStyledElement(components.track ?? <DialTrack style={defaultStyles?.track}/>, {
+            cx: radius,
+            cy: radius,
+            r: radius - trackThickness / 2,
+            strokeWidth: trackThickness,
+          })}
+        </svg>
+      </div>
+      <div style={styles(fixedStyles.knobContainer)}>
+        <svg viewBox={`0 0 ${diameter} ${diameter}`} xmlns='http://www.w3.org/2000/svg' style={fixedStyles.svgContainer}>
+          {cloneStyledElement(components.knob ?? <DialKnob style={defaultStyles?.knob}/>, {
+            strokeWidth: knobThickness,
+            d: arcPath(radius, radius, radius - knobThickness / 2 - (trackThickness - knobThickness) / 2, -clampedKnobAngle / 2, clampedKnobAngle / 2),
+          })}
+        </svg>
+      </div>
+    </div>
+  )
+})
+
+Object.defineProperty(Dial, 'displayName', { value: 'Dial', writable: false })
+
+export const DialTrack = ({ ...props }: SVGAttributes<SVGCircleElement>) => <circle {...props} data-child='track'/>
+
+export const DialKnob = ({ ...props }: SVGAttributes<SVGPathElement>) => <path {...props} data-child='knob'/>
+
+function polarToCartesian(centerX: number, centerY: number, radius: number, angleInDegrees: number) {
+  const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0
+
+  return {
+    x: centerX + radius * Math.cos(angleInRadians),
+    y: centerY + radius * Math.sin(angleInRadians),
+  }
+}
+
+function arcPath(x: number, y: number, radius: number, startAngle: number, endAngle: number) {
+  const start = polarToCartesian(x, y, radius, endAngle)
+  const end = polarToCartesian(x, y, radius, startAngle)
+  const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1'
+  const d = [
+    'M',
+    start.x,
+    start.y,
+    'A',
+    radius,
+    radius,
+    0,
+    largeArcFlag,
+    0,
+    end.x,
+    end.y,
+  ]
+
+  return d.join(' ')
+}
+
+function getFixedStyles({ diameter = 0, angle = 0 }) {
+  return asStyleDict({
     root: {
       height: `${diameter}px`,
       width: `${diameter}px`,
@@ -94,8 +162,10 @@ export const Dial = forwardRef<HTMLDivElement, DialProps>(({
       top: '0',
     },
   })
+}
 
-  const defaultStyles = asStyleDict({
+function getDefaultStyles() {
+  return asStyleDict({
     knob: {
       stroke: '#fff',
     },
@@ -104,63 +174,4 @@ export const Dial = forwardRef<HTMLDivElement, DialProps>(({
       stroke: '#fff',
     },
   })
-
-  return (
-    <div {...props} ref={ref} style={styles(style, fixedStyles.root)}>
-      <div style={fixedStyles.trackContainer}>
-        <svg width={diameter} height={diameter} viewBox={`0 0 ${diameter} ${diameter}`} style={fixedStyles.svgContainer}>
-          {cloneStyledElement(components.track ?? <DialTrack style={defaultStyles.track}/>, {
-            cx: radius,
-            cy: radius,
-            r: radius - trackThickness / 2,
-            strokeWidth: trackThickness,
-          })}
-        </svg>
-      </div>
-      <div style={styles(fixedStyles.knobContainer)}>
-        <svg viewBox={`0 0 ${diameter} ${diameter}`} xmlns='http://www.w3.org/2000/svg' style={fixedStyles.svgContainer}>
-          {cloneStyledElement(components.knob ?? <DialKnob style={defaultStyles.knob}/>, {
-            strokeWidth: knobThickness,
-            d: arcPath(radius, radius, radius - knobThickness / 2 - (trackThickness - knobThickness) / 2, -clampedKnobAngle / 2, clampedKnobAngle / 2),
-          })}
-        </svg>
-      </div>
-    </div>
-  )
-})
-
-Object.defineProperty(Dial, 'displayName', { value: 'Dial', writable: false })
-
-export const DialTrack = ({ ...props }: SVGAttributes<SVGCircleElement>) => <circle {...props}/>
-
-export const DialKnob = ({ ...props }: SVGAttributes<SVGPathElement>) => <path {...props}/>
-
-function polarToCartesian(centerX: number, centerY: number, radius: number, angleInDegrees: number) {
-  const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0
-
-  return {
-    x: centerX + radius * Math.cos(angleInRadians),
-    y: centerY + radius * Math.sin(angleInRadians),
-  }
-}
-
-function arcPath(x: number, y: number, radius: number, startAngle: number, endAngle: number) {
-  const start = polarToCartesian(x, y, radius, endAngle)
-  const end = polarToCartesian(x, y, radius, startAngle)
-  const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1'
-  const d = [
-    'M',
-    start.x,
-    start.y,
-    'A',
-    radius,
-    radius,
-    0,
-    largeArcFlag,
-    0,
-    end.x,
-    end.y,
-  ]
-
-  return d.join(' ')
 }

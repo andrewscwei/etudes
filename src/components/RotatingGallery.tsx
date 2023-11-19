@@ -90,7 +90,7 @@ export const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(
   const [index, setIndex] = tracksIndexChanges ? useState(0) : [externalIndex]
   const fixedClassNames = getFixedClassNames()
   const fixedStyles = getFixedStyles({ transitionDuration })
-  const defaultStyles: Record<string, any> = usesDefaultStyles ? getDefaultStyles() : {}
+  const defaultStyles = usesDefaultStyles ? getDefaultStyles() : undefined
 
   useInterval(() => {
     handleIndexChange((index + 1) % srcs.length)
@@ -101,7 +101,7 @@ export const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(
   }, [index])
 
   return (
-    <div {...props} className={classNames(className, fixedClassNames.root)} ref={ref}>
+    <div {...props} className={classNames(className, fixedClassNames.root)} ref={ref} data-component='rotating-gallery'>
       <Each in={srcs}>
         {(src, idx) => {
           const isVisible = idx === index
@@ -109,9 +109,10 @@ export const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(
           return ImageComponent ? (
             <ImageComponent
               className={classNames(fixedClassNames.image)}
+              data-child='item'
               style={styles(
                 fixedStyles.image,
-                defaultStyles.image,
+                defaultStyles?.image,
                 usesDefaultStyles ? {
                   opacity: isVisible ? '1' : '0',
                 } : {},
@@ -124,9 +125,10 @@ export const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(
             <img
               className={classNames(fixedClassNames.image)}
               loading={lazy ? 'lazy' : 'eager'}
+              data-child='item'
               style={styles(
                 fixedStyles.image,
-                defaultStyles.image,
+                defaultStyles?.image,
                 usesDefaultStyles ? {
                   opacity: isVisible ? '1' : '0',
                 } : {},

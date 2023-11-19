@@ -74,6 +74,11 @@ export type StepwiseSliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChil
   labelProvider?: (position: number, index: number) => string
 
   /**
+   * Specifies if the component should use default styles.
+   */
+  usesDefaultStyles?: boolean
+
+  /**
    * Handler invoked when index changes. This can either be invoked from the
    * `index` prop being changed or from the slider being dragged. Note that if
    * the event is emitted at the end of dragging due to
@@ -139,6 +144,7 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
   orientation = 'vertical',
   steps = generateSteps(10),
   trackPadding = 0,
+  usesDefaultStyles = false,
   onDragEnd,
   onDragStart,
   onIndexChange,
@@ -195,6 +201,15 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
   const naturalPosition = isInverted ? 1 - position : position
   const isAtEnd = isInverted ? position === 0 : position === 1
   const isAtStart = isInverted ? position === 1 : position === 0
+  const components = asComponentDict(children, {
+    knob: StepwiseSliderKnob,
+    label: StepwiseSliderLabel,
+    track: StepwiseSliderTrack,
+  })
+
+  const fixedClassNames = getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
+  const fixedStyles = getFixedStyles({ orientation, naturalPosition, isDragging, knobHeight, knobWidth, isTrackInteractive })
+  const defaultStyles = usesDefaultStyles ? getDefaultStyles({ knobHeight }) : undefined
 
   useEffect(() => {
     if (isDragging) return
@@ -236,118 +251,10 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
     }
   }, [isDragging])
 
-  const components = asComponentDict(children, {
-    knob: StepwiseSliderKnob,
-    label: StepwiseSliderLabel,
-    track: StepwiseSliderTrack,
-  })
-
-  const fixedClassNames = asClassNameDict({
-    root: classNames(orientation, {
-      'at-end': isAtEnd,
-      'at-start': isAtStart,
-      'dragging': isDragging,
-      'releasing': isReleasing,
-    }),
-    track: classNames(orientation, {
-      'at-end': isAtEnd,
-      'at-start': isAtStart,
-      'dragging': isDragging,
-      'releasing': isReleasing,
-    }),
-    knob: classNames(orientation, {
-      'at-end': isAtEnd,
-      'at-start': isAtStart,
-      'dragging': isDragging,
-      'releasing': isReleasing,
-    }),
-    label: classNames(orientation, {
-      'at-end': isAtEnd,
-      'at-start': isAtStart,
-      'dragging': isDragging,
-      'releasing': isReleasing,
-    }),
-  })
-
-  const fixedStyles = asStyleDict({
-    body: {
-      height: '100%',
-      width: '100%',
-    },
-    knobContainer: {
-      background: 'none',
-      border: 'none',
-      outline: 'none',
-      position: 'absolute',
-      transform: 'translate3d(-50%, -50%, 0)',
-      zIndex: '1',
-      ...orientation === 'vertical' ? {
-        left: '50%',
-        top: `${naturalPosition * 100}%`,
-        transition: isDragging === false ? 'top 100ms ease-out' : 'none',
-      } : {
-        left: `${naturalPosition * 100}%`,
-        top: '50%',
-        transition: isDragging === false ? 'left 100ms ease-out' : 'none',
-      },
-    },
-    knob: {
-      height: `${knobHeight}px`,
-      touchAction: 'none',
-      width: `${knobWidth}px`,
-    },
-    label: {
-      pointerEvents: 'none',
-      userSelect: 'none',
-    },
-    track: {
-      cursor: isTrackInteractive ? 'pointer' : 'auto',
-      pointerEvents: isTrackInteractive ? 'auto' : 'none',
-      position: 'absolute',
-      ...orientation === 'vertical' ? {
-        left: '0',
-        margin: '0 auto',
-        right: '0',
-        width: '100%',
-      } : {
-        bottom: '0',
-        height: '100%',
-        margin: 'auto 0',
-        top: '0',
-      },
-    },
-    trackHitbox: {
-      height: '100%',
-      minHeight: '20px',
-      minWidth: '20px',
-      position: 'absolute',
-      transform: orientation === 'horizontal' ? 'translate3d(0, -50%, 0)' : 'translate3d(-50%, 0, 0)',
-      width: '100%',
-    },
-  })
-
-  const defaultStyles = asStyleDict({
-    knob: {
-      alignItems: 'center',
-      background: '#fff',
-      boxSizing: 'border-box',
-      display: 'flex',
-      justifyContent: 'center',
-    },
-    label: {
-      color: '#000',
-      fontSize: '12px',
-      lineHeight: `${knobHeight}px`,
-    },
-    track: {
-      background: '#fff',
-    },
-  })
-
   return (
-    <div {...props} ref={ref} className={classNames(className, fixedClassNames.root)}>
+    <div {...props} ref={ref} className={classNames(className, fixedClassNames.root)} data-component='stepwise-slider'>
       <div ref={bodyRef} style={fixedStyles.body}>
-        {cloneStyledElement(components.track ?? <StepwiseSliderTrack style={defaultStyles.track}/>, {
+        {cloneStyledElement(components.track ?? <StepwiseSliderTrack style={defaultStyles?.track}/>, {
           className: classNames('start', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
             height: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
@@ -358,7 +265,7 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
           }),
           onClick: trackClickHandler,
         }, <div style={fixedStyles.trackHitbox}/>)}
-        {cloneStyledElement(components.track ?? <StepwiseSliderTrack style={defaultStyles.track}/>, {
+        {cloneStyledElement(components.track ?? <StepwiseSliderTrack style={defaultStyles?.track}/>, {
           className: classNames('end', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
             bottom: '0',
@@ -370,10 +277,10 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
           onClick: trackClickHandler,
         }, <div style={fixedStyles.trackHitbox}/>)}
         <button ref={knobContainerRef} style={fixedStyles.knobContainer}>
-          {cloneStyledElement(components.knob ?? <StepwiseSliderKnob style={defaultStyles.knob}/>, {
+          {cloneStyledElement(components.knob ?? <StepwiseSliderKnob style={defaultStyles?.knob}/>, {
             className: classNames(fixedClassNames.knob),
             style: styles(fixedStyles.knob),
-          }, steps && labelProvider && cloneStyledElement(components.label ?? <StepwiseSliderLabel style={defaultStyles.label}/>, {
+          }, steps && labelProvider && cloneStyledElement(components.label ?? <StepwiseSliderLabel style={defaultStyles?.label}/>, {
             className: classNames(fixedClassNames.label),
             style: styles(fixedStyles.label),
           }, labelProvider(position, getNearestIndexByPosition(position, steps))))}
@@ -385,11 +292,11 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
 
 Object.defineProperty(StepwiseSlider, 'displayName', { value: 'StepwiseSlider', writable: false })
 
-export const StepwiseSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
+export const StepwiseSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props} data-child='track'/>
 
-export const StepwiseSliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
+export const StepwiseSliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props} data-child='knob'/>
 
-export const StepwiseSliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props}/>
+export const StepwiseSliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props} data-child='label'/>
 
 /**
  * Generates a set of steps compatible with this component.
@@ -454,4 +361,112 @@ function getPositionAt(index: number, steps: readonly number[]): number {
   if (index >= steps.length) return NaN
 
   return steps[index]
+}
+
+function getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtStart = false, isDragging = false, isReleasing = false }) {
+  return asClassNameDict({
+    root: classNames(orientation, {
+      'at-end': isAtEnd,
+      'at-start': isAtStart,
+      'dragging': isDragging,
+      'releasing': isReleasing,
+    }),
+    track: classNames(orientation, {
+      'at-end': isAtEnd,
+      'at-start': isAtStart,
+      'dragging': isDragging,
+      'releasing': isReleasing,
+    }),
+    knob: classNames(orientation, {
+      'at-end': isAtEnd,
+      'at-start': isAtStart,
+      'dragging': isDragging,
+      'releasing': isReleasing,
+    }),
+    label: classNames(orientation, {
+      'at-end': isAtEnd,
+      'at-start': isAtStart,
+      'dragging': isDragging,
+      'releasing': isReleasing,
+    }),
+  })
+}
+
+function getFixedStyles({ orientation = 'vertical', naturalPosition = 0, isDragging = false, knobHeight = 0, knobWidth = 0, isTrackInteractive = false }) {
+  return asStyleDict({
+    body: {
+      height: '100%',
+      width: '100%',
+    },
+    knobContainer: {
+      background: 'none',
+      border: 'none',
+      outline: 'none',
+      position: 'absolute',
+      transform: 'translate3d(-50%, -50%, 0)',
+      zIndex: '1',
+      ...orientation === 'vertical' ? {
+        left: '50%',
+        top: `${naturalPosition * 100}%`,
+        transition: isDragging === false ? 'top 100ms ease-out' : 'none',
+      } : {
+        left: `${naturalPosition * 100}%`,
+        top: '50%',
+        transition: isDragging === false ? 'left 100ms ease-out' : 'none',
+      },
+    },
+    knob: {
+      height: `${knobHeight}px`,
+      touchAction: 'none',
+      width: `${knobWidth}px`,
+    },
+    label: {
+      pointerEvents: 'none',
+      userSelect: 'none',
+    },
+    track: {
+      cursor: isTrackInteractive ? 'pointer' : 'auto',
+      pointerEvents: isTrackInteractive ? 'auto' : 'none',
+      position: 'absolute',
+      ...orientation === 'vertical' ? {
+        left: '0',
+        margin: '0 auto',
+        right: '0',
+        width: '100%',
+      } : {
+        bottom: '0',
+        height: '100%',
+        margin: 'auto 0',
+        top: '0',
+      },
+    },
+    trackHitbox: {
+      height: '100%',
+      minHeight: '20px',
+      minWidth: '20px',
+      position: 'absolute',
+      transform: orientation === 'horizontal' ? 'translate3d(0, -50%, 0)' : 'translate3d(-50%, 0, 0)',
+      width: '100%',
+    },
+  })
+}
+
+function getDefaultStyles({ knobHeight = 0 }) {
+  return asStyleDict({
+    knob: {
+      alignItems: 'center',
+      background: '#fff',
+      boxSizing: 'border-box',
+      display: 'flex',
+      justifyContent: 'center',
+    },
+    label: {
+      color: '#000',
+      fontSize: '12px',
+      lineHeight: `${knobHeight}px`,
+    },
+    track: {
+      background: '#fff',
+    },
+  })
 }

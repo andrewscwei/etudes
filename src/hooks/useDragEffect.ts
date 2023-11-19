@@ -50,7 +50,7 @@ export function useDragEffect(targetRef: RefObject<HTMLElement>, {
   onDragStart,
   onDragMove,
   onDragEnd,
-}: Options, deps?: DependencyList) {
+}: Options, deps: DependencyList = []) {
   const element = targetRef.current
   const startPositionRef = useRef<Point>()
   const dragPositionRef = useRef<Point>()
@@ -114,5 +114,5 @@ export function useDragEffect(targetRef: RefObject<HTMLElement>, {
       element.removeEventListener('mouseup', mouseUpHandler, { capture: true })
       element.removeEventListener('mouseleave', mouseUpHandler)
     }
-  }, [targetRef.current, ...deps ?? []])
+  }, [targetRef.current, ...deps])
 }
