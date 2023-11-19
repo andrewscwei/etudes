@@ -135,7 +135,7 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   /**
    * Specifies if the component should use default styles.
    */
-  useDefaultStyles?: boolean
+  usesDefaultStyles?: boolean
 
   /**
    * Handler invoked when an item is activated in a section. The order of
@@ -270,7 +270,7 @@ export const Accordion = forwardRef(({
   sections,
   selection: externalSelection,
   selectionMode = 'single',
-  useDefaultStyles = false,
+  usesDefaultStyles = false,
   onActivateAt,
   onCollapseSectionAt,
   onDeselectAt,
@@ -439,7 +439,7 @@ export const Accordion = forwardRef(({
   const [expandedSectionIndices, setExpandedSectionIndices] = tracksExpansionChanges ? useState(sanitizedExternalExpandedSectionIndices) : [sanitizedExternalExpandedSectionIndices]
 
   const fixedStyles = getFixedStyles({ orientation })
-  const defaultStyles = useDefaultStyles ? getDefaultStyles({ orientation }) : undefined
+  const defaultStyles = usesDefaultStyles ? getDefaultStyles({ orientation }) : undefined
 
   const prevSelectionRef = useRef<AccordionSelection>()
   const prevSelection = prevSelectionRef.current

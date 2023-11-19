@@ -4,7 +4,7 @@ import { useRect } from '../hooks/useRect'
 import { asStyleDict, styles } from '../utils'
 import { Video, type VideoProps } from './Video'
 
-export type CoverVideoProps = VideoProps & PropsWithChildren<{
+export type CoverVideoProps = HTMLAttributes<HTMLDivElement> & Pick<VideoProps, 'autoLoop' | 'autoPlay' | 'hasControls' | 'isMuted' | 'playsInline' | 'posterSrc' | 'src' | 'onEnd' | 'onFullscreenChange' | 'onLoadMetadata' | 'onLoadMetadataComplete' | 'onLoadMetadataError' | 'onSizeChange'> & PropsWithChildren<{
   /**
    * The known aspect ratio of the video, expressed by width / height. If
    * unprovided, it will be inferred after loading the video.
@@ -18,7 +18,7 @@ export type CoverVideoProps = VideoProps & PropsWithChildren<{
   renderViewportContent?: () => JSX.Element
 }>
 
-export const CoverVideo = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & CoverVideoProps>(({
+export const CoverVideo = forwardRef<HTMLDivElement, CoverVideoProps>(({
   className,
   children,
   style,

@@ -89,7 +89,7 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
   /**
    * Specifies if the component should use default styles.
    */
-  useDefaultStyles?: boolean
+  usesDefaultStyles?: boolean
 
   /**
    * Handler invoked when the component is collapsed.
@@ -149,7 +149,7 @@ export const Dropdown = forwardRef(({
   orientation = 'vertical',
   selection: externalSelection = [],
   selectionMode = 'single',
-  useDefaultStyles = false,
+  usesDefaultStyles = false,
   onActivateAt,
   onCollapse,
   onDeselectAt,
@@ -231,7 +231,7 @@ export const Dropdown = forwardRef(({
   const menuLength = itemLength * numVisibleItems + itemPadding * (numVisibleItems - 1)
 
   const fixedStyles = getFixedStyles({ isCollapsed, isInverted, maxVisibleItems, menuLength, numItems, orientation })
-  const defaultStyles = useDefaultStyles ? getDefaultStyles({ orientation }) : undefined
+  const defaultStyles = usesDefaultStyles ? getDefaultStyles({ orientation }) : undefined
 
   const ExpandIcon = expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles?.expandIcon}/> : <></>
   const CollapseIcon = collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles?.collapseIcon}/> : ExpandIcon

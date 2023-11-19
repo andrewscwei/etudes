@@ -39,7 +39,7 @@ export function AccordionDemo() {
           orientation='vertical'
           sections={sections}
           selectionMode='single'
-          useDefaultStyles={true}
+          usesDefaultStyles={true}
           onSelectAt={(itemIdx, sectionIdx) => {
             setSectionIndex(sectionIdx)
             setItemIndex(itemIdx)

@@ -5,9 +5,7 @@ import { useDebug } from '../utils'
 
 const debug = useDebug('video')
 
-export type VideoHTMLAttributes = Omit<HTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'controls' | 'loop' | 'muted' | 'playsInline' | 'poster' | 'onCanPlay' | 'onEnded' | 'onPause' | 'onPlay'>
-
-export type VideoProps = {
+export type VideoProps = Omit<HTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'controls' | 'loop' | 'muted' | 'playsInline' | 'poster' | 'onCanPlay' | 'onEnded' | 'onPause' | 'onPlay'> & {
   autoLoop?: boolean
   autoPlay?: boolean
   hasControls?: boolean
@@ -26,7 +24,7 @@ export type VideoProps = {
   onSizeChange?: (size?: Size) => void
 }
 
-export const Video = forwardRef<HTMLVideoElement, VideoHTMLAttributes & VideoProps>(({
+export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
   autoLoop = true,
   autoPlay = true,
   hasControls = false,

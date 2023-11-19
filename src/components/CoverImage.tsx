@@ -4,7 +4,7 @@ import { useRect } from '../hooks/useRect'
 import { asStyleDict, styles } from '../utils'
 import { Image, type ImageProps } from './Image'
 
-export type CoverImageProps = ImageProps & PropsWithChildren<{
+export type CoverImageProps = Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<ImageProps, 'alt' | 'loadingMode' | 'sizes' | 'src' | 'srcSet' | 'onLoadStart' | 'onLoadComplete' | 'onLoadError'> & PropsWithChildren<{
   /**
    * The known aspect ratio of the image, expressed by width / height. If
    * unprovided, it will be inferred after loading the image.
@@ -18,7 +18,7 @@ export type CoverImageProps = ImageProps & PropsWithChildren<{
   renderViewportContent?: () => JSX.Element
 }>
 
-export const CoverImage = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & CoverImageProps>(({
+export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
   children,
   style,
   alt,
@@ -31,13 +31,10 @@ export const CoverImage = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEleme
   onLoadStart,
   onLoadComplete,
   onLoadError,
-  onSizeChange,
   ...props
 }, ref) => {
   const handleSizeChange = (size?: Size) => {
     if (setAspectRatio) setAspectRatio(size ? size.width / size.height : NaN)
-
-    onSizeChange?.(size)
   }
 
   const rootRef = ref ?? useRef<HTMLDivElement>(null)
@@ -54,7 +51,7 @@ export const CoverImage = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEleme
   ])
 
   return (
-    <div ref={ref ?? rootRef} {...props} style={styles(style, FIXED_STYLES.root)} data-component='cover-image'>
+    <div {...props} ref={rootRef} style={styles(style, FIXED_STYLES.root)} data-component='cover-image'>
       <Image
         style={styles(FIXED_STYLES.viewport, {
           width: `${imageSize.width}px`,
