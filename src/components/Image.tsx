@@ -2,9 +2,7 @@ import React, { forwardRef, useEffect, type HTMLAttributes } from 'react'
 import { type Size } from 'spase'
 import { useImageSize } from '../hooks/useImageSize'
 
-export type ImageHTMLAttributes = Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'srcSet' | 'sizes' | 'src' | 'loading'>
-
-export type ImageProps = {
+export type ImageProps = Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'srcSet' | 'sizes' | 'src' | 'loading' | 'onLoadStart'> & {
   /**
    * Optional alt text.
    */
@@ -87,7 +85,7 @@ export type ImageProps = {
   onSizeChange?: (size?: Size) => void
 }
 
-export const Image = forwardRef<HTMLImageElement, ImageHTMLAttributes & ImageProps>(({
+export const Image = forwardRef<HTMLImageElement, ImageProps>(({
   alt,
   loadingMode = 'preload',
   sizes,

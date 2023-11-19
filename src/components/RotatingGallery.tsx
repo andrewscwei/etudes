@@ -43,7 +43,7 @@ export type RotatingGalleryProps = HTMLAttributes<HTMLDivElement> & PropsWithChi
   /**
    * Specifies if the component should use default styles.
    */
-  useDefaultStyles?: boolean
+  usesDefaultStyles?: boolean
 
   /**
    * Handler invoked when the image index changes.
@@ -72,7 +72,7 @@ export const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(
   rotationDuration = 5000,
   srcs = [],
   transitionDuration = 500,
-  useDefaultStyles = true,
+  usesDefaultStyles = true,
   onIndexChange,
   ImageComponent,
   ...props
@@ -90,7 +90,7 @@ export const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(
   const [index, setIndex] = tracksIndexChanges ? useState(0) : [externalIndex]
   const fixedClassNames = getFixedClassNames()
   const fixedStyles = getFixedStyles({ transitionDuration })
-  const defaultStyles: Record<string, any> = useDefaultStyles ? getDefaultStyles() : {}
+  const defaultStyles: Record<string, any> = usesDefaultStyles ? getDefaultStyles() : {}
 
   useInterval(() => {
     handleIndexChange((index + 1) % srcs.length)
@@ -112,7 +112,7 @@ export const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(
               style={styles(
                 fixedStyles.image,
                 defaultStyles.image,
-                useDefaultStyles ? {
+                usesDefaultStyles ? {
                   opacity: isVisible ? '1' : '0',
                 } : {},
               )}
@@ -127,7 +127,7 @@ export const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(
               style={styles(
                 fixedStyles.image,
                 defaultStyles.image,
-                useDefaultStyles ? {
+                usesDefaultStyles ? {
                   opacity: isVisible ? '1' : '0',
                 } : {},
               )}

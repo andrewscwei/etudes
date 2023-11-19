@@ -59,7 +59,7 @@ export function CollectionDemo() {
         maxVisibleItems={-1}
         orientation='vertical'
         selection={[selectedOrientationIndex]}
-        useDefaultStyles={true}
+        usesDefaultStyles={true}
         onSelectionChange={t => setSelectedOrientationIndex(t[0])}
         ItemComponent={DropdownItem}
       />

@@ -10,7 +10,7 @@ type Props = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & {
   max?: number
   quantity?: number
   allowInput?: boolean
-  useDefaultStyles?: boolean
+  usesDefaultStyles?: boolean
   onChange?: (quantity: number) => void
   AddButtonComponent?: ComponentType<HTMLAttributes<HTMLElement>>
   SubtractButtonComponent?: ComponentType<HTMLAttributes<HTMLElement>>
@@ -22,7 +22,7 @@ export const Counter = forwardRef<HTMLDivElement, Props>(({
   max = NaN,
   allowInput = true,
   quantity: externalQuantity,
-  useDefaultStyles = true,
+  usesDefaultStyles = true,
   onChange,
   AddButtonComponent,
   SubtractButtonComponent,
@@ -60,7 +60,7 @@ export const Counter = forwardRef<HTMLDivElement, Props>(({
   const tracksChanges = externalQuantity === undefined
   const [quantity, setQuantity] = tracksChanges ? useState(1) : [externalQuantity]
   const prevQuantity = usePrevious(quantity)
-  const defaultStyles = useDefaultStyles ? DEFAULT_STYLES : undefined
+  const defaultStyles = usesDefaultStyles ? DEFAULT_STYLES : undefined
   const isAddingDisabled = !isNaN(max) && quantity + 1 > max
   const isSubtractingDisabled = !isNaN(min) && quantity - 1 < min
 
