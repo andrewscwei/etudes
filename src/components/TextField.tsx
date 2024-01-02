@@ -4,6 +4,7 @@ import { usePrevious } from '../hooks/usePrevious'
 export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
   emptyValue?: string
   isDisabled?: boolean
+  placeholder?: string
   value?: string
   formatter?: (prevValue: string, newValue: string) => string
   onFocus?: (value: string) => void
@@ -14,6 +15,7 @@ export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(({
   emptyValue = '',
   isDisabled = false,
+  placeholder,
   value: externalValue,
   formatter,
   onFocus,
@@ -49,6 +51,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(({
       {...props}
       ref={ref}
       data-component='text-field'
+      placeholder={placeholder}
       type='text'
       value={value}
       disabled={isDisabled}
