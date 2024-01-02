@@ -29,6 +29,7 @@ export function PanoramaDemo() {
           knobWidth={20}
           orientation='horizontal'
           position={(width - 400) / 400}
+          usesDefaultStyles={true}
           onPositionChange={position => { setWidth(400 + position * 400) }}
         >
           <SliderKnob className='knob'/>
@@ -44,6 +45,7 @@ export function PanoramaDemo() {
         <StyledPanoramaSlider
           angle={angle}
           src={$$PanoramaImage}
+          usesDefaultStyles={true}
           viewportSize={viewportSize}
           zeroAnchor={zeroAnchor}
           onAngleChange={(value, isDragging) => { if (isDragging) setAngle(value) }}

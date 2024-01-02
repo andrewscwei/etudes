@@ -94,7 +94,7 @@ export function useDragValueEffect<T = [number, number]>(targetRef: RefObject<HT
   const [value, setValue] = useState(initialValue)
 
   useEffect(() => {
-    if (targetRef.current && !interact.isSet(targetRef.current)) {
+    if (targetRef.current) {
       // Do not consume states in these listeners as they will remain their
       // initial values within the scope of the listeners.
       interact(targetRef.current).draggable({
@@ -126,7 +126,7 @@ export function useDragValueEffect<T = [number, number]>(targetRef: RefObject<HT
     }
 
     return () => {
-      if (targetRef.current && interact.isSet(targetRef.current)) {
+      if (targetRef.current) {
         interact(targetRef.current).unset()
       }
     }
