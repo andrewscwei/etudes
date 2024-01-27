@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
 import { Each } from '../operators/Each'
@@ -335,7 +335,7 @@ export const Collection = forwardRef(({
       {...props}
       data-component='collection'
       ref={ref}
-      className={classNames(className)}
+      className={clsx(className)}
       style={styles(style, fixedStyles.root)}
     >
       {ItemComponent && (
@@ -343,7 +343,7 @@ export const Collection = forwardRef(({
           {(val, idx) => (
             <ItemComponent
               data-child='item'
-              className={classNames({ selected: isSelectedAt(idx) })}
+              className={clsx({ selected: isSelectedAt(idx) })}
               style={styles(fixedStyles.item, {
                 pointerEvents: isSelectionTogglable !== true && isSelectedAt(idx) ? 'none' : 'auto',
                 ...idx >= items.length - 1 ? {} : {

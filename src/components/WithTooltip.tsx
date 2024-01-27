@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import clsx from 'clsx'
 import React, { useEffect, useRef, type CSSProperties, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
 import { Rect, Size } from 'spase'
 import { useRect } from '../hooks/useRect'
@@ -64,7 +64,7 @@ export function WithTooltip({
   const createDialog = () => {
     const dialog = document.createElement('div')
     const dialogStyle = styles(style, fixedStyles.dialog)
-    dialog.className = classNames(className)
+    dialog.className = clsx(className)
     dialog.setAttribute('data-component', 'tool-tip')
     Object.keys(dialogStyle).forEach(rule => (dialog.style as any)[rule] = (dialogStyle as any)[rule])
 

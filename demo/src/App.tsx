@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import clsx from 'clsx'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { BurgerButton, BurgerButtonBar } from '../../lib/components/BurgerButton'
@@ -60,13 +60,13 @@ export function App() {
     <>
       <StyledDemo>{renderDemo()}</StyledDemo>
       <StyledHUDs>
-        <StyledNav className={classNames({ active: isNavActive })}>
-          <StyledNavButton className={classNames({ active: hash === 'masonry-grid' })} onClick={() => setHash('masonry-grid')}>Masonry Grid</StyledNavButton>
-          <StyledNavButton className={classNames({ active: hash === 'collection' })} onClick={() => setHash('collection')}>Collection+Dropdown</StyledNavButton>
-          <StyledNavButton className={classNames({ active: hash === 'accordion' })} onClick={() => setHash('accordion')}>Accordion</StyledNavButton>
-          <StyledNavButton className={classNames({ active: hash === 'dial+sliders' })} onClick={() => setHash('dial+sliders')}>Dial+Sliders</StyledNavButton>
-          <StyledNavButton className={classNames({ active: hash === 'video' })} onClick={() => setHash('video')}>Video</StyledNavButton>
-          <StyledNavButton className={classNames({ active: hash === 'panorama+slider' })} onClick={() => setHash('panorama+slider')}>Panorama+Slider</StyledNavButton>
+        <StyledNav className={clsx({ active: isNavActive })}>
+          <StyledNavButton className={clsx({ active: hash === 'masonry-grid' })} onClick={() => setHash('masonry-grid')}>Masonry Grid</StyledNavButton>
+          <StyledNavButton className={clsx({ active: hash === 'collection' })} onClick={() => setHash('collection')}>Collection+Dropdown</StyledNavButton>
+          <StyledNavButton className={clsx({ active: hash === 'accordion' })} onClick={() => setHash('accordion')}>Accordion</StyledNavButton>
+          <StyledNavButton className={clsx({ active: hash === 'dial+sliders' })} onClick={() => setHash('dial+sliders')}>Dial+Sliders</StyledNavButton>
+          <StyledNavButton className={clsx({ active: hash === 'video' })} onClick={() => setHash('video')}>Video</StyledNavButton>
+          <StyledNavButton className={clsx({ active: hash === 'panorama+slider' })} onClick={() => setHash('panorama+slider')}>Panorama+Slider</StyledNavButton>
         </StyledNav>
         <StyledBurgerButton
           height={32}

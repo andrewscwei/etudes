@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import clsx from 'clsx'
 import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
 import { usePrevious } from '../hooks/usePrevious'
 import { useRect } from '../hooks/useRect'
@@ -297,7 +297,7 @@ export const Dropdown = forwardRef(({
       {...props}
       data-component='dropdown'
       ref={ref}
-      className={classNames(className, { collapsed: isCollapsed, expanded: !isCollapsed })}
+      className={clsx(className, { collapsed: isCollapsed, expanded: !isCollapsed })}
       style={styles(style, fixedStyles.root)}
     >
       <div ref={bodyRef} style={styles(fixedStyles.body)}>

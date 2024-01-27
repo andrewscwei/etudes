@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
 import { Each } from '../operators/Each'
@@ -473,7 +473,7 @@ export const Accordion = forwardRef(({
               {HeaderComponent ? (
                 <HeaderComponent
                   data-child='header'
-                  className={classNames({ collapsed: isCollapsed, expanded: !isCollapsed })}
+                  className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
                   style={styles(fixedStyles.header)}
                   index={sectionIndex}
                   isCollapsed={isCollapsed}
@@ -484,7 +484,7 @@ export const Accordion = forwardRef(({
               ) : (
                 <button
                   data-child='header'
-                  className={classNames({ collapsed: isCollapsed, expanded: !isCollapsed })}
+                  className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
                   style={styles(fixedStyles.header, defaultStyles?.header)}
                   onClick={() => toggleSectionAt(sectionIndex)}
                 >
@@ -496,7 +496,7 @@ export const Accordion = forwardRef(({
               )}
               <Collection
                 data-child='collection'
-                className={classNames({ collapsed: isCollapsed, expanded: !isCollapsed })}
+                className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
                 style={styles(fixedStyles.list, defaultStyles?.collection, orientation === 'vertical' ? {
                   width: '100%',
                   height: isCollapsed ? '0px' : `${maxLength}px`,

@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
 import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { useDragValueEffect } from '../hooks/useDragValueEffect'
@@ -134,7 +134,7 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
   const defaultStyles = usesDefaultStyles ? getDefaultStyles({ isReleasingStartKnob, isReleasingEndKnob, orientation }) : undefined
 
   return (
-    <div {...props} ref={ref} className={classNames(className, orientation)} data-component='range-slider'>
+    <div {...props} ref={ref} className={clsx(className, orientation)} data-component='range-slider'>
       <div ref={bodyRef} style={fixedStyles.body}>
         {cloneStyledElement(components.gutter ?? <RangeSliderGutter style={defaultStyles?.gutter}/>, {
           style: styles(fixedStyles.gutter),
@@ -147,7 +147,7 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
         })}/>, {
           ref: startKnobRef,
           disabled: isDeepEqual([startValue, endValue], [maxValue, maxValue]),
-          className: classNames({
+          className: clsx({
             dragging: isDraggingStartKnob,
             releasing: isReleasingStartKnob,
           }),
@@ -162,7 +162,7 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
           cloneStyledElement(components.label ?? <RangeSliderLabel style={styles(defaultStyles?.label, {
             transitionProperty: isReleasingStartKnob ? 'opacity, transform' : 'opacity',
           })}/>, {
-            className: classNames({
+            className: clsx({
               dragging: isDraggingStartKnob || isDraggingEndKnob,
               releasing: isReleasingStartKnob || isReleasingEndKnob,
             }),
@@ -174,7 +174,7 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
         })}/>, {
           ref: endKnobRef,
           disabled: isDeepEqual([startValue, endValue], [maxValue, maxValue]),
-          className: classNames({
+          className: clsx({
             dragging: isDraggingEndKnob,
             releasing: isDraggingEndKnob,
           }),
@@ -189,7 +189,7 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
           cloneStyledElement(components.label ?? <RangeSliderLabel style={styles(defaultStyles?.label, {
             transitionProperty: isReleasingEndKnob ? 'opacity, transform' : 'opacity',
           })}/>, {
-            className: classNames({
+            className: clsx({
               dragging: isDraggingEndKnob,
               releasing: isReleasingEndKnob,
             }),

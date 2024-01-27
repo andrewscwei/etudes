@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import clsx from 'clsx'
 import React, { forwardRef, useEffect, useRef, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
 import { Rect } from 'spase'
 import { useDragValueEffect } from '../hooks/useDragValueEffect'
@@ -195,10 +195,10 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
   const defaultStyles = usesDefaultStyles ? getDefaultStyles({ knobHeight }) : undefined
 
   return (
-    <div {...props} ref={ref} className={classNames(className, fixedClassNames.root)} data-component='slider'>
+    <div {...props} ref={ref} className={clsx(className, fixedClassNames.root)} data-component='slider'>
       <div ref={bodyRef} style={fixedStyles.body}>
         {cloneStyledElement(components.track ?? <SliderTrack style={defaultStyles?.track}/>, {
-          className: classNames('start', fixedClassNames.track),
+          className: clsx('start', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
             height: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
             top: '0',
@@ -209,7 +209,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
           onClick: trackClickHandler,
         }, <div style={fixedStyles.trackHitbox}/>)}
         {cloneStyledElement(components.track ?? <SliderTrack style={defaultStyles?.track}/>, {
-          className: classNames('end', fixedClassNames.track),
+          className: clsx('end', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
             bottom: '0',
             height: `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
@@ -221,10 +221,10 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
         }, <div style={fixedStyles.trackHitbox}/>)}
         <button ref={knobContainerRef} style={fixedStyles.knobContainer}>
           {cloneStyledElement(components.knob ?? <SliderKnob style={defaultStyles?.knob}/>, {
-            className: classNames(fixedClassNames.knob),
+            className: clsx(fixedClassNames.knob),
             style: styles(fixedStyles.knob),
           }, labelProvider && cloneStyledElement(components.label ?? <SliderLabel style={defaultStyles?.label}/>, {
-            className: classNames(fixedClassNames.label),
+            className: clsx(fixedClassNames.label),
             style: styles(fixedStyles.label),
           }, labelProvider(position)))}
         </button>
@@ -243,25 +243,25 @@ export const SliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <di
 
 function getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtStart = false, isDragging = false, isReleasing = false }) {
   return asClassNameDict({
-    root: classNames(orientation, {
+    root: clsx(orientation, {
       'at-end': isAtEnd,
       'at-start': isAtStart,
       'dragging': isDragging,
       'releasing': isReleasing,
     }),
-    track: classNames(orientation, {
+    track: clsx(orientation, {
       'at-end': isAtEnd,
       'at-start': isAtStart,
       'dragging': isDragging,
       'releasing': isReleasing,
     }),
-    knob: classNames(orientation, {
+    knob: clsx(orientation, {
       'at-end': isAtEnd,
       'at-start': isAtStart,
       'dragging': isDragging,
       'releasing': isReleasing,
     }),
-    label: classNames(orientation, {
+    label: clsx(orientation, {
       'at-end': isAtEnd,
       'at-start': isAtStart,
       'dragging': isDragging,
