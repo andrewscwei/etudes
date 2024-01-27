@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import clsx from 'clsx'
 import React, { forwardRef, useEffect, useState, type ComponentType, type HTMLAttributes } from 'react'
 import { usePrevious } from '../hooks/usePrevious'
 import { asStyleDict } from '../utils/asStyleDict'
@@ -90,14 +90,14 @@ export const Counter = forwardRef<HTMLDivElement, Props>(({
       {SubtractButtonComponent && (
         <SubtractButtonComponent
           data-child='subtract-button'
-          className={classNames({ disabled: isSubtractingDisabled })}
+          className={clsx({ disabled: isSubtractingDisabled })}
           style={styles(FIXED_STYLES.subtract)}
           onClick={() => handleSubtract()}
         />
       ) || (
         <button
           data-child='subtract-button'
-          className={classNames({ disabled: isSubtractingDisabled })}
+          className={clsx({ disabled: isSubtractingDisabled })}
           style={styles(FIXED_STYLES.subtract, defaultStyles?.subtract)}
           onClick={() => handleSubtract()}
         />
@@ -112,14 +112,14 @@ export const Counter = forwardRef<HTMLDivElement, Props>(({
       {AddButtonComponent && (
         <AddButtonComponent
           data-child='add-button'
-          className={classNames({ disabled: isAddingDisabled })}
+          className={clsx({ disabled: isAddingDisabled })}
           style={styles(FIXED_STYLES.add)}
           onClick={() => handleAdd()}
         />
       ) || (
         <button
           data-child='add-button'
-          className={classNames({ disabled: isAddingDisabled })}
+          className={clsx({ disabled: isAddingDisabled })}
           style={styles(FIXED_STYLES.add, defaultStyles?.add)}
           onClick={() => handleAdd()}
         />

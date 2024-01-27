@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import clsx from 'clsx'
 import React, { forwardRef, useEffect, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { Repeat } from '../operators/Repeat'
 import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils'
@@ -60,10 +60,10 @@ export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
   })
 
   const fixedClassNames = asClassNameDict({
-    root: classNames({
+    root: clsx({
       active: isActive,
     }),
-    bar: classNames({
+    bar: clsx({
       active: isActive,
     }),
   })
@@ -75,7 +75,7 @@ export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
     <button
       {...props}
       ref={ref}
-      className={classNames(className, fixedClassNames.root)}
+      className={clsx(className, fixedClassNames.root)}
       style={styles(style, fixedStyles.root)}
       data-component='burger-button'
       onClick={() => setIsActive(!isActive)}
@@ -85,7 +85,7 @@ export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
           <div style={styles(fixedStyles.joint, (fixedStyles as any)[`joint${j}`])} data-child='joint'>
             <Repeat count={3}>
               {i => cloneStyledElement(components.bar ?? <BurgerButtonBar style={defaultStyles?.bar}/>, {
-                'className': classNames(fixedClassNames.bar),
+                'className': clsx(fixedClassNames.bar),
                 'style': styles(fixedStyles.bar, (fixedStyles as any)[`bar${j}${i}`]),
                 'data-index': i,
               })}

@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import clsx from 'clsx'
 import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Rect, Size } from 'spase'
 import { useResizeEffect } from '../hooks/useResizeEffect'
@@ -205,7 +205,7 @@ export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
   const fixedStyles = getFixedStyles({ orientation, minHeight, minWidth })
 
   return (
-    <div {...props} ref={ref} className={classNames(className, fixedClassNames.root)} data-component='masonry-grid'>
+    <div {...props} ref={ref} className={clsx(className, fixedClassNames.root)} data-component='masonry-grid'>
       <div ref={bodyRef} style={fixedStyles.body}>
         {children}
       </div>
@@ -217,7 +217,7 @@ Object.defineProperty(MasonryGrid, 'displayName', { value: 'MasonryGrid', writab
 
 function getFixedClassNames({ orientation = 'horizontal' }) {
   return asClassNameDict({
-    root: classNames(orientation),
+    root: clsx(orientation),
   })
 }
 

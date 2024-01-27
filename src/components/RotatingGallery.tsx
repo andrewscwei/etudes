@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import clsx from 'clsx'
 import React, { forwardRef, useEffect, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { useInterval } from '../hooks/useInterval'
 import { Each } from '../operators/Each'
@@ -101,14 +101,14 @@ export const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(
   }, [index])
 
   return (
-    <div {...props} className={classNames(className, fixedClassNames.root)} ref={ref} data-component='rotating-gallery'>
+    <div {...props} className={clsx(className, fixedClassNames.root)} ref={ref} data-component='rotating-gallery'>
       <Each in={srcs}>
         {(src, idx) => {
           const isVisible = idx === index
 
           return ImageComponent ? (
             <ImageComponent
-              className={classNames(fixedClassNames.image)}
+              className={clsx(fixedClassNames.image)}
               data-child='item'
               style={styles(
                 fixedStyles.image,
@@ -123,7 +123,7 @@ export const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(
             />
           ) : (
             <img
-              className={classNames(fixedClassNames.image)}
+              className={clsx(fixedClassNames.image)}
               loading={lazy ? 'lazy' : 'eager'}
               data-child='item'
               style={styles(
@@ -146,8 +146,8 @@ Object.defineProperty(RotatingGallery, 'displayName', { value: 'RotatingGallery'
 
 function getFixedClassNames() {
   return asClassNameDict({
-    root: classNames('rotating-gallery'),
-    image: classNames('image'),
+    root: clsx('rotating-gallery'),
+    image: clsx('image'),
   })
 }
 

@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import clsx from 'clsx'
 import React, { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { Rect, type Size } from 'spase'
 import { useRect } from '../hooks/useRect'
@@ -117,7 +117,7 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
   const defaultStyles = usesDefaultStyles ? getDefaultStyles({ isDragging }) : undefined
 
   return (
-    <div {...props} ref={ref} className={classNames(className, { dragging: isDragging })} style={styles(style, fixedStyles.root)} data-component='panorama-slider'>
+    <div {...props} ref={ref} className={clsx(className, { dragging: isDragging })} style={styles(style, fixedStyles.root)} data-component='panorama-slider'>
       <Panorama
         angle={angle}
         ref={panoramaRef}
