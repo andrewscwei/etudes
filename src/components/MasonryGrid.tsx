@@ -2,9 +2,9 @@ import clsx from 'clsx'
 import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Rect, Size } from 'spase'
 import { useResizeEffect } from '../hooks/useResizeEffect'
-import { asClassNameDict, asStyleDict, useDebug } from '../utils'
+import { asClassNameDict, asStyleDict, createDebug } from '../utils'
 
-const debug = useDebug('masonry')
+const debug = createDebug('masonry')
 
 type Orientation = 'horizontal' | 'vertical'
 

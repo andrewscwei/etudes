@@ -1,8 +1,8 @@
 import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { useDebug } from '../utils'
+import { createDebug } from '../utils'
 
-const debug = useDebug('hooks')
+const debug = createDebug('hooks')
 
 export type Options<T> = {
   /**
