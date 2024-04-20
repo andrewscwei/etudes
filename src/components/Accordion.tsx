@@ -304,7 +304,7 @@ export const Accordion = forwardRef(({
 
   const isSelectedAt = (itemIndex: number, sectionIndex: number) => (selection[sectionIndex]?.indexOf(itemIndex) ?? -1) >= 0
 
-  const sanitizeExpandedSectionIndices = (sectionIndices: number[]) => sectionIndices.sort().filter(t => !isSectionIndexOutOfRange(t))
+  const sanitizeExpandedSectionIndices = (sectionIndices: number[]) => sortIndices(sectionIndices).filter(t => !isSectionIndexOutOfRange(t))
 
   const sanitizeSelection = (selection: AccordionSelection) => {
     const newValue: AccordionSelection = {}
@@ -312,9 +312,9 @@ export const Accordion = forwardRef(({
     for (const sectionIndex in sections) {
       if (!Object.prototype.hasOwnProperty.call(sections, sectionIndex)) continue
 
-      const indices = [...selection[sectionIndex] ?? []].sort()
+      const indices = sortIndices([...selection[sectionIndex] ?? []])
 
-      newValue[Number(sectionIndex)] = indices.sort().filter(t => !isItemIndexOutOfRange(t, Number(sectionIndex)))
+      newValue[Number(sectionIndex)] = sortIndices(indices).filter(t => !isItemIndexOutOfRange(t, Number(sectionIndex)))
     }
 
     return newValue
@@ -352,7 +352,7 @@ export const Accordion = forwardRef(({
       case 'multiple':
         transform = val => ({
           ...val,
-          [sectionIndex]: [...(val[sectionIndex] ?? []).filter(t => t !== itemIndex), itemIndex].sort(),
+          [sectionIndex]: sortIndices([...(val[sectionIndex] ?? []).filter(t => t !== itemIndex), itemIndex]),
         })
         break
       case 'single':
@@ -518,9 +518,9 @@ export const Accordion = forwardRef(({
                 numSegments={numSegments}
                 selection={selection[sectionIndex] ?? []}
                 onActivateAt={itemIndex => onActivateAt?.(itemIndex, sectionIndex)}
-                onDeselectAt={itemIndex => handleDeselectAt?.(itemIndex, sectionIndex)}
+                onDeselectAt={itemIndex => { handleDeselectAt?.(itemIndex, sectionIndex) }}
                 onItemCustomEvent={(itemIndex, name, info) => onItemCustomEvent?.(itemIndex, sectionIndex, name, info)}
-                onSelectAt={itemIndex => handleSelectAt?.(itemIndex, sectionIndex)}
+                onSelectAt={itemIndex => { handleSelectAt?.(itemIndex, sectionIndex) }}
                 ItemComponent={ItemComponent}
               />
             </div>
@@ -532,6 +532,10 @@ export const Accordion = forwardRef(({
 }) as <I, S extends AccordionSection<I> = AccordionSection<I>>(props: AccordionProps<I, S> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
 Object.defineProperty(Accordion, 'displayName', { value: 'Accordion', writable: false })
+
+function sortIndices(indices: number[]): number[] {
+  return indices.sort((a, b) => a - b)
+}
 
 function getFixedStyles({ orientation = 'vertical' }) {
   return asStyleDict({

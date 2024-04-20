@@ -229,7 +229,7 @@ export const Collection = forwardRef(({
     return false
   }
 
-  const sanitizeSelection = (indices: CollectionSelection) => indices.sort().filter(t => !isIndexOutOfRange(t))
+  const sanitizeSelection = (indices: CollectionSelection) => sortIndices(indices).filter(t => !isIndexOutOfRange(t))
 
   const isSelectedAt = (index: number) => selection.indexOf(index) >= 0
 
@@ -249,7 +249,7 @@ export const Collection = forwardRef(({
 
     switch (selectionMode) {
       case 'multiple': {
-        transform = val => [...val.filter(t => t !== index), index].sort()
+        transform = val => sortIndices([...val.filter(t => t !== index), index])
         break
       }
       case 'single': {
@@ -372,6 +372,10 @@ export const Collection = forwardRef(({
 }) as <T>(props: CollectionProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
 Object.defineProperty(Collection, 'displayName', { value: 'Collection', writable: false })
+
+function sortIndices(indices: number[]): number[] {
+  return indices.sort((a, b) => a - b)
+}
 
 function getFixedStyles({ itemLength = NaN, itemPadding = 0, layout = 'collection', numSegments = 1, orientation = 'vertical' }) {
   return asStyleDict({
