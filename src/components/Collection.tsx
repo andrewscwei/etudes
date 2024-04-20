@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
+import React, { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
 import { Each } from '../operators/Each'
 import { asStyleDict, styles } from '../utils'
 
@@ -260,31 +260,20 @@ export const Collection = forwardRef(({
         return
     }
 
-    if (setSelection) {
-      setSelection(prev => transform(prev))
-    }
-    else {
-      const newValue = transform(selection)
+    const newValue = transform(selection)
 
-      prevSelectionRef.current = newValue
-      handleSelectionChange(selection, newValue)
-    }
+    prevSelectionRef.current = newValue
+    handleSelectionChange(selection, newValue)
   }
 
   const deselectAt = (index: number) => {
     if (!isSelectedAt(index)) return
 
     const transform = (val: CollectionSelection) => val.filter(t => t !== index)
+    const newValue = transform(selection)
 
-    if (setSelection) {
-      setSelection(prev => transform(prev))
-    }
-    else {
-      const newValue = transform(selection)
-
-      prevSelectionRef.current = newValue
-      handleSelectionChange(selection, newValue)
-    }
+    prevSelectionRef.current = newValue
+    handleSelectionChange(selection, newValue)
   }
 
   const activateAt = (index: number) => {
@@ -312,13 +301,8 @@ export const Collection = forwardRef(({
     onSelectionChange?.(newValue)
   }
 
-  const tracksSelectionChanges = externalSelection === undefined && selectionMode !== 'none'
-
-  const sanitizedExternalSelection = sanitizeSelection(externalSelection ?? [])
-  const [selection, setSelection] = tracksSelectionChanges ? useState(sanitizedExternalSelection) : [sanitizedExternalSelection]
-
+  const selection = sanitizeSelection(externalSelection ?? [])
   const fixedStyles = getFixedStyles({ itemLength, itemPadding, layout, numSegments, orientation })
-
   const prevSelectionRef = useRef<CollectionSelection>()
   const prevSelection = prevSelectionRef.current
 
