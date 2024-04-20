@@ -12,7 +12,8 @@
     "demo": "concurrently \"cross-env NODE_ENV=production tsc -w --diagnostics false\" \"wait-on lib && cross-env NODE_ENV=development webpack-cli serve --mode development --hot --config demo/config/build.conf.ts\"",
     "test": "echo \"No tests yet :)\"",
     "lint": "eslint --ext .ts --ext .tsx src demo",
-    "lint:fix": "npm run lint -- --fix"
+    "lint:fix": "npm run lint -- --fix",
+    "scan": "dotenv -- sh -c 'sonar-scanner -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.sources=. -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.token=$SONAR_TOKEN'"
   },
   "repository": {
     "type": "git",
@@ -55,6 +56,7 @@
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
     "debug": "^4.3.4",
+    "dotenv-cli": "^7.4.1",
     "eslint": "^8.56.0",
     "fast-xml-parser": "^4.3.3",
     "html-webpack-plugin": "^5.6.0",
