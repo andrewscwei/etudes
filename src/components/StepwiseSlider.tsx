@@ -2,9 +2,9 @@ import clsx from 'clsx'
 import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
 import { Rect } from 'spase'
 import { useDragValueEffect } from '../hooks/useDragValueEffect'
-import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles, useDebug } from '../utils'
+import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, createDebug, styles } from '../utils'
 
-const debug = useDebug('stepwise-slider')
+const debug = createDebug('stepwise-slider')
 
 type Orientation = 'horizontal' | 'vertical'
 
