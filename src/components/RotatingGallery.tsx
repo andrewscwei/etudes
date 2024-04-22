@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import React, { forwardRef, useEffect, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren } from 'react'
+import React, { forwardRef, useEffect, type ComponentType, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { useInterval } from '../hooks/useInterval'
 import { Each } from '../operators/Each'
 import { asClassNameDict, asStyleDict, styles } from '../utils'
@@ -60,14 +60,11 @@ export type RotatingGalleryProps = HTMLAttributes<HTMLDivElement> & PropsWithChi
 
 /**
  * A component displaying rotating images.
- *
- * @exports RotatingGalleryImage Component for each rotating image, classes:
- *                               `entering`, `entered`, `exiting`, `exited`.
  */
 export const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(({
   children,
   className,
-  index: externalIndex,
+  index = 0,
   lazy = true,
   rotationDuration = 5000,
   srcs = [],
@@ -78,16 +75,9 @@ export const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(
   ...props
 }, ref) => {
   const handleIndexChange = (newValue: number) => {
-    if (setIndex) {
-      setIndex(newValue)
-    }
-    else {
-      onIndexChange?.(newValue)
-    }
+    onIndexChange?.(newValue)
   }
 
-  const tracksIndexChanges = externalIndex === undefined
-  const [index, setIndex] = tracksIndexChanges ? useState(0) : [externalIndex]
   const fixedClassNames = getFixedClassNames()
   const fixedStyles = getFixedStyles({ transitionDuration })
   const defaultStyles = usesDefaultStyles ? getDefaultStyles() : undefined
