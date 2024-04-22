@@ -22,12 +22,6 @@ export type WithToolTipProps = Pick<HTMLAttributes<HTMLElement>, 'className' | '
   backgroundColor?: string
 
   /**
-   * Specifies if the tooltip should be disabled in touch devices (i.e. `html`
-   * has class `.touch`).
-   */
-  disabledOnTouch?: boolean
-
-  /**
    * The hint string to display in the tooltip.
    */
   hint: string
@@ -164,11 +158,12 @@ export function WithTooltip({
 
   return (
     <ExtractChild
-      children={children}
       ref={rootRef}
       onMouseEnter={mouseEnterHandler}
       onMouseLeave={mouseLeaveHandler}
-    />
+    >
+      {children}
+    </ExtractChild>
   )
 }
 

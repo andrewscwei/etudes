@@ -167,7 +167,7 @@ export const Dropdown = forwardRef(({
     return false
   }
 
-  const sanitizedSelection = (selection: DropdownSelection) => selection.sort().filter(t => !isIndexOutOfRange(t))
+  const sanitizedSelection = (selection: DropdownSelection) => sortIndices(selection).filter(t => !isIndexOutOfRange(t))
 
   const expand = () => {
     if (!isCollapsed) return
@@ -200,11 +200,10 @@ export const Dropdown = forwardRef(({
     onSelectionChange?.(value)
   }
 
-  const bodyRef = useRef<HTMLDivElement>(null)
-
   const selection = sanitizedSelection(externalSelection)
-
-  const itemLength = externalItemLength ?? (orientation === 'vertical' ? useRect(bodyRef).height : useRect(bodyRef).width)
+  const bodyRef = useRef<HTMLDivElement>(null)
+  const bodyRect = useRect(bodyRef)
+  const itemLength = externalItemLength ?? (orientation === 'vertical' ? bodyRect.height : bodyRect.width)
   const numItems = items.length
   const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
   const menuLength = itemLength * numVisibleItems + itemPadding * (numVisibleItems - 1)
@@ -297,6 +296,10 @@ export const Dropdown = forwardRef(({
 
 Object.defineProperty(Dropdown, 'displayName', { value: 'Dropdown', writable: false })
 
+function sortIndices(indices: number[]): number[] {
+  return indices.sort((a, b) => a - b)
+}
+
 function getFixedStyles({ isCollapsed = true, isInverted = false, collectionPadding = 0, maxVisibleItems = 0, menuLength = NaN, numItems = 0, orientation = 'vertical' }) {
   return asStyleDict({
     root: {
@@ -335,7 +338,7 @@ function getFixedStyles({ isCollapsed = true, isInverted = false, collectionPadd
       ...orientation === 'vertical' ? {
         width: '100%',
         height: isCollapsed ? '0px' : `${menuLength}px`,
-        overflowY: maxVisibleItems === -1 ? 'hidden' : maxVisibleItems < numItems ? 'scroll' : 'hidden',
+        overflowY: maxVisibleItems !== -1 && maxVisibleItems < numItems ? 'scroll' : 'hidden',
         ...isInverted ? {
           marginBottom: `${collectionPadding}px`,
           bottom: '100%',
@@ -346,7 +349,7 @@ function getFixedStyles({ isCollapsed = true, isInverted = false, collectionPadd
       } : {
         width: isCollapsed ? '0px' : `${menuLength}px`,
         height: '100%',
-        overflowX: maxVisibleItems === -1 ? 'hidden' : maxVisibleItems < numItems ? 'scroll' : 'hidden',
+        overflowX: maxVisibleItems !== -1 && maxVisibleItems < numItems ? 'scroll' : 'hidden',
         ...isInverted ? {
           marginRight: `${collectionPadding}px`,
           right: '100%',

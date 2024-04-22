@@ -9,7 +9,7 @@ export type ExtractChildrenProps = HTMLAttributes<HTMLElement>
 export function ExtractChildren({
   children,
   ...props
-}: ExtractChildrenProps) {
+}: Readonly<ExtractChildrenProps>) {
   return (
     <>
       {Children.map(children, child => {

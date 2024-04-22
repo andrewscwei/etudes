@@ -14,12 +14,12 @@ export function Repeat({
   count = 1,
   children,
   render,
-}: RepeatProps) {
+}: Readonly<RepeatProps>) {
   return (
     <>
       {[...Array(count)].map((v, i) => (
         <Fragment key={`element-${i}`}>
-          {render ? render(i) : typeof children === 'function' ? children(i) : children}
+          {render?.(i) ?? (typeof children === 'function' ? children(i) : children)}
         </Fragment>
       ))}
     </>

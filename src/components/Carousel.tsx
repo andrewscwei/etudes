@@ -226,38 +226,35 @@ export const Carousel = forwardRef(({
     }
   }, [isPointerDown])
 
-  if (isDragEnabled && items.length > 1) {
-    useDragEffect(viewportRef, {
-      onDragMove: (displacement: Point) => {
-        switch (orientation) {
-          case 'horizontal':
-            requestAnimationFrame(() => {
-              if (!viewportRef.current) return
-              viewportRef.current.scrollLeft += displacement.x * 1.5
-            })
+  useDragEffect(viewportRef, {
+    isEnabled: isDragEnabled && items.length > 1,
+    onDragMove: (displacement: Point) => {
+      switch (orientation) {
+        case 'horizontal':
+          requestAnimationFrame(() => {
+            if (!viewportRef.current) return
+            viewportRef.current.scrollLeft += displacement.x * 1.5
+          })
 
-            break
-          case 'vertical':
-            requestAnimationFrame(() => {
-              if (!viewportRef.current) return
-              viewportRef.current.scrollTop += displacement.y * 1.5
-            })
+          break
+        case 'vertical':
+          requestAnimationFrame(() => {
+            if (!viewportRef.current) return
+            viewportRef.current.scrollTop += displacement.y * 1.5
+          })
 
-            break
-          default:
-            throw Error(`Unsupported orientation '${orientation}'`)
-        }
-      },
-    })
-  }
+          break
+        default:
+          throw Error(`Unsupported orientation '${orientation}'`)
+      }
+    },
+  })
 
-  if (autoAdvanceInterval > 0) {
-    useTimeout(
-      () => handleIndexChange((index + items.length + 1) % items.length),
-      isPointerDown ? -1 : autoAdvanceInterval,
-      [isPointerDown, index, items.length],
-    )
-  }
+  useTimeout(
+    () => handleIndexChange((index + items.length + 1) % items.length),
+    (isPointerDown || autoAdvanceInterval <= 0) ? -1 : autoAdvanceInterval,
+    [isPointerDown, index, items.length],
+  )
 
   const fixedStyles = getFixedStyles({ isPointerDown, orientation })
 

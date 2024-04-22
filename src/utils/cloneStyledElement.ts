@@ -32,7 +32,7 @@ function cloneStyledElement<P, T extends Component<P, ComponentState> = never>(
     },
     ...otherElementProps,
     ...otherProps,
-  } as any, ...children)
+  }, ...children)
 }
 
 export { cloneStyledElement }

@@ -302,7 +302,7 @@ export const Accordion = forwardRef(({
     const newValue: AccordionSelection = {}
 
     for (const sectionIndex in sections) {
-      if (!Object.prototype.hasOwnProperty.call(sections, sectionIndex)) continue
+      if (!Object.hasOwn(sections, sectionIndex)) continue
 
       const indices = sortIndices([...selection[sectionIndex] ?? []])
 
@@ -471,10 +471,10 @@ export const Accordion = forwardRef(({
                   width: '100%',
                   height: isCollapsed ? '0px' : `${maxLength}px`,
                   marginTop: isCollapsed ? '0px' : `${collectionPadding}px`,
-                  overflowY: maxVisible < 0 ? 'hidden' : maxVisible < allVisible ? 'scroll' : 'hidden',
+                  overflowY: maxVisible < 0 || maxVisible >= allVisible ? 'hidden' : 'scroll',
                 } : {
                   marginLeft: isCollapsed ? '0px' : `${collectionPadding}px`,
-                  overflowX: maxVisible < 0 ? 'hidden' : maxVisible < allVisible ? 'scroll' : 'hidden',
+                  overflowX: maxVisible < 0 || maxVisible >= allVisible ? 'hidden' : 'scroll',
                   width: isCollapsed ? '0px' : `${maxLength}px`,
                   height: '100%',
                 })}
@@ -487,10 +487,18 @@ export const Accordion = forwardRef(({
                 layout={layout}
                 numSegments={numSegments}
                 selection={selection[sectionIndex] ?? []}
-                onActivateAt={itemIndex => onActivateAt?.(itemIndex, sectionIndex)}
-                onDeselectAt={itemIndex => { handleDeselectAt?.(itemIndex, sectionIndex) }}
-                onItemCustomEvent={(itemIndex, name, info) => onItemCustomEvent?.(itemIndex, sectionIndex, name, info)}
-                onSelectAt={itemIndex => { handleSelectAt?.(itemIndex, sectionIndex) }}
+                onActivateAt={itemIndex => {
+                  onActivateAt?.(itemIndex, sectionIndex)
+                }}
+                onDeselectAt={itemIndex => {
+                  handleDeselectAt?.(itemIndex, sectionIndex)
+                }}
+                onItemCustomEvent={(itemIndex, name, info) => {
+                  onItemCustomEvent?.(itemIndex, sectionIndex, name, info)
+                }}
+                onSelectAt={itemIndex => {
+                  handleSelectAt?.(itemIndex, sectionIndex)
+                }}
                 ItemComponent={ItemComponent}
               />
             </div>

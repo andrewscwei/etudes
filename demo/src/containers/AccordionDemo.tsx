@@ -30,23 +30,21 @@ export function AccordionDemo() {
   }]
 
   return (
-    <>
-      <StyledRoot>
-        <StyledAccordion
-          autoCollapseSections={false}
-          expandIconSvg={$$ExpandIcon}
-          orientation='vertical'
-          sections={sections}
-          selection={selection}
-          selectionMode='single'
-          usesDefaultStyles={true}
-          expandedSectionIndices={expandedSectionIndices}
-          onExpandedSectionsChange={setExpandedSectionIndices}
-          onSelectionChange={val => setSelection(val)}
-          ItemComponent={AccordionItem}
-        />
-      </StyledRoot>
-    </>
+    <StyledRoot>
+      <StyledAccordion
+        autoCollapseSections={false}
+        expandIconSvg={$$ExpandIcon}
+        orientation='vertical'
+        sections={sections}
+        selection={selection}
+        selectionMode='single'
+        usesDefaultStyles={true}
+        expandedSectionIndices={expandedSectionIndices}
+        onExpandedSectionsChange={setExpandedSectionIndices}
+        onSelectionChange={val => setSelection(val)}
+        ItemComponent={AccordionItem}
+      />
+    </StyledRoot>
   )
 }
 
