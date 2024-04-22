@@ -129,7 +129,7 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(({
     return t
   }).join(', ')
 
-  const size = (onSizeChange || onLoadStart || onLoadComplete || onLoadError || loadingMode === 'preload') ? useImageSize({
+  const size = useImageSize({
     src: fallbackSrc,
     srcSet: srcSetValue,
     sizes: sizesValue,
@@ -137,7 +137,7 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(({
     onLoadStart,
     onLoadComplete,
     onLoadError,
-  }) : undefined
+  })
 
   useEffect(() => {
     onSizeChange?.(size)

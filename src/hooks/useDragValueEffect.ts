@@ -130,7 +130,7 @@ export function useDragValueEffect<T = [number, number]>(targetRef: RefObject<HT
         interact(targetRef.current).unset()
       }
     }
-  }, [...deps ? deps : []])
+  }, [...deps ?? []])
 
   useEffect(() => {
     if (hasDragged) return

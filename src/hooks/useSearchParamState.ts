@@ -1,8 +1,5 @@
 import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { useDebug } from '../utils'
-
-const debug = useDebug('hooks')
 
 export type Options<T> = {
   /**
@@ -67,8 +64,6 @@ export function useSearchParamState<T>(param: string, defaultValue: T, { mapSear
   const currentState = defaultMapSearchParamToState(searchParams.get(param) ?? undefined, defaultValue)
   const [state, setState] = useState(currentState)
 
-  debug('Using search param state...', 'OK', `param=${param}, defaultValue=${currentState}`)
-
   useEffect(() => {
     const value = searchParams.get(param)
     const newValue = defaultMapStateToSearchParam(state)
@@ -81,8 +76,6 @@ export function useSearchParamState<T>(param: string, defaultValue: T, { mapSear
     else {
       searchParams.set(param, newValue)
     }
-
-    debug('Handling state change...', 'OK', `state=${state}, oldValue=${value}, newValue=${newValue}`)
 
     setSearchParams(searchParams)
   }, [state])

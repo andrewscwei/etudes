@@ -160,3 +160,13 @@ _site
 # Ruby
 .ruby-version
 .ruby-version
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# SonarQube
+.scannerwork/
+sonar-reports/

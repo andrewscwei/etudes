@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
+import React, { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
 import { Each } from '../operators/Each'
 import { asStyleDict, styles } from '../utils'
 
@@ -114,8 +114,7 @@ export type CollectionProps<T> = HTMLAttributes<HTMLDivElement> & {
 
   /**
    * The selected indices. If `selectionMode` is `single`, only only the first
-   * value will be used. If specified, the component will not manage selection
-   * state.
+   * value will be used.
    *
    * @see {@link CollectionSelection}
    */
@@ -195,11 +194,6 @@ export type CollectionProps<T> = HTMLAttributes<HTMLDivElement> & {
  * A collection of selectable items with generic data. Items are generated based
  * on the provided `ItemComponent`. This component supports different layouts in
  * both horizontal and vertical orientations.
- *
- * This component automatically determines if it should track selection state
- * internally. If the `selection` prop is provided, the component will not
- * initialize the selection state. It will be up to its parent to provide item
- * selection in tandem with the component's `onSelectionChange` handler.
  */
 export const Collection = forwardRef(({
   className,
@@ -229,7 +223,7 @@ export const Collection = forwardRef(({
     return false
   }
 
-  const sanitizeSelection = (indices: CollectionSelection) => indices.sort().filter(t => !isIndexOutOfRange(t))
+  const sanitizeSelection = (indices: CollectionSelection) => sortIndices(indices).filter(t => !isIndexOutOfRange(t))
 
   const isSelectedAt = (index: number) => selection.indexOf(index) >= 0
 
@@ -249,7 +243,7 @@ export const Collection = forwardRef(({
 
     switch (selectionMode) {
       case 'multiple': {
-        transform = val => [...val.filter(t => t !== index), index].sort()
+        transform = val => sortIndices([...val.filter(t => t !== index), index])
         break
       }
       case 'single': {
@@ -260,31 +254,20 @@ export const Collection = forwardRef(({
         return
     }
 
-    if (setSelection) {
-      setSelection(prev => transform(prev))
-    }
-    else {
-      const newValue = transform(selection)
+    const newValue = transform(selection)
 
-      prevSelectionRef.current = newValue
-      handleSelectionChange(selection, newValue)
-    }
+    prevSelectionRef.current = newValue
+    handleSelectionChange(selection, newValue)
   }
 
   const deselectAt = (index: number) => {
     if (!isSelectedAt(index)) return
 
     const transform = (val: CollectionSelection) => val.filter(t => t !== index)
+    const newValue = transform(selection)
 
-    if (setSelection) {
-      setSelection(prev => transform(prev))
-    }
-    else {
-      const newValue = transform(selection)
-
-      prevSelectionRef.current = newValue
-      handleSelectionChange(selection, newValue)
-    }
+    prevSelectionRef.current = newValue
+    handleSelectionChange(selection, newValue)
   }
 
   const activateAt = (index: number) => {
@@ -312,13 +295,8 @@ export const Collection = forwardRef(({
     onSelectionChange?.(newValue)
   }
 
-  const tracksSelectionChanges = externalSelection === undefined && selectionMode !== 'none'
-
-  const sanitizedExternalSelection = sanitizeSelection(externalSelection ?? [])
-  const [selection, setSelection] = tracksSelectionChanges ? useState(sanitizedExternalSelection) : [sanitizedExternalSelection]
-
+  const selection = sanitizeSelection(externalSelection ?? [])
   const fixedStyles = getFixedStyles({ itemLength, itemPadding, layout, numSegments, orientation })
-
   const prevSelectionRef = useRef<CollectionSelection>()
   const prevSelection = prevSelectionRef.current
 
@@ -372,6 +350,10 @@ export const Collection = forwardRef(({
 }) as <T>(props: CollectionProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
 Object.defineProperty(Collection, 'displayName', { value: 'Collection', writable: false })
+
+function sortIndices(indices: number[]): number[] {
+  return indices.sort((a, b) => a - b)
+}
 
 function getFixedStyles({ itemLength = NaN, itemPadding = 0, layout = 'collection', numSegments = 1, orientation = 'vertical' }) {
   return asStyleDict({

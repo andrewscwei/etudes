@@ -40,7 +40,7 @@ export function useImageSize({ src, srcSet, sizes }: Params, { preservesSizeBetw
     onLoadError?.(element)
   }
 
-  const [size, setImageSize] = useState<Size | undefined>()
+  const [imageSize, setImageSize] = useState<Size | undefined>()
 
   useLoadImageEffect({ src, srcSet, sizes }, {
     onLoadStart: t => handleLoad(t),
@@ -48,7 +48,7 @@ export function useImageSize({ src, srcSet, sizes }: Params, { preservesSizeBetw
     onLoadError: t => handleLoadError(t),
   })
 
-  return size
+  return imageSize
 }
 
 function getSize(element?: HTMLImageElement): Size | undefined {

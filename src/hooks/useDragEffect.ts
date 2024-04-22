@@ -3,6 +3,11 @@ import { Point } from 'spase'
 
 type Options = {
   /**
+   * Specifies whether this effect is enabled.
+   */
+  isEnabled?: boolean
+
+  /**
    * Specifies whether the cursor icon should update.
    */
   updatesCursor?: boolean
@@ -46,6 +51,7 @@ type Options = {
  * @returns The states created for this effect.
  */
 export function useDragEffect(targetRef: RefObject<HTMLElement>, {
+  isEnabled = true,
   updatesCursor = true,
   onDragStart,
   onDragMove,
@@ -58,7 +64,7 @@ export function useDragEffect(targetRef: RefObject<HTMLElement>, {
   if (updatesCursor && element) element.style.cursor = 'grab'
 
   useEffect(() => {
-    if (!element) return
+    if (!element || !isEnabled) return
 
     const mouseDownHandler = (event: MouseEvent) => {
       event.preventDefault()
@@ -114,5 +120,5 @@ export function useDragEffect(targetRef: RefObject<HTMLElement>, {
       element.removeEventListener('mouseup', mouseUpHandler, { capture: true })
       element.removeEventListener('mouseleave', mouseUpHandler)
     }
-  }, [targetRef.current, ...deps])
+  }, [element, isEnabled, ...deps])
 }
