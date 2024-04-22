@@ -1,9 +1,6 @@
 import React, { forwardRef, useEffect, useRef, type HTMLAttributes, type ReactEventHandler, type RefObject } from 'react'
 import { type Size } from 'spase'
 import { useVideoSize } from '../hooks/useVideoSize'
-import { useDebug } from '../utils'
-
-const debug = useDebug('video')
 
 export type VideoProps = Omit<HTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'controls' | 'loop' | 'muted' | 'playsInline' | 'poster' | 'onCanPlay' | 'onEnded' | 'onPause' | 'onPlay'> & {
   autoLoop?: boolean
@@ -43,18 +40,17 @@ export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
   onSizeChange,
   ...props
 }, ref) => {
-  const videoRef = ref as RefObject<HTMLVideoElement> ?? useRef<HTMLVideoElement>(null)
-  const size = (onLoadMetadata || onLoadMetadataComplete || onLoadMetadataError || onSizeChange) ? useVideoSize({
+  const localRef = useRef<HTMLVideoElement>(null)
+  const videoRef = ref as RefObject<HTMLVideoElement> ?? localRef
+  const size = useVideoSize({
     src,
   }, {
     onLoadStart: onLoadMetadata,
     onLoadComplete: onLoadMetadataComplete,
     onLoadError: onLoadMetadataError,
-  }) : undefined
+  })
 
   useEffect(() => {
-    debug(`Initializing video with source <${src}>...`, 'OK')
-
     if (!videoRef.current) return
 
     videoRef.current.muted = isMuted
@@ -64,8 +60,6 @@ export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
     videoRef.current.addEventListener('fullscreenchange', fullscreenChangeHandler)
 
     return () => {
-      debug(`Deinitializing video with source <${src}>...`, 'OK')
-
       pause()
 
       videoRef.current?.removeEventListener('webkitfullscreenchange', fullscreenChangeHandler)
@@ -85,8 +79,6 @@ export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
   }
 
   const canPlayHandler: ReactEventHandler<HTMLVideoElement> = event => {
-    debug('Checking if video is ready to play...', 'OK')
-
     if (autoPlay && (videoRef.current?.paused ?? false)) {
       play()
     }
@@ -95,17 +87,14 @@ export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
   }
 
   const playHandler: ReactEventHandler<HTMLVideoElement> = event => {
-    debug('Playing video...', 'OK')
     onPlay?.()
   }
 
   const pauseHandler: ReactEventHandler<HTMLVideoElement> = event => {
-    debug('Pausing video...', 'OK')
     onPause?.()
   }
 
   const endHandler: ReactEventHandler<HTMLVideoElement> = event => {
-    debug('Ending video...', 'OK')
     onEnd?.()
   }
 

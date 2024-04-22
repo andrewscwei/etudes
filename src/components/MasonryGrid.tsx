@@ -2,9 +2,7 @@ import clsx from 'clsx'
 import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Rect, Size } from 'spase'
 import { useResizeEffect } from '../hooks/useResizeEffect'
-import { asClassNameDict, asStyleDict, useDebug } from '../utils'
-
-const debug = useDebug('masonry')
+import { asClassNameDict, asStyleDict } from '../utils'
 
 type Orientation = 'horizontal' | 'vertical'
 
@@ -63,8 +61,6 @@ export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
 
     if (!rootNode) return
 
-    debug('Repositioning children... OK')
-
     const nodes = rootNode.children
     const numSections = sections
 
@@ -73,9 +69,7 @@ export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
     if (orientation === 'vertical') {
       const sectionHeights: number[] = [...new Array(numSections)].map(() => 0)
 
-      for (let i = 0; i < nodes.length; i++) {
-        const child = nodes[i]
-
+      for (const child of Array.from(nodes)) {
         if (!(child instanceof HTMLElement)) continue
 
         const base = computeBaseFromElement(child, sections)
@@ -109,9 +103,7 @@ export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
       if (!isNaN(h)) rootNode.style.height = `${h}px`
 
       if (isReversed) {
-        for (let i = 0; i < nodes.length; i++) {
-          const child = nodes[i]
-
+        for (const child of Array.from(nodes)) {
           if (!(child instanceof HTMLElement)) continue
 
           const x = parseFloat(child.style.left)
@@ -123,9 +115,7 @@ export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
     else {
       const sectionWidths: number[] = [...new Array(numSections)].map(() => 0)
 
-      for (let i = 0; i < nodes.length; i++) {
-        const child = nodes[i]
-
+      for (const child of Array.from(nodes)) {
         if (!(child instanceof HTMLElement)) continue
 
         const base = computeBaseFromElement(child, sections)
@@ -159,9 +149,7 @@ export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
       if (!isNaN(w)) rootNode.style.width = `${w}px`
 
       if (isReversed) {
-        for (let i = 0; i < nodes.length; i++) {
-          const child = nodes[i]
-
+        for (const child of Array.from(nodes)) {
           if (!(child instanceof HTMLElement)) continue
 
           const y = parseFloat(child.style.top)
@@ -310,9 +298,7 @@ function computeMaxLength(currentSectionLengths: number[], base?: number): numbe
 function computeBaseFromElement(element: HTMLElement, numSections: number): number {
   const classList = element.classList
 
-  for (let i = 0; i < classList.length; i++) {
-    const c = classList[i]
-
+  for (const c of Array.from(classList)) {
     if (c.startsWith(BASE_MODIFIER_CLASS_PREFIX)) {
       const base = parseFloat(c.replace(BASE_MODIFIER_CLASS_PREFIX, ''))
       if (!isNaN(base)) return Math.min(Math.max(base, 1), numSections)
@@ -332,15 +318,14 @@ function computeBaseFromElement(element: HTMLElement, numSections: number): numb
 function getAllImageSources(htmlString?: string): string[] {
   if (!htmlString) return []
 
-  const regexImg = /<img.*?src=("|')(.*?)("|')/g
-  const regexSrc = /<img.*?src=("|')(.*?)("|')/
-  const imageTags = htmlString.match(regexImg) ?? []
+  const regexImg = /<img.*?src=(["'])(.*?)\1/g
+  const regexSrc = /<img.*?src=(["'])(.*?)\1/
+  const imageTags = regexImg.exec(htmlString) ?? []
 
   const out: string[] = []
 
-  for (let i = 0; i < imageTags.length; i++) {
-    const tag = imageTags[i]
-    const src = tag.match(regexSrc)?.[2]
+  for (const tag of imageTags) {
+    const src = regexSrc.exec(tag)?.[2]
 
     if (!src) continue
 

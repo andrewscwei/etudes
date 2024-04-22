@@ -1,6 +1,5 @@
 import clsx from 'clsx'
-import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
-import { usePrevious } from '../hooks/usePrevious'
+import React, { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
 import { useRect } from '../hooks/useRect'
 import { asStyleDict, cloneStyledElement, styles } from '../utils'
 import { Collection, type CollectionItemProps, type CollectionProps, type CollectionSelection } from './Collection'
@@ -13,6 +12,13 @@ import { FlatSVG } from './FlatSVG'
 export type DropdownItemData = {
   label?: string
 }
+
+/**
+ * Type describing the current item selection of {@link Dropdown}, composed of
+ * an array of indices of items that are selected. If the selection mode of the
+ * {@link Dropdown} is `single`, only one index is expected in this array.
+ */
+export type DropdownSelection = CollectionSelection
 
 /**
  * Type describing the props of `ToggleComponent` provided to {@link Dropdown}.
@@ -43,8 +49,8 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
   collapseIconSvg?: string
 
   /**
-   * Specifies if the internal collection collapses when an item is selected. This
-   * only works if `selectionMode` is `single`.
+   * Specifies if the internal collection collapses when an item is selected.
+   * This only works if `selectionMode` is `single`.
    */
   collapsesOnSelect?: boolean
 
@@ -58,17 +64,16 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
    *
    * @param selection The current selection.
    */
-  label?: (selection: CollectionSelection) => string
+  label?: (selection: DropdownSelection) => string
 
   /**
    * SVG markup to use as the expand icon when a toggle button is automatically
-   * generated (when `ToggleComponent` is absent).
+   * generated (when {@link ToggleComponent} is absent).
    */
   expandIconSvg?: string
 
   /**
-   * Specifies if the internal collection is collapsed. If specified, the
-   * component will not manage expansion state.
+   * Specifies if the internal collection is collapsed.
    */
   isCollapsed?: boolean
 
@@ -120,13 +125,6 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
  * A dropdown component that is invertible (i.e. can "dropup" instead) and
  * supports both horizontal and vertical orientations. Provide `items` and
  * `ItemComponent` props to populate.
- *
- * This component automatically determines if it should track selection state
- * and expansion state internally. If the `selection` prop is provided, the
- * component will not initialize the selection state. It will be up to its
- * parent to provide item selection in tandem with the component's
- * `onSelectionChange` handler. Likewise for the omission of the expansion state
- * if `isCollapsed` prop is provided.
  */
 export const Dropdown = forwardRef(({
   children,
@@ -136,7 +134,7 @@ export const Dropdown = forwardRef(({
   collapsesOnSelect = true,
   collectionPadding = 0,
   expandIconSvg,
-  isCollapsed: externalIsCollapsed,
+  isCollapsed = true,
   isInverted = false,
   label,
   layout,
@@ -169,28 +167,18 @@ export const Dropdown = forwardRef(({
     return false
   }
 
-  const sanitizedSelection = (selection: CollectionSelection) => selection.sort().filter(t => !isIndexOutOfRange(t))
+  const sanitizedSelection = (selection: DropdownSelection) => sortIndices(selection).filter(t => !isIndexOutOfRange(t))
 
   const expand = () => {
     if (!isCollapsed) return
 
-    if (setIsCollapsed) {
-      setIsCollapsed(false)
-    }
-    else {
-      onExpand?.()
-    }
+    onExpand?.()
   }
 
   const collapse = () => {
     if (isCollapsed) return
 
-    if (setIsCollapsed) {
-      setIsCollapsed(true)
-    }
-    else {
-      onCollapse?.()
-    }
+    onCollapse?.()
   }
 
   const toggle = () => {
@@ -208,24 +196,14 @@ export const Dropdown = forwardRef(({
     if (selectionMode === 'single' && collapsesOnSelect) collapse()
   }
 
-  const selectionChangeHandler = (value: CollectionSelection) => {
-    if (setSelection) {
-      setSelection(value)
-    }
-    else {
-      onSelectionChange?.(value)
-    }
+  const selectionChangeHandler = (value: DropdownSelection) => {
+    onSelectionChange?.(value)
   }
 
+  const selection = sanitizedSelection(externalSelection)
   const bodyRef = useRef<HTMLDivElement>(null)
-  const tracksSelectionChanges = externalSelection === undefined && selectionMode !== 'none'
-  const tracksExpansionChanges = externalIsCollapsed === undefined
-
-  const sanitizedExternalSelection = sanitizedSelection(externalSelection)
-  const [selection, setSelection] = tracksSelectionChanges ? useState(sanitizedExternalSelection) : [sanitizedExternalSelection]
-  const [isCollapsed, setIsCollapsed] = tracksExpansionChanges ? useState(true) : [externalIsCollapsed]
-
-  const itemLength = externalItemLength ?? (orientation === 'vertical' ? useRect(bodyRef).height : useRect(bodyRef).width)
+  const bodyRect = useRect(bodyRef)
+  const itemLength = externalItemLength ?? (orientation === 'vertical' ? bodyRect.height : bodyRect.width)
   const numItems = items.length
   const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
   const menuLength = itemLength * numVisibleItems + itemPadding * (numVisibleItems - 1)
@@ -235,31 +213,6 @@ export const Dropdown = forwardRef(({
 
   const ExpandIcon = expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles?.expandIcon}/> : <></>
   const CollapseIcon = collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles?.collapseIcon}/> : ExpandIcon
-
-  if (setSelection) {
-    const prevSelection = usePrevious(selection, { sanitizeDependency: JSON.stringify })
-
-    useEffect(() => {
-      if (prevSelection === undefined) return
-
-      onSelectionChange?.(selection)
-    }, [JSON.stringify(selection)])
-  }
-
-  if (setIsCollapsed) {
-    const prevIsCollapsed = usePrevious(isCollapsed)
-
-    useEffect(() => {
-      if (prevIsCollapsed === undefined) return
-
-      if (isCollapsed) {
-        onCollapse?.()
-      }
-      else {
-        onExpand?.()
-      }
-    }, [isCollapsed])
-  }
 
   useEffect(() => {
     const clickOutsideHandler = (event: MouseEvent) => {
@@ -343,6 +296,10 @@ export const Dropdown = forwardRef(({
 
 Object.defineProperty(Dropdown, 'displayName', { value: 'Dropdown', writable: false })
 
+function sortIndices(indices: number[]): number[] {
+  return indices.sort((a, b) => a - b)
+}
+
 function getFixedStyles({ isCollapsed = true, isInverted = false, collectionPadding = 0, maxVisibleItems = 0, menuLength = NaN, numItems = 0, orientation = 'vertical' }) {
   return asStyleDict({
     root: {
@@ -381,7 +338,7 @@ function getFixedStyles({ isCollapsed = true, isInverted = false, collectionPadd
       ...orientation === 'vertical' ? {
         width: '100%',
         height: isCollapsed ? '0px' : `${menuLength}px`,
-        overflowY: maxVisibleItems === -1 ? 'hidden' : maxVisibleItems < numItems ? 'scroll' : 'hidden',
+        overflowY: maxVisibleItems !== -1 && maxVisibleItems < numItems ? 'scroll' : 'hidden',
         ...isInverted ? {
           marginBottom: `${collectionPadding}px`,
           bottom: '100%',
@@ -392,7 +349,7 @@ function getFixedStyles({ isCollapsed = true, isInverted = false, collectionPadd
       } : {
         width: isCollapsed ? '0px' : `${menuLength}px`,
         height: '100%',
-        overflowX: maxVisibleItems === -1 ? 'hidden' : maxVisibleItems < numItems ? 'scroll' : 'hidden',
+        overflowX: maxVisibleItems !== -1 && maxVisibleItems < numItems ? 'scroll' : 'hidden',
         ...isInverted ? {
           marginRight: `${collectionPadding}px`,
           right: '100%',

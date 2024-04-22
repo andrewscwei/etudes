@@ -57,7 +57,7 @@ export const SwipeContainer = forwardRef<HTMLDivElement, SwipeContainerProps>(({
 
     const dt = Date.now() - time
     const dx = endPosition.x - startPosition.x
-    const dy = endPosition.y - endPosition.y
+    const dy = endPosition.y - startPosition.y
     const vx = dx / dt
     const vy = dy / dt
 

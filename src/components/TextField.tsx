@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useState, type ChangeEvent, type FocusEvent, type HTMLAttributes } from 'react'
+import React, { forwardRef, useEffect, type ChangeEvent, type FocusEvent, type HTMLAttributes } from 'react'
 import { usePrevious } from '../hooks/usePrevious'
 
 export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
@@ -28,16 +28,10 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(({
 
     if (formatted === value) return
 
-    if (setValue) {
-      setValue(formatted)
-    }
-    else {
-      onValueChange?.(formatted)
-    }
+    onValueChange?.(formatted)
   }
 
-  const tracksChanges = externalValue === undefined
-  const [value, setValue] = tracksChanges ? useState(emptyValue) : [externalValue]
+  const value = externalValue ?? emptyValue
   const prevValue = usePrevious(value)
 
   useEffect(() => {

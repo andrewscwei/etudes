@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
+import React, { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren, type RefObject } from 'react'
 import { Size } from 'spase'
 import { useRect } from '../hooks/useRect'
 import { asStyleDict, styles } from '../utils'
@@ -34,12 +34,14 @@ export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
   ...props
 }, ref) => {
   const handleSizeChange = (size?: Size) => {
-    if (setAspectRatio) setAspectRatio(size ? size.width / size.height : NaN)
+    setLocalAspectRatio(size ? size.width / size.height : NaN)
   }
 
-  const rootRef = ref ?? useRef<HTMLDivElement>(null)
-  const [aspectRatio, setAspectRatio] = !isNaN(externalAspectRatio) ? [externalAspectRatio] : useState(NaN)
-  const rootRect = useRect(rootRef as any)
+  const localRef = useRef<HTMLDivElement>(null)
+  const rootRef = ref as RefObject<HTMLDivElement> ?? localRef
+  const [localAspectRatio, setLocalAspectRatio] = useState(NaN)
+  const aspectRatio = isNaN(externalAspectRatio) ? localAspectRatio : externalAspectRatio
+  const rootRect = useRect(rootRef)
   const rootAspectRatio = rootRect.width / rootRect.height
   const imageSize = new Size([
     rootAspectRatio > 1

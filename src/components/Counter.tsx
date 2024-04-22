@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import React, { forwardRef, useEffect, useState, type ComponentType, type HTMLAttributes } from 'react'
+import React, { forwardRef, useEffect, type ComponentType, type HTMLAttributes } from 'react'
 import { usePrevious } from '../hooks/usePrevious'
 import { asStyleDict } from '../utils/asStyleDict'
 import { styles } from '../utils/styles'
@@ -21,7 +21,7 @@ export const Counter = forwardRef<HTMLDivElement, Props>(({
   min = NaN,
   max = NaN,
   allowsInput = true,
-  quantity: externalQuantity,
+  quantity = 0,
   usesDefaultStyles = true,
   onChange,
   AddButtonComponent,
@@ -29,36 +29,19 @@ export const Counter = forwardRef<HTMLDivElement, Props>(({
   ...props
 }, ref) => {
   const handleSubtract = () => {
-    if (setQuantity) {
-      setQuantity(prev => isNaN(min) ? prev - 1 : Math.max(min, prev - 1))
-    }
-    else {
-      onChange?.(isNaN(min) ? quantity - 1 : Math.max(min, quantity - 1))
-    }
+    onChange?.(isNaN(min) ? quantity - 1 : Math.max(min, quantity - 1))
   }
 
   const handleAdd = () => {
-    if (setQuantity) {
-      setQuantity(prev => isNaN(max) ? prev + 1 : Math.min(max, prev + 1))
-    }
-    else {
-      onChange?.(isNaN(max) ? quantity + 1 : Math.min(max, quantity + 1))
-    }
+    onChange?.(isNaN(max) ? quantity + 1 : Math.min(max, quantity + 1))
   }
 
   const handleQuantityChange = (newValue: number) => {
     if (newValue === quantity) return
 
-    if (setQuantity) {
-      setQuantity(newValue)
-    }
-    else {
-      onChange?.(newValue)
-    }
+    onChange?.(newValue)
   }
 
-  const tracksChanges = externalQuantity === undefined
-  const [quantity, setQuantity] = tracksChanges ? useState(1) : [externalQuantity]
   const prevQuantity = usePrevious(quantity)
   const defaultStyles = usesDefaultStyles ? DEFAULT_STYLES : undefined
   const isAddingDisabled = !isNaN(max) && quantity + 1 > max
