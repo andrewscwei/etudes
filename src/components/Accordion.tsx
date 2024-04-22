@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
+import React, { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
 import { Each } from '../operators/Each'
 import { asStyleDict, cloneStyledElement, styles } from '../utils'
 import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection'
@@ -118,8 +118,7 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   sections: S[]
 
   /**
-   * Indices of selected items per section. If specified, the component will not
-   * manage selection state.
+   * Indices of selected items per section.
    *
    * @see {@link AccordionSelection}
    */
@@ -335,12 +334,7 @@ export const Accordion = forwardRef(({
       transform = val => [...val.filter(t => t !== sectionIndex), sectionIndex]
     }
 
-    if (setExpandedSectionIndices) {
-      setExpandedSectionIndices(prev => transform(prev))
-    }
-    else {
-      handleExpandedSectionsChange(expandedSectionIndices, transform(expandedSectionIndices))
-    }
+    handleExpandedSectionsChange(expandedSectionIndices, transform(expandedSectionIndices))
   }
 
   const handleSelectAt = (itemIndex: number, sectionIndex: number) => {
@@ -364,15 +358,10 @@ export const Accordion = forwardRef(({
         return
     }
 
-    if (setSelection) {
-      setSelection(prev => transform(prev))
-    }
-    else {
-      const newValue = transform(selection)
+    const newValue = transform(selection)
 
-      prevSelectionRef.current = newValue
-      handleSelectionChange(selection, newValue)
-    }
+    prevSelectionRef.current = newValue
+    handleSelectionChange(selection, newValue)
   }
 
   const handleDeselectAt = (itemIndex: number, sectionIndex: number) => {
@@ -383,15 +372,10 @@ export const Accordion = forwardRef(({
       [sectionIndex]: (val[sectionIndex] ?? []).filter(t => t !== itemIndex),
     })
 
-    if (setSelection) {
-      setSelection(prev => transform(prev))
-    }
-    else {
-      const newValue = transform(selection)
+    const newValue = transform(selection)
 
-      prevSelectionRef.current = newValue
-      handleSelectionChange(selection, newValue)
-    }
+    prevSelectionRef.current = newValue
+    handleSelectionChange(selection, newValue)
   }
 
   const handleExpandedSectionsChange = (oldValue: number[] | undefined, newValue: number[]) => {
@@ -430,17 +414,10 @@ export const Accordion = forwardRef(({
     onSelectionChange?.(newValue)
   }
 
-  const tracksSelectionChanges = externalSelection === undefined && selectionMode !== 'none'
-  const tracksExpansionChanges = externalExpandedSectionIndices === undefined
-
-  const sanitizedExternalSelection = sanitizeSelection(externalSelection ?? {})
-  const [selection, setSelection] = tracksSelectionChanges ? useState(sanitizedExternalSelection) : [sanitizedExternalSelection]
-  const sanitizedExternalExpandedSectionIndices = sanitizeExpandedSectionIndices(externalExpandedSectionIndices ?? [])
-  const [expandedSectionIndices, setExpandedSectionIndices] = tracksExpansionChanges ? useState(sanitizedExternalExpandedSectionIndices) : [sanitizedExternalExpandedSectionIndices]
-
+  const selection = sanitizeSelection(externalSelection ?? {})
+  const expandedSectionIndices = sanitizeExpandedSectionIndices(externalExpandedSectionIndices ?? [])
   const fixedStyles = getFixedStyles({ orientation })
   const defaultStyles = usesDefaultStyles ? getDefaultStyles({ orientation }) : undefined
-
   const prevSelectionRef = useRef<AccordionSelection>()
   const prevSelection = prevSelectionRef.current
 
