@@ -49,8 +49,8 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
   collapseIconSvg?: string
 
   /**
-   * Specifies if the internal collection collapses when an item is selected. This
-   * only works if `selectionMode` is `single`.
+   * Specifies if the internal collection collapses when an item is selected.
+   * This only works if `selectionMode` is `single`.
    */
   collapsesOnSelect?: boolean
 
@@ -68,7 +68,7 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
 
   /**
    * SVG markup to use as the expand icon when a toggle button is automatically
-   * generated (when `ToggleComponent` is absent).
+   * generated (when {@link ToggleComponent} is absent).
    */
   expandIconSvg?: string
 
@@ -125,13 +125,6 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
  * A dropdown component that is invertible (i.e. can "dropup" instead) and
  * supports both horizontal and vertical orientations. Provide `items` and
  * `ItemComponent` props to populate.
- *
- * This component automatically determines if it should track selection state
- * and expansion state internally. If the `selection` prop is provided, the
- * component will not initialize the selection state. It will be up to its
- * parent to provide item selection in tandem with the component's
- * `onSelectionChange` handler. Likewise for the omission of the expansion state
- * if `isCollapsed` prop is provided.
  */
 export const Dropdown = forwardRef(({
   children,

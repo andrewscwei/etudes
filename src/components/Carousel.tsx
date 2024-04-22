@@ -68,7 +68,7 @@ export type CarouselProps<I> = HTMLAttributes<HTMLElement> & {
 export const Carousel = forwardRef(({
   style,
   autoAdvanceInterval = 0,
-  index: externalIndex = 0,
+  index = 0,
   isDragEnabled = true,
   items = [],
   orientation = 'horizontal',
@@ -111,12 +111,7 @@ export const Carousel = forwardRef(({
   }
 
   const handleIndexChange = (newValue: number) => {
-    if (setIndex) {
-      setIndex(newValue)
-    }
-    else {
-      onIndexChange?.(newValue)
-    }
+    onIndexChange?.(newValue)
   }
 
   const handlePointerDown = (event: PointerEvent) => {
@@ -164,13 +159,11 @@ export const Carousel = forwardRef(({
     }, autoScrollTimeoutMs)
   }
 
-  const tracksIndexChanges = externalIndex === undefined
   const prevIndexRef = useRef<number>()
   const viewportRef = useRef<HTMLDivElement>(null)
   const pointerDownPositionRef = useRef<Point | undefined>()
   const pointerUpPositionRef = useRef<Point | undefined>()
-  const [index, setIndex] = tracksIndexChanges ? useState(0) : [externalIndex]
-  const [exposures, setExposures] = tracksItemExposure ? useState<number[] | undefined>(getItemExposures()) : []
+  const [exposures, setExposures] = useState<number[] | undefined>(getItemExposures())
   const autoScrollTimeoutRef = useRef<NodeJS.Timeout>()
   const autoScrollTimeoutMs = 1000
   const [isPointerDown, setIsPointerDown] = useState(false)
@@ -180,7 +173,7 @@ export const Carousel = forwardRef(({
     if (!viewportElement) return
 
     const scrollHandler = () => {
-      if (setExposures) {
+      if (tracksItemExposure) {
         setExposures(getItemExposures())
       }
 
@@ -290,7 +283,7 @@ export const Carousel = forwardRef(({
               <ItemComponent
                 data-child='item'
                 style={styles(itemStyle, fixedStyles.item)}
-                exposure={exposures?.[idx]}
+                exposure={tracksItemExposure ? exposures?.[idx] : undefined}
                 {...itemProps as any}
               />
             </div>

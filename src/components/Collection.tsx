@@ -194,11 +194,6 @@ export type CollectionProps<T> = HTMLAttributes<HTMLDivElement> & {
  * A collection of selectable items with generic data. Items are generated based
  * on the provided `ItemComponent`. This component supports different layouts in
  * both horizontal and vertical orientations.
- *
- * This component automatically determines if it should track selection state
- * internally. If the `selection` prop is provided, the component will not
- * initialize the selection state. It will be up to its parent to provide item
- * selection in tandem with the component's `onSelectionChange` handler.
  */
 export const Collection = forwardRef(({
   className,
