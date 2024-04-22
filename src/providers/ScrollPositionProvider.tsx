@@ -17,7 +17,7 @@ export const ScrollPositionContext = createContext<ScrollPositionContextValue | 
 
 export function ScrollPositionProvider({
   children,
-}: ScrollPositionProviderProps) {
+}: Readonly<ScrollPositionProviderProps>) {
   const [value, setValue] = useState<ScrollPositionContextValue>({
     minPos: new Point(),
     maxPos: new Point(),

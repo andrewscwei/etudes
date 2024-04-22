@@ -2,9 +2,7 @@ import clsx from 'clsx'
 import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
 import { Rect } from 'spase'
 import { useDragValueEffect } from '../hooks/useDragValueEffect'
-import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, createDebug, styles } from '../utils'
-
-const debug = createDebug('stepwise-slider')
+import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils'
 
 type Orientation = 'horizontal' | 'vertical'
 
@@ -217,7 +215,6 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
     const newPosition = getPositionAt(externalIndex, steps)
 
     if (position !== newPosition) {
-      debug('Updating drag effect value from index prop...', 'OK', `prop=${newPosition}, effect=${position}`)
       setPosition(newPosition)
     }
 
