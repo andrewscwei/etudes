@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { Collection, type CollectionItemProps } from '../../../lib/components/Collection'
+import { Collection, type CollectionItemProps, type CollectionSelection } from '../../../lib/components/Collection'
 import { DebugConsole } from '../../../lib/components/DebugConsole'
-import { Dropdown, type DropdownItemProps } from '../../../lib/components/Dropdown'
+import { Dropdown, type DropdownItemProps, type DropdownSelection } from '../../../lib/components/Dropdown'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
 const DropdownItem = ({ index, isSelected, item, onCustomEvent, ...props }: DropdownItemProps) => (
@@ -21,9 +21,10 @@ const DROPDOWN_ITEMS = [{ label: 'Vertical' }, { label: 'Horizontal' }]
 const LIST_ITEMS = [...new Array(60)].map((v, i) => `${i + 1}`)
 
 export function CollectionDemo() {
-  const [selectedItemIndex, setSelectedItemIndex] = useState(-1)
-  const [selectedOrientationIndex, setSelectedOrientationIndex] = useState(0)
-  const orientation = selectedOrientationIndex === 0 ? 'vertical' : 'horizontal'
+  const [dropdownSelection, setDropdownSelection] = useState<DropdownSelection>([0])
+  const [isDropdownCollapsed, setIsDropdownCollapsed] = useState(true)
+  const [collectionSelection, setCollectionSelection] = useState<CollectionSelection>([])
+  const orientation = dropdownSelection[0] === 0 ? 'vertical' : 'horizontal'
 
   return (
     <>
@@ -45,9 +46,9 @@ export function CollectionDemo() {
           layout='grid'
           numSegments={3}
           orientation={orientation}
-          selection={[selectedItemIndex]}
+          selection={collectionSelection}
           selectionMode='single'
-          onSelectionChange={t => setSelectedItemIndex(t[0])}
+          onSelectionChange={setCollectionSelection}
           ItemComponent={CollectionItem}
         />
       </StyledRoot>
@@ -58,14 +59,17 @@ export function CollectionDemo() {
         items={DROPDOWN_ITEMS}
         maxVisibleItems={-1}
         orientation='vertical'
-        selection={[selectedOrientationIndex]}
+        selection={dropdownSelection}
+        isCollapsed={isDropdownCollapsed}
         usesDefaultStyles={true}
-        onSelectionChange={t => setSelectedOrientationIndex(t[0])}
+        onSelectionChange={setDropdownSelection}
+        onCollapse={() => setIsDropdownCollapsed(true)}
+        onExpand={() => setIsDropdownCollapsed(false)}
         ItemComponent={DropdownItem}
       />
       <DebugConsole
         title='?: Collection+Dropdown'
-        message={selectedItemIndex > -1 ? `<strong>[${orientation.toUpperCase()}]</strong> You selected item <strong>#${selectedItemIndex + 1}</strong>!` : 'No item selected!'}
+        message={collectionSelection[0] > -1 ? `<strong>[${orientation.toUpperCase()}]</strong> You selected item <strong>#${collectionSelection[0] + 1}</strong>!` : 'No item selected!'}
         style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
       />
     </>

@@ -1,6 +1,5 @@
 import clsx from 'clsx'
-import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
-import { usePrevious } from '../hooks/usePrevious'
+import React, { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
 import { useRect } from '../hooks/useRect'
 import { asStyleDict, cloneStyledElement, styles } from '../utils'
 import { Collection, type CollectionItemProps, type CollectionProps, type CollectionSelection } from './Collection'
@@ -13,6 +12,13 @@ import { FlatSVG } from './FlatSVG'
 export type DropdownItemData = {
   label?: string
 }
+
+/**
+ * Type describing the current item selection of {@link Dropdown}, composed of
+ * an array of indices of items that are selected. If the selection mode of the
+ * {@link Dropdown} is `single`, only one index is expected in this array.
+ */
+export type DropdownSelection = CollectionSelection
 
 /**
  * Type describing the props of `ToggleComponent` provided to {@link Dropdown}.
@@ -58,7 +64,7 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
    *
    * @param selection The current selection.
    */
-  label?: (selection: CollectionSelection) => string
+  label?: (selection: DropdownSelection) => string
 
   /**
    * SVG markup to use as the expand icon when a toggle button is automatically
@@ -67,8 +73,7 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
   expandIconSvg?: string
 
   /**
-   * Specifies if the internal collection is collapsed. If specified, the
-   * component will not manage expansion state.
+   * Specifies if the internal collection is collapsed.
    */
   isCollapsed?: boolean
 
@@ -136,7 +141,7 @@ export const Dropdown = forwardRef(({
   collapsesOnSelect = true,
   collectionPadding = 0,
   expandIconSvg,
-  isCollapsed: externalIsCollapsed,
+  isCollapsed = true,
   isInverted = false,
   label,
   layout,
@@ -169,28 +174,18 @@ export const Dropdown = forwardRef(({
     return false
   }
 
-  const sanitizedSelection = (selection: CollectionSelection) => selection.sort().filter(t => !isIndexOutOfRange(t))
+  const sanitizedSelection = (selection: DropdownSelection) => selection.sort().filter(t => !isIndexOutOfRange(t))
 
   const expand = () => {
     if (!isCollapsed) return
 
-    if (setIsCollapsed) {
-      setIsCollapsed(false)
-    }
-    else {
-      onExpand?.()
-    }
+    onExpand?.()
   }
 
   const collapse = () => {
     if (isCollapsed) return
 
-    if (setIsCollapsed) {
-      setIsCollapsed(true)
-    }
-    else {
-      onCollapse?.()
-    }
+    onCollapse?.()
   }
 
   const toggle = () => {
@@ -208,22 +203,13 @@ export const Dropdown = forwardRef(({
     if (selectionMode === 'single' && collapsesOnSelect) collapse()
   }
 
-  const selectionChangeHandler = (value: CollectionSelection) => {
-    if (setSelection) {
-      setSelection(value)
-    }
-    else {
-      onSelectionChange?.(value)
-    }
+  const selectionChangeHandler = (value: DropdownSelection) => {
+    onSelectionChange?.(value)
   }
 
   const bodyRef = useRef<HTMLDivElement>(null)
-  const tracksSelectionChanges = externalSelection === undefined && selectionMode !== 'none'
-  const tracksExpansionChanges = externalIsCollapsed === undefined
 
-  const sanitizedExternalSelection = sanitizedSelection(externalSelection)
-  const [selection, setSelection] = tracksSelectionChanges ? useState(sanitizedExternalSelection) : [sanitizedExternalSelection]
-  const [isCollapsed, setIsCollapsed] = tracksExpansionChanges ? useState(true) : [externalIsCollapsed]
+  const selection = sanitizedSelection(externalSelection)
 
   const itemLength = externalItemLength ?? (orientation === 'vertical' ? useRect(bodyRef).height : useRect(bodyRef).width)
   const numItems = items.length
@@ -235,31 +221,6 @@ export const Dropdown = forwardRef(({
 
   const ExpandIcon = expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles?.expandIcon}/> : <></>
   const CollapseIcon = collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles?.collapseIcon}/> : ExpandIcon
-
-  if (setSelection) {
-    const prevSelection = usePrevious(selection, { sanitizeDependency: JSON.stringify })
-
-    useEffect(() => {
-      if (prevSelection === undefined) return
-
-      onSelectionChange?.(selection)
-    }, [JSON.stringify(selection)])
-  }
-
-  if (setIsCollapsed) {
-    const prevIsCollapsed = usePrevious(isCollapsed)
-
-    useEffect(() => {
-      if (prevIsCollapsed === undefined) return
-
-      if (isCollapsed) {
-        onCollapse?.()
-      }
-      else {
-        onExpand?.()
-      }
-    }, [isCollapsed])
-  }
 
   useEffect(() => {
     const clickOutsideHandler = (event: MouseEvent) => {

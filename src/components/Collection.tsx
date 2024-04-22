@@ -114,8 +114,7 @@ export type CollectionProps<T> = HTMLAttributes<HTMLDivElement> & {
 
   /**
    * The selected indices. If `selectionMode` is `single`, only only the first
-   * value will be used. If specified, the component will not manage selection
-   * state.
+   * value will be used.
    *
    * @see {@link CollectionSelection}
    */

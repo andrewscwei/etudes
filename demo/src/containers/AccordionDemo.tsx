@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { Accordion, type AccordionItemProps, type AccordionSection } from '../../../lib/components/Accordion'
-import { DebugConsole } from '../../../lib/components/DebugConsole'
+import { Accordion, type AccordionItemProps, type AccordionSection, type AccordionSelection } from '../../../lib/components/Accordion'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg'
 
 const AccordionItem = ({ item, index, isSelected, onCustomEvent, ...props }: AccordionItemProps<string>) => (
@@ -13,8 +12,8 @@ const AccordionItem = ({ item, index, isSelected, onCustomEvent, ...props }: Acc
 type Section = AccordionSection<string>
 
 export function AccordionDemo() {
-  const [itemIndex, setItemIndex] = useState(-1)
-  const [sectionIndex, setSectionIndex] = useState(-1)
+  const [expandedSectionIndices, setExpandedSectionIndices] = useState<number[]>([])
+  const [selection, setSelection] = useState<AccordionSelection>([])
 
   const sections: Section[] = [{
     items: ['foo', 'bar', 'baz'],
@@ -38,20 +37,15 @@ export function AccordionDemo() {
           expandIconSvg={$$ExpandIcon}
           orientation='vertical'
           sections={sections}
+          selection={selection}
           selectionMode='single'
           usesDefaultStyles={true}
-          onSelectAt={(itemIdx, sectionIdx) => {
-            setSectionIndex(sectionIdx)
-            setItemIndex(itemIdx)
-          }}
+          expandedSectionIndices={expandedSectionIndices}
+          onExpandedSectionsChange={setExpandedSectionIndices}
+          onSelectionChange={val => setSelection(val)}
           ItemComponent={AccordionItem}
         />
       </StyledRoot>
-      <DebugConsole
-        title='?: Accordion'
-        message={sectionIndex > -1 ? itemIndex > -1 ? `You selected item <strong>#${itemIndex + 1}</strong> in section <strong>#${sectionIndex + 1}</strong>!` : `No item seletected in section <strong>#${sectionIndex + 1}</strong>!` : 'No section selected!'}
-        style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
-      />
     </>
   )
 }
