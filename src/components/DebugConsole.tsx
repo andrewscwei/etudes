@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef, useState, type CSSProperties, type HTMLAttributes } from 'react'
+import { forwardRef, useEffect, useRef, useState, type CSSProperties, type HTMLAttributes } from 'react'
 import { Each } from '../operators/Each'
 import { asStyleDict, styles } from '../utils'
 
@@ -46,11 +46,11 @@ export const DebugConsole = forwardRef<HTMLDivElement, DebugConsoleProps>(({
     <div
       {...props}
       ref={ref}
-      style={styles(style, FIXED_STYLES.root, getStyleByAlignment(align, margin))}
       data-component='debug-console'
+      style={styles(style, FIXED_STYLES.root, getStyleByAlignment(align, margin))}
     >
       <div data-child='header' style={FIXED_STYLES.title}>{title ?? 'Untitled'}</div>
-      <div data-child='messages' ref={messagesRef} style={FIXED_STYLES.messages}>
+      <div ref={messagesRef} data-child='messages' style={FIXED_STYLES.messages}>
         <Each in={messages} render={msg => <div dangerouslySetInnerHTML={{ __html: msg }}/>}/>
       </div>
     </div>

@@ -80,7 +80,7 @@ export function App() {
         >
           <BurgerButtonBar className='bar'/>
         </StyledBurgerButton>
-        <StyledWithTooltip hint='This is wrapped with WithTooltip!' backgroundColor='#fff'>
+        <StyledWithTooltip backgroundColor='#fff' hint='This is wrapped with WithTooltip!'>
           <StyledGithubButton href='https://github.com/andrewscwei/etudes'>
             <FlatSVG svg={$$GithubIcon}/>
           </StyledGithubButton>

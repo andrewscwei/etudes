@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import React, { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
+import { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { Rect, type Size } from 'spase'
 import { useRect } from '../hooks/useRect'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils'
@@ -117,10 +117,10 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
   const defaultStyles = usesDefaultStyles ? getDefaultStyles({ isDragging }) : undefined
 
   return (
-    <div {...props} ref={ref} className={clsx(className, { dragging: isDragging })} style={styles(style, fixedStyles.root)} data-component='panorama-slider'>
+    <div {...props} ref={ref} className={clsx(className, { dragging: isDragging })} data-component='panorama-slider' style={styles(style, fixedStyles.root)}>
       <Panorama
-        angle={angle}
         ref={panoramaRef}
+        angle={angle}
         speed={speed}
         src={src}
         style={fixedStyles.panorama}
@@ -128,10 +128,10 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
         onAngleChange={onAngleChange}
         onDragEnd={dragEndHandler}
         onDragStart={dragStartHandler}
+        onImageSizeChange={setImageSize}
         onLoadImageComplete={onLoadImageComplete}
         onLoadImageError={onLoadImageError}
         onLoadImageStart={onLoadImageStart}
-        onImageSizeChange={setImageSize}
         onPositionChange={onPositionChange}
       />
       <div style={fixedStyles.body}>

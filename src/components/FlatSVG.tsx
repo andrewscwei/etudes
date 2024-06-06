@@ -1,5 +1,5 @@
 import { XMLBuilder, XMLParser } from 'fast-xml-parser'
-import React, { forwardRef, type HTMLAttributes } from 'react'
+import { forwardRef, type HTMLAttributes } from 'react'
 
 export type FlatSVGProps = HTMLAttributes<HTMLDivElement> & {
   /**
@@ -93,9 +93,9 @@ export const FlatSVG = forwardRef<HTMLDivElement, FlatSVGProps>(({
   return (
     <figure
       {...props}
-      data-component='flat-svg'
       ref={ref}
       dangerouslySetInnerHTML={{ __html: sanitizedMarkup() }}
+      data-component='flat-svg'
     />
   )
 })

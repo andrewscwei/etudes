@@ -10,10 +10,13 @@
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "inlineSources": true,
-    "jsx": "react",
-    "lib": ["ES2022", "dom"],
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
+    "module": "CommonJS",
+    "moduleResolution": "Node",
     "noImplicitAny": true,
     "outDir": "./lib",
     "pretty": true,
@@ -24,17 +27,16 @@
     "sourceRoot": "/",
     "strict": true,
     "strictNullChecks": true,
-    "target": "es5"
+    "target": "ES5"
   },
+  "exclude": [
+    "node_modules",
+    "build",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ],
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx"
-  ],
-  "exclude": [
-    "**/*.spec.ts",
-    "**/*.spec.tsx",
-    "node_modules",
-    "build",
-    "tests"
   ]
 }

@@ -33,16 +33,16 @@ export function AccordionDemo() {
     <StyledRoot>
       <StyledAccordion
         autoCollapseSections={false}
+        expandedSectionIndices={expandedSectionIndices}
         expandIconSvg={$$ExpandIcon}
+        ItemComponent={AccordionItem}
         orientation='vertical'
         sections={sections}
         selection={selection}
         selectionMode='single'
         usesDefaultStyles={true}
-        expandedSectionIndices={expandedSectionIndices}
         onExpandedSectionsChange={setExpandedSectionIndices}
         onSelectionChange={val => setSelection(val)}
-        ItemComponent={AccordionItem}
       />
     </StyledRoot>
   )

@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
+import { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Rect, Size } from 'spase'
 import { useResizeEffect } from '../hooks/useResizeEffect'
 import { asClassNameDict, asStyleDict } from '../utils'

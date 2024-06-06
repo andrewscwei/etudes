@@ -67,7 +67,7 @@ const config: Configuration = {
   resolve: {
     alias: {
       ...!isDev ? {} : {
-        'etudes': path.join(cwd, '../lib'),
+        etudes: path.join(cwd, '../lib'),
       },
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],

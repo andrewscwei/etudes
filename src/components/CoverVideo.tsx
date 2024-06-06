@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren, type RefObject } from 'react'
+import { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren, type RefObject } from 'react'
 import { Size } from 'spase'
 import { useRect } from '../hooks/useRect'
 import { asStyleDict, styles } from '../utils'
@@ -63,20 +63,20 @@ export const CoverVideo = forwardRef<HTMLDivElement, CoverVideoProps>(({
   ])
 
   return (
-    <div {...props} ref={rootRef} className={className} style={styles(style, FIXED_STYLES.root)} data-component='cover-video'>
+    <div {...props} ref={rootRef} className={className} data-component='cover-video' style={styles(style, FIXED_STYLES.root)}>
       <Video
-        style={styles(FIXED_STYLES.viewport, {
-          width: `${videoSize.width}px`,
-          height: `${videoSize.height}px`,
-        })}
-        data-child='video'
         autoLoop={autoLoop}
         autoPlay={autoPlay}
+        data-child='video'
         hasControls={hasControls}
         isMuted={isMuted}
         playsInline={playsInline}
         posterSrc={posterSrc}
         src={src}
+        style={styles(FIXED_STYLES.viewport, {
+          width: `${videoSize.width}px`,
+          height: `${videoSize.height}px`,
+        })}
         onCanPlay={onCanPlay}
         onEnd={onEnd}
         onFullscreenChange={onFullscreenChange}

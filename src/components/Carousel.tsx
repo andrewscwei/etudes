@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef, useState, type ComponentType, type ForwardedRef, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactElement } from 'react'
+import { forwardRef, useEffect, useRef, useState, type ComponentType, type ForwardedRef, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactElement } from 'react'
 import { Point, Rect } from 'spase'
 import { useDragEffect } from '../hooks/useDragEffect'
 import { useTimeout } from '../hooks/useTimeout'
@@ -261,17 +261,17 @@ export const Carousel = forwardRef(({
   return (
     <div
       {...props}
-      data-component='carousel'
       ref={ref}
+      data-component='carousel'
       style={styles(style, fixedStyles.root)}
-      onPointerDown={event => handlePointerDown(event)}
-      onPointerUp={event => handlePointerUp(event)}
-      onPointerLeave={event => handlePointerUp(event)}
       onClick={event => handleClick(event)}
+      onPointerDown={event => handlePointerDown(event)}
+      onPointerLeave={event => handlePointerUp(event)}
+      onPointerUp={event => handlePointerUp(event)}
     >
       <div
-        data-child='viewport'
         ref={viewportRef}
+        data-child='viewport'
         style={styles(fixedStyles.viewport)}
       >
         <Each in={items}>
@@ -279,8 +279,8 @@ export const Carousel = forwardRef(({
             <div style={styles(fixedStyles.itemContainer)}>
               <ItemComponent
                 data-child='item'
-                style={styles(itemStyle, fixedStyles.item)}
                 exposure={tracksItemExposure ? exposures?.[idx] : undefined}
+                style={styles(itemStyle, fixedStyles.item)}
                 {...itemProps as any}
               />
             </div>

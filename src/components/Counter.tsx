@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import React, { forwardRef, useEffect, type ComponentType, type HTMLAttributes } from 'react'
+import { forwardRef, useEffect, type ComponentType, type HTMLAttributes } from 'react'
 import { usePrevious } from '../hooks/usePrevious'
 import { asStyleDict } from '../utils/asStyleDict'
 import { styles } from '../utils/styles'
@@ -66,43 +66,43 @@ export const Counter = forwardRef<HTMLDivElement, Props>(({
   return (
     <div
       {...props}
-      data-component='counter'
       ref={ref}
+      data-component='counter'
       style={styles(style, FIXED_STYLES.root, defaultStyles?.root)}
     >
       {SubtractButtonComponent && (
         <SubtractButtonComponent
-          data-child='subtract-button'
           className={clsx({ disabled: isSubtractingDisabled })}
+          data-child='subtract-button'
           style={styles(FIXED_STYLES.subtract)}
           onClick={() => handleSubtract()}
         />
       ) || (
         <button
-          data-child='subtract-button'
           className={clsx({ disabled: isSubtractingDisabled })}
+          data-child='subtract-button'
           style={styles(FIXED_STYLES.subtract, defaultStyles?.subtract)}
           onClick={() => handleSubtract()}
         />
       )}
       <TextField
         data-child='text-field'
-        value={quantity.toString()}
+        formatter={(oldValue, newValue) => isNaN(Number(`0${newValue}`)) ? oldValue : newValue}
         isDisabled={!allowsInput}
-        formatter={(oldValue, newValue) => isNaN(Number(`0${newValue}`)) ? oldValue : newValue }
         style={styles(FIXED_STYLES.text, defaultStyles?.text)}
+        value={quantity.toString()}
       />
       {AddButtonComponent && (
         <AddButtonComponent
-          data-child='add-button'
           className={clsx({ disabled: isAddingDisabled })}
+          data-child='add-button'
           style={styles(FIXED_STYLES.add)}
           onClick={() => handleAdd()}
         />
       ) || (
         <button
-          data-child='add-button'
           className={clsx({ disabled: isAddingDisabled })}
+          data-child='add-button'
           style={styles(FIXED_STYLES.add, defaultStyles?.add)}
           onClick={() => handleAdd()}
         />

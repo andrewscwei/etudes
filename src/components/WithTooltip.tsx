@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import React, { useEffect, useRef, type CSSProperties, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
+import { useEffect, useRef, type CSSProperties, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
 import { Rect, Size } from 'spase'
 import { useRect } from '../hooks/useRect'
 import { useViewportSize } from '../hooks/useViewportSize'

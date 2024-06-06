@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, type ChangeEvent, type FocusEvent, type HTMLAttributes } from 'react'
+import { forwardRef, useEffect, type ChangeEvent, type FocusEvent, type HTMLAttributes } from 'react'
 import { usePrevious } from '../hooks/usePrevious'
 
 export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
@@ -45,10 +45,10 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(({
       {...props}
       ref={ref}
       data-component='text-field'
+      disabled={isDisabled}
       placeholder={placeholder}
       type='text'
       value={value}
-      disabled={isDisabled}
       onBlur={({ target }: FocusEvent<HTMLInputElement>) => onUnfocus?.(target.value)}
       onChange={({ target }: ChangeEvent<HTMLInputElement>) => handleValueChange(target.value)}
       onFocus={({ target }: FocusEvent<HTMLInputElement>) => onFocus?.(target.value)}

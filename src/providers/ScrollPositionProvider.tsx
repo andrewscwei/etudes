@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, type PropsWithChildren, type RefObject } from 'react'
+import { createContext, useContext, useEffect, useState, type PropsWithChildren, type RefObject } from 'react'
 import { Point, Rect } from 'spase'
 
 type ScrollPosition = {

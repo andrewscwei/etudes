@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import React, { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
+import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
 import { Each } from '../operators/Each'
 import { asStyleDict, cloneStyledElement, styles } from '../utils'
 import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection'
@@ -423,7 +423,7 @@ export const Accordion = forwardRef(({
   }, [JSON.stringify(selection)])
 
   return (
-    <div {...props} data-component='accordion' style={styles(style, fixedStyles.root)} ref={ref}>
+    <div {...props} ref={ref} data-component='accordion' style={styles(style, fixedStyles.root)}>
       <Each in={sections}>
         {(section, sectionIndex) => {
           const { collectionPadding = 0, items, itemLength = 50, itemPadding = 0, isSelectionTogglable, layout = 'list', maxVisible = -1, numSegments = 1 } = section
@@ -431,42 +431,54 @@ export const Accordion = forwardRef(({
           const numVisible = maxVisible < 0 ? allVisible : Math.min(allVisible, maxVisible)
           const maxLength = itemLength * numVisible + itemPadding * (numVisible - 1)
           const isCollapsed = !isSectionExpandedAt(sectionIndex)
-          const expandIconComponent = expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles?.expandIcon}/> : <></>
-          const collapseIconComponent = collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles?.collapseIcon}/> : expandIconComponent
+          const expandIconComponent = expandIconSvg ? <FlatSVG style={defaultStyles?.expandIcon} svg={expandIconSvg}/> : <></>
+          const collapseIconComponent = collapseIconSvg ? <FlatSVG style={defaultStyles?.collapseIcon} svg={collapseIconSvg}/> : expandIconComponent
 
           return (
-            <div style={styles(fixedStyles.section, orientation === 'vertical' ? {
-              marginTop: sectionIndex === 0 ? '0px' : `${sectionPadding}px`,
-            } : {
-              marginLeft: sectionIndex === 0 ? '0px' : `${sectionPadding}px`,
-            })}>
+            <div
+              style={styles(fixedStyles.section, orientation === 'vertical' ? {
+                marginTop: sectionIndex === 0 ? '0px' : `${sectionPadding}px`,
+              } : {
+                marginLeft: sectionIndex === 0 ? '0px' : `${sectionPadding}px`,
+              })}
+            >
               {HeaderComponent ? (
                 <HeaderComponent
-                  data-child='header'
                   className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
-                  style={styles(fixedStyles.header)}
+                  data-child='header'
                   index={sectionIndex}
                   isCollapsed={isCollapsed}
                   section={section}
+                  style={styles(fixedStyles.header)}
                   onClick={() => toggleSectionAt(sectionIndex)}
                   onCustomEvent={(name, info) => onHeaderCustomEvent?.(sectionIndex, name, info)}
                 />
               ) : (
                 <button
-                  data-child='header'
                   className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
+                  data-child='header'
                   style={styles(fixedStyles.header, defaultStyles?.header)}
                   onClick={() => toggleSectionAt(sectionIndex)}
                 >
-                  <span style={styles(defaultStyles?.headerLabel)} dangerouslySetInnerHTML={{ __html: section.label }}/>
+                  <span dangerouslySetInnerHTML={{ __html: section.label }} style={styles(defaultStyles?.headerLabel)}/>
                   {cloneStyledElement(isCollapsed ? expandIconComponent : collapseIconComponent, {
                     style: styles(isCollapsed ? fixedStyles.expandIcon : fixedStyles.collapseIcon),
                   })}
                 </button>
               )}
               <Collection
-                data-child='collection'
                 className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
+                data-child='collection'
+                isSelectionTogglable={isSelectionTogglable}
+                ItemComponent={ItemComponent}
+                itemLength={itemLength}
+                itemPadding={itemPadding}
+                items={items}
+                layout={layout}
+                numSegments={numSegments}
+                orientation={orientation}
+                selection={selection[sectionIndex] ?? []}
+                selectionMode={selectionMode}
                 style={styles(fixedStyles.list, defaultStyles?.collection, orientation === 'vertical' ? {
                   width: '100%',
                   height: isCollapsed ? '0px' : `${maxLength}px`,
@@ -478,15 +490,6 @@ export const Accordion = forwardRef(({
                   width: isCollapsed ? '0px' : `${maxLength}px`,
                   height: '100%',
                 })}
-                selectionMode={selectionMode}
-                isSelectionTogglable={isSelectionTogglable}
-                itemLength={itemLength}
-                itemPadding={itemPadding}
-                items={items}
-                orientation={orientation}
-                layout={layout}
-                numSegments={numSegments}
-                selection={selection[sectionIndex] ?? []}
                 onActivateAt={itemIndex => {
                   onActivateAt?.(itemIndex, sectionIndex)
                 }}
@@ -499,7 +502,6 @@ export const Accordion = forwardRef(({
                 onSelectAt={itemIndex => {
                   handleSelectAt?.(itemIndex, sectionIndex)
                 }}
-                ItemComponent={ItemComponent}
               />
             </div>
           )
