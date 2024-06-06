@@ -15,8 +15,8 @@ export function VideoDemo() {
         />
       </StyledRoot>
       <DebugConsole
-        title='?: Video'
         style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
+        title='?: Video'
       />
     </>
   )

@@ -30,6 +30,16 @@ export function CollectionDemo() {
     <>
       <StyledRoot className={orientation}>
         <Collection
+          isSelectionTogglable={true}
+          ItemComponent={CollectionItem}
+          itemLength={50}
+          itemPadding={10}
+          items={LIST_ITEMS}
+          layout='grid'
+          numSegments={3}
+          orientation={orientation}
+          selection={collectionSelection}
+          selectionMode='single'
           style={orientation === 'horizontal' ? {
             height: '80%',
             minHeight: '400px',
@@ -39,38 +49,28 @@ export function CollectionDemo() {
             minWidth: '400px',
             transform: 'translate3d(0, 0, 0) rotate3d(1, 1, 0, 10deg)',
           }}
-          isSelectionTogglable={true}
-          itemLength={50}
-          itemPadding={10}
-          items={LIST_ITEMS}
-          layout='grid'
-          numSegments={3}
-          orientation={orientation}
-          selection={collectionSelection}
-          selectionMode='single'
           onSelectionChange={setCollectionSelection}
-          ItemComponent={CollectionItem}
         />
       </StyledRoot>
       <StyledDropdown
         expandIconSvg={$$ExpandIcon}
+        isCollapsed={isDropdownCollapsed}
         isInverted={false}
+        ItemComponent={DropdownItem}
         itemLength={50}
         items={DROPDOWN_ITEMS}
         maxVisibleItems={-1}
         orientation='vertical'
         selection={dropdownSelection}
-        isCollapsed={isDropdownCollapsed}
         usesDefaultStyles={true}
-        onSelectionChange={setDropdownSelection}
         onCollapse={() => setIsDropdownCollapsed(true)}
         onExpand={() => setIsDropdownCollapsed(false)}
-        ItemComponent={DropdownItem}
+        onSelectionChange={setDropdownSelection}
       />
       <DebugConsole
-        title='?: Collection+Dropdown'
         message={collectionSelection[0] > -1 ? `<strong>[${orientation.toUpperCase()}]</strong> You selected item <strong>#${collectionSelection[0] + 1}</strong>!` : 'No item selected!'}
         style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
+        title='?: Collection+Dropdown'
       />
     </>
   )

@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useState, type HTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, useEffect, useState, type HTMLAttributes, type ReactNode } from 'react'
 
 export type SelectableButtonProps = Omit<HTMLAttributes<HTMLButtonElement>, 'children'> & {
   children?: (props: Pick<SelectableButtonProps, 'isDeselectable' | 'isDisabled' | 'isSelected' | 'label'>) => ReactNode
@@ -45,7 +45,8 @@ export const SelectableButton = forwardRef<HTMLButtonElement, SelectableButtonPr
       {...props}
       ref={ref}
       data-component='selectable-button'
-      onClick={() => toggleSelection()} disabled={isDisabled || isSelected && !isDeselectable}
+      disabled={isDisabled || isSelected && !isDeselectable}
+      onClick={() => toggleSelection()}
     >
       {children?.({ isDeselectable, isDisabled, isSelected, label }) ?? label}
     </button>

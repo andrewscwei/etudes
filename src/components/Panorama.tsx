@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
+import { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Size } from 'spase'
 import { useDragValueEffect } from '../hooks/useDragValueEffect'
 import { useImageSize } from '../hooks/useImageSize'

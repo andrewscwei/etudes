@@ -31,12 +31,12 @@ export function DialSlidersDemo() {
           isInverted={true}
           knobHeight={40}
           knobWidth={60}
+          labelProvider={pos => `${Math.round(getAngleByPosition(pos))}°`}
           onlyDispatchesOnDragEnd={false}
           orientation='vertical'
           position={position}
-          trackPadding={10}
           style={{ height: `${(index + 1) * 30}px` }}
-          labelProvider={pos => `${Math.round(getAngleByPosition(pos))}°`}
+          trackPadding={10}
           onPositionChange={pos => setPosition(pos)}
         >
           <SliderKnob className='knob'/>
@@ -49,10 +49,10 @@ export function DialSlidersDemo() {
           isTrackInteractive={false}
           knobHeight={40}
           knobWidth={60}
+          labelProvider={(pos, idx) => `${idx}`}
           onlyDispatchesOnDragEnd={false}
           orientation='vertical'
           trackPadding={10}
-          labelProvider={(pos, idx) => `${idx}`}
           onIndexChange={idx => setIndex(idx)}
         >
           <StepwiseSliderKnob className='knob'/>
@@ -78,8 +78,8 @@ export function DialSlidersDemo() {
       <DebugConsole
         maxEntries={1}
         message={`Position: ${position.toFixed(3)}, Size: ${index}, Angle: ${Math.round(angle)}°, Min: ${Math.round(min)}°, Max: ${Math.round(max)}°`}
-        title='?: Dial+Sliders'
         style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
+        title='?: Dial+Sliders'
       />
     </>
   )

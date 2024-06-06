@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import React, { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
+import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
 import { Each } from '../operators/Each'
 import { asStyleDict, styles } from '../utils'
 
@@ -311,17 +311,22 @@ export const Collection = forwardRef(({
   return (
     <div
       {...props}
-      data-component='collection'
       ref={ref}
       className={clsx(className)}
+      data-component='collection'
       style={styles(style, fixedStyles.root)}
     >
       {ItemComponent && (
         <Each in={items}>
           {(val, idx) => (
             <ItemComponent
-              data-child='item'
               className={clsx({ selected: isSelectedAt(idx) })}
+              data-child='item'
+              data-index={idx}
+              index={idx}
+              isSelected={isSelectedAt(idx)}
+              item={val}
+              orientation={orientation}
               style={styles(fixedStyles.item, {
                 pointerEvents: isSelectionTogglable !== true && isSelectedAt(idx) ? 'none' : 'auto',
                 ...idx >= items.length - 1 ? {} : {
@@ -334,13 +339,8 @@ export const Collection = forwardRef(({
                   } : {},
                 },
               })}
-              data-index={idx}
-              index={idx}
-              isSelected={isSelectedAt(idx)}
-              item={val}
-              orientation={orientation}
-              onCustomEvent={(name, info) => onItemCustomEvent?.(idx, name, info)}
               onClick={() => activateAt(idx)}
+              onCustomEvent={(name, info) => onItemCustomEvent?.(idx, name, info)}
             />
           )}
         </Each>

@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren, type RefObject } from 'react'
+import { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren, type RefObject } from 'react'
 import { Size } from 'spase'
 import { useRect } from '../hooks/useRect'
 import { asStyleDict, styles } from '../utils'
@@ -53,20 +53,20 @@ export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
   ])
 
   return (
-    <div {...props} ref={rootRef} style={styles(style, FIXED_STYLES.root)} data-component='cover-image'>
+    <div {...props} ref={rootRef} data-component='cover-image' style={styles(style, FIXED_STYLES.root)}>
       <Image
+        alt={alt}
+        data-child='image'
+        sizes={sizes}
+        src={src}
+        srcSet={srcSet}
         style={styles(FIXED_STYLES.viewport, {
           width: `${imageSize.width}px`,
           height: `${imageSize.height}px`,
         })}
-        alt={alt}
-        src={src}
-        srcSet={srcSet}
-        sizes={sizes}
-        onLoadStart={onLoadStart}
         onLoadComplete={onLoadComplete}
         onLoadError={onLoadError}
-        data-child='image'
+        onLoadStart={onLoadStart}
         onSizeChange={size => handleSizeChange(size)}
       />
       {renderViewportContent && (

@@ -30,8 +30,8 @@ export function MasonryGridDemo() {
       </StyledRoot>
       <DebugConsole
         message={itemIndex > -1 ? `You selected item <strong>#${itemIndex + 1}</strong>!` : 'No item seletected!'}
-        title='?: Masonry Grid'
         style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
+        title='?: Masonry Grid'
       />
     </>
   )

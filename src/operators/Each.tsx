@@ -1,4 +1,4 @@
-import React, { Fragment, type ReactNode } from 'react'
+import { Fragment, type ReactNode } from 'react'
 
 export type EachProps<T> = {
   children?: ReactNode | ((value: T, index: number) => ReactNode)

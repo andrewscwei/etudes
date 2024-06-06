@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import React, { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
+import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
 import { useRect } from '../hooks/useRect'
 import { asStyleDict, cloneStyledElement, styles } from '../utils'
 import { Collection, type CollectionItemProps, type CollectionProps, type CollectionSelection } from './Collection'
@@ -211,8 +211,8 @@ export const Dropdown = forwardRef(({
   const fixedStyles = getFixedStyles({ isCollapsed, isInverted, maxVisibleItems, menuLength, numItems, orientation })
   const defaultStyles = usesDefaultStyles ? getDefaultStyles({ orientation }) : undefined
 
-  const ExpandIcon = expandIconSvg ? <FlatSVG svg={expandIconSvg} style={defaultStyles?.expandIcon}/> : <></>
-  const CollapseIcon = collapseIconSvg ? <FlatSVG svg={collapseIconSvg} style={defaultStyles?.collapseIcon}/> : ExpandIcon
+  const ExpandIcon = expandIconSvg ? <FlatSVG style={defaultStyles?.expandIcon} svg={expandIconSvg}/> : <></>
+  const CollapseIcon = collapseIconSvg ? <FlatSVG style={defaultStyles?.collapseIcon} svg={collapseIconSvg}/> : ExpandIcon
 
   useEffect(() => {
     const clickOutsideHandler = (event: MouseEvent) => {
@@ -248,9 +248,9 @@ export const Dropdown = forwardRef(({
   return (
     <div
       {...props}
-      data-component='dropdown'
       ref={ref}
       className={clsx(className, { collapsed: isCollapsed, expanded: !isCollapsed })}
+      data-component='dropdown'
       style={styles(style, fixedStyles.root)}
     >
       <div ref={bodyRef} style={styles(fixedStyles.body)}>
@@ -267,14 +267,14 @@ export const Dropdown = forwardRef(({
             style={styles(fixedStyles.toggle, defaultStyles?.toggle)}
             onClick={() => toggle()}
           >
-            <span style={fixedStyles.toggleLabel} dangerouslySetInnerHTML={{ __html: label?.(selection) ?? (selection.length > 0 ? selection.map(t => items[t].label).join(', ') : '') }}/>
+            <span dangerouslySetInnerHTML={{ __html: label?.(selection) ?? (selection.length > 0 ? selection.map(t => items[t].label).join(', ') : '') }} style={fixedStyles.toggleLabel}/>
             {cloneStyledElement(isCollapsed ? ExpandIcon : CollapseIcon)}
           </button>
         )}
         <Collection
           data-child='collection'
-          style={styles(fixedStyles.collection, defaultStyles?.collection)}
           isSelectionTogglable={isSelectionTogglable}
+          ItemComponent={ItemComponent}
           itemLength={itemLength}
           itemPadding={itemPadding}
           items={items}
@@ -283,11 +283,11 @@ export const Dropdown = forwardRef(({
           orientation={orientation}
           selection={selection}
           selectionMode={selectionMode}
+          style={styles(fixedStyles.collection, defaultStyles?.collection)}
           onActivateAt={onActivateAt}
           onDeselectAt={onDeselectAt}
           onSelectAt={selectAtHandler}
           onSelectionChange={selectionChangeHandler}
-          ItemComponent={ItemComponent}
         />
       </div>
     </div>

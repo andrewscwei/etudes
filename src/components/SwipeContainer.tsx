@@ -1,4 +1,4 @@
-import React, { forwardRef, useState, type HTMLAttributes } from 'react'
+import { forwardRef, useState, type HTMLAttributes } from 'react'
 import { Point } from 'spase'
 
 export type SwipeContainerProps = HTMLAttributes<HTMLDivElement> & {

@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef, type HTMLAttributes, type ReactEventHandler, type RefObject } from 'react'
+import { forwardRef, useEffect, useRef, type HTMLAttributes, type ReactEventHandler, type RefObject } from 'react'
 import { type Size } from 'spase'
 import { useVideoSize } from '../hooks/useVideoSize'
 
@@ -112,9 +112,9 @@ export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
     <video
       {...props}
       ref={ref}
-      data-component='video'
       autoPlay={autoPlay}
       controls={hasControls}
+      data-component='video'
       loop={autoLoop}
       muted={isMuted}
       playsInline={playsInline}

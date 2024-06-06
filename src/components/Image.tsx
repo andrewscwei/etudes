@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, type HTMLAttributes } from 'react'
+import { forwardRef, useEffect, type HTMLAttributes } from 'react'
 import { type Size } from 'spase'
 import { useImageSize } from '../hooks/useImageSize'
 
@@ -150,9 +150,9 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(({
       alt={alt}
       data-component='image'
       loading={loadingMode === 'lazy' ? 'lazy' : 'eager'}
-      srcSet={srcSetValue}
       sizes={sizesValue}
       src={fallbackSrc}
+      srcSet={srcSetValue}
     />
   )
 })

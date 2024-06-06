@@ -36,9 +36,9 @@ export function PanoramaDemo() {
         </StyledSlider>
         <StyledPanorama
           ref={panoramaRef}
-          style={{ width: `${width}px` }}
           angle={angle}
           src={$$PanoramaImage}
+          style={{ width: `${width}px` }}
           zeroAnchor={zeroAnchor}
           onAngleChange={(value, isDragging) => { if (isDragging) setAngle(value) }}
         />
@@ -54,8 +54,8 @@ export function PanoramaDemo() {
       <DebugConsole
         maxEntries={1}
         message={`Angle: ${Math.round(angle)}°`}
-        title='?: Panorama+Slider'
         style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
+        title='?: Panorama+Slider'
       />
     </>
   )

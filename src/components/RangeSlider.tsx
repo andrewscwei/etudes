@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import React, { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
+import { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { useDragValueEffect } from '../hooks/useDragValueEffect'
 import { useRect } from '../hooks/useRect'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils'
@@ -142,9 +142,11 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
         {cloneStyledElement(components.highlight ?? <RangeSliderHighlight style={defaultStyles?.highlight}/>, {
           style: styles(fixedStyles.highlight),
         })}
-        {cloneStyledElement(components.knob ?? <RangeSliderKnob style={styles(defaultStyles?.knob, {
-          transitionProperty: isReleasingStartKnob ? 'opacity, transform' : 'opacity',
-        })}/>, {
+        {cloneStyledElement(components.knob ?? <RangeSliderKnob
+          style={styles(defaultStyles?.knob, {
+            transitionProperty: isReleasingStartKnob ? 'opacity, transform' : 'opacity',
+          })}
+        />, {
           ref: startKnobRef,
           disabled: isDeepEqual([startValue, endValue], [maxValue, maxValue]),
           className: clsx({
@@ -159,19 +161,22 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
             marginTop: `${start}px`,
           }),
         }, <div style={fixedStyles.knobHitbox}/>, areLabelsVisible &&
-          cloneStyledElement(components.label ?? <RangeSliderLabel style={styles(defaultStyles?.label, {
+        cloneStyledElement(components.label ?? <RangeSliderLabel
+          style={styles(defaultStyles?.label, {
             transitionProperty: isReleasingStartKnob ? 'opacity, transform' : 'opacity',
-          })}/>, {
-            className: clsx({
-              dragging: isDraggingStartKnob || isDraggingEndKnob,
-              releasing: isReleasingStartKnob || isReleasingEndKnob,
-            }),
-            style: styles(fixedStyles.label),
-          }, Number(startValue.toFixed(decimalPlaces)).toLocaleString())
-        )}
-        {cloneStyledElement(components.knob ?? <RangeSliderKnob style={styles(defaultStyles?.knob, {
-          transitionProperty: isReleasingEndKnob ? 'opacity, transform' : 'opacity',
-        })}/>, {
+          })}
+        />, {
+          className: clsx({
+            dragging: isDraggingStartKnob || isDraggingEndKnob,
+            releasing: isReleasingStartKnob || isReleasingEndKnob,
+          }),
+          style: styles(fixedStyles.label),
+        }, Number(startValue.toFixed(decimalPlaces)).toLocaleString()))}
+        {cloneStyledElement(components.knob ?? <RangeSliderKnob
+          style={styles(defaultStyles?.knob, {
+            transitionProperty: isReleasingEndKnob ? 'opacity, transform' : 'opacity',
+          })}
+        />, {
           ref: endKnobRef,
           disabled: isDeepEqual([startValue, endValue], [maxValue, maxValue]),
           className: clsx({
@@ -186,16 +191,17 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
             marginTop: `${end}px`,
           }),
         }, <div style={fixedStyles.knobHitbox}/>, areLabelsVisible &&
-          cloneStyledElement(components.label ?? <RangeSliderLabel style={styles(defaultStyles?.label, {
+        cloneStyledElement(components.label ?? <RangeSliderLabel
+          style={styles(defaultStyles?.label, {
             transitionProperty: isReleasingEndKnob ? 'opacity, transform' : 'opacity',
-          })}/>, {
-            className: clsx({
-              dragging: isDraggingEndKnob,
-              releasing: isReleasingEndKnob,
-            }),
-            style: styles(fixedStyles.label),
-          }, Number(endValue.toFixed(decimalPlaces)).toLocaleString())
-        )}
+          })}
+        />, {
+          className: clsx({
+            dragging: isDraggingEndKnob,
+            releasing: isReleasingEndKnob,
+          }),
+          style: styles(fixedStyles.label),
+        }, Number(endValue.toFixed(decimalPlaces)).toLocaleString()))}
       </div>
     </div>
   )

@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import React, { forwardRef, useEffect, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
+import { forwardRef, useEffect, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { Repeat } from '../operators/Repeat'
 import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils'
 
@@ -76,13 +76,13 @@ export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
       {...props}
       ref={ref}
       className={clsx(className, fixedClassNames.root)}
-      style={styles(style, fixedStyles.root)}
       data-component='burger-button'
+      style={styles(style, fixedStyles.root)}
       onClick={() => setIsActive(!isActive)}
     >
       <Repeat count={isDoubleJointed ? 2 : 1}>
         {j => (
-          <div style={styles(fixedStyles.joint, (fixedStyles as any)[`joint${j}`])} data-child='joint'>
+          <div data-child='joint' style={styles(fixedStyles.joint, (fixedStyles as any)[`joint${j}`])}>
             <Repeat count={3}>
               {i => cloneStyledElement(components.bar ?? <BurgerButtonBar style={defaultStyles?.bar}/>, {
                 'className': clsx(fixedClassNames.bar),

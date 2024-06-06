@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import React, { forwardRef, useEffect, type ComponentType, type HTMLAttributes, type PropsWithChildren } from 'react'
+import { forwardRef, useEffect, type ComponentType, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { useInterval } from '../hooks/useInterval'
 import { Each } from '../operators/Each'
 import { asClassNameDict, asStyleDict, styles } from '../utils'
@@ -91,7 +91,7 @@ export const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(
   }, [index])
 
   return (
-    <div {...props} className={clsx(className, fixedClassNames.root)} ref={ref} data-component='rotating-gallery'>
+    <div {...props} ref={ref} className={clsx(className, fixedClassNames.root)} data-component='rotating-gallery'>
       <Each in={srcs}>
         {(src, idx) => {
           const isVisible = idx === index
@@ -100,6 +100,9 @@ export const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(
             <ImageComponent
               className={clsx(fixedClassNames.image)}
               data-child='item'
+              index={idx}
+              isVisible={isVisible}
+              src={src}
               style={styles(
                 fixedStyles.image,
                 defaultStyles?.image,
@@ -107,15 +110,13 @@ export const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(
                   opacity: isVisible ? '1' : '0',
                 } : {},
               )}
-              isVisible={isVisible}
-              index={idx}
-              src={src}
             />
           ) : (
             <img
               className={clsx(fixedClassNames.image)}
-              loading={lazy ? 'lazy' : 'eager'}
               data-child='item'
+              loading={lazy ? 'lazy' : 'eager'}
+              src={src}
               style={styles(
                 fixedStyles.image,
                 defaultStyles?.image,
@@ -123,7 +124,6 @@ export const RotatingGallery = forwardRef<HTMLDivElement, RotatingGalleryProps>(
                   opacity: isVisible ? '1' : '0',
                 } : {},
               )}
-              src={src}
             />
           )
         }}

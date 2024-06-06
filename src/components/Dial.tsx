@@ -1,4 +1,4 @@
-import React, { forwardRef, type HTMLAttributes, type PropsWithChildren, type SVGAttributes } from 'react'
+import { forwardRef, type HTMLAttributes, type PropsWithChildren, type SVGAttributes } from 'react'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils'
 
 export type DialProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
@@ -70,9 +70,9 @@ export const Dial = forwardRef<HTMLDivElement, DialProps>(({
   const defaultStyles = usesDefaultStyles ? getDefaultStyles() : undefined
 
   return (
-    <div {...props} ref={ref} style={styles(style, fixedStyles.root)} data-component='dial'>
+    <div {...props} ref={ref} data-component='dial' style={styles(style, fixedStyles.root)}>
       <div style={fixedStyles.trackContainer}>
-        <svg width={diameter} height={diameter} viewBox={`0 0 ${diameter} ${diameter}`} style={fixedStyles.svgContainer}>
+        <svg height={diameter} style={fixedStyles.svgContainer} viewBox={`0 0 ${diameter} ${diameter}`} width={diameter}>
           {cloneStyledElement(components.track ?? <DialTrack style={defaultStyles?.track}/>, {
             cx: radius,
             cy: radius,
@@ -82,7 +82,7 @@ export const Dial = forwardRef<HTMLDivElement, DialProps>(({
         </svg>
       </div>
       <div style={styles(fixedStyles.knobContainer)}>
-        <svg viewBox={`0 0 ${diameter} ${diameter}`} xmlns='http://www.w3.org/2000/svg' style={fixedStyles.svgContainer}>
+        <svg style={fixedStyles.svgContainer} viewBox={`0 0 ${diameter} ${diameter}`} xmlns='http://www.w3.org/2000/svg'>
           {cloneStyledElement(components.knob ?? <DialKnob style={defaultStyles?.knob}/>, {
             strokeWidth: knobThickness,
             d: arcPath(radius, radius, radius - knobThickness / 2 - (trackThickness - knobThickness) / 2, -clampedKnobAngle / 2, clampedKnobAngle / 2),
