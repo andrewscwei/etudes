@@ -17,9 +17,15 @@ jobs:
         uses: andrewscwei/actions/node-build@v1
       - name: Create release
         env:
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_AUTH }}
-        run: npx semantic-release
+        run: |
+          cp -r lib/* .
+          npx semantic-release
       - name: Deploy to GitHub pages
         uses: andrewscwei/actions/gh-pages-deploy@v1
         with:
