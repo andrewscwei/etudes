@@ -160,8 +160,7 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
           } : {
             marginTop: `${start}px`,
           }),
-        }, <div style={fixedStyles.knobHitbox}/>, areLabelsVisible &&
-        cloneStyledElement(components.label ?? <RangeSliderLabel
+        }, <div style={fixedStyles.knobHitbox}/>, areLabelsVisible && cloneStyledElement(components.label ?? <RangeSliderLabel
           style={styles(defaultStyles?.label, {
             transitionProperty: isReleasingStartKnob ? 'opacity, transform' : 'opacity',
           })}
@@ -190,8 +189,7 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
           } : {
             marginTop: `${end}px`,
           }),
-        }, <div style={fixedStyles.knobHitbox}/>, areLabelsVisible &&
-        cloneStyledElement(components.label ?? <RangeSliderLabel
+        }, <div style={fixedStyles.knobHitbox}/>, areLabelsVisible && cloneStyledElement(components.label ?? <RangeSliderLabel
           style={styles(defaultStyles?.label, {
             transitionProperty: isReleasingEndKnob ? 'opacity, transform' : 'opacity',
           })}
