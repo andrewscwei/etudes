@@ -1,7 +1,5 @@
 import react from '@vitejs/plugin-react'
-import autoprefixer from 'autoprefixer'
 import path from 'node:path'
-import tailwind from 'tailwindcss'
 import { defineConfig } from 'vite'
 
 export default defineConfig(({ mode }) => ({
@@ -10,14 +8,6 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: path.resolve(__dirname, '../.gh-pages'),
     target: 'esnext',
-  },
-  css: {
-    postcss: {
-      plugins: [
-        tailwind() as any,
-        autoprefixer() as any,
-      ],
-    },
   },
   plugins: [
     react(),
