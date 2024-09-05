@@ -1,5 +1,5 @@
 import { forwardRef, type HTMLAttributes, type PropsWithChildren, type SVGAttributes } from 'react'
-import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils'
+import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 
 export type DialProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   /**

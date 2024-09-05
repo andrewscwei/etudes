@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useRef, type HTMLAttributes, type ReactEventHandler, type RefObject } from 'react'
 import { type Size } from 'spase'
-import { useVideoSize } from '../hooks/useVideoSize'
+import { useVideoSize } from '../hooks/useVideoSize.js'
 
 export type VideoProps = Omit<HTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'controls' | 'loop' | 'muted' | 'playsInline' | 'poster' | 'onCanPlay' | 'onEnded' | 'onPause' | 'onPlay'> & {
   autoLoop?: boolean

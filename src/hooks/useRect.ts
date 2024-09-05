@@ -1,6 +1,6 @@
 import { useState, type RefObject } from 'react'
 import { Rect } from 'spase'
-import { useResizeEffect } from './useResizeEffect'
+import { useResizeEffect } from './useResizeEffect.js'
 
 /**
  * Hook for monitoring changes in and returning the size and position of the

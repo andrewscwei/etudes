@@ -1,8 +1,8 @@
 import { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren, type RefObject } from 'react'
 import { Size } from 'spase'
-import { useRect } from '../hooks/useRect'
-import { asStyleDict, styles } from '../utils'
-import { Image, type ImageProps } from './Image'
+import { useRect } from '../hooks/useRect.js'
+import { asStyleDict, styles } from '../utils/index.js'
+import { Image, type ImageProps } from './Image.js'
 
 export type CoverImageProps = Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<ImageProps, 'alt' | 'loadingMode' | 'sizes' | 'src' | 'srcSet' | 'onLoadStart' | 'onLoadComplete' | 'onLoadError'> & PropsWithChildren<{
   /**

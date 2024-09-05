@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Size } from 'spase'
-import { useLoadVideoMetadataEffect, type UseLoadVideoMetadataEffectOptions, type UseLoadVideoMetadataEffectParams } from './useLoadVideoMetadataEffect'
+import { useLoadVideoMetadataEffect, type UseLoadVideoMetadataEffectOptions, type UseLoadVideoMetadataEffectParams } from './useLoadVideoMetadataEffect.js'
 
 type Params = UseLoadVideoMetadataEffectParams
 

@@ -1,8 +1,8 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
 import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
-import { Each } from '../operators/Each'
-import { asStyleDict, styles } from '../utils'
+import { Each } from '../operators/Each.js'
+import { asStyleDict, styles } from '../utils/index.js'
 
 /**
  * Type describing the layout orientation of items in {@link Collection}.

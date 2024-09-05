@@ -1,5 +1,5 @@
 import { Children, isValidElement, type HTMLAttributes } from 'react'
-import { cloneStyledElement } from '../utils'
+import { cloneStyledElement } from '../utils/index.js'
 
 export type ExtractChildrenProps = HTMLAttributes<HTMLElement>
 

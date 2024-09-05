@@ -1,8 +1,8 @@
-import React, { useMemo, useState } from 'react'
+import { DebugConsole } from 'etudes/components/DebugConsole'
+import { MasonryGrid } from 'etudes/components/MasonryGrid'
+import { Each } from 'etudes/operators/Each'
+import { useMemo, useState } from 'react'
 import styled from 'styled-components'
-import { DebugConsole } from '../../../lib/components/DebugConsole'
-import { MasonryGrid } from '../../../lib/components/MasonryGrid'
-import { Each } from '../../../lib/operators/Each'
 
 export function MasonryGridDemo() {
   const [itemIndex, setItemIndex] = useState(-1)

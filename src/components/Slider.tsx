@@ -1,8 +1,8 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, useRef, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
 import { Rect } from 'spase'
-import { useDragValueEffect } from '../hooks/useDragValueEffect'
-import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils'
+import { useDragValueEffect } from '../hooks/useDragValueEffect.js'
+import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 
 type Orientation = 'horizontal' | 'vertical'
 

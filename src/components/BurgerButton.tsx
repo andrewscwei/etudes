@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
-import { Repeat } from '../operators/Repeat'
-import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils'
+import { Repeat } from '../operators/Repeat.js'
+import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 
 export type BurgerButtonProps = HTMLAttributes<HTMLButtonElement> & PropsWithChildren<{
   height?: number

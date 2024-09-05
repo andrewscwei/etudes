@@ -1,9 +1,9 @@
 import { forwardRef, useEffect, useRef, useState, type ComponentType, type ForwardedRef, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactElement } from 'react'
 import { Point, Rect } from 'spase'
-import { useDragEffect } from '../hooks/useDragEffect'
-import { useTimeout } from '../hooks/useTimeout'
-import { Each } from '../operators/Each'
-import { asStyleDict, styles } from '../utils'
+import { useDragEffect } from '../hooks/useDragEffect.js'
+import { useTimeout } from '../hooks/useTimeout.js'
+import { Each } from '../operators/Each.js'
+import { asStyleDict, styles } from '../utils/index.js'
 
 export type CarouselOrientation = 'horizontal' | 'vertical'
 

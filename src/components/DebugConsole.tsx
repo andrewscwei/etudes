@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useRef, useState, type CSSProperties, type HTMLAttributes } from 'react'
-import { Each } from '../operators/Each'
-import { asStyleDict, styles } from '../utils'
+import { Each } from '../operators/Each.js'
+import { asStyleDict, styles } from '../utils/index.js'
 
 export type DebugConsoleProps = HTMLAttributes<HTMLDivElement> & {
   align?: 'tl' | 'tc' | 'tr' | 'cl' | 'cc' | 'cr' | 'bl' | 'bc' | 'br'

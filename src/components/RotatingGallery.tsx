@@ -1,8 +1,8 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, type ComponentType, type HTMLAttributes, type PropsWithChildren } from 'react'
-import { useInterval } from '../hooks/useInterval'
-import { Each } from '../operators/Each'
-import { asClassNameDict, asStyleDict, styles } from '../utils'
+import { useInterval } from '../hooks/useInterval.js'
+import { Each } from '../operators/Each.js'
+import { asClassNameDict, asStyleDict, styles } from '../utils/index.js'
 
 export type RotatingGalleryImageProps = HTMLAttributes<HTMLElement> & {
   index: number
