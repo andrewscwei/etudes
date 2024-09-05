@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { DebugConsole } from 'etudes/components/DebugConsole'
+import { Panorama } from 'etudes/components/Panorama'
+import { PanoramaSlider } from 'etudes/components/PanoramaSlider'
+import { Slider, SliderKnob } from 'etudes/components/Slider'
+import { useSize } from 'etudes/hooks/useSize'
+import { useEffect, useRef, useState } from 'react'
 import { Size } from 'spase'
 import styled from 'styled-components'
-import { DebugConsole } from '../../../lib/components/DebugConsole'
-import { Panorama } from '../../../lib/components/Panorama'
-import { PanoramaSlider } from '../../../lib/components/PanoramaSlider'
-import { Slider, SliderKnob } from '../../../lib/components/Slider'
-import { useSize } from '../../../lib/hooks/useSize'
 import $$PanoramaImage from '../assets/images/panorama.png'
 
 export function PanoramaDemo() {

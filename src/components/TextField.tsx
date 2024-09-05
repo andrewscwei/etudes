@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, type ChangeEvent, type FocusEvent, type HTMLAttributes } from 'react'
-import { usePrevious } from '../hooks/usePrevious'
+import { usePrevious } from '../hooks/usePrevious.js'
 
 export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
   emptyValue?: string

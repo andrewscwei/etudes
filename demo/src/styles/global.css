@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind utilities;
+
+html {
+  background: theme("colors.black");
+  font-family: "Roboto Mono";
+  font-weight: 400;
+}

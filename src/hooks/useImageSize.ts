@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Size } from 'spase'
-import { useLoadImageEffect, type UseLoadImageEffectOptions, type UseLoadImageEffectParams } from './useLoadImageEffect'
+import { useLoadImageEffect, type UseLoadImageEffectOptions, type UseLoadImageEffectParams } from './useLoadImageEffect.js'
 
 type Params = UseLoadImageEffectParams
 

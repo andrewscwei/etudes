@@ -1,9 +1,8 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, type ComponentType, type HTMLAttributes } from 'react'
-import { usePrevious } from '../hooks/usePrevious'
-import { asStyleDict } from '../utils/asStyleDict'
-import { styles } from '../utils/styles'
-import { TextField } from './TextField'
+import { usePrevious } from '../hooks/usePrevious.js'
+import { asStyleDict, styles } from '../utils/index.js'
+import { TextField } from './TextField.js'
 
 type Props = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & {
   min?: number

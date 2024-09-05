@@ -1,9 +1,9 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
-import { useRect } from '../hooks/useRect'
-import { asStyleDict, cloneStyledElement, styles } from '../utils'
-import { Collection, type CollectionItemProps, type CollectionProps, type CollectionSelection } from './Collection'
-import { FlatSVG } from './FlatSVG'
+import { useRect } from '../hooks/useRect.js'
+import { asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
+import { Collection, type CollectionItemProps, type CollectionProps, type CollectionSelection } from './Collection.js'
+import { FlatSVG } from './FlatSVG.js'
 
 /**
  * Base extendable type describing the data provided to each item in

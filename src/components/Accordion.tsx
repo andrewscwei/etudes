@@ -1,10 +1,10 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
 import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
-import { Each } from '../operators/Each'
-import { asStyleDict, cloneStyledElement, styles } from '../utils'
-import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection'
-import { FlatSVG } from './FlatSVG'
+import { Each } from '../operators/Each.js'
+import { asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
+import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection.js'
+import { FlatSVG } from './FlatSVG.js'
 
 /**
  * Type describing the current item selection of {@link Accordion}, composed of

@@ -1,9 +1,9 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
 import { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
-import { useDragValueEffect } from '../hooks/useDragValueEffect'
-import { useRect } from '../hooks/useRect'
-import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils'
+import { useDragValueEffect } from '../hooks/useDragValueEffect.js'
+import { useRect } from '../hooks/useRect.js'
+import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 
 type Orientation = 'horizontal' | 'vertical'
 

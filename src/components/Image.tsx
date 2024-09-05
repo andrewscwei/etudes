@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, type HTMLAttributes } from 'react'
 import { type Size } from 'spase'
-import { useImageSize } from '../hooks/useImageSize'
+import { useImageSize } from '../hooks/useImageSize.js'
 
 export type ImageProps = Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'srcSet' | 'sizes' | 'src' | 'loading' | 'onLoadStart'> & {
   /**

@@ -1,9 +1,9 @@
 import clsx from 'clsx'
 import { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { Rect, type Size } from 'spase'
-import { useRect } from '../hooks/useRect'
-import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils'
-import { Panorama, type PanoramaProps } from './Panorama'
+import { useRect } from '../hooks/useRect.js'
+import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
+import { Panorama, type PanoramaProps } from './Panorama.js'
 
 export type PanoramaSliderProps = PanoramaProps & PropsWithChildren<{
   /**

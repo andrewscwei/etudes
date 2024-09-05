@@ -1,10 +1,10 @@
 import clsx from 'clsx'
 import { useEffect, useRef, type CSSProperties, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
 import { Rect, Size } from 'spase'
-import { useRect } from '../hooks/useRect'
-import { useViewportSize } from '../hooks/useViewportSize'
-import { ExtractChild } from '../operators/ExtractChild'
-import { asStyleDict, styles } from '../utils'
+import { useRect } from '../hooks/useRect.js'
+import { useViewportSize } from '../hooks/useViewportSize.js'
+import { ExtractChild } from '../operators/ExtractChild.js'
+import { asStyleDict, styles } from '../utils/index.js'
 
 type Alignment = 'tl' | 'tc' | 'tr' | 'cl' | 'cr' | 'bl' | 'bc' | 'br'
 

@@ -1,8 +1,8 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Rect, Size } from 'spase'
-import { useResizeEffect } from '../hooks/useResizeEffect'
-import { asClassNameDict, asStyleDict } from '../utils'
+import { useResizeEffect } from '../hooks/useResizeEffect.js'
+import { asClassNameDict, asStyleDict } from '../utils/index.js'
 
 type Orientation = 'horizontal' | 'vertical'
 

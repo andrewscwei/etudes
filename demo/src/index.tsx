@@ -1,8 +1,9 @@
-import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { App } from './App'
+import { App } from './App.js'
 
-if (process.env.NODE_ENV === 'development') {
+import './styles/global.css'
+
+if (import.meta.env.DEV) {
   window.localStorage.debug = 'demo*,etudes*'
 }
 

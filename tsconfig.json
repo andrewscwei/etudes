@@ -1,42 +1,25 @@
 {
   "compilerOptions": {
-    "allowJs": false,
     "allowSyntheticDefaultImports": true,
-    "declaration": true,
-    "diagnostics": true,
-    "downlevelIteration": true,
-    "emitDecoratorMetadata": true,
-    "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "forceConsistentCasingInFileNames": true,
-    "inlineSources": true,
     "jsx": "react-jsx",
     "lib": [
-      "ES2022",
+      "ESNext",
       "DOM"
     ],
-    "module": "CommonJS",
+    "module": "ESNext",
     "moduleResolution": "Node",
     "noImplicitAny": true,
-    "outDir": "./lib",
-    "pretty": true,
-    "removeComments": false,
-    "resolveJsonModule": true,
+    "outDir": "lib",
     "skipLibCheck": true,
-    "sourceMap": true,
-    "sourceRoot": "/",
     "strict": true,
     "strictNullChecks": true,
-    "target": "ES5"
+    "target": "ESNext"
   },
   "exclude": [
     "node_modules",
-    "build",
-    "**/*.spec.ts",
-    "**/*.spec.tsx"
+    "build"
   ],
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx"
+    "src"
   ]
 }
