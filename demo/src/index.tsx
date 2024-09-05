@@ -1,8 +1,6 @@
 import { createRoot } from 'react-dom/client'
 import { App } from './App.js'
 
-import './styles/global.css'
-
 if (import.meta.env.DEV) {
   window.localStorage.debug = 'demo*,etudes*'
 }
