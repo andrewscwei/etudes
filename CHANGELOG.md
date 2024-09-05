@@ -1,3 +1,10 @@
+## [5.3.1](https://github.com/andrewscwei/etudes/compare/v5.3.0...v5.3.1) (2024-09-05)
+
+
+### Bug Fixes
+
+* GitHub Pages ([d9ea507](https://github.com/andrewscwei/etudes/commit/d9ea50728236835495ee63f2ecc704a72615f7bf))
+
 # [5.3.0](https://github.com/andrewscwei/etudes/compare/v5.2.0...v5.3.0) (2024-09-05)
 
 
