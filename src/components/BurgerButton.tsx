@@ -1,59 +1,47 @@
 import clsx from 'clsx'
-import { forwardRef, useEffect, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
+import { forwardRef, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { Repeat } from '../operators/Repeat.js'
 import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 
 export type BurgerButtonProps = HTMLAttributes<HTMLButtonElement> & PropsWithChildren<{
-  height?: number
   isActive?: boolean
-  isDoubleJointed?: boolean
-  isLastBarHalfWidth?: boolean
-  thickness?: number
-  transitionDuration?: number
+  isSplit?: boolean
+  isTailHidden?: boolean
   usesDefaultStyles?: boolean
-  width?: number
   onActivate?: () => void
   onDeactivate?: () => void
+  onToggle?: (isActive: boolean) => void
 }>
 
 /**
  * Three-striped burger button component that transforms into an "X" when
  * selected.
  *
- * @exports BurgerButtonBar Component for each line on the burger button.
+ * @exports BurgerButtonBar Component for each bar in the burger button.
  */
 export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
   children,
   className,
   style,
-  height = 20,
-  isActive: externalIsActive = false,
-  isDoubleJointed = false,
-  isLastBarHalfWidth = false,
-  thickness = 2,
-  transitionDuration = 200,
+  isActive = false,
+  isTailHidden = false,
+  isSplit = false,
   usesDefaultStyles = false,
-  width = 20,
   onActivate,
   onDeactivate,
+  onToggle,
   ...props
 }, ref) => {
-  const [isActive, setIsActive] = useState(externalIsActive)
+  const onClick = () => {
+    onToggle?.(isActive)
 
-  useEffect(() => {
-    if (isActive === externalIsActive) return
-
-    setIsActive(externalIsActive)
-  }, [externalIsActive])
-
-  useEffect(() => {
     if (isActive) {
-      onActivate?.()
-    }
-    else {
       onDeactivate?.()
     }
-  }, [isActive])
+    else {
+      onActivate?.()
+    }
+  }
 
   const components = asComponentDict(children, {
     bar: BurgerButtonBar,
@@ -68,7 +56,7 @@ export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
     }),
   })
 
-  const fixedStyles = getFixedStyles({ height, width, isDoubleJointed, thickness, isActive, isLastBarHalfWidth })
+  const fixedStyles = getFixedStyles({ isSplit, isActive, isTailHidden })
   const defaultStyles = usesDefaultStyles ? getDefaultStyles() : undefined
 
   return (
@@ -78,16 +66,15 @@ export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
       className={clsx(className, fixedClassNames.root)}
       data-component='burger-button'
       style={styles(style, fixedStyles.root)}
-      onClick={() => setIsActive(!isActive)}
+      onClick={onClick}
     >
-      <Repeat count={isDoubleJointed ? 2 : 1}>
+      <Repeat count={isSplit ? 2 : 1}>
         {j => (
           <div data-child='joint' style={styles(fixedStyles.joint, (fixedStyles as any)[`joint${j}`])}>
             <Repeat count={3}>
               {i => cloneStyledElement(components.bar ?? <BurgerButtonBar style={defaultStyles?.bar}/>, {
-                'className': clsx(fixedClassNames.bar),
-                'style': styles(fixedStyles.bar, (fixedStyles as any)[`bar${j}${i}`]),
-                'data-index': i,
+                className: clsx(fixedClassNames.bar),
+                style: styles(fixedStyles.bar, (fixedStyles as any)[`bar${j}${i}`]),
               })}
             </Repeat>
           </div>
@@ -99,22 +86,26 @@ export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
 
 Object.defineProperty(BurgerButton, 'displayName', { value: 'BurgerButton', writable: false })
 
-export const BurgerButtonBar = ({ ...props }: HTMLAttributes<HTMLSpanElement>) => <span {...props} data-child='bar'/>
+export const BurgerButtonBar = ({ ...props }: HTMLAttributes<HTMLSpanElement>) => (
+  <span {...props} data-child='bar'/>
+)
 
-function getFixedStyles({ height = 0, width = 0, isDoubleJointed = false, thickness = 0, isActive = false, isLastBarHalfWidth = false }) {
+function getFixedStyles({
+  isActive = false,
+  isSplit = false,
+  isTailHidden = false,
+}) {
   return asStyleDict({
     root: {
       background: 'transparent',
       border: 'none',
       display: 'block',
-      height: `${height}px`,
       outline: 'none',
-      width: `${width}px`,
     },
     joint: {
       height: '100%',
       position: 'absolute',
-      width: isDoubleJointed ? '50%' : '100%',
+      width: isSplit ? '50%' : '100%',
     },
     joint0: {
       left: '0',
@@ -125,7 +116,6 @@ function getFixedStyles({ height = 0, width = 0, isDoubleJointed = false, thickn
       top: '0',
     },
     bar: {
-      height: `${thickness}px`,
       margin: '0',
       padding: '0',
       position: 'absolute',
@@ -133,41 +123,41 @@ function getFixedStyles({ height = 0, width = 0, isDoubleJointed = false, thickn
     },
     bar00: {
       left: '0',
-      top: '0',
-      transform: isActive ? `translate3d(0, ${height * 0.5 - thickness * 0.5}px, 0) rotate(45deg)` : 'translate3d(0, 0, 0) rotate(0deg)',
-      transformOrigin: isDoubleJointed ? 'right center' : 'center',
+      top: isActive ? '50%' : '0',
+      transform: isActive ? 'translate(0, -50%) rotate(45deg)' : 'translate(0, 0) rotate(0deg)',
+      transformOrigin: isSplit ? 'right center' : 'center',
     },
     bar01: {
       left: '0',
-      top: `${height * 0.5 - thickness * 0.5}px`,
-      transform: isActive ? 'translate3d(0, 0, 0) scale(0)' : 'translate3d(0, 0, 0) scale(1)',
-      transformOrigin: isDoubleJointed ? 'right center' : 'center',
+      top: '50%',
+      transform: isActive ? 'translate(0, -50%) scale(0)' : 'translate(0, -50%) scale(1)',
+      transformOrigin: isSplit ? 'right center' : 'center',
     },
     bar02: {
       left: '0',
-      top: `${height - thickness}px`,
-      transform: isActive ? `translate3d(0, ${thickness * 0.5 - height * 0.5}px, 0) rotate(-45deg)` : 'translate3d(0, 0, 0) rotate(0deg)',
-      transformOrigin: isDoubleJointed ? 'right center' : 'center',
-      width: isActive || isDoubleJointed ? '100%' : `${isLastBarHalfWidth ? '50%' : '100%'}`,
+      top: isActive ? '50%' : '100%',
+      transform: isActive ? 'translate(0, -50%) rotate(-45deg)' : 'translate(0, -100%) rotate(0deg)',
+      transformOrigin: isSplit ? 'right center' : 'center',
+      width: isActive || isSplit ? '100%' : `${isTailHidden ? '50%' : '100%'}`,
     },
     bar10: {
       left: '0',
-      top: '0',
-      transform: isActive ? `translate3d(0, ${height * 0.5 - thickness * 0.5}px, 0) rotate(-45deg)` : 'translate3d(0, 0, 0) rotate(0deg)',
+      top: isActive ? '50%' : '0',
+      transform: isActive ? 'translate(0, -50%) rotate(-45deg)' : 'translate(0, 0) rotate(0deg)',
       transformOrigin: 'left center',
     },
     bar11: {
       left: '0',
-      top: `${height * 0.5 - thickness * 0.5}px`,
-      transform: isActive ? 'translate3d(0, 0, 0) scale(0)' : 'translate3d(0, 0, 0) scale(1)',
+      top: '50%',
+      transform: isActive ? 'translate(0, -50%) scale(0)' : 'translate(0, -50%) scale(1)',
       transformOrigin: 'left center',
     },
     bar12: {
       left: '0',
-      top: `${height - thickness}px`,
-      transform: isActive ? `translate3d(0, ${thickness * 0.5 - height * 0.5}px, 0) rotate(45deg)` : 'translate3d(0, 0, 0) rotate(0deg)',
+      top: isActive ? '50%' : '100%',
+      transform: isActive ? 'translate(0, -50%) rotate(45deg)' : 'translate(0, -100%) rotate(0deg)',
       transformOrigin: 'left center',
-      width: isLastBarHalfWidth && !isActive ? '0' : '100%',
+      width: isTailHidden && !isActive ? '0' : '100%',
     },
   })
 }
@@ -175,9 +165,10 @@ function getFixedStyles({ height = 0, width = 0, isDoubleJointed = false, thickn
 function getDefaultStyles() {
   return asStyleDict({
     bar: {
+      height: '2px',
       background: '#fff',
       transitionDuration: '100ms',
-      transitionProperty: 'width, height, transform, opacity, background',
+      transitionProperty: 'background, height, opacity, transform, width, left, top, right, bottom',
       transitionTimingFunction: 'ease-out',
     },
   })
