@@ -1,14 +1,14 @@
 import clsx from 'clsx'
 import { MasonryGrid } from 'etudes/components/MasonryGrid'
 import { Each } from 'etudes/operators/Each'
-import { useMemo, type HTMLAttributes, type PropsWithChildren } from 'react'
+import { type HTMLAttributes, type PropsWithChildren } from 'react'
 import { Frame } from '../components/Frame.js'
 
 export function MasonryGridDemo() {
-  const items = useMemo(() => [...new Array(100)].map((v, i) => ({
+  const items = [...new Array(100)].map((v, i) => ({
     h: Math.floor(Math.random() * 6) + 1,
     b: Math.floor(Math.random() * 1) + 1,
-  })), [])
+  }))
 
   return (
     <Frame

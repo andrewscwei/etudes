@@ -6,7 +6,7 @@ export function OptionButtonDemo() {
   const [index, setIndex] = useState(0)
 
   return (
-    <Frame title='OptionButton'>
+    <Frame title='OptionButton' onReset={() => setIndex(0)}>
       {(_, setFeedback) => (
         <OptionButton
           className='ia text-md flex items-center justify-center border border-black px-4 py-1'
