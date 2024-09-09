@@ -48,7 +48,7 @@ export function WithTooltip({
   children,
   className,
   style,
-  arrowHeight = 8,
+  arrowHeight = 6,
   backgroundColor = '#000',
   gap = 5,
   hint,
@@ -210,28 +210,28 @@ function makeDisplacementStyle(alignment: Alignment, arrowHeight: number, gap: n
 function makeContentPositionStyle(alignment: Alignment, arrowHeight: number, gap: number): CSSProperties {
   switch (alignment) {
     case 'tl': return {
-      transform: `translate3d(calc(-100% - ${gap}px), calc(-100% - ${gap}px), 0)`,
+      transform: `translate(calc(-100% - ${gap}px), calc(-100% - ${gap}px))`,
     }
     case 'tc': return {
-      transform: `translate3d(-50%, calc(-100% - ${gap}px), 0)`,
+      transform: `translate(-50%, calc(-100% - ${gap}px))`,
     }
     case 'tr': return {
-      transform: `translate3d(calc(100% + ${gap}px), calc(-100% - ${gap}px), 0)`,
+      transform: `translate(calc(100% + ${gap}px), calc(-100% - ${gap}px))`,
     }
     case 'cl': return {
-      transform: `translate3d(calc(-100% - ${gap}px), -50%, 0)`,
+      transform: `translate(calc(-100% - ${gap}px), -50%)`,
     }
     case 'cr': return {
-      transform: `translate3d(calc(100% + ${gap}px), -50%, 0)`,
+      transform: `translate(calc(100% + ${gap}px), -50%)`,
     }
     case 'bl': return {
-      transform: `translate3d(calc(-100% - ${gap}px), calc(100% + ${gap}px), 0)`,
+      transform: `translate(calc(-100% - ${gap}px), calc(100% + ${gap}px))`,
     }
     case 'bc': return {
-      transform: `translate3d(-50%, calc(100% + ${gap}px), 0)`,
+      transform: `translate(-50%, calc(100% + ${gap}px))`,
     }
     case 'br': return {
-      transform: `translate3d(calc(100% + ${gap}px), calc(100% + ${gap}px), 0)`,
+      transform: `translate(calc(100% + ${gap}px), calc(100% + ${gap}px))`,
     }
     default: return {
 
@@ -243,35 +243,35 @@ function makeArrowPositionStyle(alignment: Alignment, arrowHeight: number, gap: 
   switch (alignment) {
     case 'tl': return {
       borderColor: `${color} transparent transparent transparent`,
-      transform: `translate3d(calc(0% - ${gap}px - ${arrowHeight * 3}px), calc(0% - ${gap}px), 0)`,
+      transform: `translate(calc(0% - ${gap}px - ${arrowHeight * 3}px), calc(0% - ${gap}px))`,
     }
     case 'tc': return {
       borderColor: `${color} transparent transparent transparent`,
-      transform: `translate3d(-50%, calc(0% - ${gap}px), 0)`,
+      transform: `translate(-50%, calc(0% - ${gap}px))`,
     }
     case 'tr': return {
       borderColor: `${color} transparent transparent transparent`,
-      transform: `translate3d(calc(100% + ${gap}px + ${arrowHeight}px), calc(0% - ${gap}px), 0)`,
+      transform: `translate(calc(100% + ${gap}px + ${arrowHeight}px), calc(0% - ${gap}px))`,
     }
     case 'cl': return {
       borderColor: `transparent transparent transparent ${color}`,
-      transform: `translate3d(calc(0% - ${gap}px), -50%, 0)`,
+      transform: `translate(calc(0% - ${gap}px), -50%)`,
     }
     case 'cr': return {
       borderColor: `transparent ${color} transparent transparent`,
-      transform: `translate3d(calc(0% + ${gap}px), -50%, 0)`,
+      transform: `translate(calc(0% + ${gap}px), -50%)`,
     }
     case 'bl': return {
       borderColor: `transparent transparent ${color} transparent`,
-      transform: `translate3d(calc(0% - ${gap}px - ${arrowHeight * 3}px), calc(0% + ${gap}px), 0)`,
+      transform: `translate(calc(0% - ${gap}px - ${arrowHeight * 3}px), calc(0% + ${gap}px))`,
     }
     case 'bc': return {
       borderColor: `transparent transparent ${color} transparent`,
-      transform: `translate3d(-50%, calc(0% + ${gap}px), 0)`,
+      transform: `translate(-50%, calc(0% + ${gap}px))`,
     }
     case 'br': return {
       borderColor: `transparent transparent ${color} transparent`,
-      transform: `translate3d(calc(100% + ${gap}px + ${arrowHeight}px), calc(0% + ${gap}px), 0)`,
+      transform: `translate(calc(100% + ${gap}px + ${arrowHeight}px), calc(0% + ${gap}px))`,
     }
     default: return {
 
@@ -279,7 +279,15 @@ function makeArrowPositionStyle(alignment: Alignment, arrowHeight: number, gap: 
   }
 }
 
-function getFixedStyles({ rect = new Rect(), arrowHeight = 0, alignment = 'tl' as Alignment, backgroundColor = '', maxTextWidth = 0, textSize = new Size(), gap = 0 }) {
+function getFixedStyles({
+  alignment = 'tl' as Alignment,
+  arrowHeight = 0,
+  backgroundColor = '',
+  gap = 0,
+  maxTextWidth = 0,
+  rect = new Rect(),
+  textSize = new Size(),
+}) {
   return asStyleDict({
     dialog: {
       background: 'none',
