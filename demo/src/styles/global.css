@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  height: 100%;
+  width: 100%;
+  background: theme("colors.bg");
+}
+
+body {
+  height: 100%;
+  width: 100%;
+}
+
+.pp {
+  perspective: 800px;
+}
+
+.os {
+  -webkit-overflow-scrolling: touch;
+}
+
+.vb {
+  backdrop-filter: blur(20px);
+}
+
+.grid {
+  background: linear-gradient(
+      -90deg,
+      rgba(63, 59, 56, 0.04) 1px,
+      transparent 1px
+    ),
+    linear-gradient(rgba(63, 59, 56, 0.04) 1px, transparent 1px),
+    theme("colors.bg");
+  background-size: 8px 8px;
+}
+
+.ia {
+  @apply transition-opacity hover:opacity-60;
+}
