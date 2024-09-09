@@ -13,11 +13,11 @@ export function SelectableButtonDemo() {
       ]}
       title='SelectableButton'
     >
-      {(selectedOptions, setFeedback) => (
+      {([isDeselectable, isDisabled], setFeedback) => (
         <SelectableButton
           className='ia text-md flex items-center justify-center border border-black px-4 py-1 active:bg-black active:text-white disabled:pointer-events-none'
-          isDeselectable={selectedOptions[1] === 'isDeselectable=true'}
-          isDisabled={selectedOptions[0] === 'isDisabled=true'}
+          isDeselectable={isDeselectable === 'isDeselectable=true'}
+          isDisabled={isDisabled === 'isDisabled=true'}
           isSelected={isSelected}
           label='Button'
           onToggle={t => {
