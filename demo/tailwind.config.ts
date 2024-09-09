@@ -10,11 +10,9 @@ export default {
     screens: {
       tab: '640px',
       note: '1025px',
-      desk: '1440px',
     },
     colors: {
       white: '#fff',
-      red: '#ff0054',
       black: '#3f3b38',
       bg: '#a9a293',
     },
