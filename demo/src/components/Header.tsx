@@ -8,7 +8,7 @@ type Props = HTMLAttributes<HTMLElement>
 
 export function Header({ className, ...props }: Props) {
   return (
-    <header {...props} className={clsx(className, 'text-md px-safe-or-8 pt-safe-or-4 sticky top-0 flex items-center justify-between border-b border-black/20 pb-4 text-black')}>
+    <header {...props} className={clsx(className, 'vb text-md px-safe-or-4 pt-safe-or-4 sticky top-0 flex items-center justify-between border-b border-black/20 pb-4 text-black')}>
       <div className='flex items-center justify-start gap-3'>
         <h1 className='font-bold'>Études</h1>
         <span className='text-sm'>[a study of headless React components]</span>
