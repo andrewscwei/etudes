@@ -1,4 +1,4 @@
-import { CycleButton } from 'etudes/components/CycleButton'
+import { OptionButton } from 'etudes/components/OptionButton'
 import { Conditional } from 'etudes/operators/Conditional'
 import { Repeat } from 'etudes/operators/Repeat'
 import { useState, type ReactNode } from 'react'
@@ -20,12 +20,12 @@ export function Frame({
   return (
     <div className='relative flex flex-col'>
       <h2 className='text-bg w-full overflow-hidden rounded-t-md bg-black px-3 py-1 text-sm'>{title}</h2>
-      <div className='flex flex-1 flex-col overflow-hidden rounded-b-md border border-t-0 border-black/40'>
+      <div className='gb flex flex-1 flex-col overflow-hidden rounded-b-md border border-t-0 border-black/40'>
         <Conditional if={options.length > 0}>
           <div className='flex flex-wrap items-center justify-start gap-1 p-2'>
             <Repeat count={options.length}>
               {i => (
-                <CycleButton
+                <OptionButton
                   className='ia flex h-6 items-center justify-center rounded-md border border-black/40 px-2 text-sm'
                   index={options[i].indexOf(selectedOptions[i])}
                   options={options[i]}

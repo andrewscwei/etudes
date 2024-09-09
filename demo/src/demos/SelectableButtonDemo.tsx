@@ -1,6 +1,6 @@
 import { SelectableButton } from 'etudes/components/SelectableButton'
 import { useState } from 'react'
-import { Frame } from '../components/Frame'
+import { Frame } from '../components/Frame.js'
 
 export function SelectableButtonDemo() {
   const [isSelected, setIsSelected] = useState(false)
@@ -8,10 +8,10 @@ export function SelectableButtonDemo() {
   return (
     <Frame
       options={[
-        ['isDisabled=false', 'isDisabled=true'],
         ['isDeselectable=true', 'isDeselectable=false'],
+        ['isDisabled=false', 'isDisabled=true'],
       ]}
-      title='components/SelectableButton'
+      title='SelectableButton'
     >
       {(selectedOptions, setFeedback) => (
         <SelectableButton

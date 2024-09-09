@@ -7,7 +7,7 @@ export type CycleButtonProps = Omit<HTMLAttributes<HTMLButtonElement>, 'disabled
   onChange?: (value: string, index: number) => void
 }
 
-export const CycleButton = forwardRef<HTMLButtonElement, CycleButtonProps>(({
+export const OptionButton = forwardRef<HTMLButtonElement, CycleButtonProps>(({
   index = 0,
   isDisabled = false,
   options,
@@ -41,4 +41,4 @@ export const CycleButton = forwardRef<HTMLButtonElement, CycleButtonProps>(({
   )
 })
 
-Object.defineProperty(CycleButton, 'displayName', { value: 'CycleButton', writable: false })
+Object.defineProperty(OptionButton, 'displayName', { value: 'OptionButton', writable: false })

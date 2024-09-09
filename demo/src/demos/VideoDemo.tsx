@@ -1,43 +1,28 @@
-import { DebugConsole } from 'etudes/components/DebugConsole'
 import { Video } from 'etudes/components/Video'
-import styled from 'styled-components'
 import $$Video from '../assets/media/video.mp4'
+import { Frame } from '../components/Frame.js'
 
 export function VideoDemo() {
   return (
-    <>
-      <StyledRoot>
-        <StyledVideo
-          autoLoop={true}
+    <Frame
+      options={[
+        ['autoLoop=true', 'autoLoop=false'],
+        ['hasControls=false', 'hasControls=true'],
+      ]}
+      title='Video'
+    >
+      {([autoLoop, hasControls], setFeedback) => (
+        <Video
+          autoLoop={autoLoop === 'autoLoop=true'}
           autoPlay={true}
+          className='grayscale'
+          hasControls={hasControls === 'hasControls=true'}
           src={$$Video}
+          onEnd={() => setFeedback('Stopped')}
+          onPause={() => setFeedback('Paused')}
+          onPlay={() => setFeedback('Playing')}
         />
-      </StyledRoot>
-      <DebugConsole
-        style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
-        title='?: Video'
-      />
-    </>
+      )}
+    </Frame>
   )
 }
-
-const StyledVideo = styled(Video)`
-  height: 100%;
-  left: 0;
-  margin: 0;
-  object-fit: cover;
-  position: absolute;
-  top: 0;
-  transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(10deg);
-  width: 100%;
-`
-
-const StyledRoot = styled.div`
-  box-sizing: border-box;
-  display: block;
-  height: 100%;
-  overflow: hidden;
-  padding: 30px;
-  perspective: 800px;
-  width: 100%;
-`

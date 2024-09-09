@@ -1,6 +1,6 @@
 import { BurgerButton, BurgerButtonBar } from 'etudes/components/BurgerButton'
 import { useState } from 'react'
-import { Frame } from '../components/Frame'
+import { Frame } from '../components/Frame.js'
 
 export function BurgerButtonDemo() {
   const [isNavActive, setIsNavActive] = useState(false)
@@ -11,7 +11,7 @@ export function BurgerButtonDemo() {
         ['isSplit=false', 'isSplit=true'],
         ['isTailHidden=false', 'isTailHidden=true'],
       ]}
-      title='components/BurgerButton'
+      title='BurgerButton'
     >
       {(selectedOptions, setFeedback) => (
         <BurgerButton
