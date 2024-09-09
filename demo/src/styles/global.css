@@ -25,7 +25,7 @@ body {
   backdrop-filter: blur(20px);
 }
 
-.grid {
+.gb {
   background: linear-gradient(
       -90deg,
       rgba(63, 59, 56, 0.04) 1px,

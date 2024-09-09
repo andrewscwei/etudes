@@ -1,7 +1,7 @@
 import { Accordion, type AccordionItemProps, type AccordionSection, type AccordionSelection } from 'etudes/components/Accordion'
 import { useState, type HTMLAttributes } from 'react'
 import $$ExpandIcon from '../assets/svgs/expand-icon.svg?raw'
-import { Frame } from '../components/Frame'
+import { Frame } from '../components/Frame.js'
 
 type Props = HTMLAttributes<HTMLDivElement>
 

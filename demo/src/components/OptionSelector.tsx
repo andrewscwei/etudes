@@ -1,4 +1,4 @@
-import { CycleButton } from '../../../lib/components/CycleButton'
+import { OptionButton } from '../../../lib/components/OptionButton'
 
 type Props = {
   options: string[]
@@ -7,6 +7,6 @@ type Props = {
 
 export function OptionSelector({ options, onChange }: Props) {
   return (
-    <CycleButton options={options} onChange={onChange}/>
+    <OptionButton options={options} onChange={onChange}/>
   )
 }
