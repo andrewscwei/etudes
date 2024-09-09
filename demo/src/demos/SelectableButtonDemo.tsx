@@ -12,6 +12,7 @@ export function SelectableButtonDemo() {
         ['isDisabled=false', 'isDisabled=true'],
       ]}
       title='SelectableButton'
+      onReset={() => setIsSelected(false)}
     >
       {([isDeselectable, isDisabled], setFeedback) => (
         <SelectableButton

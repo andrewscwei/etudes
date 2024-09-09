@@ -20,6 +20,7 @@ export default {
       sans: ['Roboto Mono', 'sans-serif'],
     },
     fontSize: {
+      xs: '.6rem',
       sm: '.7rem',
       md: '.8rem',
       lg: '1.1rem',
@@ -57,6 +58,7 @@ export default {
     require('tailwindcss-safe-area'),
     function ({ addVariant }) {
       addVariant('active', '&.active')
+      addVariant('selected', '&.selected')
       addVariant('disabled', '&.disabled')
       addVariant('svg', '& svg')
       addVariant('svg*', '& svg *')

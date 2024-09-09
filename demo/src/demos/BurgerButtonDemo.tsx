@@ -12,13 +12,14 @@ export function BurgerButtonDemo() {
         ['isTailHidden=false', 'isTailHidden=true'],
       ]}
       title='BurgerButton'
+      onReset={() => setIsNavActive(false)}
     >
-      {(selectedOptions, setFeedback) => (
+      {([isSplit, isTailHidden], setFeedback) => (
         <BurgerButton
           className='ia relative size-4'
           isActive={isNavActive}
-          isSplit={selectedOptions[0] === 'isSplit=true'}
-          isTailHidden={selectedOptions[1] === 'isTailHidden=true'}
+          isSplit={isSplit === 'isSplit=true'}
+          isTailHidden={isTailHidden === 'isTailHidden=true'}
           onToggle={t => {
             setFeedback(t ? 'Inactive' : 'Active')
             setIsNavActive(!t)
