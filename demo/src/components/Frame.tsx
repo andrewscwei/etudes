@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import { OptionButton } from 'etudes/components/OptionButton'
 import { Conditional } from 'etudes/operators/Conditional'
 import { Repeat } from 'etudes/operators/Repeat'
@@ -5,20 +6,29 @@ import { useState, type ReactNode } from 'react'
 
 type Props = {
   children: ReactNode | ((selectedOptions: string[], setFeedback: (feedback: string) => void) => ReactNode)
+  alignment?: 'start' | 'center' | 'end'
   options?: string[][]
   title: string
+  useMaxHeight?: boolean
 }
 
 export function Frame({
   children,
+  alignment = 'center',
   options = [],
   title,
+  useMaxHeight = false,
 }: Props) {
   const [selectedOptions, setSelectedOptions] = useState<string[]>(options.map(o => o[0]))
   const [feedback, setFeedback] = useState('')
 
   return (
-    <div className='relative flex flex-col'>
+    <div
+      className={clsx('flex min-h-40 flex-col', {
+        'h-80': useMaxHeight,
+        'max-h-80': !useMaxHeight,
+      })}
+    >
       <h2 className='text-bg w-full overflow-hidden rounded-t-md bg-black px-3 py-1 text-sm'>{title}</h2>
       <div className='gb flex flex-1 flex-col overflow-hidden rounded-b-md border border-t-0 border-black/40'>
         <Conditional if={options.length > 0}>
@@ -35,7 +45,13 @@ export function Frame({
             </Repeat>
           </div>
         </Conditional>
-        <div className='flex min-h-32 flex-1 items-center justify-center px-3 py-7'>
+        <div
+          className={clsx('os flex flex-1 items-center overflow-scroll p-3', {
+            'justify-start': alignment === 'start',
+            'justify-center': alignment === 'center',
+            'justify-end': alignment === 'end',
+          })}
+        >
           {typeof children === 'function' ? children(selectedOptions, setFeedback) : children}
         </div>
         <div className='h-6 w-full'>

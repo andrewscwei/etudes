@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { Header } from './components/Header'
 import { BurgerButtonDemo } from './demos/BurgerButtonDemo'
 import { ButtonDemo } from './demos/ButtonDemo'
+import { MasonryGridDemo } from './demos/MasonryGridDemo.js'
 import { OptionButtonDemo } from './demos/OptionButtonDemo'
 import { SelectableButtonDemo } from './demos/SelectableButtonDemo'
 import { VideoDemo } from './demos/VideoDemo.js'
@@ -16,6 +17,7 @@ export function App() {
       >
         <BurgerButtonDemo/>
         <ButtonDemo/>
+        <MasonryGridDemo/>
         <OptionButtonDemo/>
         <SelectableButtonDemo/>
         <VideoDemo/>

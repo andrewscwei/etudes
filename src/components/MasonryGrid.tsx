@@ -7,7 +7,7 @@ import { asClassNameDict, asStyleDict } from '../utils/index.js'
 type Orientation = 'horizontal' | 'vertical'
 
 export type MasonryGridProps = {
-  areSectionsAligned?: boolean
+  alignSections?: boolean
   horizontalSpacing?: number
   isReversed?: boolean
   orientation?: Orientation
@@ -35,7 +35,7 @@ const BASE_MODIFIER_CLASS_PREFIX = 'base-'
  * to the *number of columns*.
  */
 export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & MasonryGridProps>(({
-  areSectionsAligned = false,
+  alignSections = false,
   children,
   className,
   horizontalSpacing = 0,
@@ -85,7 +85,7 @@ export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
           sectionHeights[colIdx + j] = y + (y === 0 ? 0 : verticalSpacing) + (Rect.from(child)?.height ?? 0)
         }
 
-        if (areSectionsAligned && colIdx + base === numSections) {
+        if (alignSections && colIdx + base === numSections) {
           const m = computeMaxLength(sectionHeights)
 
           for (let j = 0; j < numSections; j++) {
@@ -106,9 +106,7 @@ export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
         for (const child of Array.from(nodes)) {
           if (!(child instanceof HTMLElement)) continue
 
-          const x = parseFloat(child.style.left)
-
-          child.style.left = `${w - x - parseFloat(child.style.width)}px`
+          child.style.left = `calc(${w}px - ${child.style.left} - ${child.getBoundingClientRect().width}px)`
         }
       }
     }
@@ -131,7 +129,7 @@ export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
           sectionWidths[rowIdx + j] = x + (x === 0 ? 0 : horizontalSpacing) + (Rect.from(child)?.width ?? 0)
         }
 
-        if (areSectionsAligned && rowIdx + base === numSections) {
+        if (alignSections && rowIdx + base === numSections) {
           const m = computeMaxLength(sectionWidths)
 
           for (let j = 0; j < numSections; j++) {
@@ -152,9 +150,7 @@ export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
         for (const child of Array.from(nodes)) {
           if (!(child instanceof HTMLElement)) continue
 
-          const y = parseFloat(child.style.top)
-
-          child.style.top = `${h - y - parseFloat(child.style.height)}px`
+          child.style.top = `calc(${h}px - ${child.style.top} - ${child.getBoundingClientRect().height}px)`
         }
       }
     }
@@ -172,7 +168,7 @@ export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
         setMaxHeight(maxSize.height)
       }
     },
-  }, [areSectionsAligned, horizontalSpacing, isReversed, sections, verticalSpacing])
+  }, [alignSections, horizontalSpacing, isReversed, sections, verticalSpacing, orientation])
 
   useEffect(() => {
     const imageSources = getAllImageSources(bodyRef.current?.innerHTML)
