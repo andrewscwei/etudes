@@ -7,7 +7,7 @@ export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   ...TailwindPlugin.configs['flat/recommended'],
-  { ignores: ['**/.netlify', '**/build/**'] },
+  { ignores: ['**/lib/**'] },
   {
     rules: {
       'tailwindcss/classnames-order': ['error', { callees: ['clsx', 'clsxm'] }],

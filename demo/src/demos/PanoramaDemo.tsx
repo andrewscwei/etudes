@@ -1,12 +1,9 @@
-import { DebugConsole } from 'etudes/components/DebugConsole'
 import { Panorama } from 'etudes/components/Panorama'
-import { PanoramaSlider } from 'etudes/components/PanoramaSlider'
-import { Slider, SliderKnob } from 'etudes/components/Slider'
 import { useSize } from 'etudes/hooks/useSize'
 import { useEffect, useRef, useState } from 'react'
 import { Size } from 'spase'
-import styled from 'styled-components'
 import $$PanoramaImage from '../assets/images/panorama.png'
+import { Frame } from '../components/Frame.js'
 
 export function PanoramaDemo() {
   const [angle, setAngle] = useState(0)
@@ -21,81 +18,15 @@ export function PanoramaDemo() {
   }, [panoramaSize.width, panoramaSize.height])
 
   return (
-    <>
-      <StyledRoot>
-        <StyledSlider
-          isInverted={false}
-          knobHeight={20}
-          knobWidth={20}
-          orientation='horizontal'
-          position={(width - 400) / 400}
-          usesDefaultStyles={true}
-          onPositionChange={position => { setWidth(400 + position * 400) }}
-        >
-          <SliderKnob className='knob'/>
-        </StyledSlider>
-        <StyledPanorama
-          ref={panoramaRef}
-          angle={angle}
-          src={$$PanoramaImage}
-          style={{ width: `${width}px` }}
-          zeroAnchor={zeroAnchor}
-          onAngleChange={(value, isDragging) => { if (isDragging) setAngle(value) }}
-        />
-        <StyledPanoramaSlider
-          angle={angle}
-          src={$$PanoramaImage}
-          usesDefaultStyles={true}
-          viewportSize={viewportSize}
-          zeroAnchor={zeroAnchor}
-          onAngleChange={(value, isDragging) => { if (isDragging) setAngle(value) }}
-        />
-      </StyledRoot>
-      <DebugConsole
-        maxEntries={1}
-        message={`Angle: ${Math.round(angle)}°`}
-        style={{ transform: 'translate3d(0, 0, 0) rotateX(10deg) rotateY(30deg)' }}
-        title='?: Panorama+Slider'
+    <Frame title='Panorama'>
+      <Panorama
+        ref={panoramaRef}
+        angle={angle}
+        src={$$PanoramaImage}
+        style={{ width: `${width}px` }}
+        zeroAnchor={zeroAnchor}
+        onAngleChange={(value, isDragging) => { if (isDragging) setAngle(value) }}
       />
-    </>
+    </Frame>
   )
 }
-
-const StyledSlider = styled(Slider)`
-  height: 4px;
-  margin-bottom: 50px;
-  max-width: 80%;
-  transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(-10deg);
-  width: 400px;
-
-  .knob {
-    background: #fff;
-    border-radius: 10px;
-  }
-`
-
-const StyledPanorama = styled(Panorama)`
-  height: 400px;
-  max-width: 80%;
-  transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(-10deg);
-`
-
-const StyledPanoramaSlider = styled(PanoramaSlider)`
-  height: 80px;
-  margin-top: 30px;
-  transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(10deg);
-`
-
-const StyledRoot = styled.div`
-  align-items: center;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  height: 100%;
-  justify-content: center;
-  overflow: hidden;
-  padding: 30px;
-  perspective: 800px;
-  width: 100%;
-`

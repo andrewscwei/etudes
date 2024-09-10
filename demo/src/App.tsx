@@ -14,6 +14,7 @@ import { FlatSVGDemo } from './demos/FlatSVGDemo.js'
 import { ImageDemo } from './demos/ImageDemo.js'
 import { MasonryGridDemo } from './demos/MasonryGridDemo.js'
 import { OptionButtonDemo } from './demos/OptionButtonDemo'
+import { PanoramaDemo } from './demos/PanoramaDemo.js'
 import { PanoramaSliderDemo } from './demos/PanoramaSliderDemo.js'
 import { RangeSliderDemo } from './demos/RangeSliderDemo.js'
 import { RotatingGalleryDemo } from './demos/RotatingGalleryDemo.js'
@@ -44,7 +45,7 @@ export function App() {
         <ImageDemo/>
         <MasonryGridDemo/>
         <OptionButtonDemo/>
-        {/* <PanoramaDemo/> */}
+        <PanoramaDemo/>
         <PanoramaSliderDemo/>
         <RangeSliderDemo/>
         <RotatingGalleryDemo/>

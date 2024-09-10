@@ -4,6 +4,7 @@ import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes,
 import { Each } from '../operators/Each.js'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection.js'
+import type { DropdownToggleProps } from './Dropdown.js'
 
 /**
  * Type describing the current item selection of {@link Accordion}, composed of
