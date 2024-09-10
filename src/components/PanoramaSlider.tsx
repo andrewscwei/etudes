@@ -156,11 +156,17 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
 
 Object.defineProperty(PanoramaSlider, 'displayName', { value: 'PanoramaSlider', writable: false })
 
-export const PanoramaSliderTrack = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => <div {...props} ref={ref} data-child='track'/>)
+export const PanoramaSliderTrack = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
+  <div {...props} ref={ref} data-child='track'/>
+))
 
-export const PanoramaSliderReticle = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => <div {...props} ref={ref} data-child='reticle'/>)
+export const PanoramaSliderReticle = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
+  <div {...props} ref={ref} data-child='reticle'/>
+))
 
-export const PanoramaSliderIndicator = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => <div {...props} ref={ref} data-child='indicator'/>)
+export const PanoramaSliderIndicator = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
+  <div {...props} ref={ref} data-child='indicator'/>
+))
 
 function getDefaultStyles({ isDragging = false }) {
   return asStyleDict({

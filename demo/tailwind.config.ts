@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+
 import path from 'node:path'
 import type { Config } from 'tailwindcss'
 
