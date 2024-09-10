@@ -248,7 +248,7 @@ export const Carousel = forwardRef(({
           throw Error(`Unsupported orientation '${orientation}'`)
       }
     },
-  })
+  }, [orientation, isDragEnabled])
 
   useTimeout(
     () => handleIndexChange((index + items.length + 1) % items.length),
@@ -325,9 +325,9 @@ function getFixedStyles({ isPointerDown = false, orientation = 'horizontal' }) {
       scrollSnapAlign: 'start',
       width: '100%',
       scrollBehavior: 'smooth',
+      flex: '0 0 auto',
     },
     item: {
-      flex: '0 0 auto',
       height: '100%',
       width: '100%',
     },

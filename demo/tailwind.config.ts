@@ -63,6 +63,7 @@ export default {
       addVariant('active', '&.active')
       addVariant('selected', '&.selected')
       addVariant('disabled', '&.disabled')
+      addVariant('dragging', '&.dragging')
       addVariant('svg', '& svg')
       addVariant('svg*', '& svg *')
     },
