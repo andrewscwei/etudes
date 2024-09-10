@@ -17,12 +17,13 @@ import { OptionButtonDemo } from './demos/OptionButtonDemo'
 import { PanoramaDemo } from './demos/PanoramaDemo.js'
 import { PanoramaSliderDemo } from './demos/PanoramaSliderDemo.js'
 import { RangeSliderDemo } from './demos/RangeSliderDemo.js'
-import { RotatingGalleryDemo } from './demos/RotatingGalleryDemo.js'
 import { SelectableButtonDemo } from './demos/SelectableButtonDemo'
 import { SliderDemo } from './demos/SliderDemo.js'
 import { StepwiseSliderDemo } from './demos/StepwiseSliderDemo.js'
+import { SwipeContainerDemo } from './demos/SwipeContainerDemo.js'
 import { TextFieldDemo } from './demos/TextFieldDemo.js'
 import { VideoDemo } from './demos/VideoDemo.js'
+import { WithTooltipDemo } from './demos/WithTooltipDemo.js'
 
 export function App() {
   return (
@@ -48,12 +49,13 @@ export function App() {
         <PanoramaDemo/>
         <PanoramaSliderDemo/>
         <RangeSliderDemo/>
-        <RotatingGalleryDemo/>
         <SelectableButtonDemo/>
         <SliderDemo/>
         <StepwiseSliderDemo/>
+        <SwipeContainerDemo/>
         <TextFieldDemo/>
         <VideoDemo/>
+        <WithTooltipDemo/>
       </main>
       <Footer className='px-safe-or-4 tab:px-safe-or-10 note:px-safe-or-20'/>
     </StrictMode>

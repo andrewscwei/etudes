@@ -137,17 +137,21 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
       <div style={fixedStyles.body}>
         <div style={fixedStyles.controls}>
           {cloneStyledElement(components.track ?? <PanoramaSliderTrack style={defaultStyles?.track}/>, {
+            className: clsx({ dragging: isDragging }),
             style: styles(fixedStyles.track),
           })}
           {cloneStyledElement(components.reticle ?? <PanoramaSliderReticle style={defaultStyles?.reticle}/>, {
+            className: clsx({ dragging: isDragging }),
             style: styles(fixedStyles.reticle),
           })}
           {cloneStyledElement(components.track ?? <PanoramaSliderTrack style={defaultStyles?.track}/>, {
+            className: clsx({ dragging: isDragging }),
             style: styles(fixedStyles.track),
           })}
         </div>
       </div>
       {cloneStyledElement(components.indicator ?? <PanoramaSliderIndicator style={defaultStyles?.indicator}/>, {
+        className: clsx({ dragging: isDragging }),
         style: styles(fixedStyles.indicator),
       })}
     </div>
