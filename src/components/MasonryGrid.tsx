@@ -4,13 +4,13 @@ import { Rect, Size } from 'spase'
 import { useResizeEffect } from '../hooks/useResizeEffect.js'
 import { asClassNameDict, asStyleDict } from '../utils/index.js'
 
-type Orientation = 'horizontal' | 'vertical'
+export type MasonryGridOrientation = 'horizontal' | 'vertical'
 
 export type MasonryGridProps = {
   alignSections?: boolean
   horizontalSpacing?: number
   isReversed?: boolean
-  orientation?: Orientation
+  orientation?: MasonryGridOrientation
   sections?: number
   verticalSpacing?: number
 }

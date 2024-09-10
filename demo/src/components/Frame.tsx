@@ -6,12 +6,23 @@ import { useState, type ReactNode } from 'react'
 import { Button } from '../../../lib/components/Button.js'
 
 type Props = {
-  children: ReactNode | ((selectedOptions: string[], setFeedback: (feedback: string) => void) => ReactNode)
+  children: ReactNode | ((selectedOptions: Record<string, string>, toast: (feedback: string) => void) => ReactNode)
   alignment?: 'start' | 'center' | 'end'
   options?: string[][]
   title: string
-  useMaxHeight?: boolean
+  usesMaxHeight?: boolean
   onReset?: () => void
+}
+
+function mapSelectedOptions(selectedOptions: string[]) {
+  return selectedOptions.reduce((acc, cur) => {
+    const [name, value] = cur.split(': ')
+
+    return {
+      ...acc,
+      [name]: value,
+    }
+  }, {})
 }
 
 export function Frame({
@@ -19,17 +30,19 @@ export function Frame({
   alignment = 'center',
   options = [],
   title,
-  useMaxHeight = false,
+  usesMaxHeight = false,
   onReset,
+  ...props
 }: Props) {
   const [selectedOptions, setSelectedOptions] = useState<string[]>(options.map(o => o[0]))
-  const [feedback, setFeedback] = useState('')
+  const [feedback, toast] = useState('')
 
   return (
     <div
+      {...props}
       className={clsx('flex min-h-40 flex-col', {
-        'h-80': useMaxHeight,
-        'max-h-80': !useMaxHeight,
+        'h-80': usesMaxHeight,
+        'max-h-80': !usesMaxHeight,
       })}
     >
       <div className='text-bg flex w-full justify-between overflow-hidden rounded-t-md bg-black px-3 py-1'>
@@ -52,10 +65,10 @@ export function Frame({
             <Repeat count={options.length}>
               {i => (
                 <OptionButton
-                  className='ia flex h-6 items-center justify-center rounded-md border border-black/40 px-2 text-xs'
+                  className='ia flex h-6 grow items-center justify-center rounded-md border border-black/40 px-2 text-xs'
                   index={options[i].indexOf(selectedOptions[i])}
                   options={options[i]}
-                  onChange={val => setSelectedOptions(prev => [...prev.slice(0, i), val, ...prev.slice(i + 1)])}
+                  onChange={t => setSelectedOptions(prev => [...prev.slice(0, i), t, ...prev.slice(i + 1)])}
                 />
               )}
             </Repeat>
@@ -68,7 +81,7 @@ export function Frame({
             'justify-end': alignment === 'end',
           })}
         >
-          {typeof children === 'function' ? children(selectedOptions, setFeedback) : children}
+          {typeof children === 'function' ? children(mapSelectedOptions(selectedOptions), toast) : children}
         </div>
         <div className='absolute bottom-0 h-6 w-full'>
           <Conditional if={!!feedback}>

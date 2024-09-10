@@ -12,6 +12,7 @@ export default {
       note: '1025px',
     },
     colors: {
+      transparent: 'transparent',
       white: '#fff',
       black: '#3f3b38',
       bg: '#a9a293',
@@ -20,10 +21,10 @@ export default {
       sans: ['Roboto Mono', 'sans-serif'],
     },
     fontSize: {
-      xs: '.6rem',
-      sm: '.7rem',
-      md: '.8rem',
+      base: '.8rem',
       lg: '1.1rem',
+      sm: '.7rem',
+      xs: '.6rem',
     },
     extend: {
       transitionDuration: {

@@ -1,9 +1,8 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
 import { useRect } from '../hooks/useRect.js'
-import { asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
-import { Collection, type CollectionItemProps, type CollectionProps, type CollectionSelection } from './Collection.js'
-import { FlatSVG } from './FlatSVG.js'
+import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
+import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelection } from './Collection.js'
 
 /**
  * Base extendable type describing the data provided to each item in
@@ -12,6 +11,11 @@ import { FlatSVG } from './FlatSVG.js'
 export type DropdownItemData = {
   label?: string
 }
+
+/**
+ * Type describing the orientation of {@link Dropdown}.
+ */
+export type DropdownOrientation = CollectionOrientation
 
 /**
  * Type describing the current item selection of {@link Dropdown}, composed of
@@ -23,7 +27,7 @@ export type DropdownSelection = CollectionSelection
 /**
  * Type describing the props of `ToggleComponent` provided to {@link Dropdown}.
  */
-export type DropdownToggleProps = HTMLAttributes<HTMLElement> & {
+export type DropdownToggleProps = HTMLAttributes<HTMLButtonElement> & {
   /**
    * Handler invoked to dispatch a custom event.
    *
@@ -43,12 +47,6 @@ export type DropdownItemProps<T extends DropdownItemData = DropdownItemData> = C
  */
 export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLAttributes<HTMLDivElement> & CollectionProps<T> & PropsWithChildren<{
   /**
-   * SVG markup to use as the collapse icon when a toggle button is
-   * automatically generated (when `ToggleComponent` is absent).
-   */
-  collapseIconSvg?: string
-
-  /**
    * Specifies if the internal collection collapses when an item is selected.
    * This only works if `selectionMode` is `single`.
    */
@@ -65,12 +63,6 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
    * @param selection The current selection.
    */
   label?: (selection: DropdownSelection) => string
-
-  /**
-   * SVG markup to use as the expand icon when a toggle button is automatically
-   * generated (when {@link ToggleComponent} is absent).
-   */
-  expandIconSvg?: string
 
   /**
    * Specifies if the internal collection is collapsed.
@@ -130,10 +122,8 @@ export const Dropdown = forwardRef(({
   children,
   className,
   style,
-  collapseIconSvg,
   collapsesOnSelect = true,
   collectionPadding = 0,
-  expandIconSvg,
   isCollapsed = true,
   isInverted = false,
   label,
@@ -145,7 +135,7 @@ export const Dropdown = forwardRef(({
   maxVisibleItems = -1,
   numSegments,
   orientation = 'vertical',
-  selection: externalSelection = [],
+  selection = [],
   selectionMode = 'single',
   usesDefaultStyles = false,
   onActivateAt,
@@ -159,16 +149,6 @@ export const Dropdown = forwardRef(({
   ToggleComponent,
   ...props
 }, ref) => {
-  const isIndexOutOfRange = (index: number) => {
-    if (isNaN(index)) return true
-    if (index >= items.length) return true
-    if (index < 0) return true
-
-    return false
-  }
-
-  const sanitizedSelection = (selection: DropdownSelection) => sortIndices(selection).filter(t => !isIndexOutOfRange(t))
-
   const expand = () => {
     if (!isCollapsed) return
 
@@ -200,7 +180,6 @@ export const Dropdown = forwardRef(({
     onSelectionChange?.(value)
   }
 
-  const selection = sanitizedSelection(externalSelection)
   const bodyRef = useRef<HTMLDivElement>(null)
   const bodyRect = useRect(bodyRef)
   const itemLength = externalItemLength ?? (orientation === 'vertical' ? bodyRect.height : bodyRect.width)
@@ -211,8 +190,11 @@ export const Dropdown = forwardRef(({
   const fixedStyles = getFixedStyles({ isCollapsed, isInverted, maxVisibleItems, menuLength, numItems, orientation })
   const defaultStyles = usesDefaultStyles ? getDefaultStyles({ orientation }) : undefined
 
-  const ExpandIcon = expandIconSvg ? <FlatSVG style={defaultStyles?.expandIcon} svg={expandIconSvg}/> : <></>
-  const CollapseIcon = collapseIconSvg ? <FlatSVG style={defaultStyles?.collapseIcon} svg={collapseIconSvg}/> : ExpandIcon
+  const components = asComponentDict(children, {
+    collapseIcon: DropdownCollapseIcon,
+    expandIcon: DropdownExpandIcon,
+    toggle: DropdownToggle,
+  })
 
   useEffect(() => {
     const clickOutsideHandler = (event: MouseEvent) => {
@@ -262,14 +244,15 @@ export const Dropdown = forwardRef(({
             onCustomEvent={(name, info) => onToggleCustomEvent?.(name, info)}
           />
         ) : (
-          <button
-            data-child='toggle'
-            style={styles(fixedStyles.toggle, defaultStyles?.toggle)}
-            onClick={() => toggle()}
-          >
-            <span dangerouslySetInnerHTML={{ __html: label?.(selection) ?? (selection.length > 0 ? selection.map(t => items[t].label).join(', ') : '') }} style={fixedStyles.toggleLabel}/>
-            {cloneStyledElement(isCollapsed ? ExpandIcon : CollapseIcon)}
-          </button>
+          cloneStyledElement(
+            components.toggle ?? <DropdownToggle/>,
+            {
+              style: styles(fixedStyles.toggle, defaultStyles?.toggle),
+              onClick: () => toggle(),
+            },
+            <span dangerouslySetInnerHTML={{ __html: label?.(selection) ?? (selection.length > 0 ? selection.map(t => items[t].label).join(', ') : '') }}/>,
+            isCollapsed ? components.collapseIcon ?? components.expandIcon : components.expandIcon,
+          )
         )}
         <Collection
           data-child='collection'
@@ -294,11 +277,19 @@ export const Dropdown = forwardRef(({
   )
 }) as <T extends DropdownItemData = DropdownItemData>(props: DropdownProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
-Object.defineProperty(Dropdown, 'displayName', { value: 'Dropdown', writable: false })
+export const DropdownToggle = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & PropsWithChildren<DropdownToggleProps>) => (
+  <button {...props} data-child='toggle'>{children}</button>
+)
 
-function sortIndices(indices: number[]): number[] {
-  return indices.sort((a, b) => a - b)
-}
+export const DropdownExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
+  <figure {...props} data-child='expand-icon'>{children}</figure>
+)
+
+export const DropdownCollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
+  <figure {...props} data-child='collapse-icon'>{children}</figure>
+)
+
+Object.defineProperty(Dropdown, 'displayName', { value: 'Dropdown', writable: false })
 
 function getFixedStyles({ isCollapsed = true, isInverted = false, collectionPadding = 0, maxVisibleItems = 0, menuLength = NaN, numItems = 0, orientation = 'vertical' }) {
   return asStyleDict({
@@ -325,13 +316,6 @@ function getFixedStyles({ isCollapsed = true, isInverted = false, collectionPadd
       top: '0',
       width: '100%',
       zIndex: '1',
-    },
-    toggleLabel: {
-      fontFamily: 'inherit',
-      fontSize: 'inherit',
-      fontWeight: 'inherit',
-      letterSpacing: 'inherit',
-      lineHeight: 'inherit',
     },
     collection: {
       position: 'absolute',

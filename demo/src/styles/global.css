@@ -28,10 +28,10 @@ body {
 .gb {
   background: linear-gradient(
       -90deg,
-      rgba(63, 59, 56, 0.04) 1px,
+      rgba(63, 59, 56, 0.08) 1px,
       transparent 1px
     ),
-    linear-gradient(rgba(63, 59, 56, 0.04) 1px, transparent 1px),
+    linear-gradient(rgba(63, 59, 56, 0.08) 1px, transparent 1px),
     theme("colors.bg");
   background-size: 8px 8px;
 }

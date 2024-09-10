@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import { forwardRef, useEffect, type ChangeEvent, type FocusEvent, type HTMLAttributes } from 'react'
 import { usePrevious } from '../hooks/usePrevious.js'
 
@@ -13,6 +14,7 @@ export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
 }
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(({
+  className,
   emptyValue = '',
   isDisabled = false,
   placeholder,
@@ -44,6 +46,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(({
     <input
       {...props}
       ref={ref}
+      className={clsx(className, { disabled: isDisabled })}
       data-component='text-field'
       disabled={isDisabled}
       placeholder={placeholder}

@@ -7,14 +7,14 @@ export function OptionButtonDemo() {
 
   return (
     <Frame title='OptionButton' onReset={() => setIndex(0)}>
-      {(_, setFeedback) => (
+      {(_, toast) => (
         <OptionButton
-          className='ia text-md flex items-center justify-center border border-black px-4 py-1'
+          className='ia flex items-center justify-center border border-black px-4 py-1 text-base'
           index={index}
           options={['Option 1', 'Option 2', 'Option 3']}
           onChange={(val, i) => {
             setIndex(i)
-            setFeedback(`Changed to Option ${i + 1}`)
+            toast(`Changed to Option ${i + 1}`)
           }}
         />
       )}
