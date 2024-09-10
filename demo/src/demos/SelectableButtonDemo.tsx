@@ -8,22 +8,22 @@ export function SelectableButtonDemo() {
   return (
     <Frame
       options={[
-        ['isDeselectable=true', 'isDeselectable=false'],
-        ['isDisabled=false', 'isDisabled=true'],
+        ['isDeselectable: true', 'isDeselectable: false'],
+        ['isDisable: false', 'isDisabled: true'],
       ]}
       title='SelectableButton'
       onReset={() => setIsSelected(false)}
     >
-      {([isDeselectable, isDisabled], setFeedback) => (
+      {({ isDeselectable, isDisabled }, toast) => (
         <SelectableButton
-          className='ia text-md flex items-center justify-center border border-black px-4 py-1 active:bg-black active:text-white disabled:pointer-events-none'
-          isDeselectable={isDeselectable === 'isDeselectable=true'}
-          isDisabled={isDisabled === 'isDisabled=true'}
+          className='ia flex items-center justify-center border border-black px-4 py-1 text-base active:bg-black active:text-white disabled:pointer-events-none'
+          isDeselectable={isDeselectable === 'true'}
+          isDisabled={isDisabled === 'true'}
           isSelected={isSelected}
           label='Button'
           onToggle={t => {
             setIsSelected(!t)
-            setFeedback(t ? 'Inactive' : 'Active')
+            toast(t ? 'Inactive' : 'Active')
           }}
         />
       )}

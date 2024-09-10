@@ -6,21 +6,21 @@ export function VideoDemo() {
   return (
     <Frame
       options={[
-        ['autoLoop=true', 'autoLoop=false'],
-        ['hasControls=false', 'hasControls=true'],
+        ['autoLoop: true', 'autoLoop: false'],
+        ['hasControls: false', 'hasControls: true'],
       ]}
       title='Video'
     >
-      {([autoLoop, hasControls], setFeedback) => (
+      {({ autoLoop, hasControls }, toast) => (
         <Video
-          autoLoop={autoLoop === 'autoLoop=true'}
+          autoLoop={autoLoop === 'true'}
           autoPlay={true}
           className='grayscale'
-          hasControls={hasControls === 'hasControls=true'}
+          hasControls={hasControls === 'true'}
           src={$$Video}
-          onEnd={() => setFeedback('Stopped')}
-          onPause={() => setFeedback('Paused')}
-          onPlay={() => setFeedback('Playing')}
+          onEnd={() => toast('Stopped')}
+          onPause={() => toast('Paused')}
+          onPlay={() => toast('Playing')}
         />
       )}
     </Frame>

@@ -25,7 +25,7 @@ function cloneStyledElement<P, T extends Component<P, ComponentState> = never>(
   const { className: elementClassName, style: elementStyle, ...otherElementProps } = element.props as any
 
   return cloneElement(element, {
-    className: `${elementClassName ?? ''} ${className ?? ''}`.split(' ').filter(Boolean).join(' '),
+    className: `${elementClassName ?? ''} ${className ?? ''}`.split(' ').filter(Boolean).join(' ') || undefined,
     style: {
       ...elementStyle ?? {},
       ...style ?? {},

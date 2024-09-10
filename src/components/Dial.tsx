@@ -9,6 +9,11 @@ export type DialProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   angle?: number
 
   /**
+   * Gap between each dashed line on the track.
+   */
+  trackGap?: number
+
+  /**
    * Length of the knob along the track expressed in degrees, between 0.0 and
    * 360.0 degrees, exclusive. If set to 0 or 360, the knob disappears.
    *
@@ -54,6 +59,7 @@ export const Dial = forwardRef<HTMLDivElement, DialProps>(({
   knobLength = 30,
   knobThickness = 10,
   radius = 50,
+  trackGap = 0,
   trackThickness = 2,
   usesDefaultStyles = false,
   ...props
@@ -76,7 +82,9 @@ export const Dial = forwardRef<HTMLDivElement, DialProps>(({
           {cloneStyledElement(components.track ?? <DialTrack style={defaultStyles?.track}/>, {
             cx: radius,
             cy: radius,
+            fill: 'none',
             r: radius - trackThickness / 2,
+            strokeDasharray: trackGap,
             strokeWidth: trackThickness,
           })}
         </svg>
@@ -84,8 +92,9 @@ export const Dial = forwardRef<HTMLDivElement, DialProps>(({
       <div style={styles(fixedStyles.knobContainer)}>
         <svg style={fixedStyles.svgContainer} viewBox={`0 0 ${diameter} ${diameter}`} xmlns='http://www.w3.org/2000/svg'>
           {cloneStyledElement(components.knob ?? <DialKnob style={defaultStyles?.knob}/>, {
-            strokeWidth: knobThickness,
             d: arcPath(radius, radius, radius - knobThickness / 2 - (trackThickness - knobThickness) / 2, -clampedKnobAngle / 2, clampedKnobAngle / 2),
+            fill: 'none',
+            strokeWidth: knobThickness,
           })}
         </svg>
       </div>

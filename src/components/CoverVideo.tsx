@@ -1,7 +1,7 @@
 import { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren, type RefObject } from 'react'
 import { Size } from 'spase'
 import { useRect } from '../hooks/useRect.js'
-import { asStyleDict, styles } from '../utils/index.js'
+import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 import { Video, type VideoProps } from './Video.js'
 
 export type CoverVideoProps = HTMLAttributes<HTMLDivElement> & Pick<VideoProps, 'autoLoop' | 'autoPlay' | 'hasControls' | 'isMuted' | 'playsInline' | 'posterSrc' | 'src' | 'onPause' | 'onPlay' | 'onCanPlay' | 'onEnd' | 'onFullscreenChange' | 'onLoadMetadata' | 'onLoadMetadataComplete' | 'onLoadMetadataError' | 'onSizeChange'> & PropsWithChildren<{
@@ -10,12 +10,6 @@ export type CoverVideoProps = HTMLAttributes<HTMLDivElement> & Pick<VideoProps, 
    * unprovided, it will be inferred after loading the video.
    */
   aspectRatio?: number
-
-  /**
-   * Content to render in the full-sized viewport (same size as the cover
-   * video).
-   */
-  renderViewportContent?: () => JSX.Element
 }>
 
 export const CoverVideo = forwardRef<HTMLDivElement, CoverVideoProps>(({
@@ -29,7 +23,6 @@ export const CoverVideo = forwardRef<HTMLDivElement, CoverVideoProps>(({
   isMuted,
   playsInline,
   posterSrc,
-  renderViewportContent,
   src,
   onCanPlay,
   onEnd,
@@ -62,6 +55,11 @@ export const CoverVideo = forwardRef<HTMLDivElement, CoverVideoProps>(({
       : Math.max(rootRect.height, rootRect.width / aspectRatio),
   ])
 
+  const components = asComponentDict(children, {
+    content: CoverVideoContent,
+    viewport: CoverVideoViewport,
+  })
+
   return (
     <div {...props} ref={rootRef} className={className} data-component='cover-video' style={styles(style, FIXED_STYLES.root)}>
       <Video
@@ -76,6 +74,7 @@ export const CoverVideo = forwardRef<HTMLDivElement, CoverVideoProps>(({
         style={styles(FIXED_STYLES.viewport, {
           width: `${videoSize.width}px`,
           height: `${videoSize.height}px`,
+          maxWidth: 'unset',
         })}
         onCanPlay={onCanPlay}
         onEnd={onEnd}
@@ -87,24 +86,31 @@ export const CoverVideo = forwardRef<HTMLDivElement, CoverVideoProps>(({
         onPlay={onPlay}
         onSizeChange={size => handleSizeChange(size)}
       />
-      {renderViewportContent && (
-        <div
-          data-child='viewport'
-          style={styles(FIXED_STYLES.viewport, {
-            height: `${videoSize.height}px`,
-            pointerEvents: 'none',
-            width: `${videoSize.width}px`,
-          })}
-        >
-          {renderViewportContent()}
-        </div>
-      )}
-      {children}
+      {components.viewport && cloneStyledElement(components.viewport, {
+        style: styles(FIXED_STYLES.viewport, {
+          height: `${videoSize.height}px`,
+          pointerEvents: 'none',
+          width: `${videoSize.width}px`,
+        }),
+      })}
+      {components.content}
     </div>
   )
 })
 
 Object.defineProperty(CoverVideo, 'displayName', { value: 'CoverVideo', writable: false })
+
+export const CoverVideoViewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
+  <div {...props} data-child='viewport'>
+    {children}
+  </div>
+)
+
+export const CoverVideoContent = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
+  <div {...props} data-child='content'>
+    {children}
+  </div>
+)
 
 const FIXED_STYLES = asStyleDict({
   root: {
@@ -116,12 +122,5 @@ const FIXED_STYLES = asStyleDict({
     position: 'absolute',
     top: '50%',
     transform: 'translate(-50%, -50%)',
-  },
-  viewportContent: {
-    height: '100%',
-    left: '0',
-    position: 'absolute',
-    top: '0',
-    width: '100%',
   },
 })

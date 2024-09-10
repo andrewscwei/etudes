@@ -2,9 +2,8 @@ import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
 import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
 import { Each } from '../operators/Each.js'
-import { asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
+import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection.js'
-import { FlatSVG } from './FlatSVG.js'
 
 /**
  * Type describing the current item selection of {@link Accordion}, composed of
@@ -83,22 +82,10 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   autoCollapseSections?: boolean
 
   /**
-   * SVG markup to use as the collapse icon when a toggle button is
-   * automatically generated (when `HeaderComponent` is absent).
-   */
-  collapseIconSvg?: string
-
-  /**
    * Indices of sections that are expanded. If specified, the component will not
    * manage expansion states.
    */
   expandedSectionIndices?: number[]
-
-  /**
-   * SVG markup to use as the expand icon when a toggle button is automatically
-   * generated (when `HeaderComponent` is absent).
-   */
-  expandIconSvg?: string
 
   /**
    * Orientation of this component.
@@ -254,9 +241,7 @@ export const Accordion = forwardRef(({
   children,
   style,
   autoCollapseSections = false,
-  collapseIconSvg,
   expandedSectionIndices: externalExpandedSectionIndices,
-  expandIconSvg,
   orientation = 'vertical',
   sectionPadding = 0,
   sections,
@@ -414,6 +399,12 @@ export const Accordion = forwardRef(({
   const prevSelectionRef = useRef<AccordionSelection>()
   const prevSelection = prevSelectionRef.current
 
+  const components = asComponentDict(children, {
+    collapseIcon: AccordionCollapseIcon,
+    expandIcon: AccordionExpandIcon,
+    header: AccordionHeader,
+  })
+
   useEffect(() => {
     prevSelectionRef.current = selection
 
@@ -431,8 +422,6 @@ export const Accordion = forwardRef(({
           const numVisible = maxVisible < 0 ? allVisible : Math.min(allVisible, maxVisible)
           const maxLength = itemLength * numVisible + itemPadding * (numVisible - 1)
           const isCollapsed = !isSectionExpandedAt(sectionIndex)
-          const expandIconComponent = expandIconSvg ? <FlatSVG style={defaultStyles?.expandIcon} svg={expandIconSvg}/> : <></>
-          const collapseIconComponent = collapseIconSvg ? <FlatSVG style={defaultStyles?.collapseIcon} svg={collapseIconSvg}/> : expandIconComponent
 
           return (
             <div
@@ -454,17 +443,16 @@ export const Accordion = forwardRef(({
                   onCustomEvent={(name, info) => onHeaderCustomEvent?.(sectionIndex, name, info)}
                 />
               ) : (
-                <button
-                  className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
-                  data-child='header'
-                  style={styles(fixedStyles.header, defaultStyles?.header)}
-                  onClick={() => toggleSectionAt(sectionIndex)}
-                >
-                  <span dangerouslySetInnerHTML={{ __html: section.label }} style={styles(defaultStyles?.headerLabel)}/>
-                  {cloneStyledElement(isCollapsed ? expandIconComponent : collapseIconComponent, {
-                    style: styles(isCollapsed ? fixedStyles.expandIcon : fixedStyles.collapseIcon),
-                  })}
-                </button>
+                cloneStyledElement(
+                  components.header ?? <AccordionHeader/>,
+                  {
+                    className: clsx({ collapsed: isCollapsed, expanded: !isCollapsed }),
+                    style: styles(fixedStyles.header, defaultStyles?.header),
+                    onClick: () => toggleSectionAt(sectionIndex),
+                  },
+                  <span dangerouslySetInnerHTML={{ __html: section.label }} style={styles(defaultStyles?.headerLabel)}/>,
+                  isCollapsed ? components.collapseIcon ?? components.expandIcon : components.expandIcon,
+                )
               )}
               <Collection
                 className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
@@ -510,6 +498,18 @@ export const Accordion = forwardRef(({
     </div>
   )
 }) as <I, S extends AccordionSection<I> = AccordionSection<I>>(props: AccordionProps<I, S> & { ref?: Ref<HTMLDivElement> }) => ReactElement
+
+export const AccordionHeader = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & PropsWithChildren<DropdownToggleProps>) => (
+  <button {...props} data-child='header'>{children}</button>
+)
+
+export const AccordionExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
+  <figure {...props} data-child='expand-icon'>{children}</figure>
+)
+
+export const AccordionCollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
+  <figure {...props} data-child='collapse-icon'>{children}</figure>
+)
 
 Object.defineProperty(Accordion, 'displayName', { value: 'Accordion', writable: false })
 

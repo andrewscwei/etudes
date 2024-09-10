@@ -8,21 +8,21 @@ export function BurgerButtonDemo() {
   return (
     <Frame
       options={[
-        ['isSplit=false', 'isSplit=true'],
-        ['isTailHidden=false', 'isTailHidden=true'],
+        ['isSplit: false', 'isSplit: true'],
+        ['isTailHidden: false', 'isTailHidden: true'],
       ]}
       title='BurgerButton'
       onReset={() => setIsNavActive(false)}
     >
-      {([isSplit, isTailHidden], setFeedback) => (
+      {({ isSplit, isTailHidden }, toast) => (
         <BurgerButton
           className='ia relative size-4'
           isActive={isNavActive}
-          isSplit={isSplit === 'isSplit=true'}
-          isTailHidden={isTailHidden === 'isTailHidden=true'}
+          isSplit={isSplit === 'true'}
+          isTailHidden={isTailHidden === 'true'}
           onToggle={t => {
-            setFeedback(t ? 'Inactive' : 'Active')
             setIsNavActive(!t)
+            toast(t ? 'Inactive' : 'Active')
           }}
         >
           <BurgerButtonBar className='h-[2px] bg-black transition-[left,top,right,bottom,transform]'/>
