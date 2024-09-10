@@ -4,16 +4,10 @@ import { Frame } from '../components/Frame.js'
 
 export function CoverVideoDemo() {
   return (
-    <Frame
-      options={[
-        ['autoLoop: true', 'autoLoop: false'],
-      ]}
-      title='CoverVideo'
-      usesMaxHeight={true}
-    >
-      {({ autoLoop, hasControls }, toast) => (
+    <Frame title='CoverVideo' usesMaxHeight={true}>
+      {(_, toast) => (
         <CoverVideo
-          autoLoop={autoLoop === 'true'}
+          autoLoop={true}
           autoPlay={true}
           className='relative size-full grayscale'
           src={$$Video}

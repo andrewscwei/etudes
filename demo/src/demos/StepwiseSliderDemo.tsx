@@ -1,12 +1,10 @@
 import clsx from 'clsx'
-import { Slider, SliderKnob, SliderLabel, SliderTrack } from 'etudes/components/Slider'
+import { StepwiseSlider, StepwiseSliderKnob, StepwiseSliderLabel, StepwiseSliderTrack } from 'etudes/components/StepwiseSlider'
 import { useState } from 'react'
 import { Frame } from '../components/Frame.js'
 
-export function SliderDemo() {
-  const min = 0
-  const max = 100
-  const [position, setPosition] = useState(0)
+export function StepwiseSliderDemo() {
+  const [index, setIndex] = useState(0)
 
   return (
     <Frame
@@ -16,34 +14,34 @@ export function SliderDemo() {
         ['onlyDispatchesOnDragEnd: true', 'onlyDispatchesOnDragEnd: false'],
         ['orientation: horizontal', 'orientation: vertical'],
       ]}
-      title='Slider'
+      title='StepwiseSlider'
       usesMaxHeight={true}
-      onReset={() => setPosition(0)}
+      onReset={() => setIndex(0)}
     >
       {({ isInverted, isTrackInteractive, onlyDispatchesOnDragEnd, orientation }, toast) => (
-        <Slider
+        <StepwiseSlider
           className={clsx('relative', {
             'h-1 w-44': orientation === 'horizontal',
             'h-32 w-1': orientation === 'vertical',
           })}
+          index={index}
           isInverted={isInverted === 'true'}
           isTrackInteractive={isTrackInteractive === 'true'}
           knobHeight={28}
           knobWidth={40}
-          labelProvider={pos => `${Math.round(pos * (max - min) + min)}`}
+          labelProvider={(pos, idx) => `${idx}`}
           onlyDispatchesOnDragEnd={onlyDispatchesOnDragEnd === 'true'}
           orientation={orientation as any}
-          position={position}
           trackPadding={0}
-          onPositionChange={pos => {
-            setPosition(pos)
-            toast(`Position: ${pos.toFixed(2)}`)
+          onIndexChange={idx => {
+            setIndex(idx)
+            toast(`Index: ${idx}`)
           }}
         >
-          <SliderKnob className='bg-bg ia flex items-center justify-center border border-black'/>
-          <SliderLabel className='text-base text-black'/>
-          <SliderTrack className='ia bg-black/40'/>
-        </Slider>
+          <StepwiseSliderKnob className='bg-bg ia flex items-center justify-center border border-black'/>
+          <StepwiseSliderLabel className='text-base text-black'/>
+          <StepwiseSliderTrack className='ia bg-black/40'/>
+        </StepwiseSlider>
       )}
     </Frame>
   )

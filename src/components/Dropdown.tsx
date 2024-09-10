@@ -135,7 +135,7 @@ export const Dropdown = forwardRef(({
   maxVisibleItems = -1,
   numSegments,
   orientation = 'vertical',
-  selection = [],
+  selection: externalSelection = [],
   selectionMode = 'single',
   usesDefaultStyles = false,
   onActivateAt,
@@ -149,6 +149,16 @@ export const Dropdown = forwardRef(({
   ToggleComponent,
   ...props
 }, ref) => {
+  const isIndexOutOfRange = (index: number) => {
+    if (isNaN(index)) return true
+    if (index >= items.length) return true
+    if (index < 0) return true
+
+    return false
+  }
+
+  const sanitizedSelection = (selection: DropdownSelection) => sortIndices(selection).filter(t => !isIndexOutOfRange(t))
+
   const expand = () => {
     if (!isCollapsed) return
 
@@ -180,6 +190,7 @@ export const Dropdown = forwardRef(({
     onSelectionChange?.(value)
   }
 
+  const selection = sanitizedSelection(externalSelection)
   const bodyRef = useRef<HTMLDivElement>(null)
   const bodyRect = useRect(bodyRef)
   const itemLength = externalItemLength ?? (orientation === 'vertical' ? bodyRect.height : bodyRect.width)
@@ -290,6 +301,10 @@ export const DropdownCollapseIcon = ({ children, ...props }: HTMLAttributes<HTML
 )
 
 Object.defineProperty(Dropdown, 'displayName', { value: 'Dropdown', writable: false })
+
+function sortIndices(indices: number[]): number[] {
+  return indices.sort((a, b) => a - b)
+}
 
 function getFixedStyles({ isCollapsed = true, isInverted = false, collectionPadding = 0, maxVisibleItems = 0, menuLength = NaN, numItems = 0, orientation = 'vertical' }) {
   return asStyleDict({

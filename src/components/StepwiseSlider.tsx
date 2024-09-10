@@ -192,7 +192,7 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
     transform: mapDragValueToPosition,
     onDragStart,
     onDragEnd,
-  })
+  }, [isInverted, orientation])
 
   // Natural position is the position affecting internal components accounting
   // for `isInverted`.

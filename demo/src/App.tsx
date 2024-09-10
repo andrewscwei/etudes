@@ -15,10 +15,11 @@ import { ImageDemo } from './demos/ImageDemo.js'
 import { MasonryGridDemo } from './demos/MasonryGridDemo.js'
 import { OptionButtonDemo } from './demos/OptionButtonDemo'
 import { PanoramaSliderDemo } from './demos/PanoramaSliderDemo.js'
+import { RangeSliderDemo } from './demos/RangeSliderDemo.js'
 import { RotatingGalleryDemo } from './demos/RotatingGalleryDemo.js'
 import { SelectableButtonDemo } from './demos/SelectableButtonDemo'
 import { SliderDemo } from './demos/SliderDemo.js'
-import { StepwiseSliderDemo } from './demos/StepwiseSlider.js'
+import { StepwiseSliderDemo } from './demos/StepwiseSliderDemo.js'
 import { TextFieldDemo } from './demos/TextFieldDemo.js'
 import { VideoDemo } from './demos/VideoDemo.js'
 
@@ -45,7 +46,7 @@ export function App() {
         <OptionButtonDemo/>
         {/* <PanoramaDemo/> */}
         <PanoramaSliderDemo/>
-        {/* <RangeSliderDemo/> */}
+        <RangeSliderDemo/>
         <RotatingGalleryDemo/>
         <SelectableButtonDemo/>
         <SliderDemo/>
