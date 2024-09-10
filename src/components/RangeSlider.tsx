@@ -10,9 +10,10 @@ type Orientation = 'horizontal' | 'vertical'
 type Range = [number, number]
 
 export type RangeSliderProps = PropsWithChildren<{
-  areLabelsVisible?: boolean
   decimalPlaces?: number
+  knobHeight?: number
   knobPadding?: number
+  knobWidth?: number
   max: number
   min: number
   orientation?: Orientation
@@ -25,9 +26,10 @@ export type RangeSliderProps = PropsWithChildren<{
 export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & RangeSliderProps>(({
   children,
   className,
-  areLabelsVisible = true,
   decimalPlaces = 2,
-  knobPadding = 20,
+  knobHeight = 28,
+  knobPadding = 0,
+  knobWidth = 40,
   max: maxValue,
   min: minValue,
   orientation = 'vertical',
@@ -111,7 +113,9 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
   useEffect(() => {
     if (isDraggingStartKnob || isDraggingEndKnob || isDeepEqual(externalRange, range)) return
     setRange(externalRange ?? [minValue, maxValue])
-  }, [externalRange])
+    setStartValue(externalRange?.[0] ?? minValue)
+    setEndValue(externalRange?.[1] ?? maxValue)
+  }, [externalRange?.[0], externalRange?.[1]])
 
   useEffect(() => {
     if (steps < 0) return
@@ -130,7 +134,7 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
     label: RangeSliderLabel,
   })
 
-  const fixedStyles = getFixedStyles({ orientation, highlightLength, start, knobPadding })
+  const fixedStyles = getFixedStyles({ orientation, highlightLength, start, knobPadding, knobWidth, knobHeight })
   const defaultStyles = usesDefaultStyles ? getDefaultStyles({ isReleasingStartKnob, isReleasingEndKnob, orientation }) : undefined
 
   return (
@@ -156,15 +160,13 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
           style: styles(fixedStyles.knob, {
             pointerEvents: isDeepEqual([startValue, endValue], [minValue, minValue]) ? 'none' : 'auto',
           }, orientation === 'horizontal' ? {
-            marginLeft: `${start}px`,
+            marginTop: `${-knobHeight / 2 + bodyRect.height / 2}px`,
+            marginLeft: `${start - knobWidth / 2}px`,
           } : {
-            marginTop: `${start}px`,
+            marginTop: `${start - knobHeight / 2}px`,
+            marginLeft: `${-knobWidth / 2 + bodyRect.width / 2}px`,
           }),
-        }, <div style={fixedStyles.knobHitbox}/>, areLabelsVisible && cloneStyledElement(components.label ?? <RangeSliderLabel
-          style={styles(defaultStyles?.label, {
-            transitionProperty: isReleasingStartKnob ? 'opacity, transform' : 'opacity',
-          })}
-        />, {
+        }, <div style={fixedStyles.knobHitbox}/>, components.label && cloneStyledElement(components.label, {
           className: clsx({
             dragging: isDraggingStartKnob || isDraggingEndKnob,
             releasing: isReleasingStartKnob || isReleasingEndKnob,
@@ -185,15 +187,13 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
           style: styles(fixedStyles.knob, {
             pointerEvents: isDeepEqual([startValue, endValue], [maxValue, maxValue]) ? 'none' : 'auto',
           }, orientation === 'horizontal' ? {
-            marginLeft: `${end}px`,
+            marginTop: `${-knobHeight / 2 + bodyRect.height / 2}px`,
+            marginLeft: `${end - knobWidth / 2}px`,
           } : {
-            marginTop: `${end}px`,
+            marginTop: `${end - knobHeight / 2}px`,
+            marginLeft: `${-knobWidth / 2 + bodyRect.width / 2}px`,
           }),
-        }, <div style={fixedStyles.knobHitbox}/>, areLabelsVisible && cloneStyledElement(components.label ?? <RangeSliderLabel
-          style={styles(defaultStyles?.label, {
-            transitionProperty: isReleasingEndKnob ? 'opacity, transform' : 'opacity',
-          })}
-        />, {
+        }, <div style={fixedStyles.knobHitbox}/>, components.label && cloneStyledElement(components.label, {
           className: clsx({
             dragging: isDraggingEndKnob,
             releasing: isReleasingEndKnob,
@@ -207,15 +207,23 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
 
 Object.defineProperty(RangeSlider, 'displayName', { value: 'RangeSlider', writable: false })
 
-export const RangeSliderGutter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => <div {...props} ref={ref} data-child='gutter'/>)
+export const RangeSliderGutter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
+  <div {...props} ref={ref} data-child='gutter'/>
+))
 
-export const RangeSliderLabel = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => <div {...props} ref={ref} data-child='label'/>)
+export const RangeSliderLabel = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
+  <div {...props} ref={ref} data-child='label'/>
+))
 
-export const RangeSliderHighlight = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => <div {...props} ref={ref} data-child='highlight'/>)
+export const RangeSliderHighlight = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
+  <div {...props} ref={ref} data-child='highlight'/>
+))
 
-export const RangeSliderKnob = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => <div {...props} ref={ref} data-child='knob'/>)
+export const RangeSliderKnob = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
+  <div {...props} ref={ref} data-child='knob'/>
+))
 
-function getFixedStyles({ orientation = 'horizontal', highlightLength = 0, start = 0, knobPadding = 0 }) {
+function getFixedStyles({ orientation = 'horizontal', knobWidth = 0, knobHeight = 0, highlightLength = 0, start = 0, knobPadding = 0 }) {
   return asStyleDict({
     body: {
       height: '100%',
@@ -248,6 +256,8 @@ function getFixedStyles({ orientation = 'horizontal', highlightLength = 0, start
       margin: 'auto',
       position: 'absolute',
       right: '0',
+      width: `${knobWidth}px`,
+      height: `${knobHeight}px`,
       top: '0',
       touchAction: 'none',
       zIndex: '1',

@@ -1,7 +1,7 @@
 import { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren, type RefObject } from 'react'
 import { Size } from 'spase'
 import { useRect } from '../hooks/useRect.js'
-import { asStyleDict, styles } from '../utils/index.js'
+import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 import { Image, type ImageProps } from './Image.js'
 
 export type CoverImageProps = Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<ImageProps, 'alt' | 'loadingMode' | 'sizes' | 'src' | 'srcSet' | 'onLoadStart' | 'onLoadComplete' | 'onLoadError'> & PropsWithChildren<{
@@ -10,12 +10,6 @@ export type CoverImageProps = Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'
    * unprovided, it will be inferred after loading the image.
    */
   aspectRatio?: number
-
-  /**
-   * Content to render in the full-sized viewport (same size as the cover
-   * image).
-   */
-  renderViewportContent?: () => JSX.Element
 }>
 
 export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
@@ -24,7 +18,6 @@ export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
   alt,
   aspectRatio: externalAspectRatio = NaN,
   loadingMode,
-  renderViewportContent,
   sizes,
   src,
   srcSet,
@@ -52,6 +45,11 @@ export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
       : Math.max(rootRect.height, rootRect.width / aspectRatio),
   ])
 
+  const components = asComponentDict(children, {
+    content: CoverImageContent,
+    viewport: CoverImageViewport,
+  })
+
   return (
     <div {...props} ref={rootRef} data-component='cover-image' style={styles(style, FIXED_STYLES.root)}>
       <Image
@@ -69,24 +67,31 @@ export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
         onLoadStart={onLoadStart}
         onSizeChange={size => handleSizeChange(size)}
       />
-      {renderViewportContent && (
-        <div
-          data-child='viewport'
-          style={styles(FIXED_STYLES.viewport, {
-            height: `${imageSize.height}px`,
-            pointerEvents: 'none',
-            width: `${imageSize.width}px`,
-          })}
-        >
-          {renderViewportContent()}
-        </div>
-      )}
-      {children}
+      {components.viewport && cloneStyledElement(components.viewport, {
+        style: styles(FIXED_STYLES.viewport, {
+          height: `${imageSize.height}px`,
+          pointerEvents: 'none',
+          width: `${imageSize.width}px`,
+        }),
+      })}
+      {components.content}
     </div>
   )
 })
 
 Object.defineProperty(CoverImage, 'displayName', { value: 'CoverImage', writable: false })
+
+export const CoverImageViewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
+  <div {...props} data-child='viewport'>
+    {children}
+  </div>
+)
+
+export const CoverImageContent = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
+  <div {...props} data-child='content'>
+    {children}
+  </div>
+)
 
 const FIXED_STYLES = asStyleDict({
   root: {

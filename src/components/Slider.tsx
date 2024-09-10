@@ -4,7 +4,7 @@ import { Rect } from 'spase'
 import { useDragValueEffect } from '../hooks/useDragValueEffect.js'
 import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 
-type Orientation = 'horizontal' | 'vertical'
+export type SliderOrientation = 'horizontal' | 'vertical'
 
 export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   /**
@@ -43,7 +43,7 @@ export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   /**
    * Orientation of the slider.
    */
-  orientation?: Orientation
+  orientation?: SliderOrientation
 
   /**
    * The current position.
@@ -109,12 +109,12 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
   isTrackInteractive = true,
   knobHeight = 30,
   knobWidth = 30,
-  labelProvider,
   onlyDispatchesOnDragEnd = false,
   orientation = 'vertical',
   position: externalPosition = 0,
   trackPadding = 0,
   usesDefaultStyles = false,
+  labelProvider,
   onDragEnd,
   onDragStart,
   onPositionChange,
@@ -135,18 +135,20 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
     if (!isTrackInteractive) return
 
     const rect = Rect.from(bodyRef.current) ?? new Rect()
+    const vrect = Rect.fromViewport()
 
     switch (orientation) {
       case 'horizontal': {
-        const trackPosition = (event.clientX - rect.left) / rect.width
+        const trackPosition = (event.clientX + vrect.left - rect.left) / rect.width
         const normalizedPosition = isInverted ? 1 - trackPosition : trackPosition
         setPosition(normalizedPosition)
         break
       }
       case 'vertical': {
-        const trackPosition = (event.clientY - rect.top) / rect.height
+        const trackPosition = (event.clientY + vrect.top - rect.top) / rect.height
         const normalizedPosition = isInverted ? 1 - trackPosition : trackPosition
         setPosition(normalizedPosition)
+
         break
       }
       default: break
@@ -161,7 +163,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
     transform: mapDragValueToPosition,
     onDragStart,
     onDragEnd,
-  })
+  }, [isInverted, orientation])
 
   // Natural position is the position affecting internal components accounting
   // for `isInverted`.
@@ -235,11 +237,17 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
 
 Object.defineProperty(Slider, 'displayName', { value: 'Slider', writable: false })
 
-export const SliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props} data-child='track'/>
+export const SliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <div {...props} data-child='track'/>
+)
 
-export const SliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props} data-child='knob'/>
+export const SliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <div {...props} data-child='knob'/>
+)
 
-export const SliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props} data-child='label'/>
+export const SliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <div {...props} data-child='label'/>
+)
 
 function getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtStart = false, isDragging = false, isReleasing = false }) {
   return asClassNameDict({
