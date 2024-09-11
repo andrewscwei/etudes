@@ -1,25 +1,36 @@
 import clsx from 'clsx'
-import { useEffect, useRef, type CSSProperties, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
+import { useEffect, useRef, type CSSProperties, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { Rect, Size } from 'spase'
 import { useRect } from '../hooks/useRect.js'
-import { useViewportSize } from '../hooks/useViewportSize.js'
 import { ExtractChild } from '../operators/ExtractChild.js'
 import { asStyleDict, styles } from '../utils/index.js'
 
 type Alignment = 'tl' | 'tc' | 'tr' | 'cl' | 'cr' | 'bl' | 'bc' | 'br'
 
+type StyleOptions = {
+  alignment: Alignment
+  arrowSize: Size
+  fullDialogWidth: number
+  gap: number
+  maxDialogWidth: number
+  targetWidth: number
+}
+
 export type WithToolTipProps = Pick<HTMLAttributes<HTMLElement>, 'className' | 'style'> & PropsWithChildren<{
   /**
-   * The height of the arrow. The width (longest edge) of the arrow is always
-   * twice its height.
+   * Target alignment, automatically computed if not provided.
+   */
+  alignment?: Alignment
+
+  /**
+   * The height of the arrow.
    */
   arrowHeight?: number
 
   /**
-   * Color of the dialog background, same format as a CSS color string (i.e.
-   * '#000').
+   * The width of the arrow.
    */
-  backgroundColor?: string
+  arrowWidth?: number
 
   /**
    * The hint string to display in the tooltip.
@@ -28,14 +39,14 @@ export type WithToolTipProps = Pick<HTMLAttributes<HTMLElement>, 'className' | '
 
   /**
    * The gap (in pixels) between the target element and the tooltip, defaults to
-   * zero.
+   * `0`.
    */
   gap?: number
 
   /**
-   * The maximum width (in pixels) of the hint text.
+   * The maximum width (in pixels) of the tooltip.
    */
-  maxTextWidth?: number
+  maxWidth?: number
 
   /**
    * The minimum space (in pixels) between the target element and the edge of
@@ -48,288 +59,249 @@ export function WithTooltip({
   children,
   className,
   style,
+  alignment: externalAlignment,
   arrowHeight = 6,
-  backgroundColor = '#000',
-  gap = 5,
+  arrowWidth = 12,
+  gap = 4,
   hint,
-  maxTextWidth = 200,
+  maxWidth = 200,
   threshold = 100,
 }: WithToolTipProps) {
   const createDialog = () => {
-    const dialog = document.createElement('div')
-    const dialogStyle = styles(style, fixedStyles.dialog)
+    const dialog = document.createElement('span')
     dialog.className = clsx(className)
-    dialog.setAttribute('data-component', 'tool-tip')
+    dialog.innerHTML = hint
+    dialog.setAttribute('data-component', 'tooltip')
+
+    const alignment = externalAlignment ?? (targetRef.current ? computeAlignment(targetRef.current, threshold) : 'tl')
+    const fullDialogSize = computeMaxSize(dialog)
+    const fixedStyles = getFixedStyles({ alignment, arrowSize: Size.make(arrowWidth, arrowHeight), gap, maxDialogWidth: maxWidth, fullDialogWidth: fullDialogSize.width, targetWidth: targetRect.width })
+
+    const dialogStyle = styles(style, fixedStyles.dialog)
     Object.keys(dialogStyle).forEach(rule => (dialog.style as any)[rule] = (dialogStyle as any)[rule])
 
-    const arrow = document.createElement('div')
+    const arrow = document.createElement('span')
+    arrow.setAttribute('data-child', 'arrow')
     Object.keys(fixedStyles.arrow).forEach(rule => (arrow.style as any)[rule] = (fixedStyles.arrow as any)[rule])
 
-    const content = document.createElement('div')
-    content.innerText = hint
-    Object.keys(fixedStyles.content).forEach(rule => (content.style as any)[rule] = (fixedStyles.content as any)[rule])
-
     dialog.appendChild(arrow)
-    dialog.appendChild(content)
 
     return dialog
   }
 
-  const computeAlignment = () => {
-    if (!rootRef.current) return 'bc'
-
-    const vrect = Rect.fromViewport()
-    const irect = Rect.intersecting(rootRef.current)
-
-    if (irect) {
-      const leftBound = irect.left - vrect.left < threshold
-      const rightBound = vrect.right - irect.right < threshold
-      const topBound = irect.top - vrect.top < threshold
-      const bottomBound = vrect.bottom - irect.bottom < threshold
-
-      if (leftBound && topBound) return 'br'
-      if (leftBound && bottomBound) return 'tr'
-      if (rightBound && topBound) return 'bl'
-      if (rightBound && bottomBound) return 'tl'
-      if (leftBound) return 'cr'
-      if (rightBound) return 'cl'
-      if (bottomBound) return 'tc'
-    }
-
-    return 'bc'
-  }
-
-  const computeTextSize = () => {
-    if (!dialogRef.current) return new Size()
-
-    const computedStyle = window.getComputedStyle(dialogRef.current)
-    const div = document.createElement('div')
-    div.innerText = hint
-    div.style.fontFamily = computedStyle.getPropertyValue('font-family')
-    div.style.fontSize = computedStyle.getPropertyValue('font-size')
-    div.style.fontStyle = computedStyle.getPropertyValue('font-style')
-    div.style.fontVariant = computedStyle.getPropertyValue('font-variant')
-    div.style.fontWeight = computedStyle.getPropertyValue('font-weight')
-    div.style.left = '0'
-    div.style.position = 'absolute'
-    div.style.top = '0'
-    div.style.visibility = 'hidden'
-    div.style.whiteSpace = 'pre'
-
-    document.body.appendChild(div)
-
-    // Add 1px as buffer to mitigate precision discrepancies.
-    const width = div.clientWidth + 1
-    const height = div.clientHeight + 1
-
-    document.body.removeChild(div)
-
-    return new Size([width, height])
-  }
-
-  const mouseEnterHandler = (event: MouseEvent) => {
+  const mouseEnterHandler = () => {
     if (!dialogRef.current) return
+
     dialogRef.current.style.opacity = '1'
   }
 
-  const mouseLeaveHandler = (event: MouseEvent) => {
+  const mouseLeaveHandler = () => {
     if (!dialogRef.current) return
+
     dialogRef.current.style.opacity = '0'
   }
 
-  const rootRef = useRef<HTMLElement>(null)
-  const dialogRef = useRef<HTMLDivElement>()
-  const rect = useRect(rootRef)
-  const viewportSize = useViewportSize()
-  const alignment = computeAlignment()
-  const textSize = computeTextSize()
-  const fixedStyles = getFixedStyles({ rect, arrowHeight, alignment, backgroundColor, maxTextWidth, textSize, gap })
+  const targetRef = useRef<HTMLElement>(null)
+  const dialogRef = useRef<HTMLSpanElement>()
+  const targetRect = useRect(targetRef)
 
   useEffect(() => {
     const dialogNode = createDialog()
-    rootRef.current?.appendChild(dialogNode)
-
+    targetRef.current?.appendChild(dialogNode)
     dialogRef.current = dialogNode
 
     return () => {
-      rootRef.current?.removeChild(dialogNode)
+      targetRef.current?.removeChild(dialogNode)
+      dialogRef.current = undefined
     }
-  }, [rect, viewportSize])
+  }, [externalAlignment, arrowHeight, arrowWidth, className, gap, hint, maxWidth, style, targetRef.current, threshold])
 
   return (
-    <ExtractChild
-      ref={rootRef}
-      onMouseEnter={mouseEnterHandler}
-      onMouseLeave={mouseLeaveHandler}
-    >
+    <ExtractChild ref={targetRef} onMouseEnter={mouseEnterHandler} onMouseLeave={mouseLeaveHandler}>
       {children}
     </ExtractChild>
   )
 }
 
-function makeDisplacementStyle(alignment: Alignment, arrowHeight: number, gap: number): CSSProperties {
+function computeMaxSize(element: HTMLElement) {
+  const clone = element.cloneNode(false) as HTMLElement
+  clone.innerHTML = element.innerHTML
+  clone.style.visibility = 'hidden'
+  clone.style.whiteSpace = 'pre'
+
+  document.body.appendChild(clone)
+  const rect = clone.getBoundingClientRect()
+  document.body.removeChild(clone)
+
+  return Size.make(rect.width, rect.height)
+}
+
+function computeAlignment(element: HTMLElement, threshold: number) {
+  const vrect = Rect.fromViewport()
+  const isect = Rect.intersecting(element)
+
+  if (isect) {
+    const leftBound = isect.left - vrect.left < threshold
+    const rightBound = vrect.right - isect.right < threshold
+    const topBound = isect.top - vrect.top < threshold
+    const bottomBound = vrect.bottom - isect.bottom < threshold
+
+    if (leftBound && topBound) return 'br'
+    if (leftBound && bottomBound) return 'tr'
+    if (rightBound && topBound) return 'bl'
+    if (rightBound && bottomBound) return 'tl'
+    if (leftBound) return 'cr'
+    if (rightBound) return 'cl'
+    if (bottomBound) return 'tc'
+  }
+
+  return 'tc'
+}
+
+function makeDialogStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }: StyleOptions): CSSProperties {
+  const dialogWidth = Math.min(fullDialogWidth, maxDialogWidth)
+  const shouldRealign = targetWidth > dialogWidth
+
   switch (alignment) {
     case 'tl': return {
-      top: `${-arrowHeight}px`,
-      left: `calc(50% + ${arrowHeight * 2.5}px)`,
+      bottom: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
+      right: shouldRealign ? '' : '0',
+      left: shouldRealign ? '50%' : '',
+      transform: `translate(${dialogWidth > targetWidth ? '0' : '-50%'}, 0)`,
     }
     case 'tc': return {
-      top: `${-arrowHeight}px`,
+      bottom: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
       left: '50%',
+      transform: 'translateX(-50%)',
     }
     case 'tr': return {
-      top: `${-arrowHeight}px`,
-      right: `calc(50% + ${arrowHeight * 2.5}px)`,
+      bottom: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
+      left: shouldRealign ? '50%' : '0',
+      transform: `translate(${dialogWidth > targetWidth ? '0' : '-50%'}, 0)`,
     }
     case 'cl': return {
       top: '50%',
-      left: `${-arrowHeight}px`,
+      right: `calc(100% + ${arrowSize.height + gap}px)`,
+      transform: 'translate(0, -50%)',
     }
     case 'cr': return {
       top: '50%',
-      right: `${-arrowHeight}px`,
+      left: `calc(100% + ${arrowSize.height + gap}px)`,
+      transform: 'translate(0, -50%)',
     }
     case 'bl': return {
-      bottom: `${-arrowHeight}px`,
-      left: `calc(50% + ${arrowHeight * 2.5}px)`,
+      left: shouldRealign ? '50%' : '',
+      right: shouldRealign ? '' : '0',
+      top: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
+      transform: `translate(${dialogWidth > targetWidth ? '0' : '-50%'}, 0)`,
     }
     case 'bc': return {
-      bottom: `${-arrowHeight}px`,
       left: '50%',
+      top: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
+      transform: 'translateX(-50%)',
     }
     case 'br': return {
-      bottom: `${-arrowHeight}px`,
-      right: `calc(50% + ${arrowHeight * 2.5}px)`,
+      left: shouldRealign ? '50%' : '0',
+      top: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
+      transform: `translate(${dialogWidth > targetWidth ? '0' : '-50%'}, 0)`,
     }
-    default: return {
-
-    }
+    default: throw Error(`Invalid alignment: ${alignment}`)
   }
 }
 
-function makeContentPositionStyle(alignment: Alignment, arrowHeight: number, gap: number): CSSProperties {
+function makeArrowStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }: StyleOptions): CSSProperties {
+  const dialogWidth = Math.min(fullDialogWidth, maxDialogWidth)
+  const shouldRealign = targetWidth > dialogWidth
+
   switch (alignment) {
     case 'tl': return {
-      transform: `translate(calc(-100% - ${gap}px), calc(-100% - ${gap}px))`,
+      bottom: 0,
+      clipPath: 'polygon(50% 100%,100% 0,0 0)',
+      height: `${arrowSize.height}px`,
+      left: shouldRealign ? '50%' : '',
+      right: shouldRealign ? '' : `${targetWidth - arrowSize.width / 2 - targetWidth / 2}px`,
+      transform: `translate(${shouldRealign ? '-50%' : '0'}, 100%)`,
+      width: `${arrowSize.width}px`,
     }
     case 'tc': return {
-      transform: `translate(-50%, calc(-100% - ${gap}px))`,
+      bottom: 0,
+      clipPath: 'polygon(50% 100%,100% 0,0 0)',
+      height: `${arrowSize.height}px`,
+      left: '50%',
+      transform: 'translate(-50%, 100%)',
+      width: `${arrowSize.width}px`,
     }
     case 'tr': return {
-      transform: `translate(calc(100% + ${gap}px), calc(-100% - ${gap}px))`,
+      bottom: 0,
+      clipPath: 'polygon(50% 100%,100% 0,0 0)',
+      height: `${arrowSize.height}px`,
+      left: shouldRealign ? '50%' : `${targetWidth - arrowSize.width / 2 - targetWidth / 2}px`,
+      transform: `translate(${shouldRealign ? '-50%' : '0'}, 100%)`,
+      width: `${arrowSize.width}px`,
     }
     case 'cl': return {
-      transform: `translate(calc(-100% - ${gap}px), -50%)`,
+      clipPath: 'polygon(0 0,100% 50%,0 100%)',
+      height: `${arrowSize.width}px`,
+      right: '0',
+      top: '50%',
+      transform: 'translate(100%, -50%)',
+      width: `${arrowSize.height}px`,
     }
     case 'cr': return {
-      transform: `translate(calc(100% + ${gap}px), -50%)`,
+      clipPath: 'polygon(100% 0,0 50%,100% 100%)',
+      height: `${arrowSize.width}px`,
+      left: '0',
+      top: '50%',
+      transform: 'translate(-100%, -50%)',
+      width: `${arrowSize.height}px`,
     }
     case 'bl': return {
-      transform: `translate(calc(-100% - ${gap}px), calc(100% + ${gap}px))`,
+      clipPath: 'polygon(50% 0,100% 100%,0 100%)',
+      height: `${arrowSize.height}px`,
+      left: shouldRealign ? '50%' : '',
+      right: shouldRealign ? '' : `${targetWidth - arrowSize.width / 2 - targetWidth / 2}px`,
+      top: '0',
+      transform: `translate(${shouldRealign ? '-50%' : '0'}, -100%)`,
+      width: `${arrowSize.width}px`,
     }
     case 'bc': return {
-      transform: `translate(-50%, calc(100% + ${gap}px))`,
+      clipPath: 'polygon(50% 0,100% 100%,0 100%)',
+      height: `${arrowSize.height}px`,
+      left: '50%',
+      top: '0',
+      transform: 'translate(-50%, -100%)',
+      width: `${arrowSize.width}px`,
     }
     case 'br': return {
-      transform: `translate(calc(100% + ${gap}px), calc(100% + ${gap}px))`,
+      clipPath: 'polygon(50% 0,100% 100%,0 100%)',
+      height: `${arrowSize.height}px`,
+      left: shouldRealign ? '50%' : `${targetWidth - arrowSize.width / 2 - targetWidth / 2}px`,
+      top: '0',
+      transform: `translate(${shouldRealign ? '-50%' : '0'}, -100%)`,
+      width: `${arrowSize.width}px`,
     }
-    default: return {
-
-    }
+    default: throw Error(`Invalid alignment: ${alignment}`)
   }
 }
 
-function makeArrowPositionStyle(alignment: Alignment, arrowHeight: number, gap: number, color: string): CSSProperties {
-  switch (alignment) {
-    case 'tl': return {
-      borderColor: `${color} transparent transparent transparent`,
-      transform: `translate(calc(0% - ${gap}px - ${arrowHeight * 3}px), calc(0% - ${gap}px))`,
-    }
-    case 'tc': return {
-      borderColor: `${color} transparent transparent transparent`,
-      transform: `translate(-50%, calc(0% - ${gap}px))`,
-    }
-    case 'tr': return {
-      borderColor: `${color} transparent transparent transparent`,
-      transform: `translate(calc(100% + ${gap}px + ${arrowHeight}px), calc(0% - ${gap}px))`,
-    }
-    case 'cl': return {
-      borderColor: `transparent transparent transparent ${color}`,
-      transform: `translate(calc(0% - ${gap}px), -50%)`,
-    }
-    case 'cr': return {
-      borderColor: `transparent ${color} transparent transparent`,
-      transform: `translate(calc(0% + ${gap}px), -50%)`,
-    }
-    case 'bl': return {
-      borderColor: `transparent transparent ${color} transparent`,
-      transform: `translate(calc(0% - ${gap}px - ${arrowHeight * 3}px), calc(0% + ${gap}px))`,
-    }
-    case 'bc': return {
-      borderColor: `transparent transparent ${color} transparent`,
-      transform: `translate(-50%, calc(0% + ${gap}px))`,
-    }
-    case 'br': return {
-      borderColor: `transparent transparent ${color} transparent`,
-      transform: `translate(calc(100% + ${gap}px + ${arrowHeight}px), calc(0% + ${gap}px))`,
-    }
-    default: return {
-
-    }
-  }
-}
-
-function getFixedStyles({
-  alignment = 'tl' as Alignment,
-  arrowHeight = 0,
-  backgroundColor = '',
-  gap = 0,
-  maxTextWidth = 0,
-  rect = new Rect(),
-  textSize = new Size(),
-}) {
+function getFixedStyles({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }: StyleOptions) {
   return asStyleDict({
     dialog: {
-      background: 'none',
       boxSizing: 'border-box',
-      height: `${rect.size.height}px`,
-      left: '0',
+      height: 'auto',
       margin: '0',
       opacity: '0',
+      pointerEvents: 'none',
       position: 'absolute',
-      top: '0',
-      width: `${rect.size.width}px`,
-      zIndex: '10000',
+      userSelect: 'none',
+      whiteSpace: fullDialogWidth > maxDialogWidth ? 'normal' : 'pre',
+      width: fullDialogWidth > maxDialogWidth ? `${maxDialogWidth}px` : '',
+      ...makeDialogStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }),
     },
     arrow: {
-      borderStyle: 'solid',
-      borderWidth: `${arrowHeight}px`,
-      height: '0',
-      pointerEvents: 'none',
+      background: 'inherit',
       position: 'absolute',
-      width: '0',
-      ...makeDisplacementStyle(alignment, arrowHeight, gap),
-      ...makeArrowPositionStyle(alignment, arrowHeight, gap, backgroundColor),
-    },
-    content: {
-      background: backgroundColor,
-      boxSizing: 'content-box',
-      color: 'inherit',
-      fontFamily: 'inherit',
-      fontSize: 'inherit',
-      fontWeight: 'inherit',
-      letterSpacing: 'inherit',
-      lineHeight: 'inherit',
-      maxWidth: `${maxTextWidth}px`,
-      overflow: 'hidden',
-      padding: 'inherit',
-      pointerEvents: 'none',
-      position: 'absolute',
-      textAlign: 'inherit',
-      transition: 'inherit',
-      width: textSize.width > 0 ? `${textSize.width}px` : 'auto',
-      ...makeDisplacementStyle(alignment, arrowHeight, gap),
-      ...makeContentPositionStyle(alignment, arrowHeight, gap),
+      ...makeArrowStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }),
     },
   })
 }
