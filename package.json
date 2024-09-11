@@ -1,6 +1,6 @@
 {
   "name": "etudes",
-  "version": "5.3.1",
+  "version": "6.0.0",
   "description": "A study of headless React components",
   "type": "module",
   "scripts": {
