@@ -1,116 +1,137 @@
 import clsx from 'clsx'
-import { forwardRef, useEffect, type ComponentType, type HTMLAttributes } from 'react'
+import { forwardRef, useEffect, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { usePrevious } from '../hooks/usePrevious.js'
-import { asStyleDict, styles } from '../utils/index.js'
-import { TextField } from './TextField.js'
+import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
+import { TextField, type TextFieldProps } from './TextField.js'
 
-type Props = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & {
+type Props = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & PropsWithChildren<{
   min?: number
   max?: number
   quantity?: number
   allowsInput?: boolean
-  usesDefaultStyles?: boolean
   onChange?: (quantity: number) => void
-  AddButtonComponent?: ComponentType<HTMLAttributes<HTMLElement>>
-  SubtractButtonComponent?: ComponentType<HTMLAttributes<HTMLElement>>
-}
+}>
 
 export const Counter = forwardRef<HTMLDivElement, Props>(({
+  children,
   style,
-  min = NaN,
-  max = NaN,
   allowsInput = true,
+  max = NaN,
+  min = NaN,
   quantity = 0,
-  usesDefaultStyles = true,
   onChange,
-  AddButtonComponent,
-  SubtractButtonComponent,
   ...props
 }, ref) => {
-  const handleSubtract = () => {
-    onChange?.(isNaN(min) ? quantity - 1 : Math.max(min, quantity - 1))
+  const handleSubtract = () => onChange?.(clamp(quantity - 1))
+  const handleAdd = () => onChange?.(clamp(quantity + 1))
+  const handleQuantityChange = (newValue: number) => onChange?.(newValue)
+
+  const toString = (qty: number) => {
+    return qty.toLocaleString()
   }
 
-  const handleAdd = () => {
-    onChange?.(isNaN(max) ? quantity + 1 : Math.min(max, quantity + 1))
+  const toQuantity = (text: string) => {
+    const out = parseInt(text, 10)
+    if (out.toString() !== text.replace(/^0+/, '')) return quantity
+
+    return clamp(out)
   }
 
-  const handleQuantityChange = (newValue: number) => {
-    if (newValue === quantity) return
+  const clamp = (qty: number) => {
+    let out = qty
 
-    onChange?.(newValue)
+    if (!isNaN(min)) out = Math.max(min, out)
+    if (!isNaN(max)) out = Math.min(max, out)
+
+    return out
   }
 
+  const [text, setText] = useState(toString(quantity))
   const prevQuantity = usePrevious(quantity)
-  const defaultStyles = usesDefaultStyles ? DEFAULT_STYLES : undefined
   const isAddingDisabled = !isNaN(max) && quantity + 1 > max
   const isSubtractingDisabled = !isNaN(min) && quantity - 1 < min
 
   useEffect(() => {
-    if (prevQuantity === undefined) return
+    if (prevQuantity === undefined || prevQuantity === quantity) return
 
+    setText(toString(clamp(quantity)))
     handleQuantityChange(quantity)
   }, [quantity])
 
   useEffect(() => {
-    handleQuantityChange(isNaN(min) ? quantity : Math.max(min, quantity))
+    if (isNaN(min)) return
+
+    handleQuantityChange(clamp(quantity))
   }, [min])
 
   useEffect(() => {
     if (isNaN(max)) return
 
-    handleQuantityChange(isNaN(max) ? quantity : Math.min(max, quantity))
+    handleQuantityChange(clamp(quantity))
   }, [max])
 
+  const components = asComponentDict(children, {
+    textField: CounterTextField,
+    addButton: CounterAddButton,
+    subscribeButton: CounterSubtractButton,
+  })
+
   return (
-    <div
-      {...props}
-      ref={ref}
-      data-component='counter'
-      style={styles(style, FIXED_STYLES.root, defaultStyles?.root)}
-    >
-      {SubtractButtonComponent && (
-        <SubtractButtonComponent
-          className={clsx({ disabled: isSubtractingDisabled })}
-          data-child='subtract-button'
-          style={styles(FIXED_STYLES.subtract)}
-          onClick={() => handleSubtract()}
-        />
-      ) || (
-        <button
-          className={clsx({ disabled: isSubtractingDisabled })}
-          data-child='subtract-button'
-          style={styles(FIXED_STYLES.subtract, defaultStyles?.subtract)}
-          onClick={() => handleSubtract()}
-        />
+    <div {...props} ref={ref} data-component='counter' style={styles(style, FIXED_STYLES.root)}>
+      {cloneStyledElement(
+        components.subscribeButton ?? <CounterSubtractButton/>,
+        {
+          className: clsx({ disabled: isSubtractingDisabled }),
+          style: styles(FIXED_STYLES.subtract),
+          onClick: () => handleSubtract(),
+        },
       )}
-      <TextField
-        data-child='text-field'
-        formatter={(oldValue, newValue) => isNaN(Number(`0${newValue}`)) ? oldValue : newValue}
-        isDisabled={!allowsInput}
-        style={styles(FIXED_STYLES.text, defaultStyles?.text)}
-        value={quantity.toString()}
-      />
-      {AddButtonComponent && (
-        <AddButtonComponent
-          className={clsx({ disabled: isAddingDisabled })}
-          data-child='add-button'
-          style={styles(FIXED_STYLES.add)}
-          onClick={() => handleAdd()}
-        />
-      ) || (
-        <button
-          className={clsx({ disabled: isAddingDisabled })}
-          data-child='add-button'
-          style={styles(FIXED_STYLES.add, defaultStyles?.add)}
-          onClick={() => handleAdd()}
-        />
+      {cloneStyledElement(
+        components.textField ?? <CounterTextField/>,
+        {
+          isDisabled: !allowsInput,
+          style: styles(FIXED_STYLES.text),
+          value: text,
+          onValueChange: setText,
+          onUnfocus: (value: string) => {
+            const newQuantity = toQuantity(value)
+
+            if (newQuantity !== quantity) {
+              onChange?.(newQuantity)
+            }
+            else {
+              setText(toString(newQuantity))
+            }
+          },
+        },
+      )}
+      {cloneStyledElement(
+        components.addButton ?? <CounterAddButton/>,
+        {
+          className: clsx({ disabled: isAddingDisabled }),
+          style: styles(FIXED_STYLES.add),
+          onClick: () => handleAdd(),
+        },
       )}
     </div>
   )
 })
 
-Object.defineProperty(Counter, 'displayName', { value: 'Counter', writable: false })
+export const CounterTextField = ({ ...props }: TextFieldProps) => (
+  <TextField {...props} data-child='text-field'/>
+)
+
+export const CounterAddButton = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & PropsWithChildren) => (
+  <button {...props} data-child='add-button'>
+    {children}
+  </button>
+)
+
+export const CounterSubtractButton = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & PropsWithChildren) => (
+  <button {...props} data-child='subtract-button'>
+    {children}
+  </button>
+)
 
 const FIXED_STYLES = asStyleDict({
   root: styles({
@@ -130,21 +151,4 @@ const FIXED_STYLES = asStyleDict({
   }),
 })
 
-const DEFAULT_STYLES = asStyleDict({
-  root: styles({
-
-  }),
-  subtract: styles({
-    width: '20px',
-    height: '100%',
-    background: '#000',
-  }),
-  add: styles({
-    width: '20px',
-    height: '100%',
-    background: '#000',
-  }),
-  text: styles({
-    height: '100%',
-  }),
-})
+Object.defineProperty(Counter, 'displayName', { value: 'Counter', writable: false })
