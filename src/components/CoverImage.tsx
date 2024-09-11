@@ -36,6 +36,7 @@ export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
   const aspectRatio = isNaN(externalAspectRatio) ? localAspectRatio : externalAspectRatio
   const rootRect = useRect(rootRef)
   const rootAspectRatio = rootRect.width / rootRect.height
+
   const imageSize = Size.make(
     rootAspectRatio > 1
       ? Math.max(rootRect.width, rootRect.height * aspectRatio)
@@ -44,7 +45,6 @@ export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
       ? Math.max(rootRect.height, Math.max(rootRect.width, rootRect.height * aspectRatio) / aspectRatio)
       : Math.max(rootRect.height, rootRect.width / aspectRatio),
   )
-
   const components = asComponentDict(children, {
     content: CoverImageContent,
     viewport: CoverImageViewport,
@@ -59,8 +59,9 @@ export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
         src={src}
         srcSet={srcSet}
         style={styles(FIXED_STYLES.viewport, {
-          width: `${imageSize.width}px`,
           height: `${imageSize.height}px`,
+          maxWidth: 'unset',
+          width: `${imageSize.width}px`,
         })}
         onLoadComplete={onLoadComplete}
         onLoadError={onLoadError}
@@ -101,13 +102,6 @@ const FIXED_STYLES = asStyleDict({
     position: 'absolute',
     top: '50%',
     transform: 'translate(-50%, -50%)',
-  },
-  viewportContent: {
-    height: '100%',
-    left: '0',
-    position: 'absolute',
-    top: '0',
-    width: '100%',
   },
 })
 

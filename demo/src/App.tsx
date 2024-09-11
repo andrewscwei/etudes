@@ -31,7 +31,7 @@ export function App() {
     <StrictMode>
       <Header className='px-safe-or-4 tab:px-safe-or-10 note:px-safe-or-20'/>
       <main
-        className='px-safe-or-4 tab:px-safe-or-10 note:px-safe-or-20 grid-cols grid w-full gap-6 py-6 text-black'
+        className='px-safe-or-4 tab:px-safe-or-10 note:px-safe-or-20 grid-cols text-dark grid w-full gap-6 py-6'
         style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr)' }}
       >
         <AccordionDemo/>

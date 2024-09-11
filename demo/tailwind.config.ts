@@ -15,8 +15,8 @@ export default {
     },
     colors: {
       transparent: 'transparent',
-      black: '#3f3b38',
-      bg: '#a9a293',
+      dark: '#3f3b38',
+      light: '#a9a293',
     },
     fontFamily: {
       sans: ['Roboto Mono', 'sans-serif'],

@@ -461,7 +461,7 @@ export const Accordion = forwardRef(({
                 orientation={orientation}
                 selection={selection[sectionIndex] ?? []}
                 selectionMode={selectionMode}
-                style={styles(fixedStyles.list, orientation === 'vertical' ? {
+                style={styles(orientation === 'vertical' ? {
                   width: '100%',
                   height: isCollapsed ? '0px' : `${maxLength}px`,
                   marginTop: isCollapsed ? '0px' : `${collectionPadding}px`,
@@ -541,9 +541,6 @@ function getFixedStyles({ orientation = 'vertical' }) {
         height: '100%',
       },
     },
-    list: {
-
-    },
     header: {
       cursor: 'pointer',
       margin: '0',
@@ -552,14 +549,6 @@ function getFixedStyles({ orientation = 'vertical' }) {
       } : {
         height: '100%',
       },
-    },
-    expandIcon: {
-      margin: '0',
-      padding: '0',
-    },
-    collapseIcon: {
-      margin: '0',
-      padding: '0',
     },
   })
 }

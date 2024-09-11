@@ -2,11 +2,11 @@ import clsx from 'clsx'
 import { Dropdown, DropdownExpandIcon, DropdownToggle, type DropdownItemProps, type DropdownSelection } from 'etudes/components/Dropdown'
 import { FlatSVG } from 'etudes/components/FlatSVG.js'
 import { useState } from 'react'
-import $$ExpandIcon from '../assets/svgs/expand-icon.svg?raw'
+import $$ExpandIcon from '../assets/expand-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
 
 const DropdownItem = ({ className, index, isSelected, item, orientation, onCustomEvent, ...props }: DropdownItemProps) => (
-  <button {...props} className={clsx(className, 'ia selected:bg-black selected:text-bg flex items-center justify-start border border-black px-3')}>
+  <button {...props} className={clsx(className, 'ia selected:bg-dark selected:text-light border-dark flex items-center justify-start border px-3')}>
     {item.label}
   </button>
 )
@@ -69,7 +69,7 @@ export function DropdownDemo() {
           onSelectAt={t => toast(`Selected Item ${t + 1}`)}
           onSelectionChange={setSelection}
         >
-          <DropdownToggle className='ia flex items-center justify-between border border-black px-3'/>
+          <DropdownToggle className='ia border-dark flex items-center justify-between border px-3'/>
           <DropdownExpandIcon className='size-3'>
             <FlatSVG
               className={clsx({

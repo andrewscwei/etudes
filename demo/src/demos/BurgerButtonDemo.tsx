@@ -25,7 +25,7 @@ export function BurgerButtonDemo() {
             toast(t ? 'Inactive' : 'Active')
           }}
         >
-          <BurgerButtonBar className='h-[2px] bg-black transition-[left,top,right,bottom,transform]'/>
+          <BurgerButtonBar className='bg-dark h-[2px] transition-[left,top,right,bottom,transform]'/>
         </BurgerButton>
       )}
     </Frame>

@@ -5,16 +5,12 @@
 html {
   height: 100%;
   width: 100%;
-  background: theme("colors.bg");
+  background: theme("colors.light");
 }
 
 body {
   height: 100%;
   width: 100%;
-}
-
-.pp {
-  perspective: 800px;
 }
 
 .os {
@@ -26,13 +22,9 @@ body {
 }
 
 .gb {
-  background: linear-gradient(
-      -90deg,
-      rgba(63, 59, 56, 0.08) 1px,
-      transparent 1px
-    ),
-    linear-gradient(rgba(63, 59, 56, 0.08) 1px, transparent 1px),
-    theme("colors.bg");
+  background:
+    linear-gradient(-90deg,rgba(63, 59, 56, 0.08) 1px,transparent 1px),
+    linear-gradient(rgba(63, 59, 56, 0.08) 1px, transparent 1px), transparent;
   background-size: 8px 8px;
 }
 
