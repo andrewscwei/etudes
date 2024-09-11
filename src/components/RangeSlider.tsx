@@ -19,7 +19,6 @@ export type RangeSliderProps = PropsWithChildren<{
   orientation?: Orientation
   range?: Range
   steps?: number
-  usesDefaultStyles?: boolean
   onRangeChange?: (range: Range) => void
 }>
 
@@ -35,7 +34,6 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
   orientation = 'vertical',
   range: externalRange,
   steps = -1,
-  usesDefaultStyles = false,
   onRangeChange,
   ...props
 }, ref) => {
@@ -135,19 +133,18 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
   })
 
   const fixedStyles = getFixedStyles({ orientation, highlightLength, start, knobPadding, knobWidth, knobHeight })
-  const defaultStyles = usesDefaultStyles ? getDefaultStyles({ isReleasingStartKnob, isReleasingEndKnob, orientation }) : undefined
 
   return (
     <div {...props} ref={ref} className={clsx(className, orientation)} data-component='range-slider'>
       <div ref={bodyRef} style={fixedStyles.body}>
-        {cloneStyledElement(components.gutter ?? <RangeSliderGutter style={defaultStyles?.gutter}/>, {
+        {cloneStyledElement(components.gutter ?? <RangeSliderGutter/>, {
           style: styles(fixedStyles.gutter),
         })}
-        {cloneStyledElement(components.highlight ?? <RangeSliderHighlight style={defaultStyles?.highlight}/>, {
+        {cloneStyledElement(components.highlight ?? <RangeSliderHighlight/>, {
           style: styles(fixedStyles.highlight),
         })}
         {cloneStyledElement(components.knob ?? <RangeSliderKnob
-          style={styles(defaultStyles?.knob, {
+          style={styles({
             transitionProperty: isReleasingStartKnob ? 'opacity, transform' : 'opacity',
           })}
         />, {
@@ -174,7 +171,7 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
           style: styles(fixedStyles.label),
         }, Number(startValue.toFixed(decimalPlaces)).toLocaleString()))}
         {cloneStyledElement(components.knob ?? <RangeSliderKnob
-          style={styles(defaultStyles?.knob, {
+          style={styles({
             transitionProperty: isReleasingEndKnob ? 'opacity, transform' : 'opacity',
           })}
         />, {
@@ -275,44 +272,6 @@ function getFixedStyles({ orientation = 'horizontal', knobWidth = 0, knobHeight 
       pointerEvents: 'none',
       position: 'relative',
       userSelect: 'none',
-    },
-  })
-}
-
-function getDefaultStyles({ isReleasingStartKnob = false, isReleasingEndKnob = false, orientation = 'horizontal' }) {
-  return asStyleDict({
-    gutter: {
-      background: 'rgba(255, 255, 255, .2)',
-    },
-    highlight: {
-      background: '#fff',
-      transitionDuration: '100ms',
-      transitionProperty: (isReleasingStartKnob ? !isReleasingEndKnob : isReleasingEndKnob) ? 'opacity, width, transform' : 'opacity',
-      transitionTimingFunction: 'ease-out',
-    },
-    knob: {
-      alignItems: 'center',
-      background: '#fff',
-      borderRadius: '10px',
-      boxSizing: 'border-box',
-      display: 'flex',
-      height: '20px',
-      justifyContent: 'center',
-      transitionDuration: '100ms',
-      transitionTimingFunction: 'ease-out',
-      width: '20px',
-    },
-    label: {
-      background: 'transparent',
-      color: '#fff',
-      textAlign: 'center',
-      transitionDuration: '100ms',
-      transitionTimingFunction: 'ease-out',
-      ...orientation === 'horizontal' ? {
-        top: 'calc(100% + 10px)',
-      } : {
-        left: 'calc(100% + 10px)',
-      },
     },
   })
 }
