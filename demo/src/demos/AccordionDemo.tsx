@@ -2,11 +2,11 @@ import clsx from 'clsx'
 import { Accordion, AccordionExpandIcon, AccordionHeader, type AccordionItemProps, type AccordionSection, type AccordionSelection } from 'etudes/components/Accordion'
 import { FlatSVG } from 'etudes/components/FlatSVG.js'
 import { useState } from 'react'
-import $$ExpandIcon from '../assets/svgs/expand-icon.svg?raw'
+import $$ExpandIcon from '../assets/expand-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
 
 const AccordionItem = ({ className, item, index, isSelected, onCustomEvent, ...props }: AccordionItemProps<string>) => (
-  <button {...props} className={clsx(className, 'ia selected:bg-black selected:text-bg flex items-center justify-start border border-black px-3 text-base')}>
+  <button {...props} className={clsx(className, 'ia selected:bg-dark selected:text-light border-dark flex items-center justify-start border px-3 text-base')}>
     {item}
   </button>
 )
@@ -64,7 +64,7 @@ export function AccordionDemo() {
           onSelectAt={(i, s) => toast(`<${Date.now()}>Selected Item ${i + 1} at Section ${s + 1}`)}
           onSelectionChange={setSelection}
         >
-          <AccordionHeader className='ia flex h-9 items-center justify-between border border-black px-3 text-base'/>
+          <AccordionHeader className='ia border-dark flex h-9 items-center justify-between border px-3 text-base'/>
           <AccordionExpandIcon className='size-3'>
             <FlatSVG
               className={clsx({

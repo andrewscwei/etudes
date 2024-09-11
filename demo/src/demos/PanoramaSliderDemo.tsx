@@ -1,7 +1,7 @@
 import { PanoramaSlider, PanoramaSliderIndicator, PanoramaSliderReticle, PanoramaSliderTrack } from 'etudes/components/PanoramaSlider'
 import { useState } from 'react'
 import { Size } from 'spase'
-import $$PanoramaImage from '../assets/images/panorama.png'
+import $$PanoramaImage from '../assets/panorama.png'
 import { Frame } from '../components/Frame.js'
 
 export function PanoramaSliderDemo() {
@@ -20,9 +20,9 @@ export function PanoramaSliderDemo() {
         zeroAnchor={zeroAnchor}
         onAngleChange={setAngle}
       >
-        <PanoramaSliderIndicator className='dragging:bg-bg bg-bg/40 absolute inset-x-0 -bottom-2 mx-auto h-[2px]'/>
-        <PanoramaSliderReticle className='dragging:bg-black/0 h-full bg-black/20 transition-colors'/>
-        <PanoramaSliderTrack className='h-full bg-black/40 transition-colors'/>
+        <PanoramaSliderIndicator className='dragging:bg-light bg-light/40 absolute inset-x-0 -bottom-2 mx-auto h-[2px]'/>
+        <PanoramaSliderReticle className='dragging:bg-dark/0 bg-dark/20 h-full transition-colors'/>
+        <PanoramaSliderTrack className='bg-dark/40 h-full transition-colors'/>
       </PanoramaSlider>
     </Frame>
   )

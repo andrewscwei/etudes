@@ -66,7 +66,6 @@ export type CarouselProps<I> = HTMLAttributes<HTMLElement> & {
 }
 
 export const Carousel = forwardRef(({
-  style,
   autoAdvanceInterval = 0,
   index = 0,
   isDragEnabled = true,
@@ -263,7 +262,6 @@ export const Carousel = forwardRef(({
       {...props}
       ref={ref}
       data-component='carousel'
-      style={styles(style, fixedStyles.root)}
       onClick={event => handleClick(event)}
       onPointerDown={event => handlePointerDown(event)}
       onPointerLeave={event => handlePointerUp(event)}
@@ -293,8 +291,6 @@ export const Carousel = forwardRef(({
 
 function getFixedStyles({ isPointerDown = false, orientation = 'horizontal' }) {
   return asStyleDict({
-    root: {
-    },
     viewport: {
       alignItems: 'center',
       display: 'flex',

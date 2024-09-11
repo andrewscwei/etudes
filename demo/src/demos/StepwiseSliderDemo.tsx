@@ -38,9 +38,9 @@ export function StepwiseSliderDemo() {
             toast(`Index: ${idx}`)
           }}
         >
-          <StepwiseSliderKnob className='bg-bg ia flex items-center justify-center border border-black'/>
-          <StepwiseSliderLabel className='text-base text-black'/>
-          <StepwiseSliderTrack className='ia bg-black/40'/>
+          <StepwiseSliderKnob className='bg-light ia border-dark flex items-center justify-center border'/>
+          <StepwiseSliderLabel className='text-dark text-base'/>
+          <StepwiseSliderTrack className='ia bg-dark/40'/>
         </StepwiseSlider>
       )}
     </Frame>

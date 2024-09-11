@@ -6,7 +6,7 @@ import { Frame } from '../components/Frame.js'
 
 const GridItem = ({ children, className, ...props }: HTMLAttributes<HTMLButtonElement> & PropsWithChildren) => {
   return (
-    <button {...props} className={clsx(className, 'ia flex items-center justify-center border border-black text-base')}>
+    <button {...props} className={clsx(className, 'ia border-dark flex items-center justify-center border text-base')}>
       {children}
     </button>
   )

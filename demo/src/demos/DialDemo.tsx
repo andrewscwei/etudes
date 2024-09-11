@@ -23,8 +23,8 @@ export function DialDemo() {
           trackGap={Number(trackGap)}
           trackThickness={Number(trackThickness)}
         >
-          <DialKnob className='stroke-black'/>
-          <DialTrack className='stroke-black/20'/>
+          <DialKnob className='stroke-dark'/>
+          <DialTrack className='stroke-dark/20'/>
         </Dial>
       )}
     </Frame>

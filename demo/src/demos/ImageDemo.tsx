@@ -1,5 +1,5 @@
 import { Image } from 'etudes/components/Image'
-import $$GitHubIcon from '../assets/svgs/github-icon.svg'
+import $$Image from '../assets/image.png'
 import { Frame } from '../components/Frame.js'
 
 export function ImageDemo() {
@@ -7,8 +7,8 @@ export function ImageDemo() {
     <Frame title='Image'>
       {(_, toast) => (
         <Image
-          className='size-32'
-          src={$$GitHubIcon}
+          className='size-full object-cover'
+          src={$$Image}
           onLoadComplete={() => toast('Loaded')}
           onLoadStart={() => toast('Loading')}
         />

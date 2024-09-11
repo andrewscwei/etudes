@@ -5,7 +5,7 @@ import { Frame } from '../components/Frame.js'
 
 function Item({ className, label, exposure, ...props }: HTMLAttributes<HTMLDivElement> & { exposure?: number; label: string }) {
   return (
-    <div {...props} className={clsx(className, 'flex flex-col items-center justify-center border border-black text-base')}>
+    <div {...props} className={clsx(className, 'border-dark flex flex-col items-center justify-center border text-base')}>
       <span>{label}</span>
       {exposure !== undefined && (<span>{`(exposure: ${exposure})`}</span>)}
     </div>

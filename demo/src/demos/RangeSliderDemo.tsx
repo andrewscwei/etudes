@@ -39,10 +39,10 @@ export function RangeSliderDemo() {
             toast(`Min: ${Math.round(range[0])}, Max: ${Math.round(range[1])}`)
           }}
         >
-          <RangeSliderGutter className='bg-black/40'/>
-          <RangeSliderHighlight className='bg-black'/>
-          <RangeSliderKnob className='bg-bg ia flex items-center justify-center border border-black'/>
-          <RangeSliderLabel className='text-base text-black'/>
+          <RangeSliderGutter className='bg-dark/40'/>
+          <RangeSliderHighlight className='bg-dark'/>
+          <RangeSliderKnob className='bg-light ia border-dark flex items-center justify-center border'/>
+          <RangeSliderLabel className='text-dark text-base'/>
         </RangeSlider>
       )}
     </Frame>

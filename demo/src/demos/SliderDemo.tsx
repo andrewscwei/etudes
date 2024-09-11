@@ -40,9 +40,9 @@ export function SliderDemo() {
             toast(`Position: ${pos.toFixed(2)}`)
           }}
         >
-          <SliderKnob className='bg-bg ia flex items-center justify-center border border-black'/>
-          <SliderLabel className='text-base text-black'/>
-          <SliderTrack className='ia bg-black/40'/>
+          <SliderKnob className='bg-light ia border-dark flex items-center justify-center border'/>
+          <SliderLabel className='text-dark text-base'/>
+          <SliderTrack className='ia bg-dark/40'/>
         </Slider>
       )}
     </Frame>

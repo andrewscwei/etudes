@@ -1,6 +1,6 @@
 import { Panorama } from 'etudes/components/Panorama'
 import { useState } from 'react'
-import $$PanoramaImage from '../assets/images/panorama.png'
+import $$PanoramaImage from '../assets/panorama.png'
 import { Frame } from '../components/Frame.js'
 
 export function PanoramaDemo() {
