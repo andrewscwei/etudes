@@ -6,6 +6,7 @@ import { BurgerButtonDemo } from './demos/BurgerButtonDemo'
 import { ButtonDemo } from './demos/ButtonDemo'
 import { CarouselDemo } from './demos/CarouselDemo.js'
 import { CollectionDemo } from './demos/CollectionDemo.js'
+import { CounterDemo } from './demos/CounterDemo.js'
 import { CoverImageDemo } from './demos/CoverImageDemo.js'
 import { CoverVideoDemo } from './demos/CoverVideoDemo.js'
 import { DialDemo } from './demos/DialDemo.js'
@@ -38,6 +39,7 @@ export function App() {
         <ButtonDemo/>
         <CarouselDemo/>
         <CollectionDemo/>
+        <CounterDemo/>
         <CoverImageDemo/>
         <CoverVideoDemo/>
         <DialDemo/>
