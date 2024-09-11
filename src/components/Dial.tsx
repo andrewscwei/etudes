@@ -39,11 +39,6 @@ export type DialProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
    * `stroke-width` of the `<circle>` element.
    */
   trackThickness?: number
-
-  /**
-   * Specifies if the component should use default styles.
-   */
-  usesDefaultStyles?: boolean
 }>
 
 /**
@@ -61,7 +56,6 @@ export const Dial = forwardRef<HTMLDivElement, DialProps>(({
   radius = 50,
   trackGap = 0,
   trackThickness = 2,
-  usesDefaultStyles = false,
   ...props
 }, ref) => {
   const diameter = radius * 2
@@ -73,13 +67,12 @@ export const Dial = forwardRef<HTMLDivElement, DialProps>(({
   })
 
   const fixedStyles = getFixedStyles({ angle, diameter })
-  const defaultStyles = usesDefaultStyles ? getDefaultStyles() : undefined
 
   return (
     <div {...props} ref={ref} data-component='dial' style={styles(style, fixedStyles.root)}>
       <div style={fixedStyles.trackContainer}>
         <svg height={diameter} style={fixedStyles.svgContainer} viewBox={`0 0 ${diameter} ${diameter}`} width={diameter}>
-          {cloneStyledElement(components.track ?? <DialTrack style={defaultStyles?.track}/>, {
+          {cloneStyledElement(components.track ?? <DialTrack/>, {
             cx: radius,
             cy: radius,
             fill: 'none',
@@ -91,7 +84,7 @@ export const Dial = forwardRef<HTMLDivElement, DialProps>(({
       </div>
       <div style={styles(fixedStyles.knobContainer)}>
         <svg style={fixedStyles.svgContainer} viewBox={`0 0 ${diameter} ${diameter}`} xmlns='http://www.w3.org/2000/svg'>
-          {cloneStyledElement(components.knob ?? <DialKnob style={defaultStyles?.knob}/>, {
+          {cloneStyledElement(components.knob ?? <DialKnob/>, {
             d: arcPath(radius, radius, radius - knobThickness / 2 - (trackThickness - knobThickness) / 2, -clampedKnobAngle / 2, clampedKnobAngle / 2),
             fill: 'none',
             strokeWidth: knobThickness,
@@ -169,18 +162,6 @@ function getFixedStyles({ diameter = 0, angle = 0 }) {
       position: 'absolute',
       right: '0',
       top: '0',
-    },
-  })
-}
-
-function getDefaultStyles() {
-  return asStyleDict({
-    knob: {
-      stroke: '#fff',
-    },
-    track: {
-      strokeDasharray: '4',
-      stroke: '#fff',
     },
   })
 }
