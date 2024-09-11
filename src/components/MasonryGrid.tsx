@@ -158,7 +158,7 @@ export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
 
   useResizeEffect(bodyRef, {
     onResize: element => {
-      const maxSize = Rect.from(element)?.size ?? new Size()
+      const maxSize = Rect.from(element)?.size ?? Size.make()
       const currWidth = getCurrentWidth()
       const currHeight = getCurrentHeight()
 

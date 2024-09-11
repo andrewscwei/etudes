@@ -56,5 +56,5 @@ function getSize(element?: HTMLImageElement): Size | undefined {
   if (typeof element.width !== 'number') return undefined
   if (typeof element.height !== 'number') return undefined
 
-  return new Size([element.width, element.height])
+  return Size.make(element.width, element.height)
 }

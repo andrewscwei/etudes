@@ -121,7 +121,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
   ...props
 }, ref) => {
   const mapDragValueToPosition = (value: number, dx: number, dy: number) => {
-    const rect = Rect.from(bodyRef.current) ?? new Rect()
+    const rect = Rect.from(bodyRef.current) ?? Rect.make()
     const truePosition = isInverted ? 1 - value : value
     const trueNewPositionX = truePosition * rect.width + dx
     const trueNewPositionY = truePosition * rect.height + dy
@@ -134,7 +134,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
   const trackClickHandler = (event: MouseEvent) => {
     if (!isTrackInteractive) return
 
-    const rect = Rect.from(bodyRef.current) ?? new Rect()
+    const rect = Rect.from(bodyRef.current) ?? Rect.make()
     const vrect = Rect.fromViewport()
 
     switch (orientation) {

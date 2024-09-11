@@ -30,7 +30,7 @@ export const SwipeContainer = forwardRef<HTMLDivElement, SwipeContainerProps>(({
 
   const onDragStart = (x: number, y: number) => {
     if (isNaN(x) || isNaN(y)) return onDragCancel()
-    setDragStartPosition(new Point([x, y]))
+    setDragStartPosition(Point.make(x, y))
   }
 
   const onDragMove = (x: number, y: number) => {
@@ -45,7 +45,7 @@ export const SwipeContainer = forwardRef<HTMLDivElement, SwipeContainerProps>(({
 
     if (!hasStartTime) setDragStartTime(Date.now())
 
-    setDragEndPosition(new Point([x, y]))
+    setDragEndPosition(Point.make(x, y))
   }
 
   const onDragEnd = () => {

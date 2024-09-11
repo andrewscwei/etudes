@@ -19,10 +19,10 @@ export function ScrollPositionProvider({
   children,
 }: Readonly<ScrollPositionProviderProps>) {
   const [value, setValue] = useState<ScrollPositionContextValue>({
-    minPos: new Point(),
-    maxPos: new Point(),
-    pos: new Point(),
-    step: new Point(),
+    minPos: Point.make(),
+    maxPos: Point.make(),
+    pos: Point.make(),
+    step: Point.make(),
   })
 
   useEffect(() => {
@@ -34,12 +34,12 @@ export function ScrollPositionProvider({
       if (!refRectFull) return
 
       const refRectMax = refRectMin.clone({ x: refRectFull.width - refRect.width, y: refRectFull.height - refRect.height })
-      const step = new Point([refRect.left / refRectMax.left, refRect.top / refRectMax.top])
+      const step = Point.make(refRect.left / refRectMax.left, refRect.top / refRectMax.top)
 
       setValue({
-        minPos: new Point([refRectMin.left, refRectMin.top]),
-        maxPos: new Point([refRectMax.left, refRectMax.top]),
-        pos: new Point([refRect.left, refRect.top]),
+        minPos: Point.make(refRectMin.left, refRectMin.top),
+        maxPos: Point.make(refRectMax.left, refRectMax.top),
+        pos: Point.make(refRect.left, refRect.top),
         step,
       })
     }
@@ -82,8 +82,8 @@ export function useScrollPosition(targetRef?: RefObject<Element>): ScrollPositio
 
   if (!refRect || !rect) {
     return {
-      pos: new Point(),
-      step: new Point(),
+      pos: Point.make(),
+      step: Point.make(),
     }
   }
 
@@ -93,7 +93,7 @@ export function useScrollPosition(targetRef?: RefObject<Element>): ScrollPositio
   const stepY = posY / rect.height
 
   return {
-    pos: new Point([posX, posY]),
-    step: new Point([stepX, stepY]),
+    pos: Point.make(posX, posY),
+    step: Point.make(stepX, stepY),
   }
 }

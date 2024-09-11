@@ -115,13 +115,13 @@ export const Carousel = forwardRef(({
   }
 
   const handlePointerDown = (event: PointerEvent) => {
-    pointerDownPositionRef.current = new Point([event.clientX, event.clientY])
+    pointerDownPositionRef.current = Point.make(event.clientX, event.clientY)
 
     setIsPointerDown(true)
   }
 
   const handlePointerUp = (event: PointerEvent) => {
-    pointerUpPositionRef.current = new Point([event.clientX, event.clientY])
+    pointerUpPositionRef.current = Point.make(event.clientX, event.clientY)
 
     setIsPointerDown(false)
   }

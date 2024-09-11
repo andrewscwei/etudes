@@ -36,14 +36,14 @@ export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
   const aspectRatio = isNaN(externalAspectRatio) ? localAspectRatio : externalAspectRatio
   const rootRect = useRect(rootRef)
   const rootAspectRatio = rootRect.width / rootRect.height
-  const imageSize = new Size([
+  const imageSize = Size.make(
     rootAspectRatio > 1
       ? Math.max(rootRect.width, rootRect.height * aspectRatio)
       : Math.max(rootRect.width, (Math.max(rootRect.height, rootRect.width / aspectRatio)) * aspectRatio),
     rootAspectRatio > 1
       ? Math.max(rootRect.height, Math.max(rootRect.width, rootRect.height * aspectRatio) / aspectRatio)
       : Math.max(rootRect.height, rootRect.width / aspectRatio),
-  ])
+  )
 
   const components = asComponentDict(children, {
     content: CoverImageContent,
