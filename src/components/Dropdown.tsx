@@ -84,11 +84,6 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
   maxVisibleItems?: number
 
   /**
-   * Specifies if the component should use default styles.
-   */
-  usesDefaultStyles?: boolean
-
-  /**
    * Handler invoked when the component is collapsed.
    */
   onCollapse?: () => void
@@ -137,7 +132,6 @@ export const Dropdown = forwardRef(({
   orientation = 'vertical',
   selection: externalSelection = [],
   selectionMode = 'single',
-  usesDefaultStyles = false,
   onActivateAt,
   onCollapse,
   onDeselectAt,
@@ -199,7 +193,6 @@ export const Dropdown = forwardRef(({
   const menuLength = itemLength * numVisibleItems + itemPadding * (numVisibleItems - 1)
 
   const fixedStyles = getFixedStyles({ isCollapsed, isInverted, maxVisibleItems, menuLength, numItems, orientation })
-  const defaultStyles = usesDefaultStyles ? getDefaultStyles({ orientation }) : undefined
 
   const components = asComponentDict(children, {
     collapseIcon: DropdownCollapseIcon,
@@ -258,7 +251,7 @@ export const Dropdown = forwardRef(({
           cloneStyledElement(
             components.toggle ?? <DropdownToggle/>,
             {
-              style: styles(fixedStyles.toggle, defaultStyles?.toggle),
+              style: styles(fixedStyles.toggle),
               onClick: () => toggle(),
             },
             <span dangerouslySetInnerHTML={{ __html: label?.(selection) ?? (selection.length > 0 ? selection.map(t => items[t].label).join(', ') : '') }}/>,
@@ -277,7 +270,7 @@ export const Dropdown = forwardRef(({
           orientation={orientation}
           selection={selection}
           selectionMode={selectionMode}
-          style={styles(fixedStyles.collection, defaultStyles?.collection)}
+          style={styles(fixedStyles.collection)}
           onActivateAt={onActivateAt}
           onDeselectAt={onDeselectAt}
           onSelectAt={selectAtHandler}
@@ -356,42 +349,6 @@ function getFixedStyles({ isCollapsed = true, isInverted = false, collectionPadd
           left: '100%',
           marginLeft: `${collectionPadding}px`,
         },
-      },
-    },
-  })
-}
-
-function getDefaultStyles({ orientation = 'vertical' }) {
-  return asStyleDict({
-    toggle: {
-      alignItems: 'center',
-      background: '#fff',
-      boxSizing: 'border-box',
-      color: '#000',
-      display: 'flex',
-      flexDirection: 'row',
-      fontSize: '16px',
-      justifyContent: 'space-between',
-      margin: '0',
-      padding: '0 10px',
-    },
-    expandIcon: {
-      height: '15px',
-      margin: '0',
-      padding: '0',
-      width: '15px',
-    },
-    collapseIcon: {
-      height: '15px',
-      margin: '0',
-      padding: '0',
-      width: '15px',
-    },
-    collection: {
-      ...orientation === 'vertical' ? {
-        transition: 'height 100ms ease-out',
-      } : {
-        transition: 'width 100ms ease-out',
       },
     },
   })
