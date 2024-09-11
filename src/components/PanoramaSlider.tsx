@@ -29,11 +29,6 @@ export type PanoramaSliderProps = PanoramaProps & PropsWithChildren<{
    * is, this prop is ignored.
    */
   viewportSize?: Size
-
-  /**
-   * Specifies if the component should use default styles.
-   */
-  usesDefaultStyles?: boolean
 }>
 
 /**
@@ -54,7 +49,6 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
   fov,
   speed = 1,
   src,
-  usesDefaultStyles = false,
   viewportSize,
   zeroAnchor = 0,
   onAngleChange,
@@ -114,7 +108,6 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
   })
 
   const fixedStyles = getFixedStyles({ autoDimension, panoramaRect, aspectRatio, reticleWidth })
-  const defaultStyles = usesDefaultStyles ? getDefaultStyles({ isDragging }) : undefined
 
   return (
     <div {...props} ref={ref} className={clsx(className, { dragging: isDragging })} data-component='panorama-slider' style={styles(style, fixedStyles.root)}>
@@ -136,21 +129,21 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
       />
       <div style={fixedStyles.body}>
         <div style={fixedStyles.controls}>
-          {cloneStyledElement(components.track ?? <PanoramaSliderTrack style={defaultStyles?.track}/>, {
+          {cloneStyledElement(components.track ?? <PanoramaSliderTrack/>, {
             className: clsx({ dragging: isDragging }),
             style: styles(fixedStyles.track),
           })}
-          {cloneStyledElement(components.reticle ?? <PanoramaSliderReticle style={defaultStyles?.reticle}/>, {
+          {cloneStyledElement(components.reticle ?? <PanoramaSliderReticle/>, {
             className: clsx({ dragging: isDragging }),
             style: styles(fixedStyles.reticle),
           })}
-          {cloneStyledElement(components.track ?? <PanoramaSliderTrack style={defaultStyles?.track}/>, {
+          {cloneStyledElement(components.track ?? <PanoramaSliderTrack/>, {
             className: clsx({ dragging: isDragging }),
             style: styles(fixedStyles.track),
           })}
         </div>
       </div>
-      {cloneStyledElement(components.indicator ?? <PanoramaSliderIndicator style={defaultStyles?.indicator}/>, {
+      {cloneStyledElement(components.indicator ?? <PanoramaSliderIndicator/>, {
         className: clsx({ dragging: isDragging }),
         style: styles(fixedStyles.indicator),
       })}
@@ -171,37 +164,6 @@ export const PanoramaSliderReticle = forwardRef<HTMLDivElement, HTMLAttributes<H
 export const PanoramaSliderIndicator = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
   <div {...props} ref={ref} data-child='indicator'/>
 ))
-
-function getDefaultStyles({ isDragging = false }) {
-  return asStyleDict({
-    track: {
-      background: 'rgba(0, 0, 0, .7)',
-      height: '100%',
-    },
-    reticle: {
-      background: `rgba(0, 0, 0, ${isDragging ? 0 : 0.3})`,
-      flex: '0 0 auto',
-      height: '100%',
-      transitionDuration: '100ms',
-      transitionProperty: 'background',
-      transitionTimingFunction: 'ease-out',
-    },
-    indicator: {
-      background: '#fff',
-      borderRadius: '2px',
-      bottom: '-10px',
-      boxSizing: 'border-box',
-      display: 'block',
-      height: '2px',
-      left: '0',
-      margin: '0 auto',
-      opacity: isDragging ? 1 : 0,
-      position: 'absolute',
-      right: '0',
-      transition: 'opacity .3s ease-out',
-    },
-  })
-}
 
 function getFixedStyles({ autoDimension = 'width', panoramaRect = Rect.make(), aspectRatio = 0, reticleWidth = 0 }) {
   return asStyleDict({
