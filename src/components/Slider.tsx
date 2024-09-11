@@ -61,11 +61,6 @@ export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
   labelProvider?: (position: number) => string
 
   /**
-   * Specifies if the component should use default styles.
-   */
-  usesDefaultStyles?: boolean
-
-  /**
    * Handler invoked when position changes. This can either be invoked from the
    * `position` prop being changed or from the slider being dragged. Note that
    * if the event is emitted at the end of dragging due to
@@ -113,7 +108,6 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
   orientation = 'vertical',
   position: externalPosition = 0,
   trackPadding = 0,
-  usesDefaultStyles = false,
   labelProvider,
   onDragEnd,
   onDragStart,
@@ -194,12 +188,11 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
 
   const fixedClassNames = getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
   const fixedStyles = getFixedStyles({ orientation, isDragging, naturalPosition, knobHeight, knobWidth, isTrackInteractive })
-  const defaultStyles = usesDefaultStyles ? getDefaultStyles({ knobHeight }) : undefined
 
   return (
     <div {...props} ref={ref} className={clsx(className, fixedClassNames.root)} data-component='slider'>
       <div ref={bodyRef} style={fixedStyles.body}>
-        {cloneStyledElement(components.track ?? <SliderTrack style={defaultStyles?.track}/>, {
+        {cloneStyledElement(components.track ?? <SliderTrack/>, {
           className: clsx('start', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
             height: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
@@ -210,7 +203,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
           }),
           onClick: trackClickHandler,
         }, <div style={fixedStyles.trackHitbox}/>)}
-        {cloneStyledElement(components.track ?? <SliderTrack style={defaultStyles?.track}/>, {
+        {cloneStyledElement(components.track ?? <SliderTrack/>, {
           className: clsx('end', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
             bottom: '0',
@@ -222,10 +215,10 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
           onClick: trackClickHandler,
         }, <div style={fixedStyles.trackHitbox}/>)}
         <button ref={knobContainerRef} style={fixedStyles.knobContainer}>
-          {cloneStyledElement(components.knob ?? <SliderKnob style={defaultStyles?.knob}/>, {
+          {cloneStyledElement(components.knob ?? <SliderKnob/>, {
             className: clsx(fixedClassNames.knob),
             style: styles(fixedStyles.knob),
-          }, labelProvider && cloneStyledElement(components.label ?? <SliderLabel style={defaultStyles?.label}/>, {
+          }, labelProvider && cloneStyledElement(components.label ?? <SliderLabel/>, {
             className: clsx(fixedClassNames.label),
             style: styles(fixedStyles.label),
           }, labelProvider(position)))}
@@ -333,26 +326,6 @@ function getFixedStyles({ orientation = 'vertical', isDragging = false, naturalP
       position: 'absolute',
       transform: orientation === 'horizontal' ? 'translate3d(0, -50%, 0)' : 'translate3d(-50%, 0, 0)',
       width: '100%',
-    },
-  })
-}
-
-function getDefaultStyles({ knobHeight = 0 }) {
-  return asStyleDict({
-    knob: {
-      alignItems: 'center',
-      background: '#fff',
-      boxSizing: 'border-box',
-      display: 'flex',
-      justifyContent: 'center',
-    },
-    label: {
-      color: '#000',
-      fontSize: '12px',
-      lineHeight: `${knobHeight}px`,
-    },
-    track: {
-      background: '#fff',
     },
   })
 }
