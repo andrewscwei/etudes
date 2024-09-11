@@ -13,7 +13,7 @@ export function WithTooltipDemo() {
       {({ alignment }) => (
         <WithTooltip
           alignment={alignment as any}
-          className='z-50 bg-black px-2 py-1 text-sm text-white'
+          className='text-bg z-50 bg-black px-2 py-1 text-sm'
           hint='Hello, world!'
         >
           <span className='relative cursor-pointer border border-black px-2 py-1 text-base'>Hover me</span>

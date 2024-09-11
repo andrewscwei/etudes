@@ -6,7 +6,7 @@ import $$ExpandIcon from '../assets/svgs/expand-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
 
 const DropdownItem = ({ className, index, isSelected, item, orientation, onCustomEvent, ...props }: DropdownItemProps) => (
-  <button {...props} className={clsx(className, 'ia selected:bg-black selected:text-white flex items-center justify-start border border-black px-3')}>
+  <button {...props} className={clsx(className, 'ia selected:bg-black selected:text-bg flex items-center justify-start border border-black px-3')}>
     {item.label}
   </button>
 )

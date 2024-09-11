@@ -6,7 +6,7 @@ import $$ExpandIcon from '../assets/svgs/expand-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
 
 const AccordionItem = ({ className, item, index, isSelected, onCustomEvent, ...props }: AccordionItemProps<string>) => (
-  <button {...props} className={clsx(className, 'ia selected:bg-black selected:text-white flex items-center justify-start border border-black px-3 text-base')}>
+  <button {...props} className={clsx(className, 'ia selected:bg-black selected:text-bg flex items-center justify-start border border-black px-3 text-base')}>
     {item}
   </button>
 )
