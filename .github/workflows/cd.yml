@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          lfs: true
       - name: Build
         id: build
         uses: andrewscwei/actions/node-build@v1
