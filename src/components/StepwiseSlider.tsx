@@ -280,13 +280,17 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
   )
 })
 
-Object.defineProperty(StepwiseSlider, 'displayName', { value: 'StepwiseSlider', writable: false })
+export const StepwiseSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <div {...props} data-child='track'/>
+)
 
-export const StepwiseSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props} data-child='track'/>
+export const StepwiseSliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <div {...props} data-child='knob'/>
+)
 
-export const StepwiseSliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props} data-child='knob'/>
-
-export const StepwiseSliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => <div {...props} data-child='label'/>
+export const StepwiseSliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <div {...props} data-child='label'/>
+)
 
 /**
  * Generates a set of steps compatible with this component.
@@ -296,7 +300,7 @@ export const StepwiseSliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>
  *
  * @returns An array of steps.
  */
-export function generateSteps(length: number): readonly number[] {
+function generateSteps(length: number): readonly number[] {
   if (length <= 1) throw new Error('`length` value must be greater than or equal to 2')
   if (Math.round(length) !== length) throw new Error('`length` value must be an integer')
 
@@ -440,3 +444,5 @@ function getFixedStyles({ orientation = 'vertical', naturalPosition = 0, isDragg
     },
   })
 }
+
+Object.defineProperty(StepwiseSlider, 'displayName', { value: 'StepwiseSlider', writable: false })

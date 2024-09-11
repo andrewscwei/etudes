@@ -95,11 +95,13 @@ export const Dial = forwardRef<HTMLDivElement, DialProps>(({
   )
 })
 
-Object.defineProperty(Dial, 'displayName', { value: 'Dial', writable: false })
+export const DialTrack = ({ ...props }: SVGAttributes<SVGCircleElement>) => (
+  <circle {...props} data-child='track'/>
+)
 
-export const DialTrack = ({ ...props }: SVGAttributes<SVGCircleElement>) => <circle {...props} data-child='track'/>
-
-export const DialKnob = ({ ...props }: SVGAttributes<SVGPathElement>) => <path {...props} data-child='knob'/>
+export const DialKnob = ({ ...props }: SVGAttributes<SVGPathElement>) => (
+  <path {...props} data-child='knob'/>
+)
 
 function polarToCartesian(centerX: number, centerY: number, radius: number, angleInDegrees: number) {
   const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0
@@ -165,3 +167,5 @@ function getFixedStyles({ diameter = 0, angle = 0 }) {
     },
   })
 }
+
+Object.defineProperty(Dial, 'displayName', { value: 'Dial', writable: false })

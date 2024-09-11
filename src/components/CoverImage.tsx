@@ -79,8 +79,6 @@ export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
   )
 })
 
-Object.defineProperty(CoverImage, 'displayName', { value: 'CoverImage', writable: false })
-
 export const CoverImageViewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
   <div {...props} data-child='viewport'>
     {children}
@@ -112,3 +110,5 @@ const FIXED_STYLES = asStyleDict({
     width: '100%',
   },
 })
+
+Object.defineProperty(CoverImage, 'displayName', { value: 'CoverImage', writable: false })

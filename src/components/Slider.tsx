@@ -228,8 +228,6 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
   )
 })
 
-Object.defineProperty(Slider, 'displayName', { value: 'Slider', writable: false })
-
 export const SliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props} data-child='track'/>
 )
@@ -329,3 +327,5 @@ function getFixedStyles({ orientation = 'vertical', isDragging = false, naturalP
     },
   })
 }
+
+Object.defineProperty(Slider, 'displayName', { value: 'Slider', writable: false })
