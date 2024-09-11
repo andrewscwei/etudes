@@ -1,0 +1,3 @@
+demo/src/assets/image.png
+demo/src/assets/panorama.png
+demo/src/assets/video.mov
