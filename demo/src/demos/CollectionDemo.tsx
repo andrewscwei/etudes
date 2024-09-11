@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Frame } from '../components/Frame.js'
 
 const CollectionItem = ({ className, index, isSelected, item, onCustomEvent, ...props }: CollectionItemProps<string>) => (
-  <button {...props} className={clsx(className, 'ia selected:bg-black selected:text-white border border-black text-base')}>
+  <button {...props} className={clsx(className, 'ia selected:bg-black selected:text-bg border border-black text-base')}>
     {item}
   </button>
 )

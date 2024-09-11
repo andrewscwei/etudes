@@ -7,7 +7,7 @@ export function CoverImageDemo() {
     <Frame title='CoverImage' usesMaxHeight={true}>
       <CoverImage className='relative size-full' src={$$GitHubIcon}>
         <CoverImageViewport className='z-10 flex items-center justify-center'>
-          <div className='flex items-center justify-center bg-black px-2 py-1 text-sm text-white'>Cover</div>
+          <div className='text-bg flex items-center justify-center bg-black px-2 py-1 text-sm'>Cover</div>
         </CoverImageViewport>
         <CoverImageContent className='pointer-events-none relative size-full bg-black/40'/>
       </CoverImage>

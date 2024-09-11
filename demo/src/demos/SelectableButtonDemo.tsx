@@ -16,7 +16,7 @@ export function SelectableButtonDemo() {
     >
       {({ isDeselectable, isDisabled }, toast) => (
         <SelectableButton
-          className='ia flex items-center justify-center border border-black px-4 py-1 text-base active:bg-black active:text-white disabled:pointer-events-none'
+          className='ia active:text-bg flex items-center justify-center border border-black px-4 py-1 text-base active:bg-black disabled:pointer-events-none'
           isDeselectable={isDeselectable === 'true'}
           isDisabled={isDisabled === 'true'}
           isSelected={isSelected}
