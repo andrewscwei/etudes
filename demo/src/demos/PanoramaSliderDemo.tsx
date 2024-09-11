@@ -16,7 +16,7 @@ export function PanoramaSliderDemo() {
         angle={angle}
         className='relative h-24'
         src={$$PanoramaImage}
-        viewportSize={new Size([500, 400])}
+        viewportSize={Size.make(500, 400)}
         zeroAnchor={zeroAnchor}
         onAngleChange={setAngle}
       >

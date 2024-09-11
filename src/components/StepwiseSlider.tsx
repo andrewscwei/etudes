@@ -150,7 +150,7 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
   ...props
 }, ref) => {
   const mapDragValueToPosition = (value: number, dx: number, dy: number) => {
-    const rect = Rect.from(bodyRef.current) ?? new Rect()
+    const rect = Rect.from(bodyRef.current) ?? Rect.make()
     const truePosition = isInverted ? 1 - value : value
     const trueNewPositionX = truePosition * rect.width + dx
     const trueNewPositionY = truePosition * rect.height + dy
@@ -163,7 +163,7 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
   const trackClickHandler = (event: MouseEvent) => {
     if (!isTrackInteractive) return
 
-    const rect = Rect.from(bodyRef.current) ?? new Rect()
+    const rect = Rect.from(bodyRef.current) ?? Rect.make()
 
     switch (orientation) {
       case 'horizontal': {

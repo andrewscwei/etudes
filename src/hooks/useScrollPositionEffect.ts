@@ -30,12 +30,12 @@ export function useScrollPositionEffect({ onChange }: Props, deps: DependencyLis
     if (!refRectFull) return undefined
 
     const refRectMax = refRectMin.clone({ x: refRectFull.width - refRect.width, y: refRectFull.height - refRect.height })
-    const step = new Point([refRect.left / refRectMax.left, refRect.top / refRectMax.top])
+    const step = Point.make(refRect.left / refRectMax.left, refRect.top / refRectMax.top)
 
     return {
-      minPos: new Point([refRectMin.left, refRectMin.top]),
-      maxPos: new Point([refRectMax.left, refRectMax.top]),
-      pos: new Point([refRect.left, refRect.top]),
+      minPos: Point.make(refRectMin.left, refRectMin.top),
+      maxPos: Point.make(refRectMax.left, refRectMax.top),
+      pos: Point.make(refRect.left, refRect.top),
       step,
     }
   }

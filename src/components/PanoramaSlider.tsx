@@ -203,7 +203,7 @@ function getDefaultStyles({ isDragging = false }) {
   })
 }
 
-function getFixedStyles({ autoDimension = 'width', panoramaRect = new Rect(), aspectRatio = 0, reticleWidth = 0 }) {
+function getFixedStyles({ autoDimension = 'width', panoramaRect = Rect.make(), aspectRatio = 0, reticleWidth = 0 }) {
   return asStyleDict({
     root: {
       ...autoDimension === 'width' ? {

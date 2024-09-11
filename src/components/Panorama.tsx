@@ -191,7 +191,7 @@ function getFilledImageSize(originalSize: Size, sizeToFill: Size): Size {
   const { width: originalWidth, height: originalHeight } = originalSize
   const { height: filledHeignt } = sizeToFill
 
-  if (originalHeight <= 0) return new Size()
+  if (originalHeight <= 0) return Size.make()
 
   const aspectRatio = filledHeignt / originalHeight
   const filledWidth = aspectRatio * originalWidth

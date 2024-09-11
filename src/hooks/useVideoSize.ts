@@ -56,5 +56,5 @@ function getSize(element?: HTMLVideoElement): Size | undefined {
   if (typeof element.videoWidth !== 'number') return undefined
   if (typeof element.videoHeight !== 'number') return undefined
 
-  return new Size([element.videoWidth, element.videoHeight])
+  return Size.make(element.videoWidth, element.videoHeight)
 }

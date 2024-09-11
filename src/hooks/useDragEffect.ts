@@ -69,7 +69,7 @@ export function useDragEffect(targetRef: RefObject<HTMLElement>, {
     const mouseDownHandler = (event: MouseEvent) => {
       event.preventDefault()
 
-      const position = new Point([event.clientX, event.clientY])
+      const position = Point.make(event.clientX, event.clientY)
 
       startPositionRef.current = position
       dragPositionRef.current = position
@@ -86,7 +86,7 @@ export function useDragEffect(targetRef: RefObject<HTMLElement>, {
     const mouseMoveHandler = (event: MouseEvent) => {
       if (!startPositionRef.current) return
 
-      const position = new Point([event.clientX, event.clientY])
+      const position = Point.make(event.clientX, event.clientY)
       const displacement = (dragPositionRef.current ?? startPositionRef.current).subtract(position)
 
       dragPositionRef.current = position
@@ -97,7 +97,7 @@ export function useDragEffect(targetRef: RefObject<HTMLElement>, {
     const mouseUpHandler = (event: MouseEvent) => {
       if (!startPositionRef.current) return
 
-      const position = new Point([event.clientX, event.clientY])
+      const position = Point.make(event.clientX, event.clientY)
       const displacement = (dragPositionRef.current ?? startPositionRef.current).subtract(position)
 
       onDragEnd?.(position, displacement, startPositionRef.current)
