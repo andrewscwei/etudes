@@ -7,7 +7,6 @@ export type BurgerButtonProps = HTMLAttributes<HTMLButtonElement> & PropsWithChi
   isActive?: boolean
   isSplit?: boolean
   isTailHidden?: boolean
-  usesDefaultStyles?: boolean
   onActivate?: () => void
   onDeactivate?: () => void
   onToggle?: (isActive: boolean) => void
@@ -26,7 +25,6 @@ export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
   isActive = false,
   isTailHidden = false,
   isSplit = false,
-  usesDefaultStyles = false,
   onActivate,
   onDeactivate,
   onToggle,
@@ -57,7 +55,6 @@ export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
   })
 
   const fixedStyles = getFixedStyles({ isSplit, isActive, isTailHidden })
-  const defaultStyles = usesDefaultStyles ? getDefaultStyles() : undefined
 
   return (
     <button
@@ -72,7 +69,7 @@ export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
         {j => (
           <div data-child='joint' style={styles(fixedStyles.joint, (fixedStyles as any)[`joint${j}`])}>
             <Repeat count={3}>
-              {i => cloneStyledElement(components.bar ?? <BurgerButtonBar style={defaultStyles?.bar}/>, {
+              {i => cloneStyledElement(components.bar ?? <BurgerButtonBar/>, {
                 className: clsx(fixedClassNames.bar),
                 style: styles(fixedStyles.bar, (fixedStyles as any)[`bar${j}${i}`]),
               })}
@@ -158,18 +155,6 @@ function getFixedStyles({
       transform: isActive ? 'translate(0, -50%) rotate(45deg)' : 'translate(0, -100%) rotate(0deg)',
       transformOrigin: 'left center',
       width: isTailHidden && !isActive ? '0' : '100%',
-    },
-  })
-}
-
-function getDefaultStyles() {
-  return asStyleDict({
-    bar: {
-      height: '2px',
-      background: '#fff',
-      transitionDuration: '100ms',
-      transitionProperty: 'background, height, opacity, transform, width, left, top, right, bottom',
-      transitionTimingFunction: 'ease-out',
     },
   })
 }
