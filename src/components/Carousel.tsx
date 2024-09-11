@@ -291,8 +291,6 @@ export const Carousel = forwardRef(({
   )
 }) as <I extends HTMLAttributes<HTMLElement>>(props: CarouselProps<I> & { ref?: ForwardedRef<HTMLDivElement> }) => ReactElement
 
-Object.defineProperty(Carousel, 'displayName', { value: 'Carousel', writable: false })
-
 function getFixedStyles({ isPointerDown = false, orientation = 'horizontal' }) {
   return asStyleDict({
     root: {
@@ -333,3 +331,5 @@ function getFixedStyles({ isPointerDown = false, orientation = 'horizontal' }) {
     },
   })
 }
+
+Object.defineProperty(Carousel, 'displayName', { value: 'Carousel', writable: false })

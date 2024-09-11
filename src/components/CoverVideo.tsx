@@ -98,8 +98,6 @@ export const CoverVideo = forwardRef<HTMLDivElement, CoverVideoProps>(({
   )
 })
 
-Object.defineProperty(CoverVideo, 'displayName', { value: 'CoverVideo', writable: false })
-
 export const CoverVideoViewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
   <div {...props} data-child='viewport'>
     {children}
@@ -124,3 +122,5 @@ const FIXED_STYLES = asStyleDict({
     transform: 'translate(-50%, -50%)',
   },
 })
+
+Object.defineProperty(CoverVideo, 'displayName', { value: 'CoverVideo', writable: false })

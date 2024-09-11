@@ -202,8 +202,6 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
   )
 })
 
-Object.defineProperty(RangeSlider, 'displayName', { value: 'RangeSlider', writable: false })
-
 export const RangeSliderGutter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
   <div {...props} ref={ref} data-child='gutter'/>
 ))
@@ -275,3 +273,5 @@ function getFixedStyles({ orientation = 'horizontal', knobWidth = 0, knobHeight 
     },
   })
 }
+
+Object.defineProperty(RangeSlider, 'displayName', { value: 'RangeSlider', writable: false })

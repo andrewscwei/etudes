@@ -293,8 +293,6 @@ export const DropdownCollapseIcon = ({ children, ...props }: HTMLAttributes<HTML
   <figure {...props} data-child='collapse-icon'>{children}</figure>
 )
 
-Object.defineProperty(Dropdown, 'displayName', { value: 'Dropdown', writable: false })
-
 function sortIndices(indices: number[]): number[] {
   return indices.sort((a, b) => a - b)
 }
@@ -353,3 +351,5 @@ function getFixedStyles({ isCollapsed = true, isInverted = false, collectionPadd
     },
   })
 }
+
+Object.defineProperty(Dropdown, 'displayName', { value: 'Dropdown', writable: false })

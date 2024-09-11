@@ -151,8 +151,6 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
   )
 })
 
-Object.defineProperty(PanoramaSlider, 'displayName', { value: 'PanoramaSlider', writable: false })
-
 export const PanoramaSliderTrack = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
   <div {...props} ref={ref} data-child='track'/>
 ))
@@ -209,3 +207,5 @@ function getFixedStyles({ autoDimension = 'width', panoramaRect = Rect.make(), a
     },
   })
 }
+
+Object.defineProperty(PanoramaSlider, 'displayName', { value: 'PanoramaSlider', writable: false })

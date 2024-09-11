@@ -197,8 +197,6 @@ export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
   )
 })
 
-Object.defineProperty(MasonryGrid, 'displayName', { value: 'MasonryGrid', writable: false })
-
 function getFixedClassNames({ orientation = 'horizontal' }) {
   return asClassNameDict({
     root: clsx(orientation),
@@ -330,3 +328,5 @@ function getAllImageSources(htmlString?: string): string[] {
 
   return out
 }
+
+Object.defineProperty(MasonryGrid, 'displayName', { value: 'MasonryGrid', writable: false })

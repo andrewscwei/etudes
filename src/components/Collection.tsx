@@ -349,8 +349,6 @@ export const Collection = forwardRef(({
   )
 }) as <T>(props: CollectionProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
-Object.defineProperty(Collection, 'displayName', { value: 'Collection', writable: false })
-
 function sortIndices(indices: number[]): number[] {
   return indices.sort((a, b) => a - b)
 }
@@ -395,3 +393,5 @@ function getFixedStyles({ itemLength = NaN, itemPadding = 0, layout = 'collectio
     },
   })
 }
+
+Object.defineProperty(Collection, 'displayName', { value: 'Collection', writable: false })

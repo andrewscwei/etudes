@@ -81,17 +81,11 @@ export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
   )
 })
 
-Object.defineProperty(BurgerButton, 'displayName', { value: 'BurgerButton', writable: false })
-
 export const BurgerButtonBar = ({ ...props }: HTMLAttributes<HTMLSpanElement>) => (
   <span {...props} data-child='bar'/>
 )
 
-function getFixedStyles({
-  isActive = false,
-  isSplit = false,
-  isTailHidden = false,
-}) {
+function getFixedStyles({ isActive = false, isSplit = false, isTailHidden = false }) {
   return asStyleDict({
     root: {
       background: 'transparent',
@@ -158,3 +152,5 @@ function getFixedStyles({
     },
   })
 }
+
+Object.defineProperty(BurgerButton, 'displayName', { value: 'BurgerButton', writable: false })

@@ -505,8 +505,6 @@ export const AccordionCollapseIcon = ({ children, ...props }: HTMLAttributes<HTM
   <figure {...props} data-child='collapse-icon'>{children}</figure>
 )
 
-Object.defineProperty(Accordion, 'displayName', { value: 'Accordion', writable: false })
-
 function sortIndices(indices: number[]): number[] {
   return indices.sort((a, b) => a - b)
 }
@@ -565,3 +563,5 @@ function getFixedStyles({ orientation = 'vertical' }) {
     },
   })
 }
+
+Object.defineProperty(Accordion, 'displayName', { value: 'Accordion', writable: false })
