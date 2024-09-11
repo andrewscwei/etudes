@@ -72,11 +72,6 @@ export type StepwiseSliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChil
   labelProvider?: (position: number, index: number) => string
 
   /**
-   * Specifies if the component should use default styles.
-   */
-  usesDefaultStyles?: boolean
-
-  /**
    * Handler invoked when index changes. This can either be invoked from the
    * `index` prop being changed or from the slider being dragged. Note that if
    * the event is emitted at the end of dragging due to
@@ -142,7 +137,6 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
   orientation = 'vertical',
   steps = generateSteps(10),
   trackPadding = 0,
-  usesDefaultStyles = false,
   onDragEnd,
   onDragStart,
   onIndexChange,
@@ -207,7 +201,6 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
 
   const fixedClassNames = getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
   const fixedStyles = getFixedStyles({ orientation, naturalPosition, isDragging, knobHeight, knobWidth, isTrackInteractive })
-  const defaultStyles = usesDefaultStyles ? getDefaultStyles({ knobHeight }) : undefined
 
   useEffect(() => {
     if (isDragging) return
@@ -251,7 +244,7 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
   return (
     <div {...props} ref={ref} className={clsx(className, fixedClassNames.root)} data-component='stepwise-slider'>
       <div ref={bodyRef} style={fixedStyles.body}>
-        {cloneStyledElement(components.track ?? <StepwiseSliderTrack style={defaultStyles?.track}/>, {
+        {cloneStyledElement(components.track ?? <StepwiseSliderTrack/>, {
           className: clsx('start', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
             height: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
@@ -262,7 +255,7 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
           }),
           onClick: trackClickHandler,
         }, <div style={fixedStyles.trackHitbox}/>)}
-        {cloneStyledElement(components.track ?? <StepwiseSliderTrack style={defaultStyles?.track}/>, {
+        {cloneStyledElement(components.track ?? <StepwiseSliderTrack/>, {
           className: clsx('end', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
             bottom: '0',
@@ -274,10 +267,10 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
           onClick: trackClickHandler,
         }, <div style={fixedStyles.trackHitbox}/>)}
         <button ref={knobContainerRef} style={fixedStyles.knobContainer}>
-          {cloneStyledElement(components.knob ?? <StepwiseSliderKnob style={defaultStyles?.knob}/>, {
+          {cloneStyledElement(components.knob ?? <StepwiseSliderKnob/>, {
             className: clsx(fixedClassNames.knob),
             style: styles(fixedStyles.knob),
-          }, steps && labelProvider && cloneStyledElement(components.label ?? <StepwiseSliderLabel style={defaultStyles?.label}/>, {
+          }, steps && labelProvider && cloneStyledElement(components.label ?? <StepwiseSliderLabel/>, {
             className: clsx(fixedClassNames.label),
             style: styles(fixedStyles.label),
           }, labelProvider(position, getNearestIndexByPosition(position, steps))))}
@@ -444,26 +437,6 @@ function getFixedStyles({ orientation = 'vertical', naturalPosition = 0, isDragg
       position: 'absolute',
       transform: orientation === 'horizontal' ? 'translate3d(0, -50%, 0)' : 'translate3d(-50%, 0, 0)',
       width: '100%',
-    },
-  })
-}
-
-function getDefaultStyles({ knobHeight = 0 }) {
-  return asStyleDict({
-    knob: {
-      alignItems: 'center',
-      background: '#fff',
-      boxSizing: 'border-box',
-      display: 'flex',
-      justifyContent: 'center',
-    },
-    label: {
-      color: '#000',
-      fontSize: '12px',
-      lineHeight: `${knobHeight}px`,
-    },
-    track: {
-      background: '#fff',
     },
   })
 }
