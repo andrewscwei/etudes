@@ -120,11 +120,6 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
   selectionMode?: CollectionSelectionMode
 
   /**
-   * Specifies if the component should use default styles.
-   */
-  usesDefaultStyles?: boolean
-
-  /**
    * Handler invoked when an item is activated in a section. The order of
    * handlers invoked when any selection changes take place is:
    *   1. `onActivateAt`
@@ -248,7 +243,6 @@ export const Accordion = forwardRef(({
   sections,
   selection: externalSelection,
   selectionMode = 'single',
-  usesDefaultStyles = false,
   onActivateAt,
   onCollapseSectionAt,
   onDeselectAt,
@@ -396,7 +390,6 @@ export const Accordion = forwardRef(({
   const selection = sanitizeSelection(externalSelection ?? {})
   const expandedSectionIndices = sanitizeExpandedSectionIndices(externalExpandedSectionIndices ?? [])
   const fixedStyles = getFixedStyles({ orientation })
-  const defaultStyles = usesDefaultStyles ? getDefaultStyles({ orientation }) : undefined
   const prevSelectionRef = useRef<AccordionSelection>()
   const prevSelection = prevSelectionRef.current
 
@@ -448,10 +441,10 @@ export const Accordion = forwardRef(({
                   components.header ?? <AccordionHeader/>,
                   {
                     className: clsx({ collapsed: isCollapsed, expanded: !isCollapsed }),
-                    style: styles(fixedStyles.header, defaultStyles?.header),
+                    style: styles(fixedStyles.header),
                     onClick: () => toggleSectionAt(sectionIndex),
                   },
-                  <span dangerouslySetInnerHTML={{ __html: section.label }} style={styles(defaultStyles?.headerLabel)}/>,
+                  <span dangerouslySetInnerHTML={{ __html: section.label }}/>,
                   isCollapsed ? components.collapseIcon ?? components.expandIcon : components.expandIcon,
                 )
               )}
@@ -468,7 +461,7 @@ export const Accordion = forwardRef(({
                 orientation={orientation}
                 selection={selection[sectionIndex] ?? []}
                 selectionMode={selectionMode}
-                style={styles(fixedStyles.list, defaultStyles?.collection, orientation === 'vertical' ? {
+                style={styles(fixedStyles.list, orientation === 'vertical' ? {
                   width: '100%',
                   height: isCollapsed ? '0px' : `${maxLength}px`,
                   marginTop: isCollapsed ? '0px' : `${collectionPadding}px`,
@@ -569,71 +562,6 @@ function getFixedStyles({ orientation = 'vertical' }) {
     collapseIcon: {
       margin: '0',
       padding: '0',
-    },
-  })
-}
-
-function getDefaultStyles({ orientation = 'vertical' }) {
-  return asStyleDict({
-    collection: {
-      transitionDuration: '100ms',
-      transitionTimingFunction: 'ease-out',
-      ...orientation === 'vertical' ? {
-        transitionProperty: 'height, margin',
-      } : {
-        transitionProperty: 'width, margin',
-      },
-    },
-    header: {
-      border: 'none',
-      outline: 'none',
-      alignItems: 'center',
-      background: '#fff',
-      boxSizing: 'border-box',
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      padding: '0 10px',
-      transitionDuration: '100ms',
-      transitionProperty: 'transform, opacity, background, color',
-      transitionTimingFunction: 'ease-out',
-      ...orientation === 'vertical' ? {
-        height: '50px',
-      } : {
-        width: '50px',
-      },
-    },
-    headerLabel: {
-      color: 'inherit',
-      fontFamily: 'inherit',
-      fontSize: 'inherit',
-      fontWeight: 'inherit',
-      letterSpacing: 'inherit',
-      lineHeight: 'inherit',
-      pointerEvents: 'none',
-      transition: 'inherit',
-    },
-    expandIcon: {
-      boxSizing: 'border-box',
-      display: 'block',
-      fill: '#000',
-      height: '15px',
-      transformOrigin: 'center',
-      transitionDuration: '100ms',
-      transitionProperty: 'transform',
-      transitionTimingFunction: 'ease-out',
-      width: '15px',
-    },
-    collapseIcon: {
-      boxSizing: 'border-box',
-      display: 'block',
-      fill: '#000',
-      height: '15px',
-      transformOrigin: 'center',
-      transitionDuration: '100ms',
-      transitionProperty: 'transform',
-      transitionTimingFunction: 'ease-out',
-      width: '15px',
     },
   })
 }
