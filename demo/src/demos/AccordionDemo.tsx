@@ -19,7 +19,7 @@ export function AccordionDemo() {
 
   const sections: Section[] = [{
     items: ['1', '2', '3'],
-    label: 'Section 1',
+    label: 'A',
     layout: 'grid',
     numSegments: 3,
     itemLength: 36,
@@ -27,15 +27,16 @@ export function AccordionDemo() {
   }, {
     items: ['1', '2', '3'],
     itemLength: 36,
-    label: 'Section 2',
+    label: 'B',
   }, {
     items: ['1', '2', '3'],
     itemLength: 36,
-    label: 'Section 3',
+    label: 'C',
   }]
 
   return (
     <Frame
+      alignment='start'
       options={[
         ['autoCollapseSections: true', 'autoCollapseSections: false'],
         ['isInverted: false', 'isInverted: true'],
@@ -52,7 +53,10 @@ export function AccordionDemo() {
       {({ autoCollapseSections, isInverted, orientation, selectionMode }, toast) => (
         <Accordion
           autoCollapseSections={autoCollapseSections === 'true'}
-          className='w-44'
+          className={clsx({
+            'self-start mx-auto w-44': orientation === 'vertical',
+            'h-44': orientation === 'horizontal',
+          })}
           expandedSectionIndices={expandedSectionIndices}
           ItemComponent={AccordionItem}
           orientation={orientation as any}
@@ -64,7 +68,11 @@ export function AccordionDemo() {
           onSelectAt={(i, s) => toast(`<${Date.now()}>Selected Item ${i + 1} at Section ${s + 1}`)}
           onSelectionChange={setSelection}
         >
-          <AccordionHeader className='ia border-dark flex h-9 items-center justify-between border px-3 text-base'/>
+          <AccordionHeader
+            className={clsx('ia border-dark flex h-9 items-center justify-between gap-3 border px-3 text-base', {
+              'h-9': orientation === 'vertical',
+            })}
+          />
           <AccordionExpandIcon className='size-3'>
             <FlatSVG
               className={clsx({
