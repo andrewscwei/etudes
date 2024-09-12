@@ -1,3 +1,24 @@
+# [6.1.0](https://github.com/andrewscwei/etudes/compare/v6.0.0...v6.1.0) (2024-09-12)
+
+
+### Bug Fixes
+
+* Remove `role` from BurgerButton ([7281811](https://github.com/andrewscwei/etudes/commit/7281811952a5f094c689c9b088a6766784ba4239))
+
+
+### Features
+
+* Add ARIA attributes for FlatSVG ([4844909](https://github.com/andrewscwei/etudes/commit/484490924df9f823a27220a3d9b1a4bc67d2991e))
+* Add ARIA attributes to Carousel ([9cce3e3](https://github.com/andrewscwei/etudes/commit/9cce3e3f1142505e05c973cc754118e142f83a73))
+* Add ARIA attributes to slider components ([ff5d717](https://github.com/andrewscwei/etudes/commit/ff5d7174d9a4cf122c48b8456c2c151ea9416591))
+* Add ARIA attributes to text field components ([d176c17](https://github.com/andrewscwei/etudes/commit/d176c178a40726596faa2bd9a2212445942abec8))
+* Add ARIA attributes to tooltip components ([c724ab1](https://github.com/andrewscwei/etudes/commit/c724ab15e15462ad58656ea04c36d09b640eb04f))
+* Add ARIA attriutes to button type components ([bbd126b](https://github.com/andrewscwei/etudes/commit/bbd126b8c61111dbbb72e7d69a9f5507d2706a36))
+* Add more ARIA attributes ([dcdf386](https://github.com/andrewscwei/etudes/commit/dcdf386eb6e0c188f2d1fb3957d2d94b5cb17e95))
+* Make Accordion accessible ([e2c3043](https://github.com/andrewscwei/etudes/commit/e2c3043ddfe07ecc3744c1940ceae51071565ce1))
+* Make BurgerButton accessible ([b6e87c7](https://github.com/andrewscwei/etudes/commit/b6e87c7f466641a8945136a73dce36b2eede06e4))
+* Remove `data-` attributes ([afcbaa3](https://github.com/andrewscwei/etudes/commit/afcbaa30b4881632e4c2fae7a4192e462f44f56a))
+
 # [6.0.0](https://github.com/andrewscwei/etudes/compare/v5.3.1...v6.0.0) (2024-09-11)
 
 
