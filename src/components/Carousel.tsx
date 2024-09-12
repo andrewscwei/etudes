@@ -261,7 +261,6 @@ export const Carousel = forwardRef(({
     <div
       {...props}
       ref={ref}
-      data-component='carousel'
       onClick={event => handleClick(event)}
       onPointerDown={event => handlePointerDown(event)}
       onPointerLeave={event => handlePointerUp(event)}
@@ -269,14 +268,12 @@ export const Carousel = forwardRef(({
     >
       <div
         ref={viewportRef}
-        data-child='viewport'
         style={styles(fixedStyles.viewport)}
       >
         <Each in={items}>
           {({ style: itemStyle, ...itemProps }, idx) => (
             <div style={styles(fixedStyles.itemContainer)}>
               <ItemComponent
-                data-child='item'
                 exposure={tracksItemExposure ? exposures?.[idx] : undefined}
                 style={styles(itemStyle, fixedStyles.item)}
                 {...itemProps as any}

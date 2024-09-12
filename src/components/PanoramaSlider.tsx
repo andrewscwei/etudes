@@ -110,7 +110,7 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
   const fixedStyles = getFixedStyles({ autoDimension, panoramaRect, aspectRatio, reticleWidth })
 
   return (
-    <div {...props} ref={ref} className={clsx(className, { dragging: isDragging })} data-component='panorama-slider' style={styles(style, fixedStyles.root)}>
+    <div {...props} ref={ref} className={clsx(className, { dragging: isDragging })} style={styles(style, fixedStyles.root)}>
       <Panorama
         ref={panoramaRef}
         angle={angle}
@@ -152,15 +152,15 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
 })
 
 export const PanoramaSliderTrack = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
-  <div {...props} ref={ref} data-child='track'/>
+  <div {...props} ref={ref}/>
 ))
 
 export const PanoramaSliderReticle = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
-  <div {...props} ref={ref} data-child='reticle'/>
+  <div {...props} ref={ref}/>
 ))
 
 export const PanoramaSliderIndicator = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
-  <div {...props} ref={ref} data-child='indicator'/>
+  <div {...props} ref={ref}/>
 ))
 
 function getFixedStyles({ autoDimension = 'width', panoramaRect = Rect.make(), aspectRatio = 0, reticleWidth = 0 }) {

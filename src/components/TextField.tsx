@@ -47,7 +47,6 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(({
       {...props}
       ref={ref}
       className={clsx(className, { disabled: isDisabled })}
-      data-component='text-field'
       disabled={isDisabled}
       placeholder={placeholder}
       type='text'

@@ -93,7 +93,6 @@ export const SwipeContainer = forwardRef<HTMLDivElement, SwipeContainerProps>(({
     <div
       {...props}
       ref={ref}
-      data-component='swipe-container'
       onMouseDown={event => onDragStart(event.clientX, event.clientY)}
       onMouseLeave={() => onDragCancel()}
       onMouseMove={event => onDragMove(event.clientX, event.clientY)}

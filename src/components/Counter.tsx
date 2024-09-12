@@ -77,7 +77,7 @@ export const Counter = forwardRef<HTMLDivElement, Props>(({
   })
 
   return (
-    <div {...props} ref={ref} data-component='counter' style={styles(style, FIXED_STYLES.root)}>
+    <div {...props} ref={ref} style={styles(style, FIXED_STYLES.root)}>
       {cloneStyledElement(
         components.subscribeButton ?? <CounterSubtractButton/>,
         {
@@ -118,17 +118,17 @@ export const Counter = forwardRef<HTMLDivElement, Props>(({
 })
 
 export const CounterTextField = ({ ...props }: TextFieldProps) => (
-  <TextField {...props} data-child='text-field'/>
+  <TextField {...props}/>
 )
 
 export const CounterAddButton = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & PropsWithChildren) => (
-  <button {...props} data-child='add-button'>
+  <button {...props}>
     {children}
   </button>
 )
 
 export const CounterSubtractButton = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & PropsWithChildren) => (
-  <button {...props} data-child='subtract-button'>
+  <button {...props}>
     {children}
   </button>
 )

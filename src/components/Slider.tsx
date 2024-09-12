@@ -190,7 +190,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
   const fixedStyles = getFixedStyles({ orientation, isDragging, naturalPosition, knobHeight, knobWidth, isTrackInteractive })
 
   return (
-    <div {...props} ref={ref} className={clsx(className, fixedClassNames.root)} data-component='slider'>
+    <div {...props} ref={ref} className={clsx(className, fixedClassNames.root)}>
       <div ref={bodyRef} style={fixedStyles.body}>
         {cloneStyledElement(components.track ?? <SliderTrack/>, {
           className: clsx('start', fixedClassNames.track),
@@ -229,15 +229,15 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
 })
 
 export const SliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props} data-child='track'/>
+  <div {...props}/>
 )
 
 export const SliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props} data-child='knob'/>
+  <div {...props}/>
 )
 
 export const SliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props} data-child='label'/>
+  <div {...props}/>
 )
 
 function getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtStart = false, isDragging = false, isReleasing = false }) {

@@ -114,7 +114,6 @@ export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
       ref={ref}
       autoPlay={autoPlay}
       controls={hasControls}
-      data-component='video'
       loop={autoLoop}
       muted={isMuted}
       playsInline={playsInline}

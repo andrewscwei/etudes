@@ -51,10 +51,9 @@ export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
   })
 
   return (
-    <div {...props} ref={rootRef} data-component='cover-image' style={styles(style, FIXED_STYLES.root)}>
+    <div {...props} ref={rootRef} style={styles(style, FIXED_STYLES.root)}>
       <Image
         alt={alt}
-        data-child='image'
         sizes={sizes}
         src={src}
         srcSet={srcSet}
@@ -81,13 +80,13 @@ export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
 })
 
 export const CoverImageViewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
-  <div {...props} data-child='viewport'>
+  <div {...props}>
     {children}
   </div>
 )
 
 export const CoverImageContent = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
-  <div {...props} data-child='content'>
+  <div {...props}>
     {children}
   </div>
 )

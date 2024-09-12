@@ -69,7 +69,7 @@ export const Dial = forwardRef<HTMLDivElement, DialProps>(({
   const fixedStyles = getFixedStyles({ angle, diameter })
 
   return (
-    <div {...props} ref={ref} data-component='dial' style={styles(style, fixedStyles.root)}>
+    <div {...props} ref={ref} style={styles(style, fixedStyles.root)}>
       <div style={fixedStyles.trackContainer}>
         <svg height={diameter} style={fixedStyles.svgContainer} viewBox={`0 0 ${diameter} ${diameter}`} width={diameter}>
           {cloneStyledElement(components.track ?? <DialTrack/>, {
@@ -96,11 +96,11 @@ export const Dial = forwardRef<HTMLDivElement, DialProps>(({
 })
 
 export const DialTrack = ({ ...props }: SVGAttributes<SVGCircleElement>) => (
-  <circle {...props} data-child='track'/>
+  <circle {...props}/>
 )
 
 export const DialKnob = ({ ...props }: SVGAttributes<SVGPathElement>) => (
-  <path {...props} data-child='knob'/>
+  <path {...props}/>
 )
 
 function polarToCartesian(centerX: number, centerY: number, radius: number, angleInDegrees: number) {

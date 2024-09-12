@@ -135,7 +135,7 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
   const fixedStyles = getFixedStyles({ orientation, highlightLength, start, knobPadding, knobWidth, knobHeight })
 
   return (
-    <div {...props} ref={ref} className={clsx(className, orientation)} data-component='range-slider'>
+    <div {...props} ref={ref} className={clsx(className, orientation)}>
       <div ref={bodyRef} style={fixedStyles.body}>
         {cloneStyledElement(components.gutter ?? <RangeSliderGutter/>, {
           style: styles(fixedStyles.gutter),
@@ -203,19 +203,19 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
 })
 
 export const RangeSliderGutter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
-  <div {...props} ref={ref} data-child='gutter'/>
+  <div {...props} ref={ref}/>
 ))
 
 export const RangeSliderLabel = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
-  <div {...props} ref={ref} data-child='label'/>
+  <div {...props} ref={ref}/>
 ))
 
 export const RangeSliderHighlight = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
-  <div {...props} ref={ref} data-child='highlight'/>
+  <div {...props} ref={ref}/>
 ))
 
 export const RangeSliderKnob = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
-  <div {...props} ref={ref} data-child='knob'/>
+  <div {...props} ref={ref}/>
 ))
 
 function getFixedStyles({ orientation = 'horizontal', knobWidth = 0, knobHeight = 0, highlightLength = 0, start = 0, knobPadding = 0 }) {

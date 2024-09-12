@@ -95,7 +95,6 @@ export const FlatSVG = forwardRef<HTMLDivElement, FlatSVGProps>(({
       {...props}
       ref={ref}
       dangerouslySetInnerHTML={{ __html: sanitizedMarkup() }}
-      data-component='flat-svg'
     />
   )
 })

@@ -242,7 +242,7 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
   }, [isDragging])
 
   return (
-    <div {...props} ref={ref} className={clsx(className, fixedClassNames.root)} data-component='stepwise-slider'>
+    <div {...props} ref={ref} className={clsx(className, fixedClassNames.root)}>
       <div ref={bodyRef} style={fixedStyles.body}>
         {cloneStyledElement(components.track ?? <StepwiseSliderTrack/>, {
           className: clsx('start', fixedClassNames.track),
@@ -281,15 +281,15 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
 })
 
 export const StepwiseSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props} data-child='track'/>
+  <div {...props}/>
 )
 
 export const StepwiseSliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props} data-child='knob'/>
+  <div {...props}/>
 )
 
 export const StepwiseSliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props} data-child='label'/>
+  <div {...props}/>
 )
 
 /**
