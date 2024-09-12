@@ -26,8 +26,9 @@ export function Button({
     return (
       <a
         {...props}
+        aria-disabled={isDisabled}
+        aria-label={label}
         className={clsx(className, { disabled: isDisabled })}
-        data-component='button'
         href={href}
         rel={opensInNewTab ? 'noopener,noreferrer' : undefined}
         target={opensInNewTab ? '_blank' : undefined}
@@ -40,8 +41,9 @@ export function Button({
     return (
       <Link
         {...props}
+        aria-disabled={isDisabled}
+        aria-label={label}
         className={clsx(className, { disabled: isDisabled })}
-        data-component='button'
         to={to}
       >
         {children ?? label}
@@ -52,8 +54,9 @@ export function Button({
     return (
       <button
         {...props}
+        aria-disabled={isDisabled}
+        aria-label={label}
         className={className}
-        data-component='button'
         disabled={isDisabled}
         type={type}
       >

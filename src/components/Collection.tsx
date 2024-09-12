@@ -158,7 +158,7 @@ export type CollectionProps<T> = HTMLAttributes<HTMLDivElement> & {
    * @param eventName User-defined name of the dispatched custom event.
    * @param eventInfo Optional user-defined info of the dispatched custom event.
    */
-  onItemCustomEvent?: (index: number, eventName: string, eventInfo?: any) => void
+  onCustomEvent?: (index: number, eventName: string, eventInfo?: any) => void
 
   /**
    * Handler invoked when an item is selected. The order of handlers invoked
@@ -209,7 +209,7 @@ export const Collection = forwardRef(({
   selectionMode = 'none',
   onActivateAt,
   onDeselectAt,
-  onItemCustomEvent,
+  onCustomEvent,
   onSelectAt,
   onSelectionChange,
   ItemComponent,
@@ -312,21 +312,22 @@ export const Collection = forwardRef(({
     <div
       {...props}
       ref={ref}
+      aria-multiselectable={selectionMode === 'multiple'}
       className={clsx(className)}
-      data-component='collection'
+      role={layout === 'grid' ? 'grid' : (selectionMode === 'none' ? 'list' : 'listbox')}
       style={styles(style, fixedStyles.root)}
     >
       {ItemComponent && (
         <Each in={items}>
           {(val, idx) => (
             <ItemComponent
+              aria-selected={isSelectedAt(idx)}
               className={clsx({ selected: isSelectedAt(idx) })}
-              data-child='item'
-              data-index={idx}
               index={idx}
               isSelected={isSelectedAt(idx)}
               item={val}
               orientation={orientation}
+              role={layout === 'grid' ? 'gridcell' : (selectionMode === 'none' ? 'listitem' : 'option')}
               style={styles(fixedStyles.item, {
                 pointerEvents: isSelectionTogglable !== true && isSelectedAt(idx) ? 'none' : 'auto',
                 ...idx >= items.length - 1 ? {} : {
@@ -340,7 +341,7 @@ export const Collection = forwardRef(({
                 },
               })}
               onClick={() => activateAt(idx)}
-              onCustomEvent={(name, info) => onItemCustomEvent?.(idx, name, info)}
+              onCustomEvent={(name, info) => onCustomEvent?.(idx, name, info)}
             />
           )}
         </Each>

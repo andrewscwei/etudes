@@ -32,7 +32,8 @@ export const OptionButton = forwardRef<HTMLButtonElement, CycleButtonProps>(({
     <button
       {...props}
       ref={ref}
-      data-component='cycle-button'
+      aria-disabled={isDisabled}
+      aria-label={label}
       disabled={isDisabled}
       onClick={onClick}
     >

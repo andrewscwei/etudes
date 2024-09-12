@@ -451,44 +451,52 @@ export const Accordion = forwardRef(({
                   isCollapsed ? components.collapseIcon ?? components.expandIcon : components.expandIcon,
                 )
               )}
-              <Collection
-                className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
+              <div
                 hidden={isCollapsed}
-                isSelectionTogglable={isSelectionTogglable}
-                ItemComponent={ItemComponent}
-                itemLength={itemLength}
-                itemPadding={itemPadding}
-                items={items}
-                layout={layout}
-                numSegments={numSegments}
-                orientation={orientation}
                 role='region'
-                selection={selection[sectionIndex] ?? []}
-                selectionMode={selectionMode}
                 style={styles(orientation === 'vertical' ? {
                   width: '100%',
-                  height: isCollapsed ? '0px' : `${maxLength}px`,
-                  marginTop: isCollapsed ? '0px' : `${collectionPadding}px`,
+                  height: isCollapsed ? '0' : `${maxLength}px`,
+                  marginTop: isCollapsed ? '0' : `${collectionPadding}px`,
                   overflowY: maxVisible < 0 || maxVisible >= allVisible ? 'hidden' : 'scroll',
                 } : {
-                  marginLeft: isCollapsed ? '0px' : `${collectionPadding}px`,
+                  marginLeft: isCollapsed ? '0' : `${collectionPadding}px`,
                   overflowX: maxVisible < 0 || maxVisible >= allVisible ? 'hidden' : 'scroll',
-                  width: isCollapsed ? '0px' : `${maxLength}px`,
+                  width: isCollapsed ? '0' : `${maxLength}px`,
                   height: '100%',
                 })}
-                onActivateAt={itemIndex => {
-                  onActivateAt?.(itemIndex, sectionIndex)
-                }}
-                onDeselectAt={itemIndex => {
-                  handleDeselectAt?.(itemIndex, sectionIndex)
-                }}
-                onItemCustomEvent={(itemIndex, name, info) => {
-                  onItemCustomEvent?.(itemIndex, sectionIndex, name, info)
-                }}
-                onSelectAt={itemIndex => {
-                  handleSelectAt?.(itemIndex, sectionIndex)
-                }}
-              />
+              >
+                <Collection
+                  className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
+                  isSelectionTogglable={isSelectionTogglable}
+                  ItemComponent={ItemComponent}
+                  itemLength={itemLength}
+                  itemPadding={itemPadding}
+                  items={items}
+                  layout={layout}
+                  numSegments={numSegments}
+                  orientation={orientation}
+                  selection={selection[sectionIndex] ?? []}
+                  selectionMode={selectionMode}
+                  style={styles(orientation === 'vertical' ? {
+                    width: '100%',
+                  } : {
+                    height: '100%',
+                  })}
+                  onActivateAt={itemIndex => {
+                    onActivateAt?.(itemIndex, sectionIndex)
+                  }}
+                  onCustomEvent={(itemIndex, name, info) => {
+                    onItemCustomEvent?.(itemIndex, sectionIndex, name, info)
+                  }}
+                  onDeselectAt={itemIndex => {
+                    handleDeselectAt?.(itemIndex, sectionIndex)
+                  }}
+                  onSelectAt={itemIndex => {
+                    handleSelectAt?.(itemIndex, sectionIndex)
+                  }}
+                />
+              </div>
             </div>
           )
         }}
