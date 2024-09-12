@@ -1,3 +1,10 @@
+## [6.1.1](https://github.com/andrewscwei/etudes/compare/v6.1.0...v6.1.1) (2024-09-12)
+
+
+### Bug Fixes
+
+* BurgerButton ([042c227](https://github.com/andrewscwei/etudes/commit/042c22703f1a485d824168ade5a978c93f2c97cc))
+
 # [6.1.0](https://github.com/andrewscwei/etudes/compare/v6.0.0...v6.1.0) (2024-09-12)
 
 
