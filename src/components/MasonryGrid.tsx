@@ -189,7 +189,7 @@ export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
   const fixedStyles = getFixedStyles({ orientation, minHeight, minWidth })
 
   return (
-    <div {...props} ref={ref} className={clsx(className, fixedClassNames.root)} data-component='masonry-grid'>
+    <div {...props} ref={ref} className={clsx(className, fixedClassNames.root)}>
       <div ref={bodyRef} style={fixedStyles.body}>
         {children}
       </div>

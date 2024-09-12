@@ -71,7 +71,6 @@ export function WithTooltip({
     const dialog = document.createElement('span')
     dialog.className = clsx(className)
     dialog.innerHTML = hint
-    dialog.setAttribute('data-component', 'tooltip')
 
     const alignment = externalAlignment ?? (targetRef.current ? computeAlignment(targetRef.current, threshold) : 'tl')
     const fullDialogSize = computeMaxSize(dialog)
@@ -81,7 +80,6 @@ export function WithTooltip({
     Object.keys(dialogStyle).forEach(rule => (dialog.style as any)[rule] = (dialogStyle as any)[rule])
 
     const arrow = document.createElement('span')
-    arrow.setAttribute('data-child', 'arrow')
     Object.keys(fixedStyles.arrow).forEach(rule => (arrow.style as any)[rule] = (fixedStyles.arrow as any)[rule])
 
     dialog.appendChild(arrow)

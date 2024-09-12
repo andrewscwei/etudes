@@ -61,11 +61,10 @@ export const CoverVideo = forwardRef<HTMLDivElement, CoverVideoProps>(({
   })
 
   return (
-    <div {...props} ref={rootRef} className={className} data-component='cover-video' style={styles(style, FIXED_STYLES.root)}>
+    <div {...props} ref={rootRef} className={className} style={styles(style, FIXED_STYLES.root)}>
       <Video
         autoLoop={autoLoop}
         autoPlay={autoPlay}
-        data-child='video'
         hasControls={hasControls}
         isMuted={isMuted}
         playsInline={playsInline}
@@ -99,13 +98,13 @@ export const CoverVideo = forwardRef<HTMLDivElement, CoverVideoProps>(({
 })
 
 export const CoverVideoViewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
-  <div {...props} data-child='viewport'>
+  <div {...props}>
     {children}
   </div>
 )
 
 export const CoverVideoContent = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
-  <div {...props} data-child='content'>
+  <div {...props}>
     {children}
   </div>
 )
