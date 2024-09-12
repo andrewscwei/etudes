@@ -99,11 +99,11 @@ function getFixedStyles({ isActive = false, isSplit = false, isTailHidden = fals
       position: 'absolute',
       width: isSplit ? '50%' : '100%',
     },
-    joint0: {
+    section0: {
       left: '0',
       top: '0',
     },
-    joint1: {
+    section1: {
       right: '0',
       top: '0',
     },
