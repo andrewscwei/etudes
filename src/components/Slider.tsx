@@ -190,7 +190,14 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
   const fixedStyles = getFixedStyles({ orientation, isDragging, naturalPosition, knobHeight, knobWidth, isTrackInteractive })
 
   return (
-    <div {...props} ref={ref} className={clsx(className, fixedClassNames.root)}>
+    <div
+      {...props}
+      ref={ref}
+      aria-orientation={orientation}
+      aria-valuenow={position}
+      className={clsx(className, fixedClassNames.root)}
+      role='slider'
+    >
       <div ref={bodyRef} style={fixedStyles.body}>
         {cloneStyledElement(components.track ?? <SliderTrack/>, {
           className: clsx('start', fixedClassNames.track),
