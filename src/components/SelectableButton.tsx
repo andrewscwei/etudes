@@ -41,8 +41,10 @@ export const SelectableButton = forwardRef<HTMLButtonElement, SelectableButtonPr
     <button
       {...props}
       ref={ref}
+      aria-disabled={isDisabled}
+      aria-label={label}
+      aria-selected={isSelected}
       className={clsx(className, { active: isSelected, disabled: isDisabled || (isSelected && !isDeselectable) })}
-      data-component='selectable-button'
       disabled={isDisabled || (isSelected && !isDeselectable)}
       onClick={onClick}
     >

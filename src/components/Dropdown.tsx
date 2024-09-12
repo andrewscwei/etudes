@@ -236,13 +236,13 @@ export const Dropdown = forwardRef(({
       {...props}
       ref={ref}
       className={clsx(className, { collapsed: isCollapsed, expanded: !isCollapsed })}
-      data-component='dropdown'
       style={styles(style, fixedStyles.root)}
     >
       <div ref={bodyRef} style={styles(fixedStyles.body)}>
         {ToggleComponent ? (
           <ToggleComponent
-            data-child='toggle'
+            aria-expanded={!isCollapsed}
+            aria-haspopup='listbox'
             style={styles(fixedStyles.toggle)}
             onClick={() => toggle()}
             onCustomEvent={(name, info) => onToggleCustomEvent?.(name, info)}
@@ -251,15 +251,16 @@ export const Dropdown = forwardRef(({
           cloneStyledElement(
             components.toggle ?? <DropdownToggle/>,
             {
-              style: styles(fixedStyles.toggle),
-              onClick: () => toggle(),
+              'aria-haspopup': 'listbox',
+              'aria-expanded': !isCollapsed,
+              'style': styles(fixedStyles.toggle),
+              'onClick': () => toggle(),
             },
             <span dangerouslySetInnerHTML={{ __html: label?.(selection) ?? (selection.length > 0 ? selection.map(t => items[t].label).join(', ') : '') }}/>,
             isCollapsed ? components.collapseIcon ?? components.expandIcon : components.expandIcon,
           )
         )}
         <Collection
-          data-child='collection'
           isSelectionTogglable={isSelectionTogglable}
           ItemComponent={ItemComponent}
           itemLength={itemLength}
@@ -282,15 +283,15 @@ export const Dropdown = forwardRef(({
 }) as <T extends DropdownItemData = DropdownItemData>(props: DropdownProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
 export const DropdownToggle = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & PropsWithChildren<DropdownToggleProps>) => (
-  <button {...props} data-child='toggle'>{children}</button>
+  <button {...props}>{children}</button>
 )
 
 export const DropdownExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
-  <figure {...props} data-child='expand-icon'>{children}</figure>
+  <figure {...props} aria-hidden={true}>{children}</figure>
 )
 
 export const DropdownCollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
-  <figure {...props} data-child='collapse-icon'>{children}</figure>
+  <figure {...props} aria-hidden={true}>{children}</figure>
 )
 
 function sortIndices(indices: number[]): number[] {
