@@ -75,6 +75,7 @@ export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
         const base = computeBaseFromElement(child, sections)
         const [colIdx, y] = computeNextAvailableSectionAndLengthByBase(sectionHeights, base)
 
+        child.role = 'gridcell'
         child.style.position = 'absolute'
         child.style.width = `calc(${100 / numSections * base}% - ${horizontalSpacing * (numSections - 1) / numSections * base}px + ${horizontalSpacing * (base - 1)}px)`
         child.style.height = ''
@@ -189,7 +190,12 @@ export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
   const fixedStyles = getFixedStyles({ orientation, minHeight, minWidth })
 
   return (
-    <div {...props} ref={ref} className={clsx(className, fixedClassNames.root)}>
+    <div
+      {...props}
+      ref={ref}
+      className={clsx(className, fixedClassNames.root)}
+      role='grid'
+    >
       <div ref={bodyRef} style={fixedStyles.body}>
         {children}
       </div>

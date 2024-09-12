@@ -110,7 +110,12 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
   const fixedStyles = getFixedStyles({ autoDimension, panoramaRect, aspectRatio, reticleWidth })
 
   return (
-    <div {...props} ref={ref} className={clsx(className, { dragging: isDragging })} style={styles(style, fixedStyles.root)}>
+    <div
+      {...props}
+      ref={ref}
+      className={clsx(className, { dragging: isDragging })}
+      style={styles(style, fixedStyles.root)}
+    >
       <Panorama
         ref={panoramaRef}
         angle={angle}
