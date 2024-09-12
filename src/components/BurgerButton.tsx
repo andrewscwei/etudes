@@ -63,7 +63,6 @@ export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
       aria-expanded={isActive}
       aria-label='Toggle navigation'
       className={clsx(className, fixedClassNames.root)}
-      role='button'
       style={styles(style, fixedStyles.root)}
       onClick={onClick}
     >
