@@ -261,6 +261,7 @@ export const Carousel = forwardRef(({
     <div
       {...props}
       ref={ref}
+      role='region'
       onClick={event => handleClick(event)}
       onPointerDown={event => handlePointerDown(event)}
       onPointerLeave={event => handlePointerUp(event)}
@@ -274,6 +275,7 @@ export const Carousel = forwardRef(({
           {({ style: itemStyle, ...itemProps }, idx) => (
             <div style={styles(fixedStyles.itemContainer)}>
               <ItemComponent
+                aria-hidden={idx !== index}
                 exposure={tracksItemExposure ? exposures?.[idx] : undefined}
                 style={styles(itemStyle, fixedStyles.item)}
                 {...itemProps as any}
