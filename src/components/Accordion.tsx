@@ -408,7 +408,7 @@ export const Accordion = forwardRef(({
   }, [JSON.stringify(selection)])
 
   return (
-    <div {...props} ref={ref} data-component='accordion' style={styles(style, fixedStyles.root)}>
+    <div {...props} ref={ref} style={styles(style, fixedStyles.root)}>
       <Each in={sections}>
         {(section, sectionIndex) => {
           const { collectionPadding = 0, items, itemLength = 50, itemPadding = 0, isSelectionTogglable, layout = 'list', maxVisible = -1, numSegments = 1 } = section
@@ -427,10 +427,11 @@ export const Accordion = forwardRef(({
             >
               {HeaderComponent ? (
                 <HeaderComponent
+                  aria-expanded={!isCollapsed}
                   className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
-                  data-child='header'
                   index={sectionIndex}
                   isCollapsed={isCollapsed}
+                  role='button'
                   section={section}
                   style={styles(fixedStyles.header)}
                   onClick={() => toggleSectionAt(sectionIndex)}
@@ -440,9 +441,11 @@ export const Accordion = forwardRef(({
                 cloneStyledElement(
                   components.header ?? <AccordionHeader/>,
                   {
-                    className: clsx({ collapsed: isCollapsed, expanded: !isCollapsed }),
-                    style: styles(fixedStyles.header),
-                    onClick: () => toggleSectionAt(sectionIndex),
+                    'aria-expanded': !isCollapsed,
+                    'className': clsx({ collapsed: isCollapsed, expanded: !isCollapsed }),
+                    'style': styles(fixedStyles.header),
+                    'role': 'button',
+                    'onClick': () => toggleSectionAt(sectionIndex),
                   },
                   <span dangerouslySetInnerHTML={{ __html: section.label }}/>,
                   isCollapsed ? components.collapseIcon ?? components.expandIcon : components.expandIcon,
@@ -450,7 +453,7 @@ export const Accordion = forwardRef(({
               )}
               <Collection
                 className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
-                data-child='collection'
+                hidden={isCollapsed}
                 isSelectionTogglable={isSelectionTogglable}
                 ItemComponent={ItemComponent}
                 itemLength={itemLength}
@@ -459,6 +462,7 @@ export const Accordion = forwardRef(({
                 layout={layout}
                 numSegments={numSegments}
                 orientation={orientation}
+                role='region'
                 selection={selection[sectionIndex] ?? []}
                 selectionMode={selectionMode}
                 style={styles(orientation === 'vertical' ? {
@@ -494,15 +498,15 @@ export const Accordion = forwardRef(({
 }) as <I, S extends AccordionSection<I> = AccordionSection<I>>(props: AccordionProps<I, S> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
 export const AccordionHeader = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & PropsWithChildren<DropdownToggleProps>) => (
-  <button {...props} data-child='header'>{children}</button>
+  <button {...props}>{children}</button>
 )
 
 export const AccordionExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
-  <figure {...props} data-child='expand-icon'>{children}</figure>
+  <figure {...props}>{children}</figure>
 )
 
 export const AccordionCollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
-  <figure {...props} data-child='collapse-icon'>{children}</figure>
+  <figure {...props}>{children}</figure>
 )
 
 function sortIndices(indices: number[]): number[] {
