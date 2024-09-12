@@ -135,7 +135,14 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
   const fixedStyles = getFixedStyles({ orientation, highlightLength, start, knobPadding, knobWidth, knobHeight })
 
   return (
-    <div {...props} ref={ref} className={clsx(className, orientation)}>
+    <div
+      {...props}
+      ref={ref}
+      aria-valuemax={maxValue}
+      aria-valuemin={minValue}
+      className={clsx(className, orientation)}
+      role='slider'
+    >
       <div ref={bodyRef} style={fixedStyles.body}>
         {cloneStyledElement(components.gutter ?? <RangeSliderGutter/>, {
           style: styles(fixedStyles.gutter),

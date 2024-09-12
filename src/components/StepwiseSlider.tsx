@@ -242,7 +242,13 @@ export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
   }, [isDragging])
 
   return (
-    <div {...props} ref={ref} className={clsx(className, fixedClassNames.root)}>
+    <div
+      {...props}
+      ref={ref}
+      aria-valuenow={index}
+      className={clsx(className, fixedClassNames.root)}
+      role='slider'
+    >
       <div ref={bodyRef} style={fixedStyles.body}>
         {cloneStyledElement(components.track ?? <StepwiseSliderTrack/>, {
           className: clsx('start', fixedClassNames.track),
