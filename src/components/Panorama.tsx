@@ -165,7 +165,12 @@ export const Panorama = forwardRef<HTMLDivElement, PanoramaHTMLAttributes & Pano
   const fixedStyles = getFixedStyles({ src, displacement })
 
   return (
-    <div {...props} ref={ref}>
+    <div
+      {...props}
+      ref={ref}
+      aria-valuenow={angle}
+      role='slider'
+    >
       <div ref={bodyRef} style={fixedStyles.body}/>
     </div>
   )
