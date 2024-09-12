@@ -5,6 +5,7 @@ import { usePrevious } from '../hooks/usePrevious.js'
 export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
   emptyValue?: string
   isDisabled?: boolean
+  isRequired?: boolean
   placeholder?: string
   value?: string
   formatter?: (prevValue: string, newValue: string) => string
@@ -17,6 +18,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(({
   className,
   emptyValue = '',
   isDisabled = false,
+  isRequired = false,
   placeholder,
   value: externalValue,
   formatter,
@@ -46,9 +48,13 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(({
     <input
       {...props}
       ref={ref}
+      aria-disabled={isDisabled}
+      aria-placeholder={placeholder}
+      aria-required={isRequired}
       className={clsx(className, { disabled: isDisabled })}
       disabled={isDisabled}
       placeholder={placeholder}
+      required={isRequired}
       type='text'
       value={value}
       onBlur={({ target }: FocusEvent<HTMLInputElement>) => onUnfocus?.(target.value)}
