@@ -60,18 +60,21 @@ export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
     <button
       {...props}
       ref={ref}
+      aria-expanded={isActive}
+      aria-label='Toggle navigation'
       className={clsx(className, fixedClassNames.root)}
-      data-component='burger-button'
+      role='button'
       style={styles(style, fixedStyles.root)}
       onClick={onClick}
     >
       <Repeat count={isSplit ? 2 : 1}>
         {j => (
-          <div data-child='joint' style={styles(fixedStyles.joint, (fixedStyles as any)[`joint${j}`])}>
+          <div aria-hidden={true} style={styles(fixedStyles.section, (fixedStyles as any)[`section${j}`])}>
             <Repeat count={3}>
               {i => cloneStyledElement(components.bar ?? <BurgerButtonBar/>, {
-                className: clsx(fixedClassNames.bar),
-                style: styles(fixedStyles.bar, (fixedStyles as any)[`bar${j}${i}`]),
+                'aria-hidden': true,
+                'className': clsx(fixedClassNames.bar),
+                'style': styles(fixedStyles.bar, (fixedStyles as any)[`bar${j}${i}`]),
               })}
             </Repeat>
           </div>
@@ -82,7 +85,7 @@ export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
 })
 
 export const BurgerButtonBar = ({ ...props }: HTMLAttributes<HTMLSpanElement>) => (
-  <span {...props} data-child='bar'/>
+  <span {...props}/>
 )
 
 function getFixedStyles({ isActive = false, isSplit = false, isTailHidden = false }) {
@@ -93,7 +96,7 @@ function getFixedStyles({ isActive = false, isSplit = false, isTailHidden = fals
       display: 'block',
       outline: 'none',
     },
-    joint: {
+    section: {
       height: '100%',
       position: 'absolute',
       width: isSplit ? '50%' : '100%',
