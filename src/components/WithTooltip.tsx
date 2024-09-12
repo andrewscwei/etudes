@@ -71,6 +71,7 @@ export function WithTooltip({
     const dialog = document.createElement('span')
     dialog.className = clsx(className)
     dialog.innerHTML = hint
+    dialog.role = 'tooltip'
 
     const alignment = externalAlignment ?? (targetRef.current ? computeAlignment(targetRef.current, threshold) : 'tl')
     const fullDialogSize = computeMaxSize(dialog)
@@ -91,12 +92,14 @@ export function WithTooltip({
     if (!dialogRef.current) return
 
     dialogRef.current.style.opacity = '1'
+    dialogRef.current.ariaHidden = 'false'
   }
 
   const mouseLeaveHandler = () => {
     if (!dialogRef.current) return
 
     dialogRef.current.style.opacity = '0'
+    dialogRef.current.ariaHidden = 'true'
   }
 
   const targetRef = useRef<HTMLElement>(null)
