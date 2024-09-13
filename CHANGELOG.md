@@ -1,3 +1,10 @@
+# [6.2.0](https://github.com/andrewscwei/etudes/compare/v6.1.1...v6.2.0) (2024-09-13)
+
+
+### Features
+
+* Rename SwipeContainer to SwipeRegion ([3e7d680](https://github.com/andrewscwei/etudes/commit/3e7d6808ace3a4d1b69466adbc0c20dfaf95192d))
+
 ## [6.1.1](https://github.com/andrewscwei/etudes/compare/v6.1.0...v6.1.1) (2024-09-12)
 
 
