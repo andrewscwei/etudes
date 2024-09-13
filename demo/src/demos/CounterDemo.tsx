@@ -27,7 +27,7 @@ export function CounterDemo() {
             toast(`Quantity: ${t}`)
           }}
         >
-          <CounterTextField className='border/black h-9 w-40 border bg-transparent px-2 text-center outline-none'/>
+          <CounterTextField className='ia border/black h-9 w-40 border bg-transparent px-2 text-center outline-none'/>
           <CounterSubtractButton className='ia border-dark size-9 border bg-transparent p-2'>-</CounterSubtractButton>
           <CounterAddButton className='ia border-dark size-9 border bg-transparent p-2'>+</CounterAddButton>
         </Counter>
