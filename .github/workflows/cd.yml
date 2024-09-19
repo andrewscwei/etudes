@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Build
         id: build
-        uses: andrewscwei/actions/node-build@v1
+        uses: andrewscwei/actions/node-build@v2
       - name: Create release
         env:
           GIT_AUTHOR_NAME: github-actions[bot]
@@ -27,7 +27,7 @@ jobs:
           cp -r lib/* .
           npx semantic-release
       - name: Deploy to GitHub pages
-        uses: andrewscwei/actions/gh-pages-deploy@v1
+        uses: andrewscwei/actions/gh-pages-deploy@v2
         with:
           cname: ${{ vars.CNAME }}
           predeploy-command: npm run pages
