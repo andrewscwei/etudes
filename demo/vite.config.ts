@@ -7,7 +7,6 @@ import packageJson from '../package.json'
 
 export default defineConfig(({ mode }) => ({
   root: __dirname,
-  base: mode === 'production' ? '/etudes/' : '/',
   build: {
     outDir: path.resolve(__dirname, '../.gh-pages'),
     target: 'esnext',
