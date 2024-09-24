@@ -1,3 +1,10 @@
+## [6.2.1](https://github.com/andrewscwei/etudes/compare/v6.2.0...v6.2.1) (2024-09-24)
+
+
+### Bug Fixes
+
+* Collection padding in Dropdown ([5edf959](https://github.com/andrewscwei/etudes/commit/5edf95957cf3cb18cd4f3eec3d6592016fa6850d))
+
 # [6.2.0](https://github.com/andrewscwei/etudes/compare/v6.1.1...v6.2.0) (2024-09-13)
 
 
