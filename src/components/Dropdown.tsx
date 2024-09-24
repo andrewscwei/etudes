@@ -192,7 +192,7 @@ export const Dropdown = forwardRef(({
   const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
   const menuLength = itemLength * numVisibleItems + itemPadding * (numVisibleItems - 1)
 
-  const fixedStyles = getFixedStyles({ isCollapsed, isInverted, maxVisibleItems, menuLength, numItems, orientation })
+  const fixedStyles = getFixedStyles({ isCollapsed, collectionPadding, isInverted, maxVisibleItems, menuLength, numItems, orientation })
 
   const components = asComponentDict(children, {
     collapseIcon: DropdownCollapseIcon,
