@@ -1,3 +1,10 @@
+## [6.2.2](https://github.com/andrewscwei/etudes/compare/v6.2.1...v6.2.2) (2024-09-30)
+
+
+### Bug Fixes
+
+* useTImeout ([ce84b20](https://github.com/andrewscwei/etudes/commit/ce84b207ed14f6bd7a7fcba7be569b498ce9642f))
+
 ## [6.2.1](https://github.com/andrewscwei/etudes/compare/v6.2.0...v6.2.1) (2024-09-24)
 
 
