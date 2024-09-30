@@ -82,11 +82,15 @@ export const Carousel = forwardRef(({
 
   const handlePointerDown = (event: PointerEvent) => {
     pointerDownPositionRef.current = Point.make(event.clientX, event.clientY)
+
     setIsPointerDown(true)
   }
 
   const handlePointerUp = (event: PointerEvent) => {
     pointerUpPositionRef.current = Point.make(event.clientX, event.clientY)
+
+    if (!isPointerDown) return
+
     setIsPointerDown(false)
   }
 
@@ -107,7 +111,7 @@ export const Carousel = forwardRef(({
     pointerUpPositionRef.current = undefined
   }
 
-  const normalizeScrollPosition = (behavior: ScrollBehavior) => scrollToIndex(viewportRef, index, orientation, behavior)
+  const normalizeScrollPosition = () => scrollToIndex(viewportRef, index, orientation)
 
   const prevIndexRef = useRef<number>()
   const viewportRef = useRef<HTMLDivElement>(null)
@@ -116,6 +120,9 @@ export const Carousel = forwardRef(({
 
   const [exposures, setExposures] = useState<number[] | undefined>(getItemExposures(viewportRef, orientation))
   const [isPointerDown, setIsPointerDown] = useState(false)
+
+  const fixedStyles = getFixedStyles({ scrollSnapEnabled: !isPointerDown, orientation })
+  const shouldAutoAdvance = autoAdvanceInterval > 0
 
   useEffect(() => {
     const viewport = viewportRef.current
@@ -150,17 +157,17 @@ export const Carousel = forwardRef(({
 
       if (!isInitialRender) {
         handleIndexChange(index)
-        normalizeScrollPosition('smooth')
+        normalizeScrollPosition()
       }
     }
 
     return () => {
       viewport.removeEventListener('scroll', scrollHandler)
     }
-  }, [index, orientation, tracksItemExposure, viewportRef])
+  }, [index, orientation, tracksItemExposure])
 
   useEffect(() => {
-    if (autoAdvanceInterval <= 0) return
+    if (!shouldAutoAdvance) return
 
     if (isPointerDown) {
       onAutoAdvancePause?.()
@@ -168,23 +175,23 @@ export const Carousel = forwardRef(({
     else {
       onAutoAdvanceResume?.()
     }
-  }, [autoAdvanceInterval, isPointerDown])
+  }, [isPointerDown, shouldAutoAdvance])
 
   useDragEffect(viewportRef, {
     isEnabled: isDragEnabled && items.length > 1,
-    onDragMove: (displacement: Point) => {
+    onDragMove: ({ x, y }) => {
       switch (orientation) {
         case 'horizontal':
           requestAnimationFrame(() => {
             if (!viewportRef.current) return
-            viewportRef.current.scrollLeft += displacement.x * 1.5
+            viewportRef.current.scrollLeft += x * 1.5
           })
 
           break
         case 'vertical':
           requestAnimationFrame(() => {
             if (!viewportRef.current) return
-            viewportRef.current.scrollTop += displacement.y * 1.5
+            viewportRef.current.scrollTop += y * 1.5
           })
 
           break
@@ -192,15 +199,15 @@ export const Carousel = forwardRef(({
           throw Error(`Unsupported orientation '${orientation}'`)
       }
     },
-  }, [orientation, isDragEnabled])
+  }, [isDragEnabled, items.length, orientation])
 
-  useTimeout(
-    () => handleIndexChange((index + items.length + 1) % items.length),
-    (isPointerDown || autoAdvanceInterval <= 0) ? -1 : autoAdvanceInterval,
-    [isPointerDown, index, items.length],
-  )
+  useTimeout((isPointerDown || !shouldAutoAdvance) ? -1 : autoAdvanceInterval, {
+    onTimeout: () => {
+      const nextIndex = (index + items.length + 1) % items.length
 
-  const fixedStyles = getFixedStyles({ scrollSnapEnabled: !isPointerDown, orientation })
+      handleIndexChange(nextIndex)
+    },
+  }, [autoAdvanceInterval, isPointerDown, index, items.length, shouldAutoAdvance, handleIndexChange])
 
   return (
     <div
@@ -208,6 +215,7 @@ export const Carousel = forwardRef(({
       ref={ref}
       role='region'
       onClick={event => handleClick(event)}
+      onPointerCancel={event => handlePointerUp(event)}
       onPointerDown={event => handlePointerDown(event)}
       onPointerLeave={event => handlePointerUp(event)}
       onPointerUp={event => handlePointerUp(event)}
@@ -230,7 +238,7 @@ export const Carousel = forwardRef(({
   )
 }) as <I extends HTMLAttributes<HTMLElement>>(props: CarouselProps<I> & { ref?: ForwardedRef<HTMLDivElement> }) => ReactElement
 
-function scrollToIndex(ref: RefObject<HTMLDivElement>, index: number, orientation: CarouselOrientation, behavior: ScrollBehavior = 'smooth') {
+function scrollToIndex(ref: RefObject<HTMLDivElement>, index: number, orientation: CarouselOrientation) {
   const viewport = ref.current
   if (!viewport) return
 
@@ -239,7 +247,7 @@ function scrollToIndex(ref: RefObject<HTMLDivElement>, index: number, orientatio
 
   if (viewport.scrollTop === top && viewport.scrollLeft === left) return
 
-  viewport.scrollTo({ top, left, behavior })
+  viewport.scrollTo({ top, left, behavior: 'smooth' })
 }
 
 function getItemExposures(ref: RefObject<HTMLDivElement>, orientation: CarouselOrientation) {
@@ -300,9 +308,8 @@ function getFixedStyles({ scrollSnapEnabled = false, orientation = 'horizontal' 
     itemContainer: {
       height: '100%',
       overflow: 'hidden',
-      scrollSnapAlign: 'start',
+      scrollSnapAlign: 'center',
       width: '100%',
-      scrollBehavior: 'smooth',
       flex: '0 0 auto',
     },
     item: {

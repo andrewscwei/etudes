@@ -1,25 +1,44 @@
-import { useEffect, useRef, type DependencyList } from 'react'
+import { useCallback, useEffect, useRef, type DependencyList, type RefObject } from 'react'
 
-/**
- * Hoook for invoking a method after a set timeout.
- *
- * @param handler The method to invoke.
- * @param timeout Time (in milliseconds) for the timeout. If the value is
- *                `undefined` or less than 0, the timeout is disabled.
- * @param deps Dependencies that trigger this effect.
- */
-export function useTimeout(handler: () => void, timeout?: number, deps: DependencyList = []) {
+type Options = {
+  autoStart?: boolean
+  onTimeout?: () => void
+}
+
+type ReturnValue = {
+  start: () => void
+  stop: () => void
+  ref: RefObject<NodeJS.Timeout | undefined>
+}
+
+export function useTimeout(timeout: number = 0, { autoStart = true, onTimeout }: Options = {}, deps: DependencyList = []): ReturnValue {
+  const timeoutRef = useRef<NodeJS.Timeout>()
   const handlerRef = useRef<(() => void)>()
 
-  useEffect(() => {
-    handlerRef.current = handler
-  }, [handler])
+  const start = useCallback(() => {
+    stop()
+
+    timeoutRef.current = setTimeout(() => {
+      stop()
+      handlerRef.current?.()
+    }, timeout)
+  }, [])
+
+  const stop = useCallback(() => {
+    clearTimeout(timeoutRef.current)
+    timeoutRef.current = undefined
+  }, [])
 
   useEffect(() => {
-    if (timeout === undefined || timeout < 0) return
+    handlerRef.current = onTimeout
+  }, [onTimeout])
 
-    const timer = setTimeout(() => handlerRef.current?.(), timeout)
+  useEffect(() => {
+    if (timeout < 0) return
+    if (autoStart) start()
 
-    return () => clearTimeout(timer)
+    return () => stop()
   }, [timeout, ...deps])
+
+  return { start, stop, ref: timeoutRef }
 }
