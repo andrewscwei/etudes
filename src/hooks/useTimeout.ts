@@ -18,11 +18,13 @@ export function useTimeout(timeout: number = 0, { autoStart = true, onTimeout }:
   const start = useCallback(() => {
     stop()
 
+    if (timeout < 0) return
+
     timeoutRef.current = setTimeout(() => {
       stop()
       handlerRef.current?.()
     }, timeout)
-  }, [])
+  }, [timeout])
 
   const stop = useCallback(() => {
     clearTimeout(timeoutRef.current)
