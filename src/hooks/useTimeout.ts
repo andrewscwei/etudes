@@ -18,7 +18,7 @@ export function useTimeout(handler: () => void, timeout?: number, deps: Dependen
   useEffect(() => {
     if (timeout === undefined || timeout < 0) return
 
-    const timer = window.setTimeout(() => handlerRef.current?.(), timeout)
+    const timer = setTimeout(() => handlerRef.current?.(), timeout)
 
     return () => clearTimeout(timer)
   }, [timeout, ...deps])
