@@ -4,8 +4,9 @@
     "declaration": true,
     "jsx": "react-jsx",
     "lib": [
-      "ESNext",
-      "DOM"
+      "DOM.Iterable",
+      "DOM",
+      "ESNext"
     ],
     "module": "ESNext",
     "moduleResolution": "Node",
@@ -14,11 +15,14 @@
     "skipLibCheck": true,
     "strict": true,
     "strictNullChecks": true,
-    "target": "ESNext"
+    "target": "ESNext",
+    "types": [
+      "vitest/globals"
+    ]
   },
   "exclude": [
     "node_modules",
-    "build"
+    "lib"
   ],
   "include": [
     "src"
