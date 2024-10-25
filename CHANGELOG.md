@@ -1,3 +1,10 @@
+# [6.3.0](https://github.com/andrewscwei/etudes/compare/v6.2.2...v6.3.0) (2024-10-25)
+
+
+### Features
+
+* Upgrade Node version, dependencies, and config files ([4d6976d](https://github.com/andrewscwei/etudes/commit/4d6976d8b019e9e18eaa961c91e1ed8148ae629f))
+
 ## [6.2.2](https://github.com/andrewscwei/etudes/compare/v6.2.1...v6.2.2) (2024-09-30)
 
 
