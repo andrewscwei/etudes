@@ -8,12 +8,12 @@ type Options = {
 type ReturnValue = {
   start: () => void
   stop: () => void
-  ref: RefObject<NodeJS.Timeout | undefined>
+  ref: RefObject<NodeJS.Timeout> | RefObject<NodeJS.Timeout | undefined> | RefObject<NodeJS.Timeout | null>
 }
 
 export function useTimeout(timeout: number = 0, { autoStart = true, onTimeout }: Options = {}, deps: DependencyList = []): ReturnValue {
-  const timeoutRef = useRef<NodeJS.Timeout>()
-  const handlerRef = useRef<(() => void)>()
+  const timeoutRef = useRef<NodeJS.Timeout>(undefined)
+  const handlerRef = useRef<() => void>(undefined)
 
   const start = useCallback(() => {
     stop()

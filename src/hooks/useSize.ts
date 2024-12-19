@@ -9,7 +9,7 @@ import { useResizeEffect } from './useResizeEffect.js'
  *
  * @returns The most current {@link Size} of the target element.
  */
-export function useSize(targetRef: RefObject<HTMLElement>): Size {
+export function useSize(targetRef: RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>): Size {
   const [rect, setRect] = useState<Rect>(Rect.make())
 
   const handleResize = (element: HTMLElement) => {

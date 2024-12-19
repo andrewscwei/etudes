@@ -1,6 +1,6 @@
 import { useEffect, type DependencyList, type RefObject } from 'react'
 
-export function useClickOutsideEffect(targetRef: RefObject<HTMLElement>, handler: () => void, deps: DependencyList = []) {
+export function useClickOutsideEffect(targetRef: RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>, handler: () => void, deps: DependencyList = []) {
   useEffect(() => {
     const clickOutsideHandler = (event: MouseEvent) => {
       if (!(event.target instanceof Node)) return

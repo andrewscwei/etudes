@@ -17,7 +17,7 @@ export type UseResizeEffectOptions = {
  * @param options See {@link Options}.
  * @param deps Additional dependencies.
  */
-export function useResizeEffect(targetRef: RefObject<HTMLElement>, { onResize }: UseResizeEffectOptions = {}, deps: DependencyList = []) {
+export function useResizeEffect(targetRef: RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>, { onResize }: UseResizeEffectOptions = {}, deps: DependencyList = []) {
   const observerRef = useRef<ResizeObserver | undefined>(undefined)
 
   useEffect(() => {

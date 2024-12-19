@@ -113,10 +113,10 @@ export const Carousel = forwardRef(({
 
   const normalizeScrollPosition = () => scrollToIndex(viewportRef, index, orientation)
 
-  const prevIndexRef = useRef<number>()
+  const prevIndexRef = useRef<number>(undefined)
   const viewportRef = useRef<HTMLDivElement>(null)
-  const pointerDownPositionRef = useRef<Point | undefined>()
-  const pointerUpPositionRef = useRef<Point | undefined>()
+  const pointerDownPositionRef = useRef<Point | undefined>(undefined)
+  const pointerUpPositionRef = useRef<Point | undefined>(undefined)
 
   const [exposures, setExposures] = useState<number[] | undefined>(getItemExposures(viewportRef, orientation))
   const [isPointerDown, setIsPointerDown] = useState(false)
@@ -238,8 +238,8 @@ export const Carousel = forwardRef(({
   )
 }) as <I extends HTMLAttributes<HTMLElement>>(props: CarouselProps<I> & { ref?: ForwardedRef<HTMLDivElement> }) => ReactElement
 
-function scrollToIndex(ref: RefObject<HTMLDivElement>, index: number, orientation: CarouselOrientation) {
-  const viewport = ref.current
+function scrollToIndex(ref: RefObject<HTMLDivElement | null>, index: number, orientation: CarouselOrientation) {
+  const viewport = ref?.current
   if (!viewport) return
 
   const top = orientation === 'horizontal' ? 0 : viewport.clientHeight * index
@@ -250,8 +250,8 @@ function scrollToIndex(ref: RefObject<HTMLDivElement>, index: number, orientatio
   viewport.scrollTo({ top, left, behavior: 'smooth' })
 }
 
-function getItemExposures(ref: RefObject<HTMLDivElement>, orientation: CarouselOrientation) {
-  const viewport = ref.current
+function getItemExposures(ref: RefObject<HTMLDivElement | null>, orientation: CarouselOrientation) {
+  const viewport = ref?.current
   if (!viewport) return undefined
 
   const exposures = []
@@ -263,8 +263,8 @@ function getItemExposures(ref: RefObject<HTMLDivElement>, orientation: CarouselO
   return exposures
 }
 
-function getItemExposureAt(idx: number, ref: RefObject<HTMLDivElement>, orientation: CarouselOrientation) {
-  const viewport = ref.current
+function getItemExposureAt(idx: number, ref: RefObject<HTMLDivElement | null>, orientation: CarouselOrientation) {
+  const viewport = ref?.current
   const child = viewport?.children[idx]
   if (!child) return 0
 

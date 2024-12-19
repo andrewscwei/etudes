@@ -40,7 +40,7 @@ export function useScrollPositionEffect({ onChange }: Props, deps: DependencyLis
     }
   }
 
-  const prevInfo = useRef<ScrollPositionInfo | undefined>()
+  const prevInfo = useRef<ScrollPositionInfo>(undefined)
 
   useEffect(() => {
     window.addEventListener('scroll', handleScrollPositionChange)

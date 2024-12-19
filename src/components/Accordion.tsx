@@ -20,7 +20,7 @@ export type AccordionSelection = Record<number, number[]>
  */
 export type AccordionSection<T> = Pick<CollectionProps<T>, 'isSelectionTogglable' | 'itemLength' | 'itemPadding' | 'items' | 'layout' | 'numSegments'> & {
   /**
-   * Padding (in pixels) between the sectionheader and the internal collection.
+   * Padding (in pixels) between the section header and the internal collection.
    */
   collectionPadding?: number
 
@@ -390,7 +390,7 @@ export const Accordion = forwardRef(({
   const selection = sanitizeSelection(externalSelection ?? {})
   const expandedSectionIndices = sanitizeExpandedSectionIndices(externalExpandedSectionIndices ?? [])
   const fixedStyles = getFixedStyles({ orientation })
-  const prevSelectionRef = useRef<AccordionSelection>()
+  const prevSelectionRef = useRef<AccordionSelection>(undefined)
   const prevSelection = prevSelectionRef.current
 
   const components = asComponentDict(children, {

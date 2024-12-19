@@ -103,7 +103,7 @@ export function WithTooltip({
   }
 
   const targetRef = useRef<HTMLElement>(null)
-  const dialogRef = useRef<HTMLSpanElement>()
+  const dialogRef = useRef<HTMLSpanElement>(undefined)
   const targetRect = useRect(targetRef)
 
   useEffect(() => {

@@ -64,7 +64,7 @@ export function ScrollPositionProvider({
   )
 }
 
-export function useScrollPosition(targetRef?: RefObject<Element>): ScrollPosition {
+export function useScrollPosition(targetRef?: RefObject<Element> | RefObject<Element | undefined> | RefObject<Element | null>): ScrollPosition {
   const context = useContext(ScrollPositionContext)
   if (!context) throw Error('Cannot fetch the current scroll position context, is the corresponding provider instated?')
 

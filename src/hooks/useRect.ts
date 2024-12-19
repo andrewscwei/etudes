@@ -10,7 +10,7 @@ import { useResizeEffect } from './useResizeEffect.js'
  *
  * @returns The most current {@link Rect} of the target element.
  */
-export function useRect(targetRef: RefObject<HTMLElement>): Rect {
+export function useRect(targetRef: RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>): Rect {
   const [rect, setRect] = useState<Rect>(Rect.make())
 
   const handleResize = (element: HTMLElement) => {

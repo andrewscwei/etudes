@@ -9,7 +9,7 @@ type Options = {
 }
 
 /**
- * Hoook for invoking a method repeatedly on every set interval.
+ * Hook for invoking a method repeatedly on every set interval.
  *
  * @param handler The method to invoke on every interval.
  * @param interval Time (in milliseconds) between each invocation.
@@ -17,7 +17,7 @@ type Options = {
  * @param deps Dependencies that trigger this effect.
  */
 export function useInterval(handler: () => void, interval?: number, { shouldInvokeInitially = false }: Options = {}, deps: DependencyList = []) {
-  const handlerRef = useRef<(() => void)>()
+  const handlerRef = useRef<() => void>(undefined)
 
   useEffect(() => {
     handlerRef.current = handler

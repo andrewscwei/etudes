@@ -297,7 +297,7 @@ export const Collection = forwardRef(({
 
   const selection = sanitizeSelection(externalSelection ?? [])
   const fixedStyles = getFixedStyles({ itemLength, itemPadding, layout, numSegments, orientation })
-  const prevSelectionRef = useRef<CollectionSelection>()
+  const prevSelectionRef = useRef<CollectionSelection>(undefined)
   const prevSelection = prevSelectionRef.current
 
   useEffect(() => {

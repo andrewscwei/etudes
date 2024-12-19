@@ -19,7 +19,7 @@ type Options<T> = {
  * @param options See {@link Options}.
  */
 export function usePrevious<T>(value: T, { sanitizeDependency = t => t }: Options<T> = {}): T | undefined {
-  const ref = useRef<T>()
+  const ref = useRef<T>(undefined)
 
   useEffect(() => {
     ref.current = value

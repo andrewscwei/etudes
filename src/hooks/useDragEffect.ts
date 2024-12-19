@@ -50,7 +50,7 @@ type Options = {
  *
  * @returns The states created for this effect.
  */
-export function useDragEffect(targetRef: RefObject<HTMLElement>, {
+export function useDragEffect(targetRef: RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>, {
   isEnabled = true,
   updatesCursor = true,
   onDragStart,
@@ -58,8 +58,8 @@ export function useDragEffect(targetRef: RefObject<HTMLElement>, {
   onDragEnd,
 }: Options, deps: DependencyList = []) {
   const element = targetRef.current
-  const startPositionRef = useRef<Point>()
-  const dragPositionRef = useRef<Point>()
+  const startPositionRef = useRef<Point>(undefined)
+  const dragPositionRef = useRef<Point>(undefined)
 
   if (updatesCursor && element) element.style.cursor = 'grab'
 

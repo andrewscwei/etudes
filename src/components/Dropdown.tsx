@@ -75,7 +75,7 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
   isInverted?: boolean
 
   /**
-   * Maximum number of items that are viside when the component expands. When a
+   * Maximum number of items that are visible when the component expands. When a
    * value greater than or equal to 0 is specified, only that number of items
    * will be visible at a time and a scrollbar will appear to enable scrolling
    * to remaining items. Any value less than 0 indicates that all items will be
