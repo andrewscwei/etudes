@@ -1,3 +1,15 @@
+# [7.0.0](https://github.com/andrewscwei/etudes/compare/v6.3.0...v7.0.0) (2024-12-19)
+
+
+### Build System
+
+* Upgrade dependencies ([9c07e95](https://github.com/andrewscwei/etudes/commit/9c07e954c09162dd2271c7ef90d7c1f6ea4d4e7b))
+
+
+### BREAKING CHANGES
+
+* Upgraded to React v19
+
 # [6.3.0](https://github.com/andrewscwei/etudes/compare/v6.2.2...v6.3.0) (2024-10-25)
 
 
