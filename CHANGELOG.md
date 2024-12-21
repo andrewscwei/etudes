@@ -1,3 +1,10 @@
+## [7.0.2](https://github.com/andrewscwei/etudes/compare/v7.0.1...v7.0.2) (2024-12-21)
+
+
+### Bug Fixes
+
+* Fix Counter double rendering ([861678c](https://github.com/andrewscwei/etudes/commit/861678c54657ded92703aecccabe444386358ba8))
+
 ## [7.0.1](https://github.com/andrewscwei/etudes/compare/v7.0.0...v7.0.1) (2024-12-21)
 
 
