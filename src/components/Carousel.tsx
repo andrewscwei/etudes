@@ -111,12 +111,23 @@ export const Carousel = forwardRef(({
     pointerUpPositionRef.current = undefined
   }
 
-  const normalizeScrollPosition = () => scrollToIndex(viewportRef, index, orientation)
+  const normalizeScrollPosition = () => {
+    scrollToIndex(viewportRef, index, orientation)
+
+    clearTimeout(autoScrollTimeoutRef.current)
+
+    autoScrollTimeoutRef.current = setTimeout(() => {
+      clearTimeout(autoScrollTimeoutRef.current)
+      autoScrollTimeoutRef.current = undefined
+    }, autoScrollTimeoutMs)
+  }
 
   const prevIndexRef = useRef<number>(undefined)
   const viewportRef = useRef<HTMLDivElement>(null)
-  const pointerDownPositionRef = useRef<Point | undefined>(undefined)
-  const pointerUpPositionRef = useRef<Point | undefined>(undefined)
+  const pointerDownPositionRef = useRef<Point>(undefined)
+  const pointerUpPositionRef = useRef<Point>(undefined)
+  const autoScrollTimeoutRef = useRef<NodeJS.Timeout>(undefined)
+  const autoScrollTimeoutMs = 1000
 
   const [exposures, setExposures] = useState<number[] | undefined>(getItemExposures(viewportRef, orientation))
   const [isPointerDown, setIsPointerDown] = useState(false)
@@ -135,6 +146,8 @@ export const Carousel = forwardRef(({
       if (tracksItemExposure) {
         setExposures(getItemExposures(viewportRef, orientation))
       }
+
+      if (autoScrollTimeoutRef.current !== undefined) return
 
       const newIndex = orientation === 'horizontal'
         ? Math.round(viewport.scrollLeft / viewport.clientWidth)
