@@ -22,9 +22,28 @@ export const Counter = forwardRef<HTMLDivElement, Props>(({
   onChange,
   ...props
 }, ref) => {
-  const handleSubtract = () => onChange?.(clamp(quantity - 1))
-  const handleAdd = () => onChange?.(clamp(quantity + 1))
-  const handleQuantityChange = (newValue: number) => onChange?.(newValue)
+  const handleSubtract = () => {
+    onChange?.(clamp(quantity - 1))
+  }
+
+  const handleAdd = () => {
+    onChange?.(clamp(quantity + 1))
+  }
+
+  const handleInputProgress = (value: string) => {
+    setText(value)
+  }
+
+  const handleInputComplete = (value: string) => {
+    const newQuantity = toQuantity(value)
+
+    if (newQuantity !== quantity) {
+      onChange?.(newQuantity)
+    }
+    else {
+      setText(toString(newQuantity))
+    }
+  }
 
   const toString = (qty: number) => {
     return qty.toLocaleString()
@@ -54,21 +73,10 @@ export const Counter = forwardRef<HTMLDivElement, Props>(({
   useEffect(() => {
     if (prevQuantity === undefined || prevQuantity === quantity) return
 
-    setText(toString(clamp(quantity)))
-    handleQuantityChange(quantity)
-  }, [quantity])
+    const value = clamp(quantity)
 
-  useEffect(() => {
-    if (isNaN(min)) return
-
-    handleQuantityChange(clamp(quantity))
-  }, [min])
-
-  useEffect(() => {
-    if (isNaN(max)) return
-
-    handleQuantityChange(clamp(quantity))
-  }, [max])
+    setText(toString(value))
+  }, [quantity, min, max])
 
   const components = asComponentDict(children, {
     textField: CounterTextField,
@@ -92,17 +100,8 @@ export const Counter = forwardRef<HTMLDivElement, Props>(({
           isDisabled: !allowsInput,
           style: styles(FIXED_STYLES.text),
           value: text,
-          onValueChange: setText,
-          onUnfocus: (value: string) => {
-            const newQuantity = toQuantity(value)
-
-            if (newQuantity !== quantity) {
-              onChange?.(newQuantity)
-            }
-            else {
-              setText(toString(newQuantity))
-            }
-          },
+          onValueChange: handleInputProgress,
+          onUnfocus: handleInputComplete,
         },
       )}
       {cloneStyledElement(
