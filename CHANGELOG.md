@@ -1,3 +1,10 @@
+## [7.0.1](https://github.com/andrewscwei/etudes/compare/v7.0.0...v7.0.1) (2024-12-21)
+
+
+### Bug Fixes
+
+* Fix autoscrolling of Carousel ([df4f54c](https://github.com/andrewscwei/etudes/commit/df4f54c43cbbefd30c3b30261354745f5e592ea8))
+
 # [7.0.0](https://github.com/andrewscwei/etudes/compare/v6.3.0...v7.0.0) (2024-12-19)
 
 
