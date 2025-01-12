@@ -1,16 +1,16 @@
-import { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren, type RefObject } from 'react'
+import { forwardRef, useRef, useState, type HTMLAttributes, type RefObject } from 'react'
 import { Size } from 'spase'
 import { useRect } from '../hooks/useRect.js'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 import { Image, type ImageProps } from './Image.js'
 
-export type CoverImageProps = Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<ImageProps, 'alt' | 'loadingMode' | 'sizes' | 'src' | 'srcSet' | 'onLoadStart' | 'onLoadComplete' | 'onLoadError'> & PropsWithChildren<{
+export type CoverImageProps = Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<ImageProps, 'alt' | 'loadingMode' | 'sizes' | 'src' | 'srcSet' | 'onLoadStart' | 'onLoadComplete' | 'onLoadError'> & {
   /**
    * The known aspect ratio of the image, expressed by width / height. If
    * unprovided, it will be inferred after loading the image.
    */
   aspectRatio?: number
-}>
+}
 
 export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
   children,
@@ -79,13 +79,13 @@ export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
   )
 })
 
-export const CoverImageViewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
+export const CoverImageViewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}>
     {children}
   </div>
 )
 
-export const CoverImageContent = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
+export const CoverImageContent = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}>
     {children}
   </div>

@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
+import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
 import { Each } from '../operators/Each.js'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection.js'
@@ -47,7 +47,7 @@ export type AccordionItemProps<T> = CollectionItemProps<T>
  * Type describing the props of each `HeaderComponent` provided to
  * {@link Accordion}.
  */
-export type AccordionHeaderProps<I, S extends AccordionSection<I> = AccordionSection<I>> = HTMLAttributes<HTMLElement> & PropsWithChildren<{
+export type AccordionHeaderProps<I, S extends AccordionSection<I> = AccordionSection<I>> = HTMLAttributes<HTMLElement> & {
   /**
    * The index of the corresponding section.
    */
@@ -70,12 +70,12 @@ export type AccordionHeaderProps<I, S extends AccordionSection<I> = AccordionSec
    * @param info Optional user-defined info of the custom event.
    */
   onCustomEvent?: (name: string, info?: any) => void
-}>
+}
 
 /**
  * Type describing the props of {@link Accordion}.
  */
-export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I>> = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
+export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I>> = HTMLAttributes<HTMLDivElement> & {
   /**
    * Specifies if expanded sections should automatically collapse upon expanding
    * another section.
@@ -226,7 +226,7 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
    * Component type for generating items for each section.
    */
   ItemComponent?: ComponentType<AccordionItemProps<I>>
-}>
+}
 
 /**
  * A collection of selectable items laid out in sections in an accordion. Items
@@ -505,15 +505,15 @@ export const Accordion = forwardRef(({
   )
 }) as <I, S extends AccordionSection<I> = AccordionSection<I>>(props: AccordionProps<I, S> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
-export const AccordionHeader = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & PropsWithChildren<DropdownToggleProps>) => (
+export const AccordionHeader = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & DropdownToggleProps) => (
   <button {...props}>{children}</button>
 )
 
-export const AccordionExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
+export const AccordionExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <figure {...props}>{children}</figure>
 )
 
-export const AccordionCollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
+export const AccordionCollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <figure {...props}>{children}</figure>
 )
 

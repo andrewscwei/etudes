@@ -1,7 +1,7 @@
 import clsx from 'clsx'
-import { forwardRef, type HTMLAttributes, type PropsWithChildren } from 'react'
+import { forwardRef, type HTMLAttributes } from 'react'
 
-export type SelectableButtonProps = HTMLAttributes<HTMLButtonElement> & PropsWithChildren<{
+export type SelectableButtonProps = HTMLAttributes<HTMLButtonElement> & {
   isDeselectable?: boolean
   isDisabled?: boolean
   isSelected?: boolean
@@ -9,7 +9,7 @@ export type SelectableButtonProps = HTMLAttributes<HTMLButtonElement> & PropsWit
   onDeselect?: () => void
   onSelect?: () => void
   onToggle?: (isSelected: boolean) => void
-}>
+}
 
 export const SelectableButton = forwardRef<HTMLButtonElement, SelectableButtonProps>(({
   children,

@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type PropsWithChildren, type ReactElement, type Ref } from 'react'
+import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
 import { useRect } from '../hooks/useRect.js'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelection } from './Collection.js'
@@ -45,7 +45,7 @@ export type DropdownItemProps<T extends DropdownItemData = DropdownItemData> = C
 /**
  * Type describing the props of {@link Dropdown}.
  */
-export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLAttributes<HTMLDivElement> & CollectionProps<T> & PropsWithChildren<{
+export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLAttributes<HTMLDivElement> & CollectionProps<T> & {
   /**
    * Specifies if the internal collection collapses when an item is selected.
    * This only works if `selectionMode` is `single`.
@@ -106,7 +106,7 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
    * component. When absent, one will be generated automatically.
    */
   ToggleComponent?: ComponentType<DropdownToggleProps>
-}>
+}
 
 /**
  * A dropdown component that is invertible (i.e. can "dropup" instead) and
@@ -282,15 +282,15 @@ export const Dropdown = forwardRef(({
   )
 }) as <T extends DropdownItemData = DropdownItemData>(props: DropdownProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
 
-export const DropdownToggle = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & PropsWithChildren<DropdownToggleProps>) => (
+export const DropdownToggle = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & DropdownToggleProps) => (
   <button {...props}>{children}</button>
 )
 
-export const DropdownExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
+export const DropdownExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <figure {...props} aria-hidden={true}>{children}</figure>
 )
 
-export const DropdownCollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
+export const DropdownCollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <figure {...props} aria-hidden={true}>{children}</figure>
 )
 

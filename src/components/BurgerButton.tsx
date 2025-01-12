@@ -1,16 +1,16 @@
 import clsx from 'clsx'
-import { forwardRef, type HTMLAttributes, type PropsWithChildren } from 'react'
+import { forwardRef, type HTMLAttributes } from 'react'
 import { Repeat } from '../operators/Repeat.js'
 import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 
-export type BurgerButtonProps = HTMLAttributes<HTMLButtonElement> & PropsWithChildren<{
+export type BurgerButtonProps = HTMLAttributes<HTMLButtonElement> & {
   isActive?: boolean
   isSplit?: boolean
   isTailHidden?: boolean
   onActivate?: () => void
   onDeactivate?: () => void
   onToggle?: (isActive: boolean) => void
-}>
+}
 
 /**
  * Three-striped burger button component that transforms into an "X" when

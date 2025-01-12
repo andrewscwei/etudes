@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
+import { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { useDragValueEffect } from '../hooks/useDragValueEffect.js'
 import { useRect } from '../hooks/useRect.js'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
@@ -9,7 +9,7 @@ type Orientation = 'horizontal' | 'vertical'
 
 type Range = [number, number]
 
-export type RangeSliderProps = PropsWithChildren<{
+export type RangeSliderProps = {
   decimalPlaces?: number
   knobHeight?: number
   knobPadding?: number
@@ -20,7 +20,7 @@ export type RangeSliderProps = PropsWithChildren<{
   range?: Range
   steps?: number
   onRangeChange?: (range: Range) => void
-}>
+}
 
 export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & RangeSliderProps>(({
   children,

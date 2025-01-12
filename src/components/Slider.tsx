@@ -1,12 +1,12 @@
 import clsx from 'clsx'
-import { forwardRef, useEffect, useRef, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
+import { forwardRef, useEffect, useRef, type HTMLAttributes, type MouseEvent } from 'react'
 import { Rect } from 'spase'
 import { useDragValueEffect } from '../hooks/useDragValueEffect.js'
 import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 
 export type SliderOrientation = 'horizontal' | 'vertical'
 
-export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
+export type SliderProps = HTMLAttributes<HTMLDivElement> & {
   /**
    * By default the position is a value from 0 - 1, 0 being the start of the
    * slider and 1 being the end. Switching on this flag inverts this behavior,
@@ -81,7 +81,7 @@ export type SliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
    * Handler invoked when dragging begins.
    */
   onDragStart?: () => void
-}>
+}
 
 /**
  * A slider component supporting both horizontal and vertical orientations whose

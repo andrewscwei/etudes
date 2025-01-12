@@ -1,12 +1,12 @@
 import clsx from 'clsx'
-import { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type MouseEvent, type PropsWithChildren } from 'react'
+import { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type MouseEvent } from 'react'
 import { Rect } from 'spase'
 import { useDragValueEffect } from '../hooks/useDragValueEffect.js'
 import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 
 type Orientation = 'horizontal' | 'vertical'
 
-export type StepwiseSliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
+export type StepwiseSliderProps = HTMLAttributes<HTMLDivElement> & {
   /**
    * By default the position is a value from 0 - 1, 0 being the start of the
    * slider and 1 being the end. Switching on this flag inverts this behavior,
@@ -104,7 +104,7 @@ export type StepwiseSliderProps = HTMLAttributes<HTMLDivElement> & PropsWithChil
    * Handler invoked when dragging begins.
    */
   onDragStart?: () => void
-}>
+}
 
 /**
  * A "stepwise" slider component supporting both horizontal and vertical

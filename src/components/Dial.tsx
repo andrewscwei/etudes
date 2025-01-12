@@ -1,7 +1,7 @@
-import { forwardRef, type HTMLAttributes, type PropsWithChildren, type SVGAttributes } from 'react'
+import { forwardRef, type HTMLAttributes, type SVGAttributes } from 'react'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 
-export type DialProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
+export type DialProps = HTMLAttributes<HTMLDivElement> & {
   /**
    * Current angle reading of the compass, between 0.0 - 360.0 degrees,
    * inclusive.
@@ -39,7 +39,7 @@ export type DialProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren<{
    * `stroke-width` of the `<circle>` element.
    */
   trackThickness?: number
-}>
+}
 
 /**
  * A circular dial with a knob and a track.

@@ -1,16 +1,16 @@
-import { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren, type RefObject } from 'react'
+import { forwardRef, useRef, useState, type HTMLAttributes, type RefObject } from 'react'
 import { Size } from 'spase'
 import { useRect } from '../hooks/useRect.js'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 import { Video, type VideoProps } from './Video.js'
 
-export type CoverVideoProps = HTMLAttributes<HTMLDivElement> & Pick<VideoProps, 'autoLoop' | 'autoPlay' | 'hasControls' | 'isMuted' | 'playsInline' | 'posterSrc' | 'src' | 'onPause' | 'onPlay' | 'onCanPlay' | 'onEnd' | 'onFullscreenChange' | 'onLoadMetadata' | 'onLoadMetadataComplete' | 'onLoadMetadataError' | 'onSizeChange'> & PropsWithChildren<{
+export type CoverVideoProps = HTMLAttributes<HTMLDivElement> & Pick<VideoProps, 'autoLoop' | 'autoPlay' | 'hasControls' | 'isMuted' | 'playsInline' | 'posterSrc' | 'src' | 'onPause' | 'onPlay' | 'onCanPlay' | 'onEnd' | 'onFullscreenChange' | 'onLoadMetadata' | 'onLoadMetadataComplete' | 'onLoadMetadataError' | 'onSizeChange'> & {
   /**
    * The known aspect ratio of the video, expressed by width / height. If
    * unprovided, it will be inferred after loading the video.
    */
   aspectRatio?: number
-}>
+}
 
 export const CoverVideo = forwardRef<HTMLDivElement, CoverVideoProps>(({
   className,
@@ -97,13 +97,13 @@ export const CoverVideo = forwardRef<HTMLDivElement, CoverVideoProps>(({
   )
 })
 
-export const CoverVideoViewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
+export const CoverVideoViewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}>
     {children}
   </div>
 )
 
-export const CoverVideoContent = ({ children, ...props }: HTMLAttributes<HTMLDivElement> & PropsWithChildren) => (
+export const CoverVideoContent = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}>
     {children}
   </div>

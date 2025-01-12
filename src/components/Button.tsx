@@ -1,15 +1,15 @@
 import clsx from 'clsx'
-import type { HTMLAttributes, PropsWithChildren } from 'react'
+import type { HTMLAttributes } from 'react'
 import { Link } from 'react-router'
 
-export type ButtonProps = HTMLAttributes<HTMLElement> & PropsWithChildren<{
+export type ButtonProps = HTMLAttributes<HTMLElement> & {
   href?: string
   isDisabled?: boolean
   label?: string
   opensInNewTab?: boolean
   to?: string
   type?: HTMLButtonElement['type']
-}>
+}
 
 export function Button({
   children,

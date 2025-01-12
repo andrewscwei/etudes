@@ -1,16 +1,16 @@
 import clsx from 'clsx'
-import { forwardRef, useEffect, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
+import { forwardRef, useEffect, useState, type HTMLAttributes } from 'react'
 import { usePrevious } from '../hooks/usePrevious.js'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 import { TextField, type TextFieldProps } from './TextField.js'
 
-type Props = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & PropsWithChildren<{
+type Props = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & {
   min?: number
   max?: number
   quantity?: number
   allowsInput?: boolean
   onChange?: (quantity: number) => void
-}>
+}
 
 export const Counter = forwardRef<HTMLDivElement, Props>(({
   children,
@@ -120,13 +120,13 @@ export const CounterTextField = ({ ...props }: TextFieldProps) => (
   <TextField {...props}/>
 )
 
-export const CounterAddButton = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & PropsWithChildren) => (
+export const CounterAddButton = ({ children, ...props }: HTMLAttributes<HTMLButtonElement>) => (
   <button {...props}>
     {children}
   </button>
 )
 
-export const CounterSubtractButton = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & PropsWithChildren) => (
+export const CounterSubtractButton = ({ children, ...props }: HTMLAttributes<HTMLButtonElement>) => (
   <button {...props}>
     {children}
   </button>

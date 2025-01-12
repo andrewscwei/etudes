@@ -1,11 +1,11 @@
 import clsx from 'clsx'
-import { forwardRef, useRef, useState, type HTMLAttributes, type PropsWithChildren } from 'react'
+import { forwardRef, useRef, useState, type HTMLAttributes } from 'react'
 import { Rect, type Size } from 'spase'
 import { useRect } from '../hooks/useRect.js'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 import { Panorama, type PanoramaProps } from './Panorama.js'
 
-export type PanoramaSliderProps = PanoramaProps & PropsWithChildren<{
+export type PanoramaSliderProps = PanoramaProps & {
   /**
    * Field-of-view (0.0 - 360.0 degrees, inclusive) that represents the size of
    * the reticle. 360 indicates the reticle covers the entire image. If this is
@@ -29,7 +29,7 @@ export type PanoramaSliderProps = PanoramaProps & PropsWithChildren<{
    * is, this prop is ignored.
    */
   viewportSize?: Size
-}>
+}
 
 /**
  * A slider for a {@link Panorama} component.
