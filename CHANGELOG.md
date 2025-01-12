@@ -1,3 +1,10 @@
+## [7.0.3](https://github.com/andrewscwei/etudes/compare/v7.0.2...v7.0.3) (2025-01-12)
+
+
+### Bug Fixes
+
+* Remove unnecessary PropsWithChildren ([1970d05](https://github.com/andrewscwei/etudes/commit/1970d054c0cda843af618a3ba4cd2154f76f8e35))
+
 ## [7.0.2](https://github.com/andrewscwei/etudes/compare/v7.0.1...v7.0.2) (2024-12-21)
 
 
