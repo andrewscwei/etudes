@@ -1,3 +1,10 @@
+# [7.1.0](https://github.com/andrewscwei/etudes/compare/v7.0.3...v7.1.0) (2025-01-13)
+
+
+### Features
+
+* Handle multiple refs in useClickOutsideEffect ([a2a4f4f](https://github.com/andrewscwei/etudes/commit/a2a4f4fa4c35fa292cbdfc353d08d1d3f190f319))
+
 ## [7.0.3](https://github.com/andrewscwei/etudes/compare/v7.0.2...v7.0.3) (2025-01-12)
 
 
