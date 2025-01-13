@@ -2,7 +2,7 @@ import { forwardRef, useEffect, useRef, type HTMLAttributes, type ReactEventHand
 import { type Size } from 'spase'
 import { useVideoSize } from '../hooks/useVideoSize.js'
 
-export type VideoProps = Omit<HTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'controls' | 'loop' | 'muted' | 'playsInline' | 'poster' | 'onCanPlay' | 'onEnded' | 'onPause' | 'onPlay'> & {
+export type VideoProps = Omit<HTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'controls' | 'loop' | 'muted' | 'playsInline' | 'poster' | 'onCanPlay' | 'onEnded' | 'onPause' | 'onPlay' | 'onTimeUpdate'> & {
   autoLoop?: boolean
   autoPlay?: boolean
   hasControls?: boolean
