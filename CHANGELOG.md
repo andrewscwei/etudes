@@ -1,3 +1,10 @@
+## [7.2.1](https://github.com/andrewscwei/etudes/compare/v7.2.0...v7.2.1) (2025-01-13)
+
+
+### Bug Fixes
+
+* Update VideoProps ([b4264b4](https://github.com/andrewscwei/etudes/commit/b4264b4a6eec178bb71858ce1155e19e5a0ddc2a))
+
 # [7.2.0](https://github.com/andrewscwei/etudes/compare/v7.1.0...v7.2.0) (2025-01-13)
 
 
