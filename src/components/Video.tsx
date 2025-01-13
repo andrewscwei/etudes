@@ -19,6 +19,7 @@ export type VideoProps = Omit<HTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'co
   onPause?: () => void
   onPlay?: () => void
   onSizeChange?: (size?: Size) => void
+  onTimeUpdate?: (currentTime: number, duration: number) => void
 }
 
 export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
@@ -38,6 +39,7 @@ export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
   onPause,
   onPlay,
   onSizeChange,
+  onTimeUpdate,
   ...props
 }, ref) => {
   const localRef = useRef<HTMLVideoElement>(null)
@@ -79,7 +81,9 @@ export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
   }
 
   const canPlayHandler: ReactEventHandler<HTMLVideoElement> = event => {
-    if (autoPlay && (videoRef.current?.paused ?? false)) {
+    const el = event.currentTarget
+
+    if (autoPlay && el.paused) {
       play()
     }
 
@@ -96,6 +100,12 @@ export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
 
   const endHandler: ReactEventHandler<HTMLVideoElement> = event => {
     onEnd?.()
+  }
+
+  const timeUpdateHandler: ReactEventHandler<HTMLVideoElement> = event => {
+    const el = event.currentTarget
+
+    onTimeUpdate?.(el.currentTime, el.duration)
   }
 
   const play = () => {
@@ -122,6 +132,7 @@ export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
       onEnded={endHandler}
       onPause={pauseHandler}
       onPlay={playHandler}
+      onTimeUpdate={timeUpdateHandler}
     >
       <source src={src}/>
     </video>
