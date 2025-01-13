@@ -1,3 +1,10 @@
+# [7.2.0](https://github.com/andrewscwei/etudes/compare/v7.1.0...v7.2.0) (2025-01-13)
+
+
+### Features
+
+* Add handler for time update in Video ([e170083](https://github.com/andrewscwei/etudes/commit/e170083256913b2685ea23a7be66be118033faec))
+
 # [7.1.0](https://github.com/andrewscwei/etudes/compare/v7.0.3...v7.1.0) (2025-01-13)
 
 
