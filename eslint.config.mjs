@@ -1,20 +1,12 @@
 import eslint from '@eslint/js'
 import StylisticPlugin from '@stylistic/eslint-plugin'
-import TailwindPlugin from 'eslint-plugin-tailwindcss'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
-  ...TailwindPlugin.configs['flat/recommended'],
   {
     ignores: ['**/lib/**'],
-  },
-  {
-    rules: {
-      'tailwindcss/classnames-order': ['error', { callees: ['clsx', 'clsxm'] }],
-      'tailwindcss/no-custom-classname': 'off',
-    },
   },
   {
     plugins: {
