@@ -1,3 +1,10 @@
+# [7.3.0](https://github.com/andrewscwei/etudes/compare/v7.2.1...v7.3.0) (2025-01-26)
+
+
+### Features
+
+* Create Burger component ([7ff6ae0](https://github.com/andrewscwei/etudes/commit/7ff6ae0ffcfeec0906619bee96561ddba07bae50))
+
 ## [7.2.1](https://github.com/andrewscwei/etudes/compare/v7.2.0...v7.2.1) (2025-01-13)
 
 
