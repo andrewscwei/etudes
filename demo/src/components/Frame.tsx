@@ -45,7 +45,7 @@ export function Frame({
         'max-h-80': !usesMaxHeight,
       })}
     >
-      <div className='text-light bg-dark flex w-full justify-between overflow-hidden rounded-t-md px-3 py-0'>
+      <div className='text-light bg-dark flex w-full justify-between overflow-hidden rounded-t-md px-3 py-1'>
         <h2 className='text-sm'>{title}</h2>
         <Conditional if={options.length > 0 || !!onReset}>
           <Button
