@@ -14,7 +14,7 @@ export function Header({ className, ...props }: Props) {
       <div className='flex items-center gap-2'>
         <span>{`v${__VERSION__}`}</span>
         <a className='ia flex size-4' href='https://github.com/andrewscwei/etudes' rel='noopener,noreferrer'>
-          <FlatSVG className='svg*:fill-dark size-full' svg={$$GitHubIcon}/>
+          <FlatSVG className='svg:fill-dark size-full' svg={$$GitHubIcon}/>
         </a>
       </div>
     </header>

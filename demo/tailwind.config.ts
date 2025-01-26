@@ -63,7 +63,6 @@ export default {
       addVariant('disabled', '&.disabled')
       addVariant('dragging', '&.dragging')
       addVariant('svg', '& svg')
-      addVariant('svg*', '& svg *')
     },
   ],
 } as Config

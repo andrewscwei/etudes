@@ -1,30 +1,20 @@
+import tailwind from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-import autoprefixer from 'autoprefixer'
 import path from 'node:path'
-import tailwind from 'tailwindcss'
 import { defineConfig } from 'vite'
 import packageJson from '../package.json'
 
-export default defineConfig(({ mode }) => ({
+export default defineConfig({
   root: __dirname,
   build: {
     outDir: path.resolve(__dirname, '../.gh-pages'),
     target: 'esnext',
   },
-  css: {
-    postcss: {
-      plugins: [
-        tailwind({
-          config: path.resolve(__dirname, 'tailwind.config.ts'),
-        }),
-        autoprefixer(),
-      ],
-    },
-  },
   define: {
     __VERSION__: JSON.stringify(packageJson.version),
   },
   plugins: [
+    tailwind(),
     react(),
   ],
   resolve: {
@@ -32,4 +22,4 @@ export default defineConfig(({ mode }) => ({
       etudes: path.resolve(__dirname, '../lib'),
     },
   },
-}))
+})

@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../../tailwind.config.ts";
 
 html {
   height: 100%;
@@ -11,6 +10,10 @@ html {
 body {
   height: 100%;
   width: 100%;
+}
+
+button {
+  cursor: pointer;
 }
 
 .os {
