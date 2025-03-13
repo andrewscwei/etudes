@@ -6,6 +6,7 @@ export function FlatSVGDemo() {
   return (
     <Frame
       options={[
+        ['fillMode: none', 'fillMode: preserve', 'fillMode: fill', 'fillMode: width', 'fillMode: height'],
         ['shouldStripClasses: true', 'shouldStripClasses: false'],
         ['shouldStripExtraneousAttributes: true', 'shouldStripExtraneousAttributes: false'],
         ['shouldStripIds: true', 'shouldStripIds: false'],
@@ -13,9 +14,10 @@ export function FlatSVGDemo() {
       ]}
       title='FlatSVG'
     >
-      {({ shouldStripClasses, shouldStripExtraneousAttributes, shouldStripIds, shouldStripStyles }, toast) => (
+      {({ fillMode, shouldStripClasses, shouldStripExtraneousAttributes, shouldStripIds, shouldStripStyles }, toast) => (
         <FlatSVG
           className='svg:fill-dark size-10'
+          fillMode={fillMode as any}
           shouldStripClasses={shouldStripClasses === 'true'}
           shouldStripExtraneousAttributes={shouldStripExtraneousAttributes === 'true'}
           shouldStripIds={shouldStripIds === 'true'}

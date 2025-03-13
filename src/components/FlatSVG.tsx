@@ -3,6 +3,19 @@ import { forwardRef, type HTMLAttributes } from 'react'
 
 export type FlatSVGProps = HTMLAttributes<HTMLDivElement> & {
   /**
+   * Specifies how the SVG should be resized:
+   * - `none`: The SVG size attributes are stripped.
+   * - `preserve`: The SVG size attributes are unchanged.
+   * - `fill`: The SVG will fill the container, i.e. `width="100%"` and
+   *   `height="100%"`.
+   * - `height`: Default: the SVG will maintain its aspect ratio and fill the height of
+   *   the container, i.e. `width="auto"` and `height="100%"`.
+   * - `width`: The SVG will maintain its aspect ratio and fill the width of the
+   *   container, i.e. `width="100%"` and `height="auto"`.
+   */
+  fillMode?: 'none' | 'preserve' | 'fill' | 'height' | 'width'
+
+  /**
    * The SVG string markup, i.e. "<svg>...</svg>".
    */
   svg: string
@@ -33,12 +46,6 @@ export type FlatSVGProps = HTMLAttributes<HTMLDivElement> & {
   shouldStripPosition?: boolean
 
   /**
-   * Specifies whether the 'width' and 'height' attributes should be removed in
-   * the SVG root node.
-   */
-  shouldStripSize?: boolean
-
-  /**
    * Specifies whether the 'style' atribute and any <style> nodes should be
    * removed in the SVG root node and all of its child nodes.
    */
@@ -58,12 +65,12 @@ export type FlatSVGProps = HTMLAttributes<HTMLDivElement> & {
  * according to the props specified.
  */
 export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, FlatSVGProps>(({
+  fillMode = 'height',
   svg,
   shouldStripClasses = true,
   shouldStripExtraneousAttributes = true,
   shouldStripIds = true,
   shouldStripPosition = true,
-  shouldStripSize = true,
   shouldStripStyles = true,
   whitelistedAttributes = ['viewBox'],
   ...props
@@ -87,13 +94,36 @@ export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, FlatSVGProps>(
           if (tagName.toLowerCase() === 'svg') {
             if (shouldStripPosition && attrName.toLowerCase() === `${attributeNamePrefix}x`) delete attrs[attrName]
             if (shouldStripPosition && attrName.toLowerCase() === `${attributeNamePrefix}y`) delete attrs[attrName]
-            if (shouldStripSize && attrName.toLowerCase() === `${attributeNamePrefix}width`) delete attrs[attrName]
-            if (shouldStripSize && attrName.toLowerCase() === `${attributeNamePrefix}height`) delete attrs[attrName]
+
+            if (fillMode !== 'preserve') {
+              // Delete first to account for case sensitivity, re-add later.
+              if (attrName.toLowerCase() === `${attributeNamePrefix}width`) delete attrs[attrName]
+              if (attrName.toLowerCase() === `${attributeNamePrefix}height`) delete attrs[attrName]
+            }
           }
 
           if (shouldStripIds && attrName.toLowerCase() === `${attributeNamePrefix}id`) delete attrs[attrName]
           if (shouldStripClasses && attrName.toLowerCase() === `${attributeNamePrefix}class`) delete attrs[attrName]
           if (shouldStripStyles && attrName.toLowerCase() === `${attributeNamePrefix}style`) delete attrs[attrName]
+        }
+
+        if (tagName.toLowerCase() === 'svg') {
+          switch (fillMode) {
+            case 'fill':
+              attrs[`${attributeNamePrefix}width`] = '100%'
+              attrs[`${attributeNamePrefix}height`] = '100%'
+              break
+            case 'width':
+              attrs[`${attributeNamePrefix}width`] = '100%'
+              attrs[`${attributeNamePrefix}height`] = 'auto'
+              break
+            case 'height':
+              attrs[`${attributeNamePrefix}width`] = 'auto'
+              attrs[`${attributeNamePrefix}height`] = '100%'
+              break
+            default:
+              break
+          }
         }
 
         return tagName
