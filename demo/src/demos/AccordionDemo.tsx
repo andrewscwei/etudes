@@ -24,9 +24,10 @@ export function AccordionDemo() {
     itemLength: 36,
     isSelectionTogglable: true,
   }, {
-    items: ['1', '2', '3'],
     itemLength: 36,
+    items: ['1', '2', '3'],
     label: 'B',
+    maxVisible: 2,
   }, {
     items: ['1', '2', '3'],
     itemLength: 36,

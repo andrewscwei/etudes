@@ -560,6 +560,7 @@ function getFixedStyles({ orientation = 'vertical' }) {
       flex: '0 0 auto',
       justifyContent: 'flex-start',
       margin: '0',
+      overflow: 'hidden',
       padding: '0',
       ...orientation === 'vertical' ? {
         flexDirection: 'column',
