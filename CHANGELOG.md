@@ -1,3 +1,10 @@
+# [8.1.0](https://github.com/andrewscwei/etudes/compare/v8.0.0...v8.1.0) (2025-03-13)
+
+
+### Features
+
+* Add fillMode to FlatSVG ([ede56f6](https://github.com/andrewscwei/etudes/commit/ede56f6b7695049de66238a46f4fbbbfdbbf2f30))
+
 # [8.0.0](https://github.com/andrewscwei/etudes/compare/v7.3.0...v8.0.0) (2025-03-13)
 
 
