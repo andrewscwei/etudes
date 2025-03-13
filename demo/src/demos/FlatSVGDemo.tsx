@@ -6,7 +6,7 @@ export function FlatSVGDemo() {
   return (
     <Frame
       options={[
-        ['fillMode: none', 'fillMode: preserve', 'fillMode: fill', 'fillMode: width', 'fillMode: height'],
+        ['fillMode: preserve', 'fillMode: none', 'fillMode: fill', 'fillMode: width', 'fillMode: height'],
         ['shouldStripClasses: true', 'shouldStripClasses: false'],
         ['shouldStripExtraneousAttributes: true', 'shouldStripExtraneousAttributes: false'],
         ['shouldStripIds: true', 'shouldStripIds: false'],

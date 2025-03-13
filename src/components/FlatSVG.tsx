@@ -4,16 +4,16 @@ import { forwardRef, type HTMLAttributes } from 'react'
 export type FlatSVGProps = HTMLAttributes<HTMLDivElement> & {
   /**
    * Specifies how the SVG should be resized:
+   * - `preserve`: Default: the SVG size attributes are unchanged.
    * - `none`: The SVG size attributes are stripped.
-   * - `preserve`: The SVG size attributes are unchanged.
    * - `fill`: The SVG will fill the container, i.e. `width="100%"` and
    *   `height="100%"`.
-   * - `height`: Default: the SVG will maintain its aspect ratio and fill the height of
+   * - `height`: The SVG will maintain its aspect ratio and fill the height of
    *   the container, i.e. `width="auto"` and `height="100%"`.
    * - `width`: The SVG will maintain its aspect ratio and fill the width of the
    *   container, i.e. `width="100%"` and `height="auto"`.
    */
-  fillMode?: 'none' | 'preserve' | 'fill' | 'height' | 'width'
+  fillMode?: 'preserve' | 'none' | 'fill' | 'height' | 'width'
 
   /**
    * The SVG string markup, i.e. "<svg>...</svg>".
@@ -65,7 +65,7 @@ export type FlatSVGProps = HTMLAttributes<HTMLDivElement> & {
  * according to the props specified.
  */
 export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, FlatSVGProps>(({
-  fillMode = 'height',
+  fillMode = 'preserve',
   svg,
   shouldStripClasses = true,
   shouldStripExtraneousAttributes = true,
