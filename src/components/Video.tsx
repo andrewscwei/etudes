@@ -22,6 +22,17 @@ export type VideoProps = Omit<HTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'co
   onTimeUpdate?: (currentTime: number, duration: number) => void
 }
 
+/**
+ * A component for displaying video content.
+ *
+ * Note that this component will handle HLS streams automatically, but only if
+ * the browser supports it. If the browser does not support HLS streams, then
+ * you must include `hls.js` in your project and ensure that it is loaded before
+ * this component is rendered, i.e. by including it in the `<head>` of your
+ * HTML document.
+ *
+ * @see {@link https://www.npmjs.com/package/hls.js}
+ */
 export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, VideoProps>(({
   autoLoop = true,
   autoPlay = true,
@@ -54,6 +65,17 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, VideoProps>(({
 
   useEffect(() => {
     if (!videoRef.current) return
+
+    if (src.toLowerCase().endsWith('.m3u8')) {
+      const canMaybePlay = !!videoRef.current.canPlayType('application/x-mpegURL')
+      const Hls = typeof window !== 'undefined' && typeof (window as any).Hls !== 'undefined' ? (window as any).Hls : undefined
+
+      if (!canMaybePlay && Hls?.isSupported()) {
+        const hls = new Hls()
+        hls.loadSource(src)
+        hls.attachMedia(videoRef.current)
+      }
+    }
 
     videoRef.current.muted = isMuted
     videoRef.current.load()
@@ -121,7 +143,7 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, VideoProps>(({
   return (
     <video
       {...props}
-      ref={ref}
+      ref={videoRef}
       autoPlay={autoPlay}
       controls={hasControls}
       loop={autoLoop}
