@@ -1,3 +1,17 @@
+# [8.0.0](https://github.com/andrewscwei/etudes/compare/v7.3.0...v8.0.0) (2025-03-13)
+
+
+### Features
+
+* Add conditional HLS support to Video ([080728d](https://github.com/andrewscwei/etudes/commit/080728df521bda1f6e89046b8816e3d504a3c5de))
+* Add option to strip positioin and size attributes from FlatSVG ([64dea32](https://github.com/andrewscwei/etudes/commit/64dea322b3a42b2ec72315e7bf3a25e7287bf095))
+* Support tree shaking ([4e94604](https://github.com/andrewscwei/etudes/commit/4e94604c2d4ea27b44638f0b6e1b483c0c650923))
+
+
+### BREAKING CHANGES
+
+* Dependency configuration changes to accommodate tree shaking
+
 # [7.3.0](https://github.com/andrewscwei/etudes/compare/v7.2.1...v7.3.0) (2025-01-26)
 
 
