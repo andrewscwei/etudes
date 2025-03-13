@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, useState, type HTMLAttributes } from 'react'
-import { usePrevious } from '../hooks/usePrevious.js'
+import { usePrevious } from '../hooks/index.js'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 import { TextField, type TextFieldProps } from './TextField.js'
 
@@ -12,7 +12,7 @@ type Props = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & {
   onChange?: (quantity: number) => void
 }
 
-export const Counter = forwardRef<HTMLDivElement, Props>(({
+export const Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Props>(({
   children,
   style,
   allowsInput = true,
@@ -133,21 +133,19 @@ export const CounterSubtractButton = ({ children, ...props }: HTMLAttributes<HTM
 )
 
 const FIXED_STYLES = asStyleDict({
-  root: styles({
+  root: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'stretch',
-  }),
-  subtract: styles({
+  },
+  subtract: {
     flex: '0 0 auto',
-  }),
-  add: styles({
+  },
+  add: {
     flex: '0 0 auto',
-  }),
-  text: styles({
+  },
+  text: {
     flex: '1 1 auto',
-  }),
+  },
 })
-
-Object.defineProperty(Counter, 'displayName', { value: 'Counter', writable: false })

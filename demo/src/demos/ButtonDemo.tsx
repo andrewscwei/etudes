@@ -1,4 +1,4 @@
-import { Button } from 'etudes/components/Button'
+import { Button } from 'etudes'
 import { Frame } from '../components/Frame.js'
 
 export function ButtonDemo() {

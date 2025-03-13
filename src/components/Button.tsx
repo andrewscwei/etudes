@@ -65,5 +65,3 @@ export function Button({
     )
   }
 }
-
-Object.defineProperty(Button, 'displayName', { value: 'Button', writable: false })

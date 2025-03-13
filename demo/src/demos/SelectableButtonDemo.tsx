@@ -1,4 +1,4 @@
-import { SelectableButton } from 'etudes/components/SelectableButton'
+import { SelectableButton } from 'etudes'
 import { useState } from 'react'
 import { Frame } from '../components/Frame.js'
 

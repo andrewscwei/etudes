@@ -1,4 +1,4 @@
-import { WithTooltip } from 'etudes/components/WithTooltip'
+import { WithTooltip } from 'etudes'
 import { Frame } from '../components/Frame.js'
 
 export function WithTooltipDemo() {

@@ -14,7 +14,7 @@ export type SwipeContainerProps = HTMLAttributes<HTMLDivElement> & {
  * An empty component with a backing `<div>` element that detects swipe
  * gestures.
  */
-export const SwipeRegion = forwardRef<HTMLDivElement, SwipeContainerProps>(({
+export const SwipeRegion = /* #__PURE__ */ forwardRef<HTMLDivElement, SwipeContainerProps>(({
   children,
   isEnabled = true,
   threshold = 0.5,
@@ -105,5 +105,3 @@ export const SwipeRegion = forwardRef<HTMLDivElement, SwipeContainerProps>(({
     </div>
   )
 })
-
-Object.defineProperty(SwipeRegion, 'displayName', { value: 'SwipeRegion', writable: false })

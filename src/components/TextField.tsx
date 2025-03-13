@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, type ChangeEvent, type FocusEvent, type HTMLAttributes } from 'react'
-import { usePrevious } from '../hooks/usePrevious.js'
+import { usePrevious } from '../hooks/index.js'
 
 export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
   emptyValue?: string
@@ -14,7 +14,7 @@ export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
   onValueChange?: (value: string) => void
 }
 
-export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(({
+export const TextField = /* #__PURE__ */ forwardRef<HTMLInputElement, TextFieldProps>(({
   className,
   emptyValue = '',
   isDisabled = false,
@@ -63,5 +63,3 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(({
     />
   )
 })
-
-Object.defineProperty(TextField, 'displayName', { value: 'TextField', writable: false })

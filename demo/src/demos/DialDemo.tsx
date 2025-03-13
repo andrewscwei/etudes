@@ -1,4 +1,4 @@
-import { Dial, DialKnob, DialTrack } from 'etudes/components/Dial'
+import { Dial, DialKnob, DialTrack } from 'etudes'
 import { Frame } from '../components/Frame.js'
 
 export function DialDemo() {

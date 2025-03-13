@@ -26,7 +26,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_AUTH }}
         run: |
-          cp -r lib/* .
           npx semantic-release
       - name: Deploy to GitHub pages
         uses: andrewscwei/actions/gh-pages-deploy@v2

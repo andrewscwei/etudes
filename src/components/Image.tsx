@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, type HTMLAttributes } from 'react'
 import { type Size } from 'spase'
-import { useImageSize } from '../hooks/useImageSize.js'
+import { useImageSize } from '../hooks/index.js'
 
 export type ImageProps = Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'srcSet' | 'sizes' | 'src' | 'loading' | 'onLoadStart'> & {
   /**
@@ -85,7 +85,7 @@ export type ImageProps = Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'srcSet'
   onSizeChange?: (size?: Size) => void
 }
 
-export const Image = forwardRef<HTMLImageElement, ImageProps>(({
+export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, ImageProps>(({
   alt,
   loadingMode = 'preload',
   sizes,
@@ -155,5 +155,3 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(({
     />
   )
 })
-
-Object.defineProperty(Image, 'displayName', { value: 'Image', writable: false })

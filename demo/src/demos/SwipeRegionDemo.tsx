@@ -1,4 +1,4 @@
-import { SwipeRegion } from 'etudes/components/SwipeRegion'
+import { SwipeRegion } from 'etudes'
 import { Frame } from '../components/Frame.js'
 
 export function SwipeContainerDemo() {

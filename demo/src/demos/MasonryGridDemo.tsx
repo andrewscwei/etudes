@@ -1,6 +1,5 @@
 import clsx from 'clsx'
-import { MasonryGrid, type MasonryGridOrientation } from 'etudes/components/MasonryGrid'
-import { Each } from 'etudes/operators/Each'
+import { Each, MasonryGrid, type MasonryGridOrientation } from 'etudes'
 import { type HTMLAttributes } from 'react'
 import { Frame } from '../components/Frame.js'
 

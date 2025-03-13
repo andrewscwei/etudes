@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
-import { useRect } from '../hooks/useRect.js'
+import { useRect } from '../hooks/index.js'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelection } from './Collection.js'
 
@@ -113,7 +113,7 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
  * supports both horizontal and vertical orientations. Provide `items` and
  * `ItemComponent` props to populate.
  */
-export const Dropdown = forwardRef(({
+export const Dropdown = /* #__PURE__ */ forwardRef(({
   children,
   className,
   style,
@@ -352,5 +352,3 @@ function getFixedStyles({ isCollapsed = true, isInverted = false, collectionPadd
     },
   })
 }
-
-Object.defineProperty(Dropdown, 'displayName', { value: 'Dropdown', writable: false })

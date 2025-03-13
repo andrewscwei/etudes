@@ -47,7 +47,7 @@ export type DialProps = HTMLAttributes<HTMLDivElement> & {
  * @exports DialKnob
  * @exports DialTrack
  */
-export const Dial = forwardRef<HTMLDivElement, DialProps>(({
+export const Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, DialProps>(({
   children,
   style,
   angle = 0,
@@ -167,5 +167,3 @@ function getFixedStyles({ diameter = 0, angle = 0 }) {
     },
   })
 }
-
-Object.defineProperty(Dial, 'displayName', { value: 'Dial', writable: false })

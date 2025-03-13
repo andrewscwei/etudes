@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useRef, type HTMLAttributes, type ReactEventHandler, type RefObject } from 'react'
 import { type Size } from 'spase'
-import { useVideoSize } from '../hooks/useVideoSize.js'
+import { useVideoSize } from '../hooks/index.js'
 
 export type VideoProps = Omit<HTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'controls' | 'loop' | 'muted' | 'playsInline' | 'poster' | 'onCanPlay' | 'onEnded' | 'onPause' | 'onPlay' | 'onTimeUpdate'> & {
   autoLoop?: boolean
@@ -22,7 +22,7 @@ export type VideoProps = Omit<HTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'co
   onTimeUpdate?: (currentTime: number, duration: number) => void
 }
 
-export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
+export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, VideoProps>(({
   autoLoop = true,
   autoPlay = true,
   hasControls = false,
@@ -138,5 +138,3 @@ export const Video = forwardRef<HTMLVideoElement, VideoProps>(({
     </video>
   )
 })
-
-Object.defineProperty(Video, 'displayName', { value: 'Video', writable: false })

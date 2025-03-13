@@ -1,8 +1,7 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
 import { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
-import { useDragValueEffect } from '../hooks/useDragValueEffect.js'
-import { useRect } from '../hooks/useRect.js'
+import { useDragValueEffect, useRect } from '../hooks/index.js'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 
 type Orientation = 'horizontal' | 'vertical'
@@ -22,7 +21,7 @@ export type RangeSliderProps = {
   onRangeChange?: (range: Range) => void
 }
 
-export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & RangeSliderProps>(({
+export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & RangeSliderProps>(({
   children,
   className,
   decimalPlaces = 2,
@@ -209,19 +208,19 @@ export const RangeSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
   )
 })
 
-export const RangeSliderGutter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
+export const RangeSliderGutter = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
   <div {...props} ref={ref}/>
 ))
 
-export const RangeSliderLabel = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
+export const RangeSliderLabel = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
   <div {...props} ref={ref}/>
 ))
 
-export const RangeSliderHighlight = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
+export const RangeSliderHighlight = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
   <div {...props} ref={ref}/>
 ))
 
-export const RangeSliderKnob = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
+export const RangeSliderKnob = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
   <div {...props} ref={ref}/>
 ))
 
@@ -280,5 +279,3 @@ function getFixedStyles({ orientation = 'horizontal', knobWidth = 0, knobHeight 
     },
   })
 }
-
-Object.defineProperty(RangeSlider, 'displayName', { value: 'RangeSlider', writable: false })

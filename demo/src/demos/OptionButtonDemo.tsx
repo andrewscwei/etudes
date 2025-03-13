@@ -1,4 +1,4 @@
-import { OptionButton } from 'etudes/components/OptionButton'
+import { OptionButton } from 'etudes'
 import { useState } from 'react'
 import { Frame } from '../components/Frame.js'
 

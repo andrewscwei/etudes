@@ -1,8 +1,8 @@
 import clsx from 'clsx'
 import { useEffect, useRef, type CSSProperties, type HTMLAttributes, type PropsWithChildren } from 'react'
 import { Rect, Size } from 'spase'
-import { useRect } from '../hooks/useRect.js'
-import { ExtractChild } from '../operators/ExtractChild.js'
+import { useRect } from '../hooks/index.js'
+import { ExtractChild } from '../operators/index.js'
 import { asStyleDict, styles } from '../utils/index.js'
 
 type Alignment = 'tl' | 'tc' | 'tr' | 'cl' | 'cr' | 'bl' | 'bc' | 'br'

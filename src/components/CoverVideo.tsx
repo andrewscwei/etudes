@@ -1,6 +1,6 @@
 import { forwardRef, useRef, useState, type HTMLAttributes, type RefObject } from 'react'
 import { Size } from 'spase'
-import { useRect } from '../hooks/useRect.js'
+import { useRect } from '../hooks/index.js'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 import { Video, type VideoProps } from './Video.js'
 
@@ -12,7 +12,7 @@ export type CoverVideoProps = HTMLAttributes<HTMLDivElement> & Pick<VideoProps, 
   aspectRatio?: number
 }
 
-export const CoverVideo = forwardRef<HTMLDivElement, CoverVideoProps>(({
+export const CoverVideo = /* #__PURE__ */ forwardRef<HTMLDivElement, CoverVideoProps>(({
   className,
   children,
   style,
@@ -121,5 +121,3 @@ const FIXED_STYLES = asStyleDict({
     transform: 'translate(-50%, -50%)',
   },
 })
-
-Object.defineProperty(CoverVideo, 'displayName', { value: 'CoverVideo', writable: false })

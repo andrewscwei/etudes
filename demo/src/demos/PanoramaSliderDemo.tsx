@@ -1,4 +1,4 @@
-import { PanoramaSlider, PanoramaSliderIndicator, PanoramaSliderReticle, PanoramaSliderTrack } from 'etudes/components/PanoramaSlider'
+import { PanoramaSlider, PanoramaSliderIndicator, PanoramaSliderReticle, PanoramaSliderTrack } from 'etudes'
 import { useState } from 'react'
 import { Size } from 'spase'
 import $$PanoramaImage from '../assets/panorama.png'

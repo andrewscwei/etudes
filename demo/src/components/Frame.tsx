@@ -1,9 +1,6 @@
 import clsx from 'clsx'
-import { OptionButton } from 'etudes/components/OptionButton'
-import { Conditional } from 'etudes/operators/Conditional'
-import { Repeat } from 'etudes/operators/Repeat'
+import { Button, Conditional, OptionButton, Repeat } from 'etudes'
 import { useState, type ReactNode } from 'react'
-import { Button } from '../../../lib/components/Button.js'
 
 type Props = {
   children: ReactNode | ((selectedOptions: Record<string, string>, toast: (feedback: string) => void) => ReactNode)

@@ -45,7 +45,7 @@ export type FlatSVGProps = HTMLAttributes<HTMLDivElement> & {
  * will attempt to sanitize the markup (i.e. stripping useless attributes)
  * according to the props specified.
  */
-export const FlatSVG = forwardRef<HTMLDivElement, FlatSVGProps>(({
+export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, FlatSVGProps>(({
   svg,
   shouldStripClasses = true,
   shouldStripExtraneousAttributes = true,
@@ -99,5 +99,3 @@ export const FlatSVG = forwardRef<HTMLDivElement, FlatSVGProps>(({
     />
   )
 })
-
-Object.defineProperty(FlatSVG, 'displayName', { value: 'FlatSVG', writable: false })

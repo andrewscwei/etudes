@@ -11,7 +11,7 @@ export type SelectableButtonProps = HTMLAttributes<HTMLButtonElement> & {
   onToggle?: (isSelected: boolean) => void
 }
 
-export const SelectableButton = forwardRef<HTMLButtonElement, SelectableButtonProps>(({
+export const SelectableButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, SelectableButtonProps>(({
   children,
   className,
   isDeselectable = false,
@@ -52,5 +52,3 @@ export const SelectableButton = forwardRef<HTMLButtonElement, SelectableButtonPr
     </button>
   )
 })
-
-Object.defineProperty(SelectableButton, 'displayName', { value: 'SelectableButton', writable: false })

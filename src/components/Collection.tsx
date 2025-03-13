@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
 import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
-import { Each } from '../operators/Each.js'
+import { Each } from '../operators/index.js'
 import { asStyleDict, styles } from '../utils/index.js'
 
 /**
@@ -195,7 +195,7 @@ export type CollectionProps<T> = HTMLAttributes<HTMLDivElement> & {
  * on the provided `ItemComponent`. This component supports different layouts in
  * both horizontal and vertical orientations.
  */
-export const Collection = forwardRef(({
+export const Collection = /* #__PURE__ */ forwardRef(({
   className,
   style,
   isSelectionTogglable = false,
@@ -394,5 +394,3 @@ function getFixedStyles({ itemLength = NaN, itemPadding = 0, layout = 'collectio
     },
   })
 }
-
-Object.defineProperty(Collection, 'displayName', { value: 'Collection', writable: false })

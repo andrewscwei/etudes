@@ -1,8 +1,6 @@
 import { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Size } from 'spase'
-import { useDragValueEffect } from '../hooks/useDragValueEffect.js'
-import { useImageSize } from '../hooks/useImageSize.js'
-import { useRect } from '../hooks/useRect.js'
+import { useDragValueEffect, useImageSize, useRect } from '../hooks/index.js'
 import { asStyleDict } from '../utils/index.js'
 
 export type PanoramaHTMLAttributes = Omit<HTMLAttributes<HTMLDivElement>, 'onResize'>
@@ -92,7 +90,7 @@ export type PanoramaProps = {
 /**
  * A component containing a pannable 360° panorama image. The angle supports two-way binding.
  */
-export const Panorama = forwardRef<HTMLDivElement, PanoramaHTMLAttributes & PanoramaProps>(({
+export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, PanoramaHTMLAttributes & PanoramaProps>(({
   angle: externalAngle = 0,
   speed = 1,
   src,
@@ -220,5 +218,3 @@ function getAngleFromDisplacement(displacement: number, originalImageSize: Size,
 
   return angle
 }
-
-Object.defineProperty(Panorama, 'displayName', { value: 'Panorama', writable: false })

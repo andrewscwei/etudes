@@ -8,7 +8,7 @@ export type ExtractChildProps = HTMLAttributes<HTMLElement>
  * parent component has multiple children, only the first one will be extracted,
  * the rest will be ignored.
  */
-export const ExtractChild = forwardRef<HTMLElement, ExtractChildProps>(({
+export const ExtractChild = /* #__PURE__ */ forwardRef<HTMLElement, ExtractChildProps>(({
   children,
   ...props
 }, ref) => {
@@ -32,5 +32,3 @@ export const ExtractChild = forwardRef<HTMLElement, ExtractChildProps>(({
     </>
   )
 })
-
-Object.defineProperty(ExtractChild, 'displayName', { value: 'ExtractChild', writable: false })

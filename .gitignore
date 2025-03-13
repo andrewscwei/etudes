@@ -20,7 +20,7 @@ Thumbs.db
 .cache/
 
 # Compiled sources
-lib/
+build/
 .gh-pages/
 
 # Packages

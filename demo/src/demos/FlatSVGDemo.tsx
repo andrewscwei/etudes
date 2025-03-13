@@ -1,4 +1,4 @@
-import { FlatSVG } from 'etudes/components/FlatSVG'
+import { FlatSVG } from 'etudes'
 import $$GitHubIcon from '../assets/github-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
 

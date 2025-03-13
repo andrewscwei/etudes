@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { Carousel } from 'etudes/components/Carousel'
+import { Carousel } from 'etudes'
 import { useState, type HTMLAttributes } from 'react'
 import { Frame } from '../components/Frame.js'
 

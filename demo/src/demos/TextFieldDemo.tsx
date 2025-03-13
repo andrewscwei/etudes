@@ -1,4 +1,4 @@
-import { TextField } from 'etudes/components/TextField'
+import { TextField } from 'etudes'
 import { useState } from 'react'
 import { Frame } from '../components/Frame.js'
 

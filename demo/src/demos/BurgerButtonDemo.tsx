@@ -1,4 +1,4 @@
-import { BurgerButton, BurgerButtonBar } from 'etudes/components/BurgerButton'
+import { BurgerButton, BurgerButtonBar } from 'etudes'
 import { useState } from 'react'
 import { Frame } from '../components/Frame.js'
 

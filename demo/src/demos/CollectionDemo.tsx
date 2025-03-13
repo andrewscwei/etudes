@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { Collection, type CollectionItemProps, type CollectionLayout, type CollectionOrientation, type CollectionSelection, type CollectionSelectionMode } from 'etudes/components/Collection'
+import { Collection, type CollectionItemProps, type CollectionLayout, type CollectionOrientation, type CollectionSelection, type CollectionSelectionMode } from 'etudes'
 import { useState } from 'react'
 import { Frame } from '../components/Frame.js'
 

@@ -1,17 +1,21 @@
 import tailwind from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-import path from 'node:path'
+import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
 import packageJson from '../package.json'
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   root: __dirname,
+  base: mode === 'production' ? '/etudes/' : '/',
   build: {
-    outDir: path.resolve(__dirname, '../.gh-pages'),
+    outDir: resolve(__dirname, '../.gh-pages'),
     target: 'esnext',
+    rollupOptions: {
+      treeshake: 'smallest',
+    },
   },
   define: {
-    __VERSION__: JSON.stringify(packageJson.version),
+    'import.meta.env.VERSION': JSON.stringify(packageJson.version),
   },
   plugins: [
     tailwind(),
@@ -19,7 +23,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      etudes: path.resolve(__dirname, '../lib'),
+      etudes: resolve(__dirname, '../'),
     },
   },
-})
+}))

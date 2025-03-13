@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { FlatSVG } from 'etudes/components/FlatSVG'
+import { FlatSVG } from 'etudes'
 import type { HTMLAttributes } from 'react'
 import $$GitHubIcon from '../assets/github-icon.svg?raw'
 
@@ -12,7 +12,7 @@ export function Header({ className, ...props }: Props) {
         <h1 className='font-bold uppercase tracking-widest'>Études</h1>
       </div>
       <div className='flex items-center gap-2'>
-        <span>{`v${__VERSION__}`}</span>
+        <span>{`v${import.meta.env.VERSION}`}</span>
         <a className='ia flex size-4' href='https://github.com/andrewscwei/etudes' rel='noopener,noreferrer'>
           <FlatSVG className='svg:fill-dark size-full' svg={$$GitHubIcon}/>
         </a>

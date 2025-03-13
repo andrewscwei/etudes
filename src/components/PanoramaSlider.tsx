@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { forwardRef, useRef, useState, type HTMLAttributes } from 'react'
 import { Rect, type Size } from 'spase'
-import { useRect } from '../hooks/useRect.js'
+import { useRect } from '../hooks/index.js'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 import { Panorama, type PanoramaProps } from './Panorama.js'
 
@@ -40,7 +40,7 @@ export type PanoramaSliderProps = PanoramaProps & {
  *                                backing {@link Panorama}.
  * @exports PanoramaSliderTrack The slide track.
  */
-export const PanoramaSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & PanoramaSliderProps>(({
+export const PanoramaSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & PanoramaSliderProps>(({
   className,
   style,
   angle = 0,
@@ -156,15 +156,15 @@ export const PanoramaSlider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
   )
 })
 
-export const PanoramaSliderTrack = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
+export const PanoramaSliderTrack = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
   <div {...props} ref={ref}/>
 ))
 
-export const PanoramaSliderReticle = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
+export const PanoramaSliderReticle = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
   <div {...props} ref={ref}/>
 ))
 
-export const PanoramaSliderIndicator = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
+export const PanoramaSliderIndicator = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
   <div {...props} ref={ref}/>
 ))
 
@@ -212,5 +212,3 @@ function getFixedStyles({ autoDimension = 'width', panoramaRect = Rect.make(), a
     },
   })
 }
-
-Object.defineProperty(PanoramaSlider, 'displayName', { value: 'PanoramaSlider', writable: false })

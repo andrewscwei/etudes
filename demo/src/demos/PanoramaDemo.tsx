@@ -1,4 +1,4 @@
-import { Panorama } from 'etudes/components/Panorama'
+import { Panorama } from 'etudes'
 import { useState } from 'react'
 import $$PanoramaImage from '../assets/panorama.png'
 import { Frame } from '../components/Frame.js'

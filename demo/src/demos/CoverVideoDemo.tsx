@@ -1,4 +1,4 @@
-import { CoverVideo, CoverVideoContent, CoverVideoViewport } from 'etudes/components/CoverVideo'
+import { CoverVideo, CoverVideoContent, CoverVideoViewport } from 'etudes'
 import $$Video from '../assets/video.mov'
 import { Frame } from '../components/Frame.js'
 

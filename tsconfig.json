@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
-    "declaration": true,
     "jsx": "react-jsx",
     "lib": [
       "DOM.Iterable",
@@ -11,7 +10,6 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "noImplicitAny": true,
-    "outDir": "lib",
     "skipLibCheck": true,
     "strict": true,
     "strictNullChecks": true,
@@ -22,7 +20,7 @@
   },
   "exclude": [
     "node_modules",
-    "lib"
+    "build"
   ],
   "include": [
     "src"

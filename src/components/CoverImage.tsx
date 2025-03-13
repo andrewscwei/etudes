@@ -1,6 +1,6 @@
 import { forwardRef, useRef, useState, type HTMLAttributes, type RefObject } from 'react'
 import { Size } from 'spase'
-import { useRect } from '../hooks/useRect.js'
+import { useRect } from '../hooks/index.js'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 import { Image, type ImageProps } from './Image.js'
 
@@ -12,7 +12,7 @@ export type CoverImageProps = Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'
   aspectRatio?: number
 }
 
-export const CoverImage = forwardRef<HTMLDivElement, CoverImageProps>(({
+export const CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, CoverImageProps>(({
   children,
   style,
   alt,
@@ -103,5 +103,3 @@ const FIXED_STYLES = asStyleDict({
     transform: 'translate(-50%, -50%)',
   },
 })
-
-Object.defineProperty(CoverImage, 'displayName', { value: 'CoverImage', writable: false })

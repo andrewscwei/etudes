@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { RangeSlider, RangeSliderGutter, RangeSliderHighlight, RangeSliderKnob, RangeSliderLabel } from 'etudes/components/RangeSlider'
+import { RangeSlider, RangeSliderGutter, RangeSliderHighlight, RangeSliderKnob, RangeSliderLabel } from 'etudes'
 import { useState } from 'react'
 import { Frame } from '../components/Frame.js'
 

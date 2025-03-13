@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Rect, Size } from 'spase'
-import { useResizeEffect } from '../hooks/useResizeEffect.js'
+import { useResizeEffect } from '../hooks/index.js'
 import { asClassNameDict, asStyleDict } from '../utils/index.js'
 
 export type MasonryGridOrientation = 'horizontal' | 'vertical'
@@ -34,7 +34,7 @@ const BASE_MODIFIER_CLASS_PREFIX = 'base-'
  * rows*, whereas in a horizontally oriented grid, *number of sections* refers
  * to the *number of columns*.
  */
-export const MasonryGrid = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & MasonryGridProps>(({
+export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & MasonryGridProps>(({
   alignSections = false,
   children,
   className,
@@ -334,5 +334,3 @@ function getAllImageSources(htmlString?: string): string[] {
 
   return out
 }
-
-Object.defineProperty(MasonryGrid, 'displayName', { value: 'MasonryGrid', writable: false })

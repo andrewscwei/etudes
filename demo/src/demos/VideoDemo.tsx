@@ -1,4 +1,4 @@
-import { Video } from 'etudes/components/Video'
+import { Video } from 'etudes'
 import $$Video from '../assets/video.mov'
 import { Frame } from '../components/Frame.js'
 

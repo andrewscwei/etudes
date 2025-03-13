@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { forwardRef, type HTMLAttributes } from 'react'
-import { Repeat } from '../operators/Repeat.js'
+import { Repeat } from '../operators/index.js'
 import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 
 export type BurgerProps = HTMLAttributes<HTMLDivElement> & {
@@ -18,7 +18,7 @@ export type BurgerProps = HTMLAttributes<HTMLDivElement> & {
  *
  * @exports BurgerBar Component for each bar in the burger.
  */
-export const Burger = forwardRef<HTMLDivElement, BurgerProps>(({
+export const Burger = /* #__PURE__ */ forwardRef<HTMLDivElement, BurgerProps>(({
   children,
   className,
   isActive = false,
@@ -138,5 +138,3 @@ function getFixedStyles({ isActive = false, isSplit = false, isTailHidden = fals
     },
   })
 }
-
-Object.defineProperty(Burger, 'displayName', { value: 'Burger', writable: false })

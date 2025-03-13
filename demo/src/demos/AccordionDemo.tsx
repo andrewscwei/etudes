@@ -1,6 +1,5 @@
 import clsx from 'clsx'
-import { Accordion, AccordionExpandIcon, AccordionHeader, type AccordionItemProps, type AccordionSection, type AccordionSelection } from 'etudes/components/Accordion'
-import { FlatSVG } from 'etudes/components/FlatSVG.js'
+import { Accordion, AccordionExpandIcon, AccordionHeader, FlatSVG, type AccordionItemProps, type AccordionSection, type AccordionSelection } from 'etudes'
 import { useState } from 'react'
 import $$ExpandIcon from '../assets/expand-icon.svg?raw'
 import { Frame } from '../components/Frame.js'

@@ -1,4 +1,4 @@
-import { Counter, CounterAddButton, CounterSubtractButton, CounterTextField } from 'etudes/components/Counter'
+import { Counter, CounterAddButton, CounterSubtractButton, CounterTextField } from 'etudes'
 import { useState } from 'react'
 import { Frame } from '../components/Frame.js'
 

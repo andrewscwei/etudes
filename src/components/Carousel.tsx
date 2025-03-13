@@ -1,8 +1,7 @@
 import { forwardRef, useEffect, useRef, useState, type ComponentType, type ForwardedRef, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactElement, type RefObject } from 'react'
 import { Point, Rect } from 'spase'
-import { useDragEffect } from '../hooks/useDragEffect.js'
-import { useTimeout } from '../hooks/useTimeout.js'
-import { Each } from '../operators/Each.js'
+import { useDragEffect, useTimeout } from '../hooks/index.js'
+import { Each } from '../operators/index.js'
 import { asStyleDict, styles } from '../utils/index.js'
 
 export type CarouselOrientation = 'horizontal' | 'vertical'
@@ -65,7 +64,7 @@ export type CarouselProps<I> = HTMLAttributes<HTMLElement> & {
   ItemComponent: ComponentType<I>
 }
 
-export const Carousel = forwardRef(({
+export const Carousel = /* #__PURE__ */ forwardRef(({
   autoAdvanceInterval = 0,
   index = 0,
   isDragEnabled = true,
@@ -331,5 +330,3 @@ function getFixedStyles({ scrollSnapEnabled = false, orientation = 'horizontal' 
     },
   })
 }
-
-Object.defineProperty(Carousel, 'displayName', { value: 'Carousel', writable: false })

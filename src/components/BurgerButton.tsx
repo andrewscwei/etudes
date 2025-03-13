@@ -15,7 +15,7 @@ export type BurgerButtonProps = Omit<HTMLAttributes<HTMLButtonElement> & BurgerP
  *
  * @exports BurgerButtonBar Component for each bar in the burger button.
  */
-export const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(({
+export const BurgerButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, BurgerButtonProps>(({
   children,
   className,
   style,
@@ -80,5 +80,3 @@ function getFixedStyles() {
     },
   })
 }
-
-Object.defineProperty(BurgerButton, 'displayName', { value: 'BurgerButton', writable: false })

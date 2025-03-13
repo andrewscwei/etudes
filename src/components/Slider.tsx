@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, useRef, type HTMLAttributes, type MouseEvent } from 'react'
 import { Rect } from 'spase'
-import { useDragValueEffect } from '../hooks/useDragValueEffect.js'
+import { useDragValueEffect } from '../hooks/index.js'
 import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 
 export type SliderOrientation = 'horizontal' | 'vertical'
@@ -97,7 +97,7 @@ export type SliderProps = HTMLAttributes<HTMLDivElement> & {
  * @exports SliderTrack The component for the slide track on either side of the
  *                      knob.
  */
-export const Slider = forwardRef<HTMLDivElement, SliderProps>(({
+export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, SliderProps>(({
   children,
   className,
   isInverted = false,
@@ -334,5 +334,3 @@ function getFixedStyles({ orientation = 'vertical', isDragging = false, naturalP
     },
   })
 }
-
-Object.defineProperty(Slider, 'displayName', { value: 'Slider', writable: false })

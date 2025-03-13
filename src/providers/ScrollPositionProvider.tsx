@@ -13,7 +13,7 @@ type ScrollPositionContextValue = ScrollPosition & {
 
 type ScrollPositionProviderProps = PropsWithChildren
 
-export const ScrollPositionContext = createContext<ScrollPositionContextValue | undefined>(undefined)
+export const ScrollPositionContext = /* #__PURE__ */ createContext<ScrollPositionContextValue | undefined>(undefined)
 
 export function ScrollPositionProvider({
   children,

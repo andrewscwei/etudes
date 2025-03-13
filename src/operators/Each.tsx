@@ -24,5 +24,3 @@ export function Each<T>({
     </>
   )
 }
-
-Object.defineProperty(Each, 'displayName', { value: 'Each', writable: false })

@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
 import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
-import { Each } from '../operators/Each.js'
+import { Each } from '../operators/index.js'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection.js'
 import type { DropdownToggleProps } from './Dropdown.js'
@@ -233,7 +233,7 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
  * are generated based on the provided `ItemComponent` while each section header
  * is optionally provided by `HeaderComponent` or generated automatically.
  */
-export const Accordion = forwardRef(({
+export const Accordion = /* #__PURE__ */ forwardRef(({
   children,
   style,
   autoCollapseSections = false,
@@ -564,5 +564,3 @@ function getFixedStyles({ orientation = 'vertical' }) {
     },
   })
 }
-
-Object.defineProperty(Accordion, 'displayName', { value: 'Accordion', writable: false })

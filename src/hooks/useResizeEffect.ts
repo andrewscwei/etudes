@@ -1,5 +1,4 @@
 import { useEffect, useRef, type DependencyList, type RefObject } from 'react'
-import ResizeObserver from 'resize-observer-polyfill'
 
 export type UseResizeEffectOptions = {
   /**

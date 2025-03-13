@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type MouseEvent } from 'react'
 import { Rect } from 'spase'
-import { useDragValueEffect } from '../hooks/useDragValueEffect.js'
+import { useDragValueEffect } from '../hooks/index.js'
 import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 
 type Orientation = 'horizontal' | 'vertical'
@@ -124,7 +124,7 @@ export type StepwiseSliderProps = HTMLAttributes<HTMLDivElement> & {
  * @exports StepwiseSliderTrack The component for the slide track on either side
  *                                of the knob.
  */
-export const StepwiseSlider = forwardRef<HTMLDivElement, StepwiseSliderProps>(({
+export const StepwiseSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, StepwiseSliderProps>(({
   children,
   className,
   index: externalIndex = 0,
@@ -450,5 +450,3 @@ function getFixedStyles({ orientation = 'vertical', naturalPosition = 0, isDragg
     },
   })
 }
-
-Object.defineProperty(StepwiseSlider, 'displayName', { value: 'StepwiseSlider', writable: false })

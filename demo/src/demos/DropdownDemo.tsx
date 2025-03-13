@@ -1,6 +1,5 @@
 import clsx from 'clsx'
-import { Dropdown, DropdownExpandIcon, DropdownToggle, type DropdownItemProps, type DropdownSelection } from 'etudes/components/Dropdown'
-import { FlatSVG } from 'etudes/components/FlatSVG.js'
+import { Dropdown, DropdownExpandIcon, DropdownToggle, FlatSVG, type DropdownItemProps, type DropdownSelection } from 'etudes'
 import { useState } from 'react'
 import $$ExpandIcon from '../assets/expand-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
