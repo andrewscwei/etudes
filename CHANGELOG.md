@@ -1,3 +1,10 @@
+# [8.2.0](https://github.com/andrewscwei/etudes/compare/v8.1.0...v8.2.0) (2025-03-13)
+
+
+### Features
+
+* Change default fillMode of FlatSVG to 'preserve' ([6918764](https://github.com/andrewscwei/etudes/commit/6918764a57c7a2cbdf77adf94929bdc9c32b539e))
+
 # [8.1.0](https://github.com/andrewscwei/etudes/compare/v8.0.0...v8.1.0) (2025-03-13)
 
 
