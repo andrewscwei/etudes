@@ -1,3 +1,10 @@
+# [8.3.0](https://github.com/andrewscwei/etudes/compare/v8.2.0...v8.3.0) (2025-03-13)
+
+
+### Features
+
+* Support animation when expanding/collapsing Accordion ([1b7123b](https://github.com/andrewscwei/etudes/commit/1b7123b0eaf2a5594fd1832d12d6cdff5f296f5b))
+
 # [8.2.0](https://github.com/andrewscwei/etudes/compare/v8.1.0...v8.2.0) (2025-03-13)
 
 
