@@ -1,3 +1,10 @@
+## [8.4.1](https://github.com/andrewscwei/etudes/compare/v8.4.0...v8.4.1) (2025-03-13)
+
+
+### Bug Fixes
+
+* Explicitly define exports in package.json ([34c244a](https://github.com/andrewscwei/etudes/commit/34c244aa2ba77238525d76e99a8a539b7f3117bb))
+
 # [8.4.0](https://github.com/andrewscwei/etudes/compare/v8.3.0...v8.4.0) (2025-03-13)
 
 
