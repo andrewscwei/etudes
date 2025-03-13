@@ -1,3 +1,10 @@
+# [8.4.0](https://github.com/andrewscwei/etudes/compare/v8.3.0...v8.4.0) (2025-03-13)
+
+
+### Features
+
+* Clip accordion regions ([6b4da6a](https://github.com/andrewscwei/etudes/commit/6b4da6a145751ba6207e8b306c8b1de03867b085))
+
 # [8.3.0](https://github.com/andrewscwei/etudes/compare/v8.2.0...v8.3.0) (2025-03-13)
 
 
