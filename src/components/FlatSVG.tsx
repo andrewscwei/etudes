@@ -27,6 +27,18 @@ export type FlatSVGProps = HTMLAttributes<HTMLDivElement> & {
   shouldStripIds?: boolean
 
   /**
+   * Specifies whether the 'x' and 'y' attributes should be removed in the SVG
+   * root node.
+   */
+  shouldStripPosition?: boolean
+
+  /**
+   * Specifies whether the 'width' and 'height' attributes should be removed in
+   * the SVG root node.
+   */
+  shouldStripSize?: boolean
+
+  /**
    * Specifies whether the 'style' atribute and any <style> nodes should be
    * removed in the SVG root node and all of its child nodes.
    */
@@ -50,6 +62,8 @@ export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, FlatSVGProps>(
   shouldStripClasses = true,
   shouldStripExtraneousAttributes = true,
   shouldStripIds = true,
+  shouldStripPosition = true,
+  shouldStripSize = true,
   shouldStripStyles = true,
   whitelistedAttributes = ['viewBox'],
   ...props
@@ -65,11 +79,18 @@ export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, FlatSVGProps>(
       removeNSPrefix: true,
       trimValues: true,
       updateTag: (tagName, jPath, attrs) => {
-        if (shouldStripStyles && tagName === 'style') return false
+        if (shouldStripStyles && tagName.toLowerCase() === 'style') return false
 
         const attrNames = Object.keys(attrs)
 
         for (const attrName of attrNames) {
+          if (tagName.toLowerCase() === 'svg') {
+            if (shouldStripPosition && attrName.toLowerCase() === `${attributeNamePrefix}x`) delete attrs[attrName]
+            if (shouldStripPosition && attrName.toLowerCase() === `${attributeNamePrefix}y`) delete attrs[attrName]
+            if (shouldStripSize && attrName.toLowerCase() === `${attributeNamePrefix}width`) delete attrs[attrName]
+            if (shouldStripSize && attrName.toLowerCase() === `${attributeNamePrefix}height`) delete attrs[attrName]
+          }
+
           if (shouldStripIds && attrName.toLowerCase() === `${attributeNamePrefix}id`) delete attrs[attrName]
           if (shouldStripClasses && attrName.toLowerCase() === `${attributeNamePrefix}class`) delete attrs[attrName]
           if (shouldStripStyles && attrName.toLowerCase() === `${attributeNamePrefix}style`) delete attrs[attrName]
