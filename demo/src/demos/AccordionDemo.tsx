@@ -51,10 +51,11 @@ export function AccordionDemo() {
     >
       {({ autoCollapseSections, isInverted, orientation, selectionMode }, toast) => (
         <Accordion
+          key={orientation}
           autoCollapseSections={autoCollapseSections === 'true'}
           className={clsx({
-            'self-start mx-auto w-44': orientation === 'vertical',
-            'h-44': orientation === 'horizontal',
+            'self-start mx-auto w-44 *:transition-[height]': orientation === 'vertical',
+            'h-44 *:transition-[width]': orientation === 'horizontal',
           })}
           expandedSectionIndices={expandedSectionIndices}
           ItemComponent={AccordionItem}

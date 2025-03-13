@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
+import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref, type RefObject } from 'react'
+import { useSize } from '../hooks/useSize.js'
 import { Each } from '../operators/index.js'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection.js'
@@ -392,6 +393,8 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
   const fixedStyles = getFixedStyles({ orientation })
   const prevSelectionRef = useRef<AccordionSelection>(undefined)
   const prevSelection = prevSelectionRef.current
+  const sectionHeaderRefs: RefObject<HTMLDivElement | null>[] = sections.map(() => useRef<HTMLDivElement>(null))
+  const sectionHeaderSizes = sectionHeaderRefs.map(t => useSize(t))
 
   const components = asComponentDict(children, {
     collapseIcon: AccordionCollapseIcon,
@@ -416,53 +419,66 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
           const numVisible = maxVisible < 0 ? allVisible : Math.min(allVisible, maxVisible)
           const maxLength = itemLength * numVisible + itemPadding * (numVisible - 1)
           const isCollapsed = !isSectionExpandedAt(sectionIndex)
+          const headerSize = sectionHeaderSizes[sectionIndex]
 
           return (
             <div
               style={styles(fixedStyles.section, orientation === 'vertical' ? {
                 marginTop: sectionIndex === 0 ? '0px' : `${sectionPadding}px`,
+                ...headerSize.height > 0 ? {
+                  height: isCollapsed ? `${headerSize.height}px` : `${maxLength + headerSize.height + collectionPadding}px`,
+                } : {},
               } : {
                 marginLeft: sectionIndex === 0 ? '0px' : `${sectionPadding}px`,
+                ...headerSize.width > 0 ? {
+                  width: isCollapsed ? `${headerSize.width}px` : `${maxLength + headerSize.width + collectionPadding}px`,
+                } : {},
               })}
             >
-              {HeaderComponent ? (
-                <HeaderComponent
-                  aria-expanded={!isCollapsed}
-                  className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
-                  index={sectionIndex}
-                  isCollapsed={isCollapsed}
-                  role='button'
-                  section={section}
-                  style={styles(fixedStyles.header)}
-                  onClick={() => toggleSectionAt(sectionIndex)}
-                  onCustomEvent={(name, info) => onHeaderCustomEvent?.(sectionIndex, name, info)}
-                />
-              ) : (
-                cloneStyledElement(
-                  components.header ?? <AccordionHeader/>,
-                  {
-                    'aria-expanded': !isCollapsed,
-                    'className': clsx({ collapsed: isCollapsed, expanded: !isCollapsed }),
-                    'style': styles(fixedStyles.header),
-                    'role': 'button',
-                    'onClick': () => toggleSectionAt(sectionIndex),
-                  },
-                  <span dangerouslySetInnerHTML={{ __html: section.label }}/>,
-                  isCollapsed ? components.collapseIcon ?? components.expandIcon : components.expandIcon,
-                )
-              )}
               <div
-                hidden={isCollapsed}
+                ref={sectionHeaderRefs[sectionIndex]}
+                style={styles(fixedStyles.headerContainer)}
+              >
+                {HeaderComponent ? (
+                  <HeaderComponent
+                    aria-expanded={!isCollapsed}
+                    className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
+                    index={sectionIndex}
+                    isCollapsed={isCollapsed}
+                    role='button'
+                    section={section}
+                    style={styles(fixedStyles.header)}
+                    onClick={() => toggleSectionAt(sectionIndex)}
+                    onCustomEvent={(name, info) => onHeaderCustomEvent?.(sectionIndex, name, info)}
+                  />
+                ) : (
+                  cloneStyledElement(
+                    components.header ?? <AccordionHeader/>,
+                    {
+                      'aria-expanded': !isCollapsed,
+                      'className': clsx({ collapsed: isCollapsed, expanded: !isCollapsed }),
+                      'style': styles(fixedStyles.header),
+                      'role': 'button',
+                      'onClick': () => toggleSectionAt(sectionIndex),
+                    },
+                    <span dangerouslySetInnerHTML={{ __html: section.label }}/>,
+                    isCollapsed ? components.collapseIcon ?? components.expandIcon : components.expandIcon,
+                  )
+                )}
+              </div>
+              <div
                 role='region'
-                style={styles(orientation === 'vertical' ? {
+                style={styles({
+                  pointerEvents: isCollapsed ? 'none' : 'auto',
+                }, orientation === 'vertical' ? {
                   width: '100%',
-                  height: isCollapsed ? '0' : `${maxLength}px`,
-                  marginTop: isCollapsed ? '0' : `${collectionPadding}px`,
+                  height: `${maxLength}px`,
+                  marginTop: `${collectionPadding}px`,
                   overflowY: maxVisible < 0 || maxVisible >= allVisible ? 'hidden' : 'scroll',
                 } : {
-                  marginLeft: isCollapsed ? '0' : `${collectionPadding}px`,
+                  marginLeft: `${collectionPadding}px`,
                   overflowX: maxVisible < 0 || maxVisible >= allVisible ? 'hidden' : 'scroll',
-                  width: isCollapsed ? '0' : `${maxLength}px`,
+                  width: `${maxLength}px`,
                   height: '100%',
                 })}
               >
@@ -550,6 +566,14 @@ function getFixedStyles({ orientation = 'vertical' }) {
         width: '100%',
       } : {
         flexDirection: 'row',
+        height: '100%',
+      },
+    },
+    headerContainer: {
+      flexShrink: '0',
+      ...orientation === 'vertical' ? {
+        width: '100%',
+      } : {
         height: '100%',
       },
     },
