@@ -22,6 +22,7 @@ export default defineConfig({
       },
       treeshake: 'smallest',
     },
+    target: 'esnext',
   },
   plugins: [
     dts(),
