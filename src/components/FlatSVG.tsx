@@ -27,13 +27,6 @@ export type FlatSVGProps = HTMLAttributes<HTMLDivElement> & {
   shouldStripClasses?: boolean
 
   /**
-   * Specifies whether extraneous attributes should be removed from the SVG root
-   * node. The `whitelistedAttributes` prop defines what attributes should be
-   * kept.
-   */
-  shouldStripExtraneousAttributes?: boolean
-
-  /**
    * Specifies whether the 'id' attribute should be removed in the SVG root node
    * and all of its child nodes.
    */
@@ -43,7 +36,7 @@ export type FlatSVGProps = HTMLAttributes<HTMLDivElement> & {
    * Specifies whether the 'x' and 'y' attributes should be removed in the SVG
    * root node.
    */
-  shouldStripPosition?: boolean
+  shouldStripPositions?: boolean
 
   /**
    * Specifies whether the 'style' atribute and any <style> nodes should be
@@ -68,14 +61,16 @@ export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, FlatSVGProps>(
   fillMode = 'preserve',
   svg,
   shouldStripClasses = true,
-  shouldStripExtraneousAttributes = true,
   shouldStripIds = true,
-  shouldStripPosition = true,
+  shouldStripPositions = true,
   shouldStripStyles = true,
-  whitelistedAttributes = ['viewBox'],
   ...props
 }, ref) => {
   const attributeNamePrefix = '@_'
+  const idAttributes = ['id'].map(t => `${attributeNamePrefix}${t}`)
+  const classAttributes = ['class'].map(t => `${attributeNamePrefix}${t}`)
+  const styleAttributes = ['fill', 'fill-opacity', 'stroke', 'stroke-opacity', 'style'].map(t => `${attributeNamePrefix}${t}`)
+  const positionAttributes = ['x', 'y'].map(t => `${attributeNamePrefix}${t}`)
 
   const sanitizedMarkup = () => {
     const parser = new XMLParser({
@@ -92,8 +87,7 @@ export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, FlatSVGProps>(
 
         for (const attrName of attrNames) {
           if (tagName.toLowerCase() === 'svg') {
-            if (shouldStripPosition && attrName.toLowerCase() === `${attributeNamePrefix}x`) delete attrs[attrName]
-            if (shouldStripPosition && attrName.toLowerCase() === `${attributeNamePrefix}y`) delete attrs[attrName]
+            if (shouldStripPositions && positionAttributes.includes(attrName.toLowerCase())) delete attrs[attrName]
 
             if (fillMode !== 'preserve') {
               // Delete first to account for case sensitivity, re-add later.
@@ -102,9 +96,9 @@ export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, FlatSVGProps>(
             }
           }
 
-          if (shouldStripIds && attrName.toLowerCase() === `${attributeNamePrefix}id`) delete attrs[attrName]
-          if (shouldStripClasses && attrName.toLowerCase() === `${attributeNamePrefix}class`) delete attrs[attrName]
-          if (shouldStripStyles && attrName.toLowerCase() === `${attributeNamePrefix}style`) delete attrs[attrName]
+          if (shouldStripIds && idAttributes.includes(attrName.toLowerCase())) delete attrs[attrName]
+          if (shouldStripClasses && classAttributes.includes(attrName.toLowerCase())) delete attrs[attrName]
+          if (shouldStripStyles && styleAttributes.includes(attrName.toLowerCase())) delete attrs[attrName]
         }
 
         if (tagName.toLowerCase() === 'svg') {

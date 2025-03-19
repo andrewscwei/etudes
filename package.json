@@ -8,9 +8,9 @@
   "types": "./build/index.d.ts",
   "exports": {
     ".": {
+      "types": "./build/index.d.ts",
       "import": "./build/etudes.js",
-      "require": "./build/etudes.umd.cjs",
-      "types": "./build/index.d.ts"
+      "require": "./build/etudes.umd.cjs"
     }
   },
   "files": [

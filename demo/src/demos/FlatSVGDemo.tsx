@@ -8,19 +8,19 @@ export function FlatSVGDemo() {
       options={[
         ['fillMode: preserve', 'fillMode: none', 'fillMode: fill', 'fillMode: width', 'fillMode: height'],
         ['shouldStripClasses: true', 'shouldStripClasses: false'],
-        ['shouldStripExtraneousAttributes: true', 'shouldStripExtraneousAttributes: false'],
         ['shouldStripIds: true', 'shouldStripIds: false'],
+        ['shouldStripPositions: true', 'shouldStripPositions: false'],
         ['shouldStripStyles: true', 'shouldStripStyles: false'],
       ]}
       title='FlatSVG'
     >
-      {({ fillMode, shouldStripClasses, shouldStripExtraneousAttributes, shouldStripIds, shouldStripStyles }, toast) => (
+      {({ fillMode, shouldStripClasses, shouldStripPositions, shouldStripIds, shouldStripStyles }, toast) => (
         <FlatSVG
           className='svg:fill-dark size-10'
           fillMode={fillMode as any}
           shouldStripClasses={shouldStripClasses === 'true'}
-          shouldStripExtraneousAttributes={shouldStripExtraneousAttributes === 'true'}
           shouldStripIds={shouldStripIds === 'true'}
+          shouldStripPositions={shouldStripPositions === 'true'}
           shouldStripStyles={shouldStripStyles === 'true'}
           svg={$$GitHubIcon}
         />
