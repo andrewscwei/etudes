@@ -100,7 +100,7 @@ export const Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Props>(({
           isDisabled: !allowsInput,
           style: styles(FIXED_STYLES.text),
           value: text,
-          onValueChange: handleInputProgress,
+          onChange: handleInputProgress,
           onUnfocus: handleInputComplete,
         },
       )}

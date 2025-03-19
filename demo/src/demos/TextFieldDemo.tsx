@@ -11,7 +11,7 @@ export function TextFieldDemo() {
         className='border-dark placeholder:text-dark w-52 border bg-transparent p-2 text-base outline-none'
         placeholder='Type here...'
         value={value}
-        onValueChange={setValue}
+        onChange={setValue}
       />
     </Frame>
   )

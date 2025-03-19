@@ -1,8 +1,8 @@
 import clsx from 'clsx'
-import { forwardRef, useEffect, type ChangeEvent, type FocusEvent, type HTMLAttributes } from 'react'
+import { forwardRef, useEffect, type ChangeEvent, type FocusEvent, type InputHTMLAttributes } from 'react'
 import { usePrevious } from '../hooks/index.js'
 
-export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
+export type TextFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'aria-disabled' | 'aria-placeholder' | 'aria-required' | 'disabled' | 'placeholder' | 'required' | 'type' | 'value' | 'onBlur' | 'onChange' | 'onFocus'> & {
   emptyValue?: string
   isDisabled?: boolean
   isRequired?: boolean
@@ -11,7 +11,7 @@ export type TextFieldProps = HTMLAttributes<HTMLInputElement> & {
   formatter?: (prevValue: string, newValue: string) => string
   onFocus?: (value: string) => void
   onUnfocus?: (value: string) => void
-  onValueChange?: (value: string) => void
+  onChange?: (value: string) => void
 }
 
 export const TextField = /* #__PURE__ */ forwardRef<HTMLInputElement, TextFieldProps>(({
@@ -24,7 +24,7 @@ export const TextField = /* #__PURE__ */ forwardRef<HTMLInputElement, TextFieldP
   formatter,
   onFocus,
   onUnfocus,
-  onValueChange,
+  onChange,
   ...props
 }, ref) => {
   const handleValueChange = (newValue: string) => {
@@ -32,7 +32,7 @@ export const TextField = /* #__PURE__ */ forwardRef<HTMLInputElement, TextFieldP
 
     if (formatted === value) return
 
-    onValueChange?.(formatted)
+    onChange?.(formatted)
   }
 
   const value = externalValue ?? emptyValue
