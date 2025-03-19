@@ -1,0 +1,48 @@
+@import 'tailwindcss';
+@plugin 'tailwindcss-safe-area';
+
+@theme {
+  --breakpoint-tab: 640px;
+  --breakpoint-note: 1025px;
+
+  --font-sans: 'Roboto Mono', sans-serif;
+  --text-base: .8rem;
+  --text-sm: .7rem;
+  --text-xs: .6rem;
+
+  --color-transparent: transparent;
+  --color-dark: #3f3b38;
+  --color-light: #a9a293;
+
+  --default-transition-duration: 200ms;
+
+  --animate-fade: fade 1000ms both ease-in-out;
+
+  @keyframes fade {
+    0% {
+      opacity: 0%;
+      transform: translateY(100%);
+    }
+
+    25% {
+      opacity: 100%;
+      transform: translateY(0);
+    }
+
+    75% {
+      opacity: 100%;
+      transform: translateY(0);
+    }
+
+    100% {
+      opacity: 0%;
+      transform: translateY(100%);
+    }
+  }
+}
+
+@custom-variant active (&.active);
+@custom-variant selected (&.selected);
+@custom-variant disabled (&.disabled);
+@custom-variant dragging (&.dragging);
+@custom-variant svg (& svg);
