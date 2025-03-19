@@ -27,4 +27,15 @@ export default defineConfig({
   plugins: [
     dts(),
   ],
+  test: {
+    coverage: {
+      reporter: ['text-summary'],
+      provider: 'v8',
+    },
+    passWithNoTests: true,
+    include: [
+      '**/*.spec.ts',
+      '**/*.spec.tsx',
+    ],
+  },
 })

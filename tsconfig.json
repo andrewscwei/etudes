@@ -18,10 +18,6 @@
       "vitest/globals"
     ]
   },
-  "exclude": [
-    "node_modules",
-    "build"
-  ],
   "include": [
     "src"
   ]
