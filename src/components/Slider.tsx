@@ -6,7 +6,7 @@ import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styl
 
 export type SliderOrientation = 'horizontal' | 'vertical'
 
-export type SliderProps = HTMLAttributes<HTMLDivElement> & {
+export type SliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-orientation' | 'aria-valuenow' | 'role'> & {
   /**
    * By default the position is a value from 0 - 1, 0 being the start of the
    * slider and 1 being the end. Switching on this flag inverts this behavior,
@@ -97,7 +97,7 @@ export type SliderProps = HTMLAttributes<HTMLDivElement> & {
  * @exports SliderTrack The component for the slide track on either side of the
  *                      knob.
  */
-export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, SliderProps>(({
+export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<SliderProps>>(({
   children,
   className,
   isInverted = false,

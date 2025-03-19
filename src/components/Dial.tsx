@@ -47,7 +47,7 @@ export type DialProps = HTMLAttributes<HTMLDivElement> & {
  * @exports DialKnob
  * @exports DialTrack
  */
-export const Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, DialProps>(({
+export const Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<DialProps>>(({
   children,
   style,
   angle = 0,

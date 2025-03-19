@@ -4,7 +4,7 @@ import { useRect } from '../hooks/index.js'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 import { Video, type VideoProps } from './Video.js'
 
-export type CoverVideoProps = HTMLAttributes<HTMLDivElement> & Pick<VideoProps, 'autoLoop' | 'autoPlay' | 'hasControls' | 'isMuted' | 'playsInline' | 'posterSrc' | 'src' | 'onPause' | 'onPlay' | 'onCanPlay' | 'onEnd' | 'onFullscreenChange' | 'onLoadMetadata' | 'onLoadMetadataComplete' | 'onLoadMetadataError' | 'onSizeChange'> & {
+export type CoverVideoProps = Omit<HTMLAttributes<HTMLDivElement>, 'onCanPlay' | 'onPause' | 'onPlay'> & Pick<VideoProps, 'autoLoop' | 'autoPlay' | 'hasControls' | 'isMuted' | 'playsInline' | 'posterSrc' | 'src' | 'onPause' | 'onPlay' | 'onCanPlay' | 'onEnd' | 'onFullscreenChange' | 'onLoadMetadata' | 'onLoadMetadataComplete' | 'onLoadMetadataError' | 'onSizeChange'> & {
   /**
    * The known aspect ratio of the video, expressed by width / height. If
    * unprovided, it will be inferred after loading the video.
@@ -12,7 +12,7 @@ export type CoverVideoProps = HTMLAttributes<HTMLDivElement> & Pick<VideoProps, 
   aspectRatio?: number
 }
 
-export const CoverVideo = /* #__PURE__ */ forwardRef<HTMLDivElement, CoverVideoProps>(({
+export const CoverVideo = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverVideoProps>>(({
   className,
   children,
   style,
@@ -61,7 +61,12 @@ export const CoverVideo = /* #__PURE__ */ forwardRef<HTMLDivElement, CoverVideoP
   })
 
   return (
-    <div {...props} ref={rootRef} className={className} style={styles(style, FIXED_STYLES.root)}>
+    <div
+      {...props}
+      ref={rootRef}
+      className={className}
+      style={styles(style, FIXED_STYLES.root)}
+    >
       <Video
         autoLoop={autoLoop}
         autoPlay={autoPlay}

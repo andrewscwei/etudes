@@ -4,7 +4,7 @@ import { usePrevious } from '../hooks/index.js'
 import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 import { TextField, type TextFieldProps } from './TextField.js'
 
-type Props = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & {
+export type CounterProps = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & {
   min?: number
   max?: number
   quantity?: number
@@ -12,7 +12,7 @@ type Props = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & {
   onChange?: (quantity: number) => void
 }
 
-export const Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Props>(({
+export const Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CounterProps>>(({
   children,
   style,
   allowsInput = true,

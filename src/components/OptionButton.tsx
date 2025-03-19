@@ -1,13 +1,13 @@
-import { forwardRef, type HTMLAttributes } from 'react'
+import { forwardRef, type ButtonHTMLAttributes } from 'react'
 
-export type CycleButtonProps = Omit<HTMLAttributes<HTMLButtonElement>, 'disabled' | 'onChange'> & {
+export type CycleButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-disabled' | 'aria-label' | 'disabled' | 'onChange'> & {
   index?: number
   isDisabled?: boolean
   options: string[] | { label: string; value: string }[]
   onChange?: (value: string, index: number) => void
 }
 
-export const OptionButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, CycleButtonProps>(({
+export const OptionButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readonly<CycleButtonProps>>(({
   index = 0,
   isDisabled = false,
   options,

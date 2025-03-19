@@ -40,7 +40,7 @@ export type PanoramaSliderProps = PanoramaProps & {
  *                                backing {@link Panorama}.
  * @exports PanoramaSliderTrack The slide track.
  */
-export const PanoramaSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & PanoramaSliderProps>(({
+export const PanoramaSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<PanoramaSliderProps>>(({
   className,
   style,
   angle = 0,

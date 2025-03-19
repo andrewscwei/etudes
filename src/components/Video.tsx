@@ -1,8 +1,8 @@
-import { forwardRef, useEffect, useRef, type HTMLAttributes, type ReactEventHandler, type RefObject } from 'react'
+import { forwardRef, useEffect, useRef, type ReactEventHandler, type RefObject, type VideoHTMLAttributes } from 'react'
 import { type Size } from 'spase'
 import { useVideoSize } from '../hooks/index.js'
 
-export type VideoProps = Omit<HTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'controls' | 'loop' | 'muted' | 'playsInline' | 'poster' | 'onCanPlay' | 'onEnded' | 'onPause' | 'onPlay' | 'onTimeUpdate'> & {
+export type VideoProps = Omit<VideoHTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'controls' | 'loop' | 'muted' | 'playsInline' | 'poster' | 'onCanPlay' | 'onEnded' | 'onPause' | 'onPlay' | 'onTimeUpdate'> & {
   autoLoop?: boolean
   autoPlay?: boolean
   hasControls?: boolean
@@ -33,7 +33,7 @@ export type VideoProps = Omit<HTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'co
  *
  * @see {@link https://www.npmjs.com/package/hls.js}
  */
-export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, VideoProps>(({
+export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<VideoProps>>(({
   autoLoop = true,
   autoPlay = true,
   hasControls = false,

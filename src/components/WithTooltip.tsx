@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { useEffect, useRef, type CSSProperties, type HTMLAttributes, type PropsWithChildren } from 'react'
+import { useEffect, useRef, type CSSProperties, type HTMLAttributes } from 'react'
 import { Rect, Size } from 'spase'
 import { useRect } from '../hooks/index.js'
 import { ExtractChild } from '../operators/index.js'
@@ -16,7 +16,7 @@ type StyleOptions = {
   targetWidth: number
 }
 
-export type WithToolTipProps = Pick<HTMLAttributes<HTMLElement>, 'className' | 'style'> & PropsWithChildren<{
+export type WithTooltipProps = Pick<HTMLAttributes<HTMLElement>, 'className' | 'children' | 'style'> & {
   /**
    * Target alignment, automatically computed if not provided.
    */
@@ -53,7 +53,7 @@ export type WithToolTipProps = Pick<HTMLAttributes<HTMLElement>, 'className' | '
    * the window required to trigger an alignment change, defaults to `100px`.
    */
   threshold?: number
-}>
+}
 
 export function WithTooltip({
   children,
@@ -66,7 +66,7 @@ export function WithTooltip({
   hint,
   maxWidth = 200,
   threshold = 100,
-}: WithToolTipProps) {
+}: Readonly<WithTooltipProps>) {
   const createDialog = () => {
     const dialog = document.createElement('span')
     dialog.className = clsx(className)

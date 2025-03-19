@@ -6,7 +6,7 @@ import { asStyleDict, styles } from '../utils/index.js'
 
 export type CarouselOrientation = 'horizontal' | 'vertical'
 
-export type CarouselProps<I> = HTMLAttributes<HTMLElement> & {
+export type CarouselProps<I> = Omit<HTMLAttributes<HTMLDivElement>, 'role' | 'onClick' | 'onPointerCancel' | 'onPointerDown' | 'onPointerLeave' | 'onPointerUp'> & {
   /**
    * Current item index.
    */
@@ -248,7 +248,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
       </div>
     </div>
   )
-}) as <I extends HTMLAttributes<HTMLElement>>(props: CarouselProps<I> & { ref?: ForwardedRef<HTMLDivElement> }) => ReactElement
+}) as <I extends HTMLAttributes<HTMLElement>>(props: Readonly<CarouselProps<I> & { ref?: ForwardedRef<HTMLDivElement> }>) => ReactElement
 
 function scrollToIndex(ref: RefObject<HTMLDivElement | null>, index: number, orientation: CarouselOrientation) {
   const viewport = ref?.current

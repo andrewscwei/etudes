@@ -8,7 +8,7 @@ type Orientation = 'horizontal' | 'vertical'
 
 type Range = [number, number]
 
-export type RangeSliderProps = {
+export type RangeSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuemax' | 'aria-valuemin' | 'role'> & {
   decimalPlaces?: number
   knobHeight?: number
   knobPadding?: number
@@ -21,7 +21,7 @@ export type RangeSliderProps = {
   onRangeChange?: (range: Range) => void
 }
 
-export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & RangeSliderProps>(({
+export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<RangeSliderProps>>(({
   children,
   className,
   decimalPlaces = 2,

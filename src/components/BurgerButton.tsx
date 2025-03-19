@@ -1,9 +1,9 @@
 import clsx from 'clsx'
-import { forwardRef, type HTMLAttributes } from 'react'
+import { forwardRef, type ButtonHTMLAttributes } from 'react'
 import { asClassNameDict, asStyleDict, styles } from '../utils/index.js'
 import { Burger, BurgerBar, type BurgerProps } from './Burger.js'
 
-export type BurgerButtonProps = Omit<HTMLAttributes<HTMLButtonElement> & BurgerProps, 'onToggle'> & {
+export type BurgerButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement> & BurgerProps, 'onToggle'> & {
   onActivate?: () => void
   onDeactivate?: () => void
   onToggle?: (isActive: boolean) => void
@@ -15,7 +15,7 @@ export type BurgerButtonProps = Omit<HTMLAttributes<HTMLButtonElement> & BurgerP
  *
  * @exports BurgerButtonBar Component for each bar in the burger button.
  */
-export const BurgerButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, BurgerButtonProps>(({
+export const BurgerButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readonly<BurgerButtonProps>>(({
   children,
   className,
   style,

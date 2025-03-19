@@ -3,9 +3,7 @@ import { Size } from 'spase'
 import { useDragValueEffect, useImageSize, useRect } from '../hooks/index.js'
 import { asStyleDict } from '../utils/index.js'
 
-export type PanoramaHTMLAttributes = Omit<HTMLAttributes<HTMLDivElement>, 'onResize'>
-
-export type PanoramaProps = {
+export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'role'> & {
   /**
    * The current angle in degrees, 0.0 - 360.0, inclusive. When angle is 0 or
    * 360, the `zeroAnchor` position of the image is at the left bound of the
@@ -90,7 +88,7 @@ export type PanoramaProps = {
 /**
  * A component containing a pannable 360° panorama image. The angle supports two-way binding.
  */
-export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, PanoramaHTMLAttributes & PanoramaProps>(({
+export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<PanoramaProps>>(({
   angle: externalAngle = 0,
   speed = 1,
   src,

@@ -6,7 +6,7 @@ import { asClassNameDict, asStyleDict } from '../utils/index.js'
 
 export type MasonryGridOrientation = 'horizontal' | 'vertical'
 
-export type MasonryGridProps = {
+export type MasonryGridProps = Omit<HTMLAttributes<HTMLDivElement>, 'role'> & {
   alignSections?: boolean
   horizontalSpacing?: number
   isReversed?: boolean
@@ -34,7 +34,7 @@ const BASE_MODIFIER_CLASS_PREFIX = 'base-'
  * rows*, whereas in a horizontally oriented grid, *number of sections* refers
  * to the *number of columns*.
  */
-export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & MasonryGridProps>(({
+export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<MasonryGridProps>>(({
   alignSections = false,
   children,
   className,

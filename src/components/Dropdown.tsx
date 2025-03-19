@@ -280,7 +280,7 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
       </div>
     </div>
   )
-}) as <T extends DropdownItemData = DropdownItemData>(props: DropdownProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
+}) as <T extends DropdownItemData = DropdownItemData>(props: Readonly<DropdownProps<T> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
 
 export const DropdownToggle = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & DropdownToggleProps) => (
   <button {...props}>{children}</button>

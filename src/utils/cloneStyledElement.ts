@@ -1,4 +1,4 @@
-import { cloneElement, type Attributes, type ClassAttributes, type Component, type ComponentState, type ReactElement, type ReactNode } from 'react'
+import { cloneElement, type Attributes, type ClassAttributes, type Component, type ComponentClass, type ComponentState, type FunctionComponent, type ReactElement, type ReactNode } from 'react'
 
 /**
  * Wrapper for {@link cloneElement} but instead of overwriting `className` and
@@ -13,11 +13,11 @@ import { cloneElement, type Attributes, type ClassAttributes, type Component, ty
  *
  * @returns The cloned element.
  */
-export function cloneStyledElement<P>(element: ReactElement<P, React.FunctionComponent<P>>, props?: Partial<P> & Attributes, ...children: ReactNode[]): ReactElement<P, React.FunctionComponent<P>>
-export function cloneStyledElement<P, T extends Component<P, ComponentState>>(element: ReactElement<P, React.ComponentClass<T>>, props?: Partial<P> & ClassAttributes<T>, ...children: ReactNode[]): ReactElement<P, React.ComponentClass<T>>
+export function cloneStyledElement<P>(element: ReactElement<P, FunctionComponent<P>>, props?: Partial<P> & Attributes, ...children: ReactNode[]): ReactElement<P, FunctionComponent<P>>
+export function cloneStyledElement<P, T extends Component<P, ComponentState>>(element: ReactElement<P, ComponentClass<T>>, props?: Partial<P> & ClassAttributes<T>, ...children: ReactNode[]): ReactElement<P, ComponentClass<T>>
 export function cloneStyledElement<P>(element: ReactElement<P>, props?: Partial<P> & Attributes, ...children: ReactNode[]): ReactElement<P>
 export function cloneStyledElement<P, T extends Component<P, ComponentState> = never>(
-  element: ReactElement<P, React.FunctionComponent<P>> | ReactElement<P, React.ComponentClass<T>> | ReactElement<P>,
+  element: ReactElement<P, FunctionComponent<P>> | ReactElement<P, ComponentClass<T>> | ReactElement<P>,
   props: Partial<P> & Attributes | Partial<P> & ClassAttributes<T> = {},
   ...children: ReactNode[]
 ) {

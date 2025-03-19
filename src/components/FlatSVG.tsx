@@ -1,7 +1,7 @@
 import { XMLBuilder, XMLParser } from 'fast-xml-parser'
 import { forwardRef, type HTMLAttributes } from 'react'
 
-export type FlatSVGProps = HTMLAttributes<HTMLDivElement> & {
+export type FlatSVGProps = Omit<HTMLAttributes<HTMLElement>, 'role'> & {
   /**
    * Specifies how the SVG should be resized:
    * - `preserve`: Default: the SVG size attributes are unchanged.
@@ -43,13 +43,6 @@ export type FlatSVGProps = HTMLAttributes<HTMLDivElement> & {
    * removed in the SVG root node and all of its child nodes.
    */
   shouldStripStyles?: boolean
-
-  /**
-   * Specifies attribute names to exclude from being stripped if
-   * `shouldStripExtraneousAttributes` is enabled. By default, only `viewBox` is
-   * whitelisted.
-   */
-  whitelistedAttributes?: string[]
 }
 
 /**
@@ -57,7 +50,7 @@ export type FlatSVGProps = HTMLAttributes<HTMLDivElement> & {
  * will attempt to sanitize the markup (i.e. stripping useless attributes)
  * according to the props specified.
  */
-export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, FlatSVGProps>(({
+export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<FlatSVGProps>>(({
   fillMode = 'preserve',
   svg,
   shouldStripClasses = true,

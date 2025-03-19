@@ -348,7 +348,7 @@ export const Collection = /* #__PURE__ */ forwardRef(({
       )}
     </div>
   )
-}) as <T>(props: CollectionProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement
+}) as <T>(props: Readonly<CollectionProps<T> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
 
 function sortIndices(indices: number[]): number[] {
   return indices.sort((a, b) => a - b)

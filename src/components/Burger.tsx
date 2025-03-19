@@ -8,9 +8,6 @@ export type BurgerProps = HTMLAttributes<HTMLDivElement> & {
   isSplit?: boolean
   isTailHidden?: boolean
   numberOfBars?: 2 | 3
-  onActivate?: () => void
-  onDeactivate?: () => void
-  onToggle?: (isActive: boolean) => void
 }
 
 /**
@@ -18,7 +15,7 @@ export type BurgerProps = HTMLAttributes<HTMLDivElement> & {
  *
  * @exports BurgerBar Component for each bar in the burger.
  */
-export const Burger = /* #__PURE__ */ forwardRef<HTMLDivElement, BurgerProps>(({
+export const Burger = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<BurgerProps>>(({
   children,
   className,
   isActive = false,

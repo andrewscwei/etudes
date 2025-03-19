@@ -14,7 +14,7 @@ export type TextFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'aria-d
   onChange?: (value: string) => void
 }
 
-export const TextField = /* #__PURE__ */ forwardRef<HTMLInputElement, TextFieldProps>(({
+export const TextField = /* #__PURE__ */ forwardRef<HTMLInputElement, Readonly<TextFieldProps>>(({
   className,
   emptyValue = '',
   isDisabled = false,

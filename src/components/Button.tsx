@@ -1,8 +1,12 @@
 import clsx from 'clsx'
-import type { HTMLAttributes } from 'react'
-import { Link } from 'react-router'
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from 'react'
+import { Link, type LinkProps } from 'react-router'
 
-export type ButtonProps = HTMLAttributes<HTMLElement> & {
+type ButtonVariantProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-disabled' | 'aria-label' | 'disabled' | 'type'>
+type LinkVariantProps = Omit<LinkProps, 'aria-disabled' | 'aria-label' | 'to'>
+type AnchorVariantProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'aria-disabled' | 'aria-label' | 'rel' | 'target'>
+
+export type ButtonProps = (AnchorVariantProps | LinkVariantProps | ButtonVariantProps) & {
   href?: string
   isDisabled?: boolean
   label?: string
@@ -21,11 +25,11 @@ export function Button({
   to,
   type,
   ...props
-}: ButtonProps) {
+}: Readonly<ButtonProps>) {
   if (href) {
     return (
       <a
-        {...props}
+        {...props as AnchorVariantProps}
         aria-disabled={isDisabled}
         aria-label={label}
         className={clsx(className, { disabled: isDisabled })}
@@ -40,7 +44,7 @@ export function Button({
   else if (to) {
     return (
       <Link
-        {...props}
+        {...props as LinkVariantProps}
         aria-disabled={isDisabled}
         aria-label={label}
         className={clsx(className, { disabled: isDisabled })}
@@ -53,7 +57,7 @@ export function Button({
   else {
     return (
       <button
-        {...props}
+        {...props as ButtonVariantProps}
         aria-disabled={isDisabled}
         aria-label={label}
         className={className}

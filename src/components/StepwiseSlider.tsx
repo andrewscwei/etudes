@@ -6,7 +6,7 @@ import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styl
 
 type Orientation = 'horizontal' | 'vertical'
 
-export type StepwiseSliderProps = HTMLAttributes<HTMLDivElement> & {
+export type StepwiseSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'role'> & {
   /**
    * By default the position is a value from 0 - 1, 0 being the start of the
    * slider and 1 being the end. Switching on this flag inverts this behavior,
@@ -124,7 +124,7 @@ export type StepwiseSliderProps = HTMLAttributes<HTMLDivElement> & {
  * @exports StepwiseSliderTrack The component for the slide track on either side
  *                                of the knob.
  */
-export const StepwiseSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, StepwiseSliderProps>(({
+export const StepwiseSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepwiseSliderProps>>(({
   children,
   className,
   index: externalIndex = 0,

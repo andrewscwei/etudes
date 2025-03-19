@@ -12,7 +12,7 @@ export type CoverImageProps = Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'
   aspectRatio?: number
 }
 
-export const CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, CoverImageProps>(({
+export const CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverImageProps>>(({
   children,
   style,
   alt,
@@ -51,7 +51,11 @@ export const CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, CoverImageP
   })
 
   return (
-    <div {...props} ref={rootRef} style={styles(style, FIXED_STYLES.root)}>
+    <div
+      {...props}
+      ref={rootRef}
+      style={styles(style, FIXED_STYLES.root)}
+    >
       <Image
         alt={alt}
         sizes={sizes}

@@ -1,7 +1,7 @@
 import clsx from 'clsx'
-import { forwardRef, type HTMLAttributes } from 'react'
+import { forwardRef, type ButtonHTMLAttributes } from 'react'
 
-export type SelectableButtonProps = HTMLAttributes<HTMLButtonElement> & {
+export type SelectableButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-disabled' | 'aria-label' | 'aria-selected' | 'disabled' | 'onClick' | 'onSelect' | 'onToggle'> & {
   isDeselectable?: boolean
   isDisabled?: boolean
   isSelected?: boolean
@@ -11,7 +11,7 @@ export type SelectableButtonProps = HTMLAttributes<HTMLButtonElement> & {
   onToggle?: (isSelected: boolean) => void
 }
 
-export const SelectableButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, SelectableButtonProps>(({
+export const SelectableButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readonly<SelectableButtonProps>>(({
   children,
   className,
   isDeselectable = false,

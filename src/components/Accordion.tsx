@@ -411,7 +411,11 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
   }, [JSON.stringify(selection)])
 
   return (
-    <div {...props} ref={ref} style={styles(style, fixedStyles.root)}>
+    <div
+      {...props}
+      ref={ref}
+      style={styles(style, fixedStyles.root)}
+    >
       <Each in={sections}>
         {(section, sectionIndex) => {
           const { collectionPadding = 0, items, itemLength = 50, itemPadding = 0, isSelectionTogglable, layout = 'list', maxVisible = -1, numSegments = 1 } = section
@@ -519,7 +523,7 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
       </Each>
     </div>
   )
-}) as <I, S extends AccordionSection<I> = AccordionSection<I>>(props: AccordionProps<I, S> & { ref?: Ref<HTMLDivElement> }) => ReactElement
+}) as <I, S extends AccordionSection<I> = AccordionSection<I>>(props: Readonly<AccordionProps<I, S> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
 
 export const AccordionHeader = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & DropdownToggleProps) => (
   <button {...props}>{children}</button>
