@@ -1,11 +1,11 @@
 import clsx from 'clsx'
 import { Each, MasonryGrid, type MasonryGridOrientation } from 'etudes'
-import { type HTMLAttributes } from 'react'
+import { type PropsWithChildren } from 'react'
 import { Frame } from '../components/Frame.js'
 
-const GridItem = ({ children, className, ...props }: HTMLAttributes<HTMLButtonElement>) => {
+const GridItem = ({ children, className, onClick }: PropsWithChildren<{ className?: string; onClick: () => void }>) => {
   return (
-    <button {...props} className={clsx(className, 'ia border-dark flex items-center justify-center border text-base')}>
+    <button className={clsx(className, 'ia border-dark flex items-center justify-center border text-base')} onClick={onClick}>
       {children}
     </button>
   )

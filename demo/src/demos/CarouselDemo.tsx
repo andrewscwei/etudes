@@ -1,9 +1,9 @@
 import clsx from 'clsx'
 import { Carousel } from 'etudes'
-import { useState, type HTMLAttributes } from 'react'
+import { useState } from 'react'
 import { Frame } from '../components/Frame.js'
 
-function Item({ className, label, exposure, ...props }: HTMLAttributes<HTMLDivElement> & { exposure?: number; label: string }) {
+function Item({ className, label, exposure, ...props }: { className?: string; exposure?: number; label: string }) {
   return (
     <div {...props} className={clsx(className, 'border-dark flex flex-col items-center justify-center border text-base')}>
       <span>{label}</span>
