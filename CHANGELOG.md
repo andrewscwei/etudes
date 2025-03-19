@@ -1,3 +1,18 @@
+# [9.0.0](https://github.com/andrewscwei/etudes/compare/v8.4.1...v9.0.0) (2025-03-19)
+
+
+### Features
+
+* Add ability to strip style attributes in FlatSVG ([9e2bc00](https://github.com/andrewscwei/etudes/commit/9e2bc00b2f7c089af8fbffc03670c62d462a58e7))
+* Migrate TailwindCSS config file to CSS ([96dac7e](https://github.com/andrewscwei/etudes/commit/96dac7e124a7d470617adc954e6ea8e753466ffc))
+* Use natural names for TextField properties ([b3557ed](https://github.com/andrewscwei/etudes/commit/b3557ed3491db7e26cc75c4edd68e50d853a3d0e))
+
+
+### BREAKING CHANGES
+
+* TextField API changes
+* Removed shouldStripExtraneousAttributes from FlatSVG
+
 ## [8.4.1](https://github.com/andrewscwei/etudes/compare/v8.4.0...v8.4.1) (2025-03-13)
 
 
