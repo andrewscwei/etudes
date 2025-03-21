@@ -1,3 +1,15 @@
+# [10.0.0](https://github.com/andrewscwei/etudes/compare/v9.0.0...v10.0.0) (2025-03-21)
+
+
+### Features
+
+* **Button:** Add `action` prop to Button ([4465705](https://github.com/andrewscwei/etudes/commit/4465705c31bdf61946ae82c8c96d57d43f06b808))
+
+
+### BREAKING CHANGES
+
+* **Button:** `to`, `href` and `onClick` props are deprecated in Button
+
 # [9.0.0](https://github.com/andrewscwei/etudes/compare/v8.4.1...v9.0.0) (2025-03-19)
 
 
