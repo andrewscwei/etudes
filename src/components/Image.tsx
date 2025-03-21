@@ -148,6 +148,7 @@ export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<Image
       {...props}
       ref={ref}
       alt={alt}
+      className='asdf'
       loading={loadingMode === 'lazy' ? 'lazy' : 'eager'}
       sizes={sizesValue}
       src={fallbackSrc}

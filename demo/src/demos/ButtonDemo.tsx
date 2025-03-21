@@ -6,9 +6,9 @@ export function ButtonDemo() {
     <Frame title='Button'>
       {(_, toast) => (
         <Button
+          action={() => toast(`<${Date.now()}>Click`)}
           className='ia border-dark flex items-center justify-center border px-4 py-1 text-base'
           label='Button'
-          onClick={t => toast(`<${Date.now()}>Click`)}
         />
       )}
     </Frame>

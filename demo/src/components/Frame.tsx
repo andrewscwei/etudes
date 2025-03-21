@@ -46,11 +46,11 @@ export function Frame({
         <h2 className='text-sm'>{title}</h2>
         <Conditional if={options.length > 0 || !!onReset}>
           <Button
-            className='ia text-sm'
-            onClick={() => {
+            action={() => {
               setSelectedOptions(options.map(o => o[0]))
               onReset?.()
             }}
+            className='ia text-sm'
           >
             Reset
           </Button>
