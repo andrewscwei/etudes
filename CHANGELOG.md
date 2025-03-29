@@ -1,3 +1,10 @@
+## [10.0.1](https://github.com/andrewscwei/etudes/compare/v10.0.0...v10.0.1) (2025-03-29)
+
+
+### Bug Fixes
+
+* Fix Image ([1a2ace1](https://github.com/andrewscwei/etudes/commit/1a2ace1fac700ea0b06a71835cdeda02139b8419))
+
 # [10.0.0](https://github.com/andrewscwei/etudes/compare/v9.0.0...v10.0.0) (2025-03-21)
 
 
