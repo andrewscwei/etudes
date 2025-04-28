@@ -1,3 +1,11 @@
+# [10.2.0](https://github.com/andrewscwei/etudes/compare/v10.1.0...v10.2.0) (2025-04-28)
+
+
+### Features
+
+* Add option to set default param for useSearchParamState ([6169d34](https://github.com/andrewscwei/etudes/commit/6169d3425df54f7988c2de1cbec4eaae7a655837))
+* Implement useDropZone ([de9ec71](https://github.com/andrewscwei/etudes/commit/de9ec716d9f59f3aee75be10e3dd7076daabf3a5))
+
 # [10.1.0](https://github.com/andrewscwei/etudes/compare/v10.0.1...v10.1.0) (2025-04-28)
 
 
