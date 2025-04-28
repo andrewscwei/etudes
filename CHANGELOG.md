@@ -1,3 +1,18 @@
+# [10.1.0](https://github.com/andrewscwei/etudes/compare/v10.0.1...v10.1.0) (2025-04-28)
+
+
+### Bug Fixes
+
+* Don't strip fill-opacity and stroke-opacity in FlatSVG ([235ce0c](https://github.com/andrewscwei/etudes/commit/235ce0c15a2587bd904c2c3f70e633c350516192))
+* Fix FOUC for Accordion ([7dad572](https://github.com/andrewscwei/etudes/commit/7dad57265ca00869080e3adb1c1aa1bc9cf5f33f))
+
+
+### Features
+
+* Add createShallowObjectKey ([64d9132](https://github.com/andrewscwei/etudes/commit/64d9132e22125b654e2691442f950a3565f1bb50))
+* Handle NavLink in Button ([e0b7c15](https://github.com/andrewscwei/etudes/commit/e0b7c153b4e10c0b158201b0bbc41b9107444257))
+* Implement createKey and createKeyDeep ([a0f91d3](https://github.com/andrewscwei/etudes/commit/a0f91d375c02c0237e30b7a9524a62584cc3f2a6))
+
 ## [10.0.1](https://github.com/andrewscwei/etudes/compare/v10.0.0...v10.0.1) (2025-03-29)
 
 
