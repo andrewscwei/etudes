@@ -164,6 +164,10 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
 
     viewport.addEventListener('scroll', scrollHandler)
 
+    if (tracksItemExposure) {
+      setExposures(getItemExposures(viewportRef, orientation))
+    }
+
     if (!isIndexModifiedFromManualScrolling) {
       prevIndexRef.current = index
 
