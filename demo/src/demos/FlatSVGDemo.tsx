@@ -14,7 +14,7 @@ export function FlatSVGDemo() {
       ]}
       title='FlatSVG'
     >
-      {({ fillMode, shouldStripClasses, shouldStripPositions, shouldStripIds, shouldStripStyles }, toast) => (
+      {({ fillMode, shouldStripClasses, shouldStripPositions, shouldStripIds, shouldStripStyles }, _) => (
         <FlatSVG
           className='svg:fill-dark size-10'
           fillMode={fillMode as any}

@@ -12,7 +12,7 @@ const GridItem = ({ children, className, onClick }: PropsWithChildren<{ classNam
 }
 
 export function MasonryGridDemo() {
-  const items = [...new Array(100)].map((v, i) => ({
+  const items = [...new Array(100)].map(() => ({
     h: Math.floor(Math.random() * 6) + 1,
     b: Math.floor(Math.random() * 1) + 1,
   }))

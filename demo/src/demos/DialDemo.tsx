@@ -13,7 +13,7 @@ export function DialDemo() {
       ]}
       title='Dial'
     >
-      {({ angle, knobLength, knobThickness, trackGap, trackThickness }, toast) => (
+      {({ angle, knobLength, knobThickness, trackGap, trackThickness }, _) => (
         <Dial
           angle={Number(angle)}
           className='relative'

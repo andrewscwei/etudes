@@ -283,7 +283,14 @@ export default tseslint.config(
       'no-restricted-imports': 'off',
       '@typescript-eslint/no-restricted-imports': 'error',
       'no-shadow': 'off',
-      '@typescript-eslint/no-shadow': 'error',
+      '@typescript-eslint/no-shadow': [
+        'error',
+        {
+          allow: [
+            '_',
+          ],
+        },
+      ],
       '@typescript-eslint/no-this-alias': 'error',
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': [

@@ -10,7 +10,7 @@ const CollectionItem = ({ className, index, isSelected, item, onCustomEvent, ...
 )
 
 export function CollectionDemo() {
-  const items = [...new Array(100)].map((v, i) => `${i + 1}`)
+  const items = [...new Array(100)].map((_, i) => `${i + 1}`)
   const [collectionSelection, setCollectionSelection] = useState<CollectionSelection>([])
 
   return (

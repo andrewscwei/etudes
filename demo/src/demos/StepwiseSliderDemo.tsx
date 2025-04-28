@@ -29,7 +29,7 @@ export function StepwiseSliderDemo() {
           isTrackInteractive={isTrackInteractive === 'true'}
           knobHeight={28}
           knobWidth={40}
-          labelProvider={(pos, idx) => `${idx}`}
+          labelProvider={(_, idx) => `${idx}`}
           onlyDispatchesOnDragEnd={onlyDispatchesOnDragEnd === 'true'}
           orientation={orientation as any}
           trackPadding={0}
