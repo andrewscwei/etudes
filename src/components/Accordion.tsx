@@ -3,7 +3,7 @@ import isDeepEqual from 'fast-deep-equal/react'
 import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref, type RefObject } from 'react'
 import { useSize } from '../hooks/useSize.js'
 import { Each } from '../operators/index.js'
-import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
+import { asComponentDict, asStyleDict, cloneStyledElement, createKey, styles } from '../utils/index.js'
 import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection.js'
 import type { DropdownToggleProps } from './Dropdown.js'
 
@@ -408,7 +408,7 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
     if (prevSelection === undefined) return
 
     handleSelectionChange(prevSelection, selection)
-  }, [JSON.stringify(selection)])
+  }, [createKey(selection)])
 
   return (
     <div
