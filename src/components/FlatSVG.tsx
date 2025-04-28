@@ -73,7 +73,7 @@ export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<FlatS
       ignorePiTags: true,
       removeNSPrefix: true,
       trimValues: true,
-      updateTag: (tagName, jPath, attrs) => {
+      updateTag: (tagName, _, attrs) => {
         if (shouldStripStyles && tagName.toLowerCase() === 'style') return false
 
         const attrNames = Object.keys(attrs)
