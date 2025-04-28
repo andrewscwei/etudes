@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
 import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref, type RefObject } from 'react'
+import { useMounted } from '../hooks/useMounted.js'
 import { useSize } from '../hooks/useSize.js'
 import { Each } from '../operators/index.js'
 import { asComponentDict, asStyleDict, cloneStyledElement, createKey, styles } from '../utils/index.js'
@@ -388,6 +389,7 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
     onSelectionChange?.(newValue)
   }
 
+  const isMounted = useMounted()
   const selection = sanitizeSelection(externalSelection ?? {})
   const expandedSectionIndices = sanitizeExpandedSectionIndices(externalExpandedSectionIndices ?? [])
   const fixedStyles = getFixedStyles({ orientation })
@@ -411,11 +413,7 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
   }, [createKey(selection)])
 
   return (
-    <div
-      {...props}
-      ref={ref}
-      style={styles(style, fixedStyles.root)}
-    >
+    <div {...props} ref={ref} style={styles(style, fixedStyles.root)}>
       <Each in={sections}>
         {(section, sectionIndex) => {
           const { collectionPadding = 0, items, itemLength = 50, itemPadding = 0, isSelectionTogglable, layout = 'list', maxVisible = -1, numSegments = 1 } = section
@@ -437,6 +435,8 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
                 ...headerSize.width > 0 ? {
                   width: isCollapsed ? `${headerSize.width}px` : `${maxLength + headerSize.width + collectionPadding}px`,
                 } : {},
+              }, {
+                visibility: isMounted ? 'visible' : 'hidden',
               })}
             >
               <div
@@ -498,23 +498,11 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
                   orientation={orientation}
                   selection={selection[sectionIndex] ?? []}
                   selectionMode={selectionMode}
-                  style={styles(orientation === 'vertical' ? {
-                    width: '100%',
-                  } : {
-                    height: '100%',
-                  })}
-                  onActivateAt={itemIndex => {
-                    onActivateAt?.(itemIndex, sectionIndex)
-                  }}
-                  onCustomEvent={(itemIndex, name, info) => {
-                    onItemCustomEvent?.(itemIndex, sectionIndex, name, info)
-                  }}
-                  onDeselectAt={itemIndex => {
-                    handleDeselectAt?.(itemIndex, sectionIndex)
-                  }}
-                  onSelectAt={itemIndex => {
-                    handleSelectAt?.(itemIndex, sectionIndex)
-                  }}
+                  style={styles(orientation === 'vertical' ? { width: '100%' } : { height: '100%' })}
+                  onActivateAt={itemIndex => onActivateAt?.(itemIndex, sectionIndex)}
+                  onCustomEvent={(itemIndex, name, info) => onItemCustomEvent?.(itemIndex, sectionIndex, name, info)}
+                  onDeselectAt={itemIndex => handleDeselectAt?.(itemIndex, sectionIndex)}
+                  onSelectAt={itemIndex => handleSelectAt?.(itemIndex, sectionIndex)}
                 />
               </div>
             </div>
