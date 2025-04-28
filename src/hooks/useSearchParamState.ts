@@ -22,6 +22,12 @@ export type Options<T> = {
    * @returns The equivalent search param value.
    */
   mapStateToSearchParam?: (state: T) => string | undefined
+
+  /**
+   * Whether to populate the state with the default value when the search param
+   * is not present.
+   */
+  shouldPopulateDefaultState?: boolean
 }
 
 /**
@@ -35,7 +41,15 @@ export type Options<T> = {
  * @returns A tuple consisting of a stateful value representing the current
  *          value of the mapped state and a function that updates it.
  */
-export function useSearchParamState<T>(param: string, defaultValue: T, { mapSearchParamToState, mapStateToSearchParam }: Options<T> = {}): [T, Dispatch<SetStateAction<T>>] {
+export function useSearchParamState<T>(
+  param: string,
+  defaultValue: T,
+  {
+    mapSearchParamToState,
+    mapStateToSearchParam,
+    shouldPopulateDefaultState = false,
+  }: Options<T> = {},
+): [T, Dispatch<SetStateAction<T>>] {
   const defaultMapSearchParamToState = (value: string | undefined, fallback: T): T => {
     if (mapSearchParamToState) {
       return mapSearchParamToState(value)
@@ -52,7 +66,7 @@ export function useSearchParamState<T>(param: string, defaultValue: T, { mapSear
     if (mapStateToSearchParam) {
       return mapStateToSearchParam(state)
     }
-    else if (state === defaultValue) {
+    else if (!shouldPopulateDefaultState && state === defaultValue) {
       return undefined
     }
     else {
