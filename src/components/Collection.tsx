@@ -247,7 +247,7 @@ export const Collection = /* #__PURE__ */ forwardRef(({
         break
       }
       case 'single': {
-        transform = val => [index]
+        transform = _ => [index]
         break
       }
       default:

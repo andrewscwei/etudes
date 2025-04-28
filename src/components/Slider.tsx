@@ -86,7 +86,7 @@ export type SliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-orientation
 /**
  * A slider component supporting both horizontal and vertical orientations whose
  * sliding position (a decimal between 0.0 and 1.0, inclusive) can be two-way
- * binded. The component consists of three customizable elements: a draggable
+ * bound. The component consists of three customizable elements: a draggable
  * knob, a label on the knob, and a scroll track on either side of the knob.
  * While the width and height of the slider is inferred from its CSS rules, the
  * width and height of the knob are set via props (`knobWidth` and `knobHeight`,
@@ -209,7 +209,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
             width: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
           }),
           onClick: trackClickHandler,
-        }, <div style={fixedStyles.trackHitbox}/>)}
+        }, <div style={fixedStyles.trackHitBox}/>)}
         {cloneStyledElement(components.track ?? <SliderTrack/>, {
           className: clsx('end', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
@@ -220,7 +220,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
             width: `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
           }),
           onClick: trackClickHandler,
-        }, <div style={fixedStyles.trackHitbox}/>)}
+        }, <div style={fixedStyles.trackHitBox}/>)}
         <button ref={knobContainerRef} style={fixedStyles.knobContainer}>
           {cloneStyledElement(components.knob ?? <SliderKnob/>, {
             className: clsx(fixedClassNames.knob),
@@ -324,7 +324,7 @@ function getFixedStyles({ orientation = 'vertical', isDragging = false, naturalP
         top: '0',
       },
     },
-    trackHitbox: {
+    trackHitBox: {
       height: '100%',
       minHeight: '20px',
       minWidth: '20px',

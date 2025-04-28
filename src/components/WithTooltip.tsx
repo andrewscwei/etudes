@@ -139,13 +139,13 @@ function computeMaxSize(element: HTMLElement) {
 
 function computeAlignment(element: HTMLElement, threshold: number) {
   const vrect = Rect.fromViewport()
-  const isect = Rect.intersecting(element)
+  const irect = Rect.intersecting(element)
 
-  if (isect) {
-    const leftBound = isect.left - vrect.left < threshold
-    const rightBound = vrect.right - isect.right < threshold
-    const topBound = isect.top - vrect.top < threshold
-    const bottomBound = vrect.bottom - isect.bottom < threshold
+  if (irect) {
+    const leftBound = irect.left - vrect.left < threshold
+    const rightBound = vrect.right - irect.right < threshold
+    const topBound = irect.top - vrect.top < threshold
+    const bottomBound = vrect.bottom - irect.bottom < threshold
 
     if (leftBound && topBound) return 'br'
     if (leftBound && bottomBound) return 'tr'
@@ -210,7 +210,7 @@ function makeDialogStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialog
   }
 }
 
-function makeArrowStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }: StyleOptions): CSSProperties {
+function makeArrowStyle({ alignment, arrowSize, fullDialogWidth, maxDialogWidth, targetWidth }: StyleOptions): CSSProperties {
   const dialogWidth = Math.min(fullDialogWidth, maxDialogWidth)
   const shouldRealign = targetWidth > dialogWidth
 

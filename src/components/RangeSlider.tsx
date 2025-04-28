@@ -91,7 +91,7 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
     },
   }, [maxValue, orientation, bodyRect.size.width, bodyRect.size.height, range[0]])
 
-  const breakpoints = [minValue, ...[...Array(steps)].map((v, i) => minValue + (i + 1) * (maxValue - minValue) / (1 + steps)), maxValue]
+  const breakpoints = [minValue, ...[...Array(steps)].map((_, i) => minValue + (i + 1) * (maxValue - minValue) / (1 + steps)), maxValue]
   const [start, end] = range.map(getDisplacementByValue)
   const highlightLength = end - start
 
@@ -169,7 +169,7 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
             marginTop: `${start - knobHeight / 2}px`,
             marginLeft: `${-knobWidth / 2 + bodyRect.width / 2}px`,
           }),
-        }, <div style={fixedStyles.knobHitbox}/>, components.label && cloneStyledElement(components.label, {
+        }, <div style={fixedStyles.knobHitBox}/>, components.label && cloneStyledElement(components.label, {
           className: clsx({
             dragging: isDraggingStartKnob || isDraggingEndKnob,
             releasing: isReleasingStartKnob || isReleasingEndKnob,
@@ -196,7 +196,7 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
             marginTop: `${end - knobHeight / 2}px`,
             marginLeft: `${-knobWidth / 2 + bodyRect.width / 2}px`,
           }),
-        }, <div style={fixedStyles.knobHitbox}/>, components.label && cloneStyledElement(components.label, {
+        }, <div style={fixedStyles.knobHitBox}/>, components.label && cloneStyledElement(components.label, {
           className: clsx({
             dragging: isDraggingEndKnob,
             releasing: isReleasingEndKnob,
@@ -263,7 +263,7 @@ function getFixedStyles({ orientation = 'horizontal', knobWidth = 0, knobHeight 
       touchAction: 'none',
       zIndex: '1',
     },
-    knobHitbox: {
+    knobHitBox: {
       background: 'transparent',
       height: `calc(100% + ${knobPadding * 2}px)`,
       left: `-${knobPadding}px`,

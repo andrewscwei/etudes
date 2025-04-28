@@ -303,7 +303,7 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
       transform = val => val.filter(t => t !== sectionIndex)
     }
     else if (autoCollapseSections) {
-      transform = val => [sectionIndex]
+      transform = _ => [sectionIndex]
     }
     else {
       transform = val => [...val.filter(t => t !== sectionIndex), sectionIndex]
@@ -325,7 +325,7 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
         })
         break
       case 'single':
-        transform = val => ({
+        transform = _ => ({
           [sectionIndex]: [itemIndex],
         })
         break

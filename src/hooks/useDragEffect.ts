@@ -40,7 +40,7 @@ type Options = {
 }
 
 /**
- * Hook for adding effectful dragging interaction to an element.
+ * Hook for adding dragging interaction to an element.
  *
  * @param targetRef The reference to the target element to add drag interaction
  *                  to.

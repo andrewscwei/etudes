@@ -39,7 +39,7 @@ export type FlatSVGProps = Omit<HTMLAttributes<HTMLElement>, 'role'> & {
   shouldStripPositions?: boolean
 
   /**
-   * Specifies whether the 'style' atribute and any <style> nodes should be
+   * Specifies whether the 'style' attribute and any <style> nodes should be
    * removed in the SVG root node and all of its child nodes.
    */
   shouldStripStyles?: boolean

@@ -96,7 +96,7 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video
     onSizeChange?.(size)
   }, [size])
 
-  const fullscreenChangeHandler = (event: Event) => {
+  const fullscreenChangeHandler = (_: Event) => {
     const isFullscreen: boolean | undefined = (document as any).fullScreen || (document as any).mozFullScreen || (document as any).webkitIsFullScreen
     if (isFullscreen === undefined) return
     onFullscreenChange?.(isFullscreen)
@@ -112,15 +112,15 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video
     onCanPlay?.()
   }
 
-  const playHandler: ReactEventHandler<HTMLVideoElement> = event => {
+  const playHandler: ReactEventHandler<HTMLVideoElement> = _ => {
     onPlay?.()
   }
 
-  const pauseHandler: ReactEventHandler<HTMLVideoElement> = event => {
+  const pauseHandler: ReactEventHandler<HTMLVideoElement> = _ => {
     onPause?.()
   }
 
-  const endHandler: ReactEventHandler<HTMLVideoElement> = event => {
+  const endHandler: ReactEventHandler<HTMLVideoElement> = _ => {
     onEnd?.()
   }
 

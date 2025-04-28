@@ -110,7 +110,7 @@ export type StepwiseSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-val
  * A "stepwise" slider component supporting both horizontal and vertical
  * orientations that automatically snaps to a set of predefined points on the
  * slider when dragged. These points are referred to as "steps", indexed by an
- * integer referred to as "index". This index can be two-way binded. The
+ * integer referred to as "index". This index can be two-way bound. The
  * component consists of four customizable elements: a draggable knob, a label
  * on the knob, a scroll track before the knob and a scroll track after the
  * knob. While the width and height of the slider is inferred from its CSS
@@ -260,7 +260,7 @@ export const StepwiseSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonl
             width: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
           }),
           onClick: trackClickHandler,
-        }, <div style={fixedStyles.trackHitbox}/>)}
+        }, <div style={fixedStyles.trackHitBox}/>)}
         {cloneStyledElement(components.track ?? <StepwiseSliderTrack/>, {
           className: clsx('end', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
@@ -271,7 +271,7 @@ export const StepwiseSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonl
             width: `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
           }),
           onClick: trackClickHandler,
-        }, <div style={fixedStyles.trackHitbox}/>)}
+        }, <div style={fixedStyles.trackHitBox}/>)}
         <button ref={knobContainerRef} style={fixedStyles.knobContainer}>
           {cloneStyledElement(components.knob ?? <StepwiseSliderKnob/>, {
             className: clsx(fixedClassNames.knob),
@@ -312,7 +312,7 @@ function generateSteps(length: number): readonly number[] {
 
   const interval = 1 / (length - 1)
 
-  return Array(length).fill(null).map((v, i) => {
+  return Array(length).fill(null).map((_, i) => {
     const position = interval * i
 
     return position
@@ -440,7 +440,7 @@ function getFixedStyles({ orientation = 'vertical', naturalPosition = 0, isDragg
         top: '0',
       },
     },
-    trackHitbox: {
+    trackHitBox: {
       height: '100%',
       minHeight: '20px',
       minWidth: '20px',

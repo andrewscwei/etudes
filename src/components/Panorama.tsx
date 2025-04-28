@@ -31,7 +31,7 @@ export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow'
   zeroAnchor?: number
 
   /**
-   * Handler invoked when the positionchanges. This can either be invoked from
+   * Handler invoked when the position changes. This can either be invoked from
    * the `angle` prop being changed or from the image being dragged.
    *
    * @param position The current position.
@@ -42,7 +42,7 @@ export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow'
   /**
    * Handler invoked when the angle changes. This can either be invoked from the
    * `angle` prop being changed or from the image being dragged. When `angle` is
-   * being double-binded, ensure that the value is only being set by this
+   * being double-bound, ensure that the value is only being set by this
    * handler when `isDragging` is `true` to avoid potential update overflow.
    *
    * @param angle The current angle.
@@ -79,7 +79,7 @@ export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow'
    * Handler invoked when the image size changes. This is the actual size of the
    * loaded image. When no images are loaded yet, the size is `undefined`.
    *
-   * @param size The actual size of the loaded iamge. If no images are loaded
+   * @param size The actual size of the loaded image. If no images are loaded
    *               yet, the size is `undefined`.
    */
   onImageSizeChange?: (size?: Size) => void
@@ -103,7 +103,7 @@ export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
   onImageSizeChange,
   ...props
 }, ref) => {
-  const mapDragPositionToDisplacement = (currentPosition: number, dx: number, dy: number): number => {
+  const mapDragPositionToDisplacement = (currentPosition: number, dx: number, _: number): number => {
     const newDisplacement = currentPosition - dx * speed
 
     return newDisplacement
@@ -188,14 +188,14 @@ function getFixedStyles({ src = '', displacement = NaN }) {
 
 function getFilledImageSize(originalSize: Size, sizeToFill: Size): Size {
   const { width: originalWidth, height: originalHeight } = originalSize
-  const { height: filledHeignt } = sizeToFill
+  const { height: filledHeight } = sizeToFill
 
   if (originalHeight <= 0) return Size.make()
 
-  const aspectRatio = filledHeignt / originalHeight
+  const aspectRatio = filledHeight / originalHeight
   const filledWidth = aspectRatio * originalWidth
 
-  return new Size([filledWidth, filledHeignt])
+  return new Size([filledWidth, filledHeight])
 }
 
 function getDisplacementFromAngle(angle: number, originalImageSize: Size, componentSize: Size, zeroAnchor: number): number {

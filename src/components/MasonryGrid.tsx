@@ -30,7 +30,7 @@ const BASE_MODIFIER_CLASS_PREFIX = 'base-'
  * child element is automatically set. Additionally, the *number of sections*
  * corresponds to the maximum the number of child elements present in the
  * direction that is parallel to the orientation of the grid. Hence, in a
- * vertically oriented grid, *number of secitons* refers to the *number of
+ * vertically oriented grid, *number of sections* refers to the *number of
  * rows*, whereas in a horizontally oriented grid, *number of sections* refers
  * to the *number of columns*.
  */
@@ -64,7 +64,7 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
     const nodes = rootNode.children
     const numSections = sections
 
-    if (numSections <= 0) throw new Error('You must specifiy a minimum of 1 section(s) (a.k.a. row(s) for horizontal orientation, column(s) for vertical orientation) for a MasonryGrid instance')
+    if (numSections <= 0) throw new Error('You must specify a minimum of 1 section(s) (a.k.a. row(s) for horizontal orientation, column(s) for vertical orientation) for a MasonryGrid instance')
 
     if (orientation === 'vertical') {
       const sectionHeights: number[] = [...new Array(numSections)].map(() => 0)
@@ -229,7 +229,7 @@ function getFixedStyles({ orientation = 'horizontal', minHeight = NaN, minWidth 
  * @param base The base value of the item to be inserted into the grid, and to
  *             be used to evaluate the next available section.
  *
- * @returns An array consiting of the computed section index and its to-be
+ * @returns An array consisting of the computed section index and its to-be
  *          length if a new item were to be placed in it.
  */
 function computeNextAvailableSectionAndLengthByBase(currentSectionLengths: number[], base: number): [number, number] {
@@ -283,7 +283,7 @@ function computeMaxLength(currentSectionLengths: number[], base?: number): numbe
     arr = arr.slice(0, Math.max(1, Math.min(base, currentSectionLengths.length)))
   }
 
-  return arr.reduce((out, curr, i) => curr > out ? curr : out, 0)
+  return arr.reduce((out, curr, _) => curr > out ? curr : out, 0)
 }
 
 /**

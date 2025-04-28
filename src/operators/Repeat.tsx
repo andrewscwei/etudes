@@ -17,7 +17,7 @@ export function Repeat({
 }: Readonly<RepeatProps>) {
   return (
     <>
-      {[...Array(count)].map((v, i) => (
+      {[...Array(count)].map((_, i) => (
         <Fragment key={`element-${i}`}>
           {render?.(i) ?? (typeof children === 'function' ? children(i) : children)}
         </Fragment>
