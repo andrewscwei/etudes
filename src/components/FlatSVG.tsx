@@ -62,7 +62,7 @@ export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<FlatS
   const attributeNamePrefix = '@_'
   const idAttributes = ['id'].map(t => `${attributeNamePrefix}${t}`)
   const classAttributes = ['class'].map(t => `${attributeNamePrefix}${t}`)
-  const styleAttributes = ['fill', 'fill-opacity', 'stroke', 'stroke-opacity', 'style'].map(t => `${attributeNamePrefix}${t}`)
+  const styleAttributes = ['fill', 'stroke', 'style'].map(t => `${attributeNamePrefix}${t}`)
   const positionAttributes = ['x', 'y'].map(t => `${attributeNamePrefix}${t}`)
 
   const sanitizedMarkup = () => {
