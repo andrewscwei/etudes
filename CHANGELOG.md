@@ -1,3 +1,10 @@
+## [10.2.1](https://github.com/andrewscwei/etudes/compare/v10.2.0...v10.2.1) (2025-04-28)
+
+
+### Bug Fixes
+
+* Fix incorrect exposure in Carousel when orientation changes ([42e4afe](https://github.com/andrewscwei/etudes/commit/42e4afe825310bfba5b9c89a629b6145c061191f))
+
 # [10.2.0](https://github.com/andrewscwei/etudes/compare/v10.1.0...v10.2.0) (2025-04-28)
 
 
