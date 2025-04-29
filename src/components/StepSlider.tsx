@@ -6,7 +6,7 @@ import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styl
 
 type Orientation = 'horizontal' | 'vertical'
 
-export type StepwiseSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'role'> & {
+export type StepSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'role'> & {
   /**
    * By default the position is a value from 0 - 1, 0 being the start of the
    * slider and 1 being the end. Switching on this flag inverts this behavior,
@@ -107,7 +107,7 @@ export type StepwiseSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-val
 }
 
 /**
- * A "stepwise" slider component supporting both horizontal and vertical
+ * A "step" slider component supporting both horizontal and vertical
  * orientations that automatically snaps to a set of predefined points on the
  * slider when dragged. These points are referred to as "steps", indexed by an
  * integer referred to as "index". This index can be two-way bound. The
@@ -119,12 +119,12 @@ export type StepwiseSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-val
  * the slider. While dragging, the slider still emits a position change event,
  * where the position is a decimal ranging between 0.0 and 1.0, inclusive.
  *
- * @exports StepwiseSliderKnob The component for the knob.
- * @exports StepwiseSliderLabel The component for the label on the knob.
- * @exports StepwiseSliderTrack The component for the slide track on either side
+ * @exports StepSliderKnob The component for the knob.
+ * @exports StepSliderLabel The component for the label on the knob.
+ * @exports StepSliderTrack The component for the slide track on either side
  *                                of the knob.
  */
-export const StepwiseSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepwiseSliderProps>>(({
+export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSliderProps>>(({
   children,
   className,
   index: externalIndex = 0,
@@ -194,9 +194,9 @@ export const StepwiseSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonl
   const isAtEnd = isInverted ? position === 0 : position === 1
   const isAtStart = isInverted ? position === 1 : position === 0
   const components = asComponentDict(children, {
-    knob: StepwiseSliderKnob,
-    label: StepwiseSliderLabel,
-    track: StepwiseSliderTrack,
+    knob: StepSliderKnob,
+    label: StepSliderLabel,
+    track: StepSliderTrack,
   })
 
   const fixedClassNames = getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
@@ -250,7 +250,7 @@ export const StepwiseSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonl
       role='slider'
     >
       <div ref={bodyRef} style={fixedStyles.body}>
-        {cloneStyledElement(components.track ?? <StepwiseSliderTrack/>, {
+        {cloneStyledElement(components.track ?? <StepSliderTrack/>, {
           className: clsx('start', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
             height: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
@@ -261,7 +261,7 @@ export const StepwiseSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonl
           }),
           onClick: trackClickHandler,
         }, <div style={fixedStyles.trackHitBox}/>)}
-        {cloneStyledElement(components.track ?? <StepwiseSliderTrack/>, {
+        {cloneStyledElement(components.track ?? <StepSliderTrack/>, {
           className: clsx('end', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
             bottom: '0',
@@ -273,10 +273,10 @@ export const StepwiseSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonl
           onClick: trackClickHandler,
         }, <div style={fixedStyles.trackHitBox}/>)}
         <button ref={knobContainerRef} style={fixedStyles.knobContainer}>
-          {cloneStyledElement(components.knob ?? <StepwiseSliderKnob/>, {
+          {cloneStyledElement(components.knob ?? <StepSliderKnob/>, {
             className: clsx(fixedClassNames.knob),
             style: styles(fixedStyles.knob),
-          }, steps && labelProvider && cloneStyledElement(components.label ?? <StepwiseSliderLabel/>, {
+          }, steps && labelProvider && cloneStyledElement(components.label ?? <StepSliderLabel/>, {
             className: clsx(fixedClassNames.label),
             style: styles(fixedStyles.label),
           }, labelProvider(position, getNearestIndexByPosition(position, steps))))}
@@ -286,15 +286,15 @@ export const StepwiseSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonl
   )
 })
 
-export const StepwiseSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+export const StepSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}/>
 )
 
-export const StepwiseSliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+export const StepSliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}/>
 )
 
-export const StepwiseSliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+export const StepSliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}/>
 )
 

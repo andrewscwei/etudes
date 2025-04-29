@@ -20,7 +20,7 @@ import { PanoramaSliderDemo } from './demos/PanoramaSliderDemo.js'
 import { RangeSliderDemo } from './demos/RangeSliderDemo.js'
 import { SelectableButtonDemo } from './demos/SelectableButtonDemo'
 import { SliderDemo } from './demos/SliderDemo.js'
-import { StepwiseSliderDemo } from './demos/StepwiseSliderDemo.js'
+import { StepSliderDemo } from './demos/StepSliderDemo.js'
 import { SwipeContainerDemo } from './demos/SwipeRegionDemo.js'
 import { TextFieldDemo } from './demos/TextFieldDemo.js'
 import { VideoDemo } from './demos/VideoDemo.js'
@@ -53,7 +53,7 @@ export function App() {
         <RangeSliderDemo/>
         <SelectableButtonDemo/>
         <SliderDemo/>
-        <StepwiseSliderDemo/>
+        <StepSliderDemo/>
         <SwipeContainerDemo/>
         <TextFieldDemo/>
         <VideoDemo/>
