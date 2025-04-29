@@ -1,3 +1,24 @@
+# [11.0.0](https://github.com/andrewscwei/etudes/compare/v10.2.1...v11.0.0) (2025-04-29)
+
+
+### Code Refactoring
+
+* Rename StepwiseSlider to StepSlider ([a32381f](https://github.com/andrewscwei/etudes/commit/a32381f467a84b3095af3a7990024fc8b6eb9855))
+* Update hook names ([b122f92](https://github.com/andrewscwei/etudes/commit/b122f92c977518622f275e85b69c63260a43e9b7))
+
+
+### BREAKING CHANGES
+
+* Hook names are changed:
+- `useClickOutsideEffect` -> `useClickOutside`
+- `useDragEffect` -> `useDrag`
+- `useDragValueEffect` -> `useDragValue`
+- `useLoadImageEffect` -> `useImageLoader`
+- `useLoadVideoMetadataEffect` -> `useVideoMetadataLoader`
+- `useResizeEffect` -> `useSizeObserver`
+- `useScrollPositionEffect` -> `usePosition`
+* StepwiseSlider is renamed to StepSlider
+
 ## [10.2.1](https://github.com/andrewscwei/etudes/compare/v10.2.0...v10.2.1) (2025-04-28)
 
 
