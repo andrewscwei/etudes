@@ -62,7 +62,7 @@ type Options<T> = Omit<InteractDraggableOptions, 'onstart' | 'onmove' | 'onend'>
  *
  * @returns The states created for this effect.
  */
-export function useDragValueEffect<T = [number, number]>(targetRef: RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>, {
+export function useDragValue<T = [number, number]>(targetRef: RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>, {
   initialValue,
   transform,
   onDragStart,

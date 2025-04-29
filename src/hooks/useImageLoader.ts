@@ -1,6 +1,6 @@
 import { useEffect, useRef, type DependencyList } from 'react'
 
-export type UseLoadImageEffectParams = {
+export type UseImageLoaderParams = {
   /**
    * `src` attribute of the image.
    */
@@ -17,7 +17,7 @@ export type UseLoadImageEffectParams = {
   sizes?: string
 }
 
-export type UseLoadImageEffectOptions = {
+export type UseImageLoaderOptions = {
   /**
    * Handler invoked when the image starts loading.
    *
@@ -43,11 +43,11 @@ export type UseLoadImageEffectOptions = {
 /**
  * Hook for preloading an image.
  *
- * @param params See {@link UseLoadImageEffectParams}.
- * @param options See {@link UseLoadImageEffectOptions}.
+ * @param params See {@link UseImageLoaderParams}.
+ * @param options See {@link UseImageLoaderOptions}.
  * @param deps Additional dependencies.
  */
-export function useLoadImageEffect({ src, srcSet, sizes }: UseLoadImageEffectParams, { onLoadStart, onLoadComplete, onLoadError }: UseLoadImageEffectOptions = {}, deps: DependencyList = []) {
+export function useImageLoader({ src, srcSet, sizes }: UseImageLoaderParams, { onLoadStart, onLoadComplete, onLoadError }: UseImageLoaderOptions = {}, deps: DependencyList = []) {
   const imageLoadCompleteHandler = (event: Event) => {
     const element = event.currentTarget as HTMLImageElement
 

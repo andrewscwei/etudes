@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Rect, Size } from 'spase'
-import { useResizeEffect } from '../hooks/index.js'
+import { useSizeObserver } from '../hooks/index.js'
 import { asClassNameDict, asStyleDict } from '../utils/index.js'
 
 export type MasonryGridOrientation = 'horizontal' | 'vertical'
@@ -157,7 +157,7 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
     }
   }
 
-  useResizeEffect(bodyRef, {
+  useSizeObserver(bodyRef, {
     onResize: element => {
       const maxSize = Rect.from(element)?.size ?? Size.make()
       const currWidth = getCurrentWidth()

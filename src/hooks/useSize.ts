@@ -1,6 +1,6 @@
 import { useState, type RefObject } from 'react'
 import { Rect, type Size } from 'spase'
-import { useResizeEffect } from './useResizeEffect.js'
+import { useSizeObserver } from './useSizeObserver.js'
 
 /**
  * Hook for monitoring changes in and returning the size of the target element.
@@ -19,7 +19,7 @@ export function useSize(targetRef: RefObject<HTMLElement> | RefObject<HTMLElemen
     setRect(newRect)
   }
 
-  useResizeEffect(targetRef, {
+  useSizeObserver(targetRef, {
     onResize: element => handleResize(element),
   })
 

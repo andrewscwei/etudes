@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type MouseEvent } from 'react'
 import { Rect } from 'spase'
-import { useDragValueEffect } from '../hooks/index.js'
+import { useDragValue } from '../hooks/index.js'
 import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
 
 type Orientation = 'horizontal' | 'vertical'
@@ -181,7 +181,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
   const knobContainerRef = useRef<HTMLButtonElement>(null)
   const [index, setIndex] = useState(externalIndex)
 
-  const { isDragging: [isDragging], isReleasing: [isReleasing], value: [position, setPosition] } = useDragValueEffect(knobContainerRef, {
+  const { isDragging: [isDragging], isReleasing: [isReleasing], value: [position, setPosition] } = useDragValue(knobContainerRef, {
     initialValue: getPositionAt(externalIndex, steps),
     transform: mapDragValueToPosition,
     onDragStart,

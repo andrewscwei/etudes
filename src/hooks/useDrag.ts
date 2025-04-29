@@ -50,7 +50,7 @@ type Options = {
  *
  * @returns The states created for this effect.
  */
-export function useDragEffect(targetRef: RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>, {
+export function useDrag(targetRef: RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>, {
   isEnabled = true,
   updatesCursor = true,
   onDragStart,

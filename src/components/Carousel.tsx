@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useRef, useState, type ComponentType, type ForwardedRef, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactElement, type RefObject } from 'react'
 import { Point, Rect } from 'spase'
-import { useDragEffect, useTimeout } from '../hooks/index.js'
+import { useDrag, useTimeout } from '../hooks/index.js'
 import { Each } from '../operators/index.js'
 import { asStyleDict, styles } from '../utils/index.js'
 
@@ -193,7 +193,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
     }
   }, [isPointerDown, shouldAutoAdvance])
 
-  useDragEffect(viewportRef, {
+  useDrag(viewportRef, {
     isEnabled: isDragEnabled && items.length > 1,
     onDragMove: ({ x, y }) => {
       switch (orientation) {

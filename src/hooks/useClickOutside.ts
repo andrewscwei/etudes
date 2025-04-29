@@ -2,7 +2,7 @@ import { useEffect, type DependencyList, type RefObject } from 'react'
 
 type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
 
-export function useClickOutsideEffect(
+export function useClickOutside(
   targetRef: TargetRef | TargetRef[],
   handler: () => void,
   deps: DependencyList = [],

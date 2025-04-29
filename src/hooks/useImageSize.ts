@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Size } from 'spase'
-import { useLoadImageEffect, type UseLoadImageEffectOptions, type UseLoadImageEffectParams } from './useLoadImageEffect.js'
+import { useImageLoader, type UseImageLoaderOptions, type UseImageLoaderParams } from './useImageLoader.js'
 
-type Params = UseLoadImageEffectParams
+type Params = UseImageLoaderParams
 
-type Options = UseLoadImageEffectOptions & {
+type Options = UseImageLoaderOptions & {
   /**
    * If `false`, the size will be reset to `undefined` when the image begins
    * loading or when an error occurs. Defaults to `true`.
@@ -42,7 +42,7 @@ export function useImageSize({ src, srcSet, sizes }: Params, { preservesSizeBetw
 
   const [imageSize, setImageSize] = useState<Size | undefined>()
 
-  useLoadImageEffect({ src, srcSet, sizes }, {
+  useImageLoader({ src, srcSet, sizes }, {
     onLoadStart: t => handleLoad(t),
     onLoadComplete: t => handleLoadComplete(t),
     onLoadError: t => handleLoadError(t),

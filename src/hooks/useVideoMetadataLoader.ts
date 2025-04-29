@@ -1,13 +1,13 @@
 import { useEffect, useRef, type DependencyList } from 'react'
 
-export type UseLoadVideoMetadataEffectParams = {
+export type UseVideoMetadataLoaderParams = {
   /**
    * `src` attribute of the video.
    */
   src?: string
 }
 
-export type UseLoadVideoMetadataEffectOptions = {
+export type UseVideoMetadataLoaderOptions = {
   /**
    * Handler invoked when the video metadata starts loading.
    *
@@ -33,11 +33,11 @@ export type UseLoadVideoMetadataEffectOptions = {
 /**
  * Hook for retrieving the size of a video.
  *
- * @param params See {@link UseLoadVideoMetadataEffectParams}.
- * @param options See {@link UseLoadVideoMetadataEffectOptions}.
+ * @param params See {@link UseVideoMetadataLoaderParams}.
+ * @param options See {@link UseVideoMetadataLoaderOptions}.
  * @param deps Additional dependencies.
  */
-export function useLoadVideoMetadataEffect({ src }: UseLoadVideoMetadataEffectParams, { onLoadStart, onLoadComplete, onLoadError }: UseLoadVideoMetadataEffectOptions = {}, deps: DependencyList = []) {
+export function useVideoMetadataLoader({ src }: UseVideoMetadataLoaderParams, { onLoadStart, onLoadComplete, onLoadError }: UseVideoMetadataLoaderOptions = {}, deps: DependencyList = []) {
   const loadCompleteHandler = (event: Event) => {
     const element = event.currentTarget as HTMLVideoElement
 

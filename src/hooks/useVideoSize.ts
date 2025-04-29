@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Size } from 'spase'
-import { useLoadVideoMetadataEffect, type UseLoadVideoMetadataEffectOptions, type UseLoadVideoMetadataEffectParams } from './useLoadVideoMetadataEffect.js'
+import { useVideoMetadataLoader, type UseVideoMetadataLoaderOptions, type UseVideoMetadataLoaderParams } from './useVideoMetadataLoader.js'
 
-type Params = UseLoadVideoMetadataEffectParams
+type Params = UseVideoMetadataLoaderParams
 
-type Options = UseLoadVideoMetadataEffectOptions & {
+type Options = UseVideoMetadataLoaderOptions & {
   /**
    * If `false`, the size will be reset to `undefined` when the video begins
    * loading or when an error occurs. Defaults to `true`.
@@ -42,7 +42,7 @@ export function useVideoSize({ src }: Params, { preservesSizeBetweenLoads = true
 
   const [size, setSize] = useState<Size | undefined>(undefined)
 
-  useLoadVideoMetadataEffect({ src }, {
+  useVideoMetadataLoader({ src }, {
     onLoadStart: t => handleLoad(t),
     onLoadComplete: t => handleLoadComplete(t),
     onLoadError: t => handleLoadError(t),
