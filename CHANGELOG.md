@@ -1,3 +1,11 @@
+## [11.0.1](https://github.com/andrewscwei/etudes/compare/v11.0.0...v11.0.1) (2025-05-01)
+
+
+### Bug Fixes
+
+* Fix slider glitches ([996e546](https://github.com/andrewscwei/etudes/commit/996e546efd1ee4668093bca977bd76a137b9334a))
+* Optimize callbacks in components using useDragValue ([0f8142f](https://github.com/andrewscwei/etudes/commit/0f8142fabaa94198f27ec64be8c8c5d000ac00ec))
+
 # [11.0.0](https://github.com/andrewscwei/etudes/compare/v10.2.1...v11.0.0) (2025-04-29)
 
 
