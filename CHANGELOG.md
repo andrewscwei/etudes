@@ -1,3 +1,16 @@
+# [11.1.0](https://github.com/andrewscwei/etudes/compare/v11.0.1...v11.1.0) (2025-05-01)
+
+
+### Bug Fixes
+
+* Proper effect cleanup for Carousel and useDrag ([4b1855d](https://github.com/andrewscwei/etudes/commit/4b1855d28e6849625962e47f25b04792bbe8ed88))
+* **useClickOutside:** Use useCallback for handler ([b8fe879](https://github.com/andrewscwei/etudes/commit/b8fe879e258eee48647d5feb8a822b59a17ec487))
+
+
+### Features
+
+* **useInertiaDrag:** Add more params to handlers ([edb10db](https://github.com/andrewscwei/etudes/commit/edb10dbe18c6ac7a12070774fbab3c0ed40dab04))
+
 ## [11.0.1](https://github.com/andrewscwei/etudes/compare/v11.0.0...v11.0.1) (2025-05-01)
 
 
