@@ -16,3 +16,5 @@ export function Conditional({ children, if: boolOrExpression }: Readonly<Conditi
       return <></>
   }
 }
+
+Conditional.displayName = 'Conditional'

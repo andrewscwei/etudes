@@ -352,3 +352,5 @@ function getFixedStyles({ isCollapsed = true, isInverted = false, collectionPadd
     },
   })
 }
+
+(Dropdown as any).displayName = 'Dropdown'

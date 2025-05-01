@@ -44,8 +44,7 @@ type Options = {
  *
  * @param targetRef The reference to the target element to add drag interaction
  *                  to.
- * @param options Additional options which include options for
- *                `module:interactjs.draggable`.
+ * @param options Additional options.
  * @param deps Dependencies that trigger this effect.
  *
  * @returns The states created for this effect.

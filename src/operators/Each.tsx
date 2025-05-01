@@ -24,3 +24,5 @@ export function Each<T>({
     </>
   )
 }
+
+Each.displayName = 'Each'

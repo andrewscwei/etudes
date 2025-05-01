@@ -114,6 +114,9 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
   onPositionChange,
   ...props
 }, ref) => {
+  const bodyRef = useRef<HTMLDivElement>(null)
+  const knobContainerRef = useRef<HTMLButtonElement>(null)
+
   const mapDragValueToPosition = useCallback((value: number, dx: number, dy: number) => {
     const rect = Rect.from(bodyRef.current) ?? Rect.make()
     const truePosition = isInverted ? 1 - value : value
@@ -123,9 +126,9 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
     const normalizedPosition = isInverted ? 1 - trueNewPosition : trueNewPosition
 
     return normalizedPosition
-  }, [isInverted, orientation])
+  }, [bodyRef.current, isInverted, orientation])
 
-  const trackClickHandler = (event: MouseEvent) => {
+  const trackClickHandler = useCallback((event: MouseEvent) => {
     if (!isTrackInteractive) return
 
     const rect = Rect.from(bodyRef.current) ?? Rect.make()
@@ -147,10 +150,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
       }
       default: break
     }
-  }
-
-  const bodyRef = useRef<HTMLDivElement>(null)
-  const knobContainerRef = useRef<HTMLButtonElement>(null)
+  }, [bodyRef.current, isInverted, isTrackInteractive, orientation])
 
   const { isDragging: [isDragging], isReleasing: [isReleasing], value: [position, setPosition] } = useDragValue(knobContainerRef, {
     initialValue: externalPosition,

@@ -52,3 +52,5 @@ export const SelectableButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Re
     </button>
   )
 })
+
+SelectableButton.displayName = 'SelectableButton'

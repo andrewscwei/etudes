@@ -149,3 +149,5 @@ const FIXED_STYLES = asStyleDict({
     flex: '1 1 auto',
   },
 })
+
+Counter.displayName = 'Counter'

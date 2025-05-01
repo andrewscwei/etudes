@@ -394,3 +394,5 @@ function getFixedStyles({ itemLength = NaN, itemPadding = 0, layout = 'collectio
     },
   })
 }
+
+(Collection as any).displayName = 'Collection'

@@ -160,3 +160,5 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video
     </video>
   )
 })
+
+Video.displayName = 'Video'

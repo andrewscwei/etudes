@@ -41,3 +41,5 @@ export const OptionButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readon
     </button>
   )
 })
+
+OptionButton.displayName = 'OptionButton'

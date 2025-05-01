@@ -131,3 +131,5 @@ function isButton(props: ButtonProps): props is ButtonVariantProps {
 
   return true
 }
+
+Button.displayName = 'Button'

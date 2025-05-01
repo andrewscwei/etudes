@@ -581,3 +581,5 @@ function getFixedStyles({ orientation = 'vertical' }) {
     },
   })
 }
+
+(Accordion as any).displayName = 'Accordion'

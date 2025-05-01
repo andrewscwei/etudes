@@ -334,3 +334,5 @@ function getAllImageSources(htmlString?: string): string[] {
 
   return out
 }
+
+MasonryGrid.displayName = 'MasonryGrid'

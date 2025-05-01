@@ -105,3 +105,5 @@ export const SwipeRegion = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<S
     </div>
   )
 })
+
+SwipeRegion.displayName = 'SwipeRegion'

@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useRef, useState, type ComponentType, type ForwardedRef, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactElement, type RefObject } from 'react'
+import { forwardRef, useCallback, useEffect, useRef, useState, type ComponentType, type ForwardedRef, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactElement, type RefObject } from 'react'
 import { Point, Rect } from 'spase'
 import { useDrag, useTimeout } from '../hooks/index.js'
 import { Each } from '../operators/index.js'
@@ -134,6 +134,29 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
   const fixedStyles = getFixedStyles({ scrollSnapEnabled: !isPointerDown, orientation })
   const shouldAutoAdvance = autoAdvanceInterval > 0
 
+  const dragMoveHandler = useCallback((x: number, y: number) => {
+    const viewport = viewportRef.current
+
+    switch (orientation) {
+      case 'horizontal':
+        requestAnimationFrame(() => {
+          if (!viewport) return
+          viewport.scrollLeft += x * 1.5
+        })
+
+        break
+      case 'vertical':
+        requestAnimationFrame(() => {
+          if (!viewport) return
+          viewport.scrollTop += y * 1.5
+        })
+
+        break
+      default:
+        throw Error(`Unsupported orientation '${orientation}'`)
+    }
+  }, [orientation, viewportRef.current])
+
   useEffect(() => {
     const viewport = viewportRef.current
     if (!viewport) return
@@ -195,26 +218,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
 
   useDrag(viewportRef, {
     isEnabled: isDragEnabled && items.length > 1,
-    onDragMove: ({ x, y }) => {
-      switch (orientation) {
-        case 'horizontal':
-          requestAnimationFrame(() => {
-            if (!viewportRef.current) return
-            viewportRef.current.scrollLeft += x * 1.5
-          })
-
-          break
-        case 'vertical':
-          requestAnimationFrame(() => {
-            if (!viewportRef.current) return
-            viewportRef.current.scrollTop += y * 1.5
-          })
-
-          break
-        default:
-          throw Error(`Unsupported orientation '${orientation}'`)
-      }
-    },
+    onDragMove: ({ x, y }) => dragMoveHandler(x, y),
   }, [isDragEnabled, items.length, orientation])
 
   useTimeout((isPointerDown || !shouldAutoAdvance) ? -1 : autoAdvanceInterval, {
@@ -334,3 +338,5 @@ function getFixedStyles({ scrollSnapEnabled = false, orientation = 'horizontal' 
     },
   })
 }
+
+(Carousel as any).displayName = 'Carousel'

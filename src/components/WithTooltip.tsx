@@ -306,3 +306,5 @@ function getFixedStyles({ alignment, arrowSize, fullDialogWidth, gap, maxDialogW
     },
   })
 }
+
+WithTooltip.displayName = 'WithTooltip'

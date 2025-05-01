@@ -155,3 +155,5 @@ export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<Image
     />
   )
 })
+
+Image.displayName = 'Image'

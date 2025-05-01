@@ -32,3 +32,5 @@ export const ExtractChild = /* #__PURE__ */ forwardRef<HTMLElement, Readonly<Ext
     </>
   )
 })
+
+ExtractChild.displayName = 'ExtractChild'

@@ -23,3 +23,5 @@ export function ExtractChildren({
     </>
   )
 }
+
+ExtractChildren.displayName = 'ExtractChildren'

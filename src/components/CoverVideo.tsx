@@ -126,3 +126,5 @@ const FIXED_STYLES = asStyleDict({
     transform: 'translate(-50%, -50%)',
   },
 })
+
+CoverVideo.displayName = 'CoverVideo'

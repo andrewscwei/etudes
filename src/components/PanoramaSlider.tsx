@@ -212,3 +212,5 @@ function getFixedStyles({ autoDimension = 'width', panoramaRect = Rect.make(), a
     },
   })
 }
+
+PanoramaSlider.displayName = 'PanoramaSlider'

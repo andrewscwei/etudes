@@ -135,3 +135,5 @@ function getFixedStyles({ isActive = false, isSplit = false, isTailHidden = fals
     },
   })
 }
+
+Burger.displayName = 'Burger'

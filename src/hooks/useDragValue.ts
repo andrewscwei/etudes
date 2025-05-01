@@ -1,6 +1,7 @@
 import isDeepEqual from 'fast-deep-equal/react'
-import interact from 'interactjs'
-import { useEffect, useRef, useState, type Dispatch, type RefObject, type SetStateAction } from 'react'
+import { useCallback, useEffect, useRef, useState, type Dispatch, type RefObject, type SetStateAction } from 'react'
+import type { Point } from 'spase'
+import { useInteractiveDrag } from './useInteractiveDrag.js'
 
 type ReturnedStates<T> = {
   isDragging: [boolean, Dispatch<SetStateAction<boolean>>]
@@ -8,9 +9,7 @@ type ReturnedStates<T> = {
   value: [T, Dispatch<SetStateAction<T>>]
 }
 
-type InteractDraggableOptions = Parameters<Interact.Interactable['draggable']>[0]
-
-type Options<T> = Omit<InteractDraggableOptions, 'onstart' | 'onmove' | 'onend'> & {
+type Options<T> = Parameters<typeof useInteractiveDrag>[1] & {
   /**
    * The initial associated value of this hook.
    */
@@ -29,26 +28,6 @@ type Options<T> = Omit<InteractDraggableOptions, 'onstart' | 'onmove' | 'onend'>
    * @returns The transformed value.
    */
   transform: (currentValue: T, dx: number, dy: number) => T
-
-  /**
-   * Handler invoked when dragging starts.
-   */
-  onDragStart?: () => void
-
-  /**
-   * Handler invoked when dragging.
-   *
-   * @param dx The displacement on the x-axis (in pixels) since the last emitted
-   *           drag move event.
-   * @param dy The displacement on the y-axis (in pixels) since the last emitted
-   *           drag move event.
-   */
-  onDragMove?: (dx: number, dy: number) => void
-
-  /**
-   * Handler invoked when dragging ends.
-   */
-  onDragEnd?: () => void
 }
 
 /**
@@ -56,8 +35,7 @@ type Options<T> = Omit<InteractDraggableOptions, 'onstart' | 'onmove' | 'onend'>
  *
  * @param targetRef The reference to the target element to add drag interaction
  *                  to.
- * @param options Additional options which include options for
- *                `module:interactjs.draggable`.
+ * @param options Additional options.
  *
  * @returns The states created for this effect.
  */
@@ -87,54 +65,51 @@ export function useDragValue<T = [number, number]>(targetRef: RefObject<HTMLElem
   }
 
   const valueRef = useRef<T>(initialValue)
-  const [hasDragged, setHasDragged] = useState<boolean>(false)
-  const [isDragging, setIsDragging] = useState<boolean>(false)
-  const [isReleasing, setIsReleasing] = useState<boolean>(false)
+  const [hasDragged, setHasDragged] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const [isReleasing, setIsReleasing] = useState(false)
   const [value, setValue] = useState(initialValue)
 
-  useEffect(() => {
-    if (targetRef.current) {
-      // Do not consume states in these listeners as they will remain their
-      // initial values within the scope of the listeners.
-      interact(targetRef.current).draggable({
-        inertia: true,
-        ...options,
-        onstart: () => {
-          setHasDragged(true)
-          setIsDragging(true)
-          setIsReleasing(false)
-          onDragStart?.()
-        },
-        onmove: ({ dx, dy }) => {
-          const newValue = transform(valueRef.current, dx, dy)
+  const dragStartHandler = useCallback((startPosition: Point) => {
+    setHasDragged(true)
+    setIsDragging(true)
+    setIsReleasing(false)
 
-          if (setValueRef(newValue)) {
-            setValue(newValue)
-          }
+    onDragStart?.(startPosition)
+  }, [onDragStart])
 
-          setIsDragging(true)
-          setIsReleasing(false)
-          onDragMove?.(dx, dy)
-        },
-        onend: () => {
-          setIsDragging(false)
-          setIsReleasing(true)
-          onDragEnd?.()
-        },
-      })
+  const dragMoveHandler = useCallback((displacement: Point) => {
+    const newValue = transform(valueRef.current, displacement.x, displacement.y)
+
+    if (setValueRef(newValue)) {
+      setValue(newValue)
     }
 
-    return () => {
-      if (targetRef.current) {
-        interact(targetRef.current).unset()
-      }
-    }
-  }, [transform, onDragStart, onDragMove, onDragEnd])
+    setIsDragging(true)
+    setIsReleasing(false)
+
+    onDragMove?.(displacement)
+  }, [transform, onDragMove])
+
+  const dragEndHandler = useCallback((endPosition: Point) => {
+    setIsDragging(false)
+    setIsReleasing(true)
+
+    onDragEnd?.(endPosition)
+  }, [onDragEnd])
+
+  useInteractiveDrag(targetRef, {
+    onDragStart: dragStartHandler,
+    onDragMove: dragMoveHandler,
+    onDragEnd: dragEndHandler,
+    ...options,
+  })
 
   useEffect(() => {
     if (hasDragged) return
+
     setValue(initialValue)
-  }, [initialValue])
+  }, [hasDragged, initialValue])
 
   useEffect(() => {
     setValueRef(value)

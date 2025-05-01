@@ -25,3 +25,5 @@ export function Repeat({
     </>
   )
 }
+
+Repeat.displayName = 'Repeat'

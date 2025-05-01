@@ -167,3 +167,5 @@ function getFixedStyles({ diameter = 0, angle = 0 }) {
     },
   })
 }
+
+Dial.displayName = 'Dial'

@@ -137,3 +137,5 @@ export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<FlatS
     />
   )
 })
+
+FlatSVG.displayName = 'FlatSVG'

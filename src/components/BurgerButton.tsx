@@ -80,3 +80,5 @@ function getFixedStyles() {
     },
   })
 }
+
+BurgerButton.displayName = 'BurgerButton'

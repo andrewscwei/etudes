@@ -97,3 +97,5 @@ export function useScrollPosition(targetRef?: RefObject<Element> | RefObject<Ele
     step: Point.make(stepX, stepY),
   }
 }
+
+ScrollPositionProvider.displayName = 'ScrollPositionProvider'
