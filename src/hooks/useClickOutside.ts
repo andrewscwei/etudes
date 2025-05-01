@@ -1,42 +1,41 @@
-import { useEffect, type DependencyList, type RefObject } from 'react'
+import { useCallback, useEffect, type RefObject } from 'react'
 
 type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
 
 export function useClickOutside(
   targetRef: TargetRef | TargetRef[],
-  handler: () => void,
-  deps: DependencyList = [],
+  onClickOutside: () => void,
 ) {
-  useEffect(() => {
-    const clickOutsideHandler = (event: MouseEvent) => {
-      if (!(event.target instanceof Node)) return
+  const clickOutsideHandler = useCallback((event: MouseEvent) => {
+    if (!(event.target instanceof Node)) return
 
-      let isOutside = true
-      let node = event.target
+    let isOutside = true
+    let node = event.target
 
-      const targetRefs = ([] as TargetRef[]).concat(targetRef)
-      const targetNodes = targetRefs.map(ref => ref.current)
+    const targetRefs = ([] as TargetRef[]).concat(targetRef)
+    const targetNodes = targetRefs.map(ref => ref.current)
 
-      while (node) {
-        if (targetNodes.find(t => t === node)) {
-          isOutside = false
-          break
-        }
-
-        if (!node.parentNode) break
-
-        node = node.parentNode
+    while (node) {
+      if (targetNodes.find(t => t === node)) {
+        isOutside = false
+        break
       }
 
-      if (!isOutside) return
+      if (!node.parentNode) break
 
-      handler()
+      node = node.parentNode
     }
 
+    if (!isOutside) return
+
+    onClickOutside()
+  }, [onClickOutside])
+
+  useEffect(() => {
     window.addEventListener('click', clickOutsideHandler, true)
 
     return () => {
       window.removeEventListener('click', clickOutsideHandler, true)
     }
-  }, [...deps])
+  }, [clickOutsideHandler])
 }
