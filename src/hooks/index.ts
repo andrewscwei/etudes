@@ -1,6 +1,7 @@
 export * from './useClickOutside.js'
 export * from './useDrag.js'
 export * from './useDragValue.js'
+export * from './useDropzone.js'
 export * from './useImageLoader.js'
 export * from './useImageSize.js'
 export * from './useInteractiveDrag.js'
