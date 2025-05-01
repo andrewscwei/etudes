@@ -3,10 +3,11 @@ import { useCallback, useEffect, useRef, useState, type Dispatch, type RefObject
 import type { Point } from 'spase'
 import { useInteractiveDrag } from './useInteractiveDrag.js'
 
-type ReturnedStates<T> = {
-  isDragging: [boolean, Dispatch<SetStateAction<boolean>>]
-  isReleasing: [boolean, Dispatch<SetStateAction<boolean>>]
-  value: [T, Dispatch<SetStateAction<T>>]
+type Output<T> = {
+  isDragging: boolean
+  isReleasing: boolean
+  value: T
+  setValue: Dispatch<SetStateAction<T>>
 }
 
 type Options<T> = Parameters<typeof useInteractiveDrag>[1] & {
@@ -46,7 +47,7 @@ export function useDragValue<T = [number, number]>(targetRef: RefObject<HTMLElem
   onDragMove,
   onDragEnd,
   ...options
-}: Options<T>): ReturnedStates<T> {
+}: Options<T>): Output<T> {
   /**
    * Sets the current associated value reference. This reference object is equal
    * to the `value` state but differs slightly in how they are set. Because
@@ -65,13 +66,11 @@ export function useDragValue<T = [number, number]>(targetRef: RefObject<HTMLElem
   }
 
   const valueRef = useRef<T>(initialValue)
-  const [hasDragged, setHasDragged] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [isReleasing, setIsReleasing] = useState(false)
   const [value, setValue] = useState(initialValue)
 
   const dragStartHandler = useCallback((startPosition: Point) => {
-    setHasDragged(true)
     setIsDragging(true)
     setIsReleasing(false)
 
@@ -106,18 +105,13 @@ export function useDragValue<T = [number, number]>(targetRef: RefObject<HTMLElem
   })
 
   useEffect(() => {
-    if (hasDragged) return
-
-    setValue(initialValue)
-  }, [hasDragged, initialValue])
-
-  useEffect(() => {
     setValueRef(value)
   }, [value])
 
   return {
-    isDragging: [isDragging, setIsDragging],
-    isReleasing: [isReleasing, setIsReleasing],
-    value: [value, setValue],
+    isDragging,
+    isReleasing,
+    value,
+    setValue,
   }
 }

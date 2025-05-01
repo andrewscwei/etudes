@@ -181,7 +181,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
   const knobContainerRef = useRef<HTMLButtonElement>(null)
   const [index, setIndex] = useState(externalIndex)
 
-  const { isDragging: [isDragging], isReleasing: [isReleasing], value: [position, setPosition] } = useDragValue(knobContainerRef, {
+  const { isDragging, isReleasing, value: position, setValue: setPosition } = useDragValue(knobContainerRef, {
     initialValue: getPositionAt(externalIndex, steps),
     transform: mapDragValueToPosition,
     onDragStart,

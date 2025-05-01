@@ -118,7 +118,7 @@ export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
   })
   const [angle, setAngle] = useState(externalAngle)
 
-  const { isDragging: [isDragging], value: [displacement, setDisplacement] } = useDragValue(bodyRef, {
+  const { isDragging, value: displacement, setValue: setDisplacement } = useDragValue(bodyRef, {
     initialValue: 0,
     transform: mapDragPositionToDisplacement,
     onDragStart,

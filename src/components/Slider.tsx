@@ -152,7 +152,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
     }
   }, [bodyRef.current, isInverted, isTrackInteractive, orientation])
 
-  const { isDragging: [isDragging], isReleasing: [isReleasing], value: [position, setPosition] } = useDragValue(knobContainerRef, {
+  const { isDragging, isReleasing, value: position, setValue: setPosition } = useDragValue(knobContainerRef, {
     initialValue: externalPosition,
     transform: mapDragValueToPosition,
     onDragStart,
