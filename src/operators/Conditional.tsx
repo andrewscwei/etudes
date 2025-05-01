@@ -1,20 +1,14 @@
 import { type PropsWithChildren } from 'react'
 
 export type ConditionalProps = PropsWithChildren<{
-  if: boolean | (() => boolean)
+  if: any | (() => any)
 }>
 
-export function Conditional({ children, if: boolOrExpression }: Readonly<ConditionalProps>) {
-  switch (typeof boolOrExpression) {
-    case 'boolean':
-      return boolOrExpression ? <>{children}</> : <></>
+export function Conditional({ children, if: functionOrTruthyExpression }: Readonly<ConditionalProps>) {
+  switch (typeof functionOrTruthyExpression) {
     case 'function':
-      return boolOrExpression() ? <>{children}</> : <></>
+      return functionOrTruthyExpression() ? <>{children}</> : <></>
     default:
-      console.error(`[etudes::Conditional] The type of provided condition ${boolOrExpression} is not supported.`)
-
-      return <></>
+      return functionOrTruthyExpression ? <>{children}</> : <></>
   }
 }
-
-Conditional.displayName = 'Conditional'
