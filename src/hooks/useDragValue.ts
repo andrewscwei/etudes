@@ -1,7 +1,7 @@
 import isDeepEqual from 'fast-deep-equal/react'
 import { useCallback, useEffect, useRef, useState, type Dispatch, type RefObject, type SetStateAction } from 'react'
 import type { Point } from 'spase'
-import { useInteractiveDrag } from './useInteractiveDrag.js'
+import { useInertiaDrag } from './useInertiaDrag.js'
 
 type Output<T> = {
   isDragging: boolean
@@ -10,7 +10,7 @@ type Output<T> = {
   setValue: Dispatch<SetStateAction<T>>
 }
 
-type Options<T> = Parameters<typeof useInteractiveDrag>[1] & {
+type Options<T> = Parameters<typeof useInertiaDrag>[1] & {
   /**
    * The initial associated value of this hook.
    */
@@ -77,7 +77,7 @@ export function useDragValue<T = [number, number]>(targetRef: RefObject<HTMLElem
     onDragStart?.(startPosition)
   }, [onDragStart])
 
-  const dragMoveHandler = useCallback((displacement: Point) => {
+  const dragMoveHandler = useCallback((displacement: Point, currentPosition: Point, startPosition: Point) => {
     const newValue = transform(valueRef.current, displacement.x, displacement.y)
 
     if (setValueRef(newValue)) {
@@ -87,17 +87,17 @@ export function useDragValue<T = [number, number]>(targetRef: RefObject<HTMLElem
     setIsDragging(true)
     setIsReleasing(false)
 
-    onDragMove?.(displacement)
+    onDragMove?.(displacement, currentPosition, startPosition)
   }, [transform, onDragMove])
 
-  const dragEndHandler = useCallback((endPosition: Point) => {
+  const dragEndHandler = useCallback((endPosition: Point, startPosition: Point) => {
     setIsDragging(false)
     setIsReleasing(true)
 
-    onDragEnd?.(endPosition)
+    onDragEnd?.(endPosition, startPosition)
   }, [onDragEnd])
 
-  useInteractiveDrag(targetRef, {
+  useInertiaDrag(targetRef, {
     onDragStart: dragStartHandler,
     onDragMove: dragMoveHandler,
     onDragEnd: dragEndHandler,

@@ -21,13 +21,19 @@ type Options = Omit<InteractDraggableOptions, 'onstart' | 'onmove' | 'onend'> & 
    *
    * @param displacement The displacement (in pixels) since the last emitted
    *                     drag move event.
+   * @param currentPosition The position (in pixels) where the drag is
+   *                        currently at.
+   * @param startPosition The position (in pixels) where the drag started.
    */
-  onDragMove?: (displacement: Point) => void
+  onDragMove?: (displacement: Point, currentPosition: Point, startPosition: Point) => void
 
   /**
    * Handler invoked when dragging ends.
+   *
+   * @param endPosition The position (in pixels) where the drag ended.
+   * @param startPosition The position (in pixels) where the drag started.
    */
-  onDragEnd?: (endPosition: Point) => void
+  onDragEnd?: (endPosition: Point, startPosition: Point) => void
 }
 
 /**
@@ -40,7 +46,7 @@ type Options = Omit<InteractDraggableOptions, 'onstart' | 'onmove' | 'onend'> & 
  *
  * @returns The states created for this effect.
  */
-export function useInteractiveDrag(targetRef: RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>, {
+export function useInertiaDrag(targetRef: RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>, {
   isEnabled = true,
   onDragStart,
   onDragMove,
@@ -56,15 +62,30 @@ export function useInteractiveDrag(targetRef: RefObject<HTMLElement> | RefObject
     const interactable = interact(el).draggable({
       inertia: true,
       ...options,
-      onstart: ({ client }) => onDragStart?.(Point.make(client)),
-      onmove: event => onDragMove?.(Point.make(event.dx, event.dy)),
-      onend: ({ client }) => onDragEnd?.(Point.make(client)),
+      onstart: ({ client }) => {
+        const startPosition = Point.make(client)
+
+        onDragStart?.(startPosition)
+      },
+      onmove: ({ client, clientX0, clientY0, dx, dy, ...foo }) => {
+        const startPosition = Point.make(clientX0, clientY0)
+        const currentPosition = Point.make(client)
+        const displacement = Point.make(dx, dy)
+
+        onDragMove?.(displacement, currentPosition, startPosition)
+      },
+      onend: ({ client, clientX0, clientY0 }) => {
+        const startPosition = Point.make(clientX0, clientY0)
+        const endPosition = Point.make(client)
+
+        onDragEnd?.(endPosition, startPosition)
+      },
     })
 
     return () => {
       interactable.unset()
 
-      onDragEnd?.(Point.make())
+      onDragEnd?.(Point.make(), Point.make())
     }
   }, [targetRef.current, isEnabled, onDragStart, onDragMove, onDragEnd, createKey(options)])
 }
