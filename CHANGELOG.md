@@ -1,3 +1,10 @@
+# [11.2.0](https://github.com/andrewscwei/etudes/compare/v11.1.0...v11.2.0) (2025-05-01)
+
+
+### Features
+
+* Handle any value that evaluates to true or false in Conditional ([4ae0c01](https://github.com/andrewscwei/etudes/commit/4ae0c01215f2b38e36bb361337f205c5ce55acbc))
+
 # [11.1.0](https://github.com/andrewscwei/etudes/compare/v11.0.1...v11.1.0) (2025-05-01)
 
 
