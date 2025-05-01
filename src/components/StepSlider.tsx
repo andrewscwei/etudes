@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { forwardRef, useEffect, useRef, useState, type HTMLAttributes, type MouseEvent } from 'react'
+import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttributes, type MouseEvent } from 'react'
 import { Rect } from 'spase'
 import { useDragValue } from '../hooks/index.js'
 import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
@@ -143,7 +143,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
   onPositionChange,
   ...props
 }, ref) => {
-  const mapDragValueToPosition = (value: number, dx: number, dy: number) => {
+  const mapDragValueToPosition = useCallback((value: number, dx: number, dy: number) => {
     const rect = Rect.from(bodyRef.current) ?? Rect.make()
     const truePosition = isInverted ? 1 - value : value
     const trueNewPositionX = truePosition * rect.width + dx
@@ -152,7 +152,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
     const normalizedPosition = isInverted ? 1 - trueNewPosition : trueNewPosition
 
     return normalizedPosition
-  }
+  }, [isInverted, orientation])
 
   const trackClickHandler = (event: MouseEvent) => {
     if (!isTrackInteractive) return
@@ -186,7 +186,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
     transform: mapDragValueToPosition,
     onDragStart,
     onDragEnd,
-  }, [isInverted, orientation])
+  })
 
   // Natural position is the position affecting internal components accounting
   // for `isInverted`.
@@ -450,3 +450,5 @@ function getFixedStyles({ orientation = 'vertical', naturalPosition = 0, isDragg
     },
   })
 }
+
+StepSlider.displayName = 'StepSlider'

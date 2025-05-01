@@ -1,6 +1,6 @@
 import isDeepEqual from 'fast-deep-equal/react'
 import interact from 'interactjs'
-import { useEffect, useRef, useState, type DependencyList, type Dispatch, type RefObject, type SetStateAction } from 'react'
+import { useEffect, useRef, useState, type Dispatch, type RefObject, type SetStateAction } from 'react'
 
 type ReturnedStates<T> = {
   isDragging: [boolean, Dispatch<SetStateAction<boolean>>]
@@ -58,7 +58,6 @@ type Options<T> = Omit<InteractDraggableOptions, 'onstart' | 'onmove' | 'onend'>
  *                  to.
  * @param options Additional options which include options for
  *                `module:interactjs.draggable`.
- * @param deps Dependencies that trigger this effect.
  *
  * @returns The states created for this effect.
  */
@@ -69,7 +68,7 @@ export function useDragValue<T = [number, number]>(targetRef: RefObject<HTMLElem
   onDragMove,
   onDragEnd,
   ...options
-}: Options<T>, deps?: DependencyList): ReturnedStates<T> {
+}: Options<T>): ReturnedStates<T> {
   /**
    * Sets the current associated value reference. This reference object is equal
    * to the `value` state but differs slightly in how they are set. Because
@@ -130,7 +129,7 @@ export function useDragValue<T = [number, number]>(targetRef: RefObject<HTMLElem
         interact(targetRef.current).unset()
       }
     }
-  }, [...deps ?? []])
+  }, [transform, onDragStart, onDragMove, onDragEnd])
 
   useEffect(() => {
     if (hasDragged) return

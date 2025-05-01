@@ -1,8 +1,9 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
+import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttributes } from 'react'
+import type { Rect } from 'spase'
 import { useDragValue, useRect } from '../hooks/index.js'
-import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
+import { asComponentDict, asStyleDict, cloneStyledElement, createKey, styles } from '../utils/index.js'
 
 type Orientation = 'horizontal' | 'vertical'
 
@@ -36,76 +37,55 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
   onRangeChange,
   ...props
 }, ref) => {
-  const getPositionByValue = (value: number) => (value - minValue) / (maxValue - minValue)
-  const getPositionByDisplacement = (displacement: number) => displacement / (orientation === 'horizontal' ? bodyRect.width : bodyRect.height)
-  const getValueByPosition = (position: number) => position * (maxValue - minValue) + minValue
-  const getValueByDisplacement = (displacement: number) => getValueByPosition(getPositionByDisplacement(displacement))
-  const getDisplacementByPosition = (position: number) => position * (orientation === 'horizontal' ? bodyRect.width : bodyRect.height)
-  const getDisplacementByValue = (value: number) => getDisplacementByPosition(getPositionByValue(value))
-
-  const getClosestSteppedValue = (value: number) => {
-    const n = breakpoints.length
-    let idx = 0
-    let diff = Infinity
-
-    for (let i = 0; i < n; i++) {
-      const t = breakpoints[i]
-      const d = Math.abs(value - t)
-
-      if (d < diff) {
-        diff = d
-        idx = i
-      }
-    }
-
-    return breakpoints[idx]
-  }
-
   const bodyRef = useRef<HTMLDivElement>(null)
   const bodyRect = useRect(bodyRef)
   const startKnobRef = useRef<HTMLDivElement>(null)
   const endKnobRef = useRef<HTMLDivElement>(null)
   const [range, setRange] = useState<Range>(externalRange ?? [minValue, maxValue])
 
+  const mapStartDragValueToValue = useCallback((value: number, dx: number, dy: number) => {
+    const delta = orientation === 'horizontal' ? dx : dy
+    const dMin = getDisplacementByValue(minValue, minValue, maxValue, orientation, bodyRect)
+    const dMax = getDisplacementByValue(range[1], minValue, maxValue, orientation, bodyRect)
+    const dCurr = getDisplacementByValue(value, minValue, maxValue, orientation, bodyRect) + delta
+
+    return getValueByDisplacement(Math.max(dMin, Math.min(dMax, dCurr)), minValue, maxValue, orientation, bodyRect)
+  }, [minValue, maxValue, orientation, range[1], createKey(bodyRect.toJSON())])
+
+  const mapEndDragValueToValue = useCallback((value: number, dx: number, dy: number) => {
+    const delta = orientation === 'horizontal' ? dx : dy
+    const dMin = getDisplacementByValue(range[0], minValue, maxValue, orientation, bodyRect)
+    const dMax = getDisplacementByValue(maxValue, minValue, maxValue, orientation, bodyRect)
+    const dCurr = getDisplacementByValue(value, minValue, maxValue, orientation, bodyRect) + delta
+
+    return getValueByDisplacement(Math.max(dMin, Math.min(dMax, dCurr)), minValue, maxValue, orientation, bodyRect)
+  }, [minValue, maxValue, orientation, range[0], createKey(bodyRect.toJSON())])
+
   const { isDragging: [isDraggingStartKnob], isReleasing: [isReleasingStartKnob], value: [startValue, setStartValue] } = useDragValue(startKnobRef, {
     initialValue: externalRange?.[0] ?? minValue,
-    transform: (value: number, dx: number, dy: number) => {
-      const delta = orientation === 'horizontal' ? dx : dy
-      const dMin = getDisplacementByValue(minValue)
-      const dMax = getDisplacementByValue(range[1])
-      const dCurr = getDisplacementByValue(value) + delta
-
-      return getValueByDisplacement(Math.max(dMin, Math.min(dMax, dCurr)))
-    },
-  }, [minValue, orientation, bodyRect.size.width, bodyRect.size.height, range[1]])
+    transform: mapStartDragValueToValue,
+  })
 
   const { isDragging: [isDraggingEndKnob], isReleasing: [isReleasingEndKnob], value: [endValue, setEndValue] } = useDragValue(endKnobRef, {
     initialValue: externalRange?.[1] ?? maxValue,
-    transform: (value: number, dx: number, dy: number) => {
-      const delta = orientation === 'horizontal' ? dx : dy
-      const dMin = getDisplacementByValue(range[0])
-      const dMax = getDisplacementByValue(maxValue)
-      const dCurr = getDisplacementByValue(value) + delta
-
-      return getValueByDisplacement(Math.max(dMin, Math.min(dMax, dCurr)))
-    },
-  }, [maxValue, orientation, bodyRect.size.width, bodyRect.size.height, range[0]])
+    transform: mapEndDragValueToValue,
+  })
 
   const breakpoints = [minValue, ...[...Array(steps)].map((_, i) => minValue + (i + 1) * (maxValue - minValue) / (1 + steps)), maxValue]
-  const [start, end] = range.map(getDisplacementByValue)
+  const [start, end] = range.map(t => getDisplacementByValue(t, minValue, maxValue, orientation, bodyRect))
   const highlightLength = end - start
 
   useEffect(() => {
     if (range[0] === startValue) return
     setRange([startValue, range[1]])
     onRangeChange?.(range)
-  }, [startValue])
+  }, [startValue, range[0]])
 
   useEffect(() => {
     if (range[1] === endValue) return
     setRange([range[0], endValue])
     onRangeChange?.(range)
-  }, [endValue])
+  }, [endValue, range[1]])
 
   useEffect(() => {
     if (isDraggingStartKnob || isDraggingEndKnob || isDeepEqual(externalRange, range)) return
@@ -116,13 +96,13 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
 
   useEffect(() => {
     if (steps < 0) return
-    setStartValue(getClosestSteppedValue(startValue))
-  }, [isReleasingStartKnob])
+    setStartValue(getClosestSteppedValue(startValue, breakpoints))
+  }, [steps, isReleasingStartKnob, createKey(breakpoints)])
 
   useEffect(() => {
     if (steps < 0 || !isReleasingEndKnob) return
-    setEndValue(getClosestSteppedValue(endValue))
-  }, [isReleasingEndKnob])
+    setEndValue(getClosestSteppedValue(endValue, breakpoints))
+  }, [steps, isReleasingEndKnob, createKey(breakpoints)])
 
   const components = asComponentDict(children, {
     gutter: RangeSliderGutter,
@@ -279,3 +259,47 @@ function getFixedStyles({ orientation = 'horizontal', knobWidth = 0, knobHeight 
     },
   })
 }
+
+function getPositionByValue(value: number, min: number, max: number) {
+  return (value - min) / (max - min)
+}
+
+function getPositionByDisplacement(displacement: number, orientation: Orientation, rect: Rect) {
+  return displacement / (orientation === 'horizontal' ? rect.width : rect.height)
+}
+
+function getValueByPosition(position: number, min: number, max: number) {
+  return position * (max - min) + min
+}
+
+function getValueByDisplacement(displacement: number, min: number, max: number, orientation: Orientation, rect: Rect) {
+  return getValueByPosition(getPositionByDisplacement(displacement, orientation, rect), min, max)
+}
+
+function getDisplacementByPosition(position: number, orientation: Orientation, rect: Rect) {
+  return position * (orientation === 'horizontal' ? rect.width : rect.height)
+}
+
+function getDisplacementByValue(value: number, min: number, max: number, orientation: Orientation, rect: Rect) {
+  return getDisplacementByPosition(getPositionByValue(value, min, max), orientation, rect)
+}
+
+function getClosestSteppedValue(value: number, breakpoints: number[]) {
+  const n = breakpoints.length
+  let idx = 0
+  let diff = Infinity
+
+  for (let i = 0; i < n; i++) {
+    const t = breakpoints[i]
+    const d = Math.abs(value - t)
+
+    if (d < diff) {
+      diff = d
+      idx = i
+    }
+  }
+
+  return breakpoints[idx]
+}
+
+RangeSlider.displayName = 'RangeSlider'

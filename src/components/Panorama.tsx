@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
+import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Size } from 'spase'
 import { useDragValue, useImageSize, useRect } from '../hooks/index.js'
 import { asStyleDict } from '../utils/index.js'
@@ -103,11 +103,11 @@ export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
   onImageSizeChange,
   ...props
 }, ref) => {
-  const mapDragPositionToDisplacement = (currentPosition: number, dx: number, _: number): number => {
+  const mapDragPositionToDisplacement = useCallback((currentPosition: number, dx: number, _: number): number => {
     const newDisplacement = currentPosition - dx * speed
 
     return newDisplacement
-  }
+  }, [speed])
 
   const bodyRef = useRef<HTMLDivElement>(null)
   const bodyRect = useRect(bodyRef)
@@ -216,3 +216,5 @@ function getAngleFromDisplacement(displacement: number, originalImageSize: Size,
 
   return angle
 }
+
+Panorama.displayName = 'Panorama'
