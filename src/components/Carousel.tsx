@@ -134,21 +134,21 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
   const fixedStyles = getFixedStyles({ scrollSnapEnabled: !isPointerDown, orientation })
   const shouldAutoAdvance = autoAdvanceInterval > 0
 
-  const dragMoveHandler = useCallback((x: number, y: number) => {
+  const dragMoveHandler = useCallback(({ x, y }: Point) => {
     const viewport = viewportRef.current
 
     switch (orientation) {
       case 'horizontal':
         requestAnimationFrame(() => {
           if (!viewport) return
-          viewport.scrollLeft += x * 1.5
+          viewport.scrollLeft -= x * 1.5
         })
 
         break
       case 'vertical':
         requestAnimationFrame(() => {
           if (!viewport) return
-          viewport.scrollTop += y * 1.5
+          viewport.scrollTop -= y * 1.5
         })
 
         break
@@ -218,8 +218,8 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
 
   useDrag(viewportRef, {
     isEnabled: isDragEnabled && items.length > 1,
-    onDragMove: ({ x, y }) => dragMoveHandler(x, y),
-  }, [isDragEnabled, items.length, orientation])
+    onDragMove: dragMoveHandler,
+  })
 
   useTimeout((isPointerDown || !shouldAutoAdvance) ? -1 : autoAdvanceInterval, {
     onTimeout: () => {
