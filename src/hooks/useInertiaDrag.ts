@@ -67,7 +67,7 @@ export function useInertiaDrag(targetRef: RefObject<HTMLElement> | RefObject<HTM
 
         onDragStart?.(startPosition)
       },
-      onmove: ({ client, clientX0, clientY0, dx, dy, ...foo }) => {
+      onmove: ({ client, clientX0, clientY0, dx, dy }) => {
         const startPosition = Point.make(clientX0, clientY0)
         const currentPosition = Point.make(client)
         const displacement = Point.make(dx, dy)
