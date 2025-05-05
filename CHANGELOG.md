@@ -1,3 +1,16 @@
+# [11.3.0](https://github.com/andrewscwei/etudes/compare/v11.2.0...v11.3.0) (2025-05-05)
+
+
+### Bug Fixes
+
+* Remove unused params ([25b07e3](https://github.com/andrewscwei/etudes/commit/25b07e3b2488cf448845e6531a5db1a14a91c9ff))
+
+
+### Features
+
+* Support clipping for RangeSlider ([b76f100](https://github.com/andrewscwei/etudes/commit/b76f100dccb13e0fb187e3008b43e15eec300adf))
+* Support clipping for Slider and StepSlider ([642a997](https://github.com/andrewscwei/etudes/commit/642a997cbe493d8e1635f7efea530f9160736696))
+
 # [11.2.0](https://github.com/andrewscwei/etudes/compare/v11.1.0...v11.2.0) (2025-05-01)
 
 
