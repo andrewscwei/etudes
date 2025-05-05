@@ -10,6 +10,7 @@ export function RangeSliderDemo() {
   return (
     <Frame
       options={[
+        ['isClipped: false', 'isClipped: true'],
         ['orientation: horizontal', 'orientation: vertical'],
       ]}
       title='RangeSlider'
@@ -19,13 +20,14 @@ export function RangeSliderDemo() {
         setMax(100)
       }}
     >
-      {({ orientation }, toast) => (
+      {({ isClipped, orientation }, toast) => (
         <RangeSlider
           className={clsx('relative', {
             'h-1 w-44': orientation === 'horizontal',
             'h-32 w-1': orientation === 'vertical',
           })}
           decimalPlaces={0}
+          isClipped={isClipped === 'true'}
           knobHeight={28}
           knobWidth={40}
           max={100}

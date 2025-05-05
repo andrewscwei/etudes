@@ -44,24 +44,35 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
   const startKnobRef = useRef<HTMLDivElement>(null)
   const endKnobRef = useRef<HTMLDivElement>(null)
   const [range, setRange] = useState<Range>(externalRange ?? [minValue, maxValue])
+  const breakpoints = [minValue, ...[...Array(steps)].map((_, i) => minValue + (i + 1) * (maxValue - minValue) / (1 + steps)), maxValue]
+  const [start, end] = range.map(t => getDisplacementByValue(t, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped))
+  const highlightLength = end - start
+  const components = asComponentDict(children, {
+    gutter: RangeSliderGutter,
+    highlight: RangeSliderHighlight,
+    knob: RangeSliderKnob,
+    label: RangeSliderLabel,
+  })
+
+  const fixedStyles = getFixedStyles({ orientation, highlightLength, start, knobPadding, knobWidth, knobHeight })
 
   const mapStartDragValueToValue = useCallback((value: number, dx: number, dy: number) => {
     const delta = orientation === 'horizontal' ? dx : dy
-    const dMin = getDisplacementByValue(minValue, minValue, maxValue, orientation, bodyRect)
-    const dMax = getDisplacementByValue(range[1], minValue, maxValue, orientation, bodyRect)
-    const dCurr = getDisplacementByValue(value, minValue, maxValue, orientation, bodyRect) + delta
+    const dMin = getDisplacementByValue(minValue, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
+    const dMax = getDisplacementByValue(range[1], minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
+    const dCurr = getDisplacementByValue(value, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped) + delta
 
-    return getValueByDisplacement(Math.max(dMin, Math.min(dMax, dCurr)), minValue, maxValue, orientation, bodyRect)
-  }, [minValue, maxValue, orientation, range[1], createKey(bodyRect.toJSON())])
+    return getValueByDisplacement(Math.max(dMin, Math.min(dMax, dCurr)), minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
+  }, [knobWidth, knobHeight, isClipped, minValue, maxValue, orientation, range[1], createKey(bodyRect.toJSON())])
 
   const mapEndDragValueToValue = useCallback((value: number, dx: number, dy: number) => {
     const delta = orientation === 'horizontal' ? dx : dy
-    const dMin = getDisplacementByValue(range[0], minValue, maxValue, orientation, bodyRect)
-    const dMax = getDisplacementByValue(maxValue, minValue, maxValue, orientation, bodyRect)
-    const dCurr = getDisplacementByValue(value, minValue, maxValue, orientation, bodyRect) + delta
+    const dMin = getDisplacementByValue(range[0], minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
+    const dMax = getDisplacementByValue(maxValue, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
+    const dCurr = getDisplacementByValue(value, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped) + delta
 
-    return getValueByDisplacement(Math.max(dMin, Math.min(dMax, dCurr)), minValue, maxValue, orientation, bodyRect)
-  }, [minValue, maxValue, orientation, range[0], createKey(bodyRect.toJSON())])
+    return getValueByDisplacement(Math.max(dMin, Math.min(dMax, dCurr)), minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
+  }, [knobWidth, knobHeight, isClipped, minValue, maxValue, orientation, range[0], createKey(bodyRect.toJSON())])
 
   const { isDragging: isDraggingStartKnob, isReleasing: isReleasingStartKnob, value: startValue, setValue: setStartValue } = useDragValue(startKnobRef, {
     initialValue: externalRange?.[0] ?? minValue,
@@ -72,10 +83,6 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
     initialValue: externalRange?.[1] ?? maxValue,
     transform: mapEndDragValueToValue,
   })
-
-  const breakpoints = [minValue, ...[...Array(steps)].map((_, i) => minValue + (i + 1) * (maxValue - minValue) / (1 + steps)), maxValue]
-  const [start, end] = range.map(t => getDisplacementByValue(t, minValue, maxValue, orientation, bodyRect))
-  const highlightLength = end - start
 
   useEffect(() => {
     if (range[0] === startValue) return
@@ -105,15 +112,6 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
     if (steps < 0 || !isReleasingEndKnob) return
     setEndValue(getClosestSteppedValue(endValue, breakpoints))
   }, [steps, isReleasingEndKnob, createKey(breakpoints)])
-
-  const components = asComponentDict(children, {
-    gutter: RangeSliderGutter,
-    highlight: RangeSliderHighlight,
-    knob: RangeSliderKnob,
-    label: RangeSliderLabel,
-  })
-
-  const fixedStyles = getFixedStyles({ orientation, highlightLength, start, knobPadding, knobWidth, knobHeight })
 
   return (
     <div
@@ -221,15 +219,16 @@ function getFixedStyles({ orientation = 'horizontal', knobWidth = 0, knobHeight 
       height: '100%',
     },
     highlight: {
-      height: '100%',
       left: '0',
       position: 'absolute',
       top: '0',
       ...orientation === 'horizontal' ? {
+        height: '100%',
         width: `${highlightLength}px`,
         transform: `translate3d(${start}px, 0, 0)`,
       } : {
         height: `${highlightLength}px`,
+        width: '100%',
         transform: `translate3d(0, ${start}px, 0)`,
       },
     },
@@ -266,24 +265,50 @@ function getPositionByValue(value: number, min: number, max: number) {
   return (value - min) / (max - min)
 }
 
-function getPositionByDisplacement(displacement: number, orientation: Orientation, rect: Rect) {
-  return displacement / (orientation === 'horizontal' ? rect.width : rect.height)
+function getPositionByDisplacement(displacement: number, orientation: Orientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
+  switch (orientation) {
+    case 'horizontal': {
+      const maxWidth = isClipped ? rect.width - knobWidth : rect.width
+      return (displacement - (isClipped ? knobWidth * 0.5 : 0)) / maxWidth
+    }
+    case 'vertical': {
+      const maxHeight = isClipped ? rect.height - knobHeight : rect.height
+      return (displacement - (isClipped ? knobHeight * 0.5 : 0)) / maxHeight
+    }
+    default:
+      throw Error(`Invalid orientation: ${orientation}`)
+  }
 }
 
 function getValueByPosition(position: number, min: number, max: number) {
   return position * (max - min) + min
 }
 
-function getValueByDisplacement(displacement: number, min: number, max: number, orientation: Orientation, rect: Rect) {
-  return getValueByPosition(getPositionByDisplacement(displacement, orientation, rect), min, max)
+function getValueByDisplacement(displacement: number, min: number, max: number, orientation: Orientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
+  const position = getPositionByDisplacement(displacement, orientation, rect, knobWidth, knobHeight, isClipped)
+
+  return getValueByPosition(position, min, max)
 }
 
-function getDisplacementByPosition(position: number, orientation: Orientation, rect: Rect) {
-  return position * (orientation === 'horizontal' ? rect.width : rect.height)
+function getDisplacementByPosition(position: number, orientation: Orientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
+  switch (orientation) {
+    case 'horizontal': {
+      const maxWidth = isClipped ? rect.width - knobWidth : rect.width
+      return position * maxWidth + (isClipped ? knobWidth * 0.5 : 0)
+    }
+    case 'vertical': {
+      const maxHeight = isClipped ? rect.height - knobHeight : rect.height
+      return position * maxHeight + (isClipped ? knobHeight * 0.5 : 0)
+    }
+    default:
+      throw Error(`Invalid orientation: ${orientation}`)
+  }
 }
 
-function getDisplacementByValue(value: number, min: number, max: number, orientation: Orientation, rect: Rect) {
-  return getDisplacementByPosition(getPositionByValue(value, min, max), orientation, rect)
+function getDisplacementByValue(value: number, min: number, max: number, orientation: Orientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
+  const position = getPositionByValue(value, min, max)
+
+  return getDisplacementByPosition(position, orientation, rect, knobWidth, knobHeight, isClipped)
 }
 
 function getClosestSteppedValue(value: number, breakpoints: number[]) {
