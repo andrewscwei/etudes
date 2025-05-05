@@ -185,6 +185,8 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
   const naturalPosition = isInverted ? 1 - position : position
   const isAtEnd = isInverted ? position === 0 : position === 1
   const isAtStart = isInverted ? position === 1 : position === 0
+  const fixedClassNames = getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
+  const fixedStyles = getFixedStyles({ orientation, isClipped, isDragging, naturalPosition, knobHeight, knobWidth, isTrackInteractive })
 
   useEffect(() => {
     if (isDragging || externalPosition === position) return
@@ -206,9 +208,6 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
     label: SliderLabel,
     track: SliderTrack,
   })
-
-  const fixedClassNames = getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
-  const fixedStyles = getFixedStyles({ orientation, isClipped, isDragging, naturalPosition, knobHeight, knobWidth, isTrackInteractive })
 
   return (
     <div
