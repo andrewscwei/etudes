@@ -11,6 +11,7 @@ export function SliderDemo() {
   return (
     <Frame
       options={[
+        ['isClipped: false', 'isClipped: true'],
         ['isInverted: false', 'isInverted: true'],
         ['isTrackInteractive: true', 'isTrackInteractive: false'],
         ['onlyDispatchesOnDragEnd: true', 'onlyDispatchesOnDragEnd: false'],
@@ -20,12 +21,13 @@ export function SliderDemo() {
       usesMaxHeight={true}
       onReset={() => setPosition(0)}
     >
-      {({ isInverted, isTrackInteractive, onlyDispatchesOnDragEnd, orientation }, toast) => (
+      {({ isClipped, isInverted, isTrackInteractive, onlyDispatchesOnDragEnd, orientation }, toast) => (
         <Slider
           className={clsx('relative', {
             'h-1 w-44': orientation === 'horizontal',
             'h-32 w-1': orientation === 'vertical',
           })}
+          isClipped={isClipped === 'true'}
           isInverted={isInverted === 'true'}
           isTrackInteractive={isTrackInteractive === 'true'}
           knobHeight={28}
@@ -40,9 +42,9 @@ export function SliderDemo() {
             toast(`Position: ${pos.toFixed(2)}`)
           }}
         >
-          <SliderKnob className='bg-light ia border-dark flex items-center justify-center border'/>
-          <SliderLabel className='text-dark text-base'/>
-          <SliderTrack className='ia bg-dark/40'/>
+          <SliderKnob className='ia flex items-center justify-center border border-dark bg-dark'/>
+          <SliderLabel className='text-base text-light'/>
+          <SliderTrack className='ia bg-dark/40 [.start]:bg-dark'/>
         </Slider>
       )}
     </Frame>

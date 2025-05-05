@@ -8,6 +8,11 @@ export type SliderOrientation = 'horizontal' | 'vertical'
 
 export type SliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-orientation' | 'aria-valuenow' | 'role'> & {
   /**
+   * Specifies if the knob is clipped to the track.
+   */
+  isClipped?: boolean
+
+  /**
    * By default the position is a value from 0 - 1, 0 being the start of the
    * slider and 1 being the end. Switching on this flag inverts this behavior,
    * where 0 becomes the end of the slider and 1 being the start.
@@ -100,6 +105,7 @@ export type SliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-orientation
 export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<SliderProps>>(({
   children,
   className,
+  isClipped = false,
   isInverted = false,
   isTrackInteractive = true,
   knobHeight = 30,
@@ -120,13 +126,28 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
   const mapDragValueToPosition = useCallback((value: number, dx: number, dy: number) => {
     const rect = Rect.from(bodyRef.current) ?? Rect.make()
     const truePosition = isInverted ? 1 - value : value
-    const trueNewPositionX = truePosition * rect.width + dx
-    const trueNewPositionY = truePosition * rect.height + dy
-    const trueNewPosition = orientation === 'vertical' ? Math.max(0, Math.min(1, trueNewPositionY / rect.height)) : Math.max(0, Math.min(1, trueNewPositionX / rect.width))
-    const normalizedPosition = isInverted ? 1 - trueNewPosition : trueNewPosition
 
-    return normalizedPosition
-  }, [bodyRef.current, isInverted, orientation])
+    switch (orientation) {
+      case 'horizontal': {
+        const maxWidth = isClipped ? rect.width - knobWidth : rect.width
+        const trueNewPositionX = truePosition * maxWidth + dx
+        const trueNewPosition = Math.max(0, Math.min(1, trueNewPositionX / maxWidth))
+        const normalizedPosition = isInverted ? 1 - trueNewPosition : trueNewPosition
+
+        return normalizedPosition
+      }
+      case 'vertical': {
+        const maxHeight = isClipped ? rect.height - knobHeight : rect.height
+        const trueNewPositionY = truePosition * maxHeight + dy
+        const trueNewPosition = Math.max(0, Math.min(1, trueNewPositionY / maxHeight))
+        const normalizedPosition = isInverted ? 1 - trueNewPosition : trueNewPosition
+
+        return normalizedPosition
+      }
+      default:
+        throw Error(`Invalid orientation: ${orientation}`)
+    }
+  }, [bodyRef.current, isClipped, isInverted, knobWidth, knobHeight, orientation])
 
   const trackClickHandler = useCallback((event: MouseEvent) => {
     if (!isTrackInteractive) return
@@ -145,10 +166,10 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
         const trackPosition = (event.clientY + vrect.top - rect.top) / rect.height
         const normalizedPosition = isInverted ? 1 - trackPosition : trackPosition
         setPosition(normalizedPosition)
-
         break
       }
-      default: break
+      default:
+        throw Error(`Invalid orientation: ${orientation}`)
     }
   }, [bodyRef.current, isInverted, isTrackInteractive, orientation])
 
@@ -187,7 +208,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
   })
 
   const fixedClassNames = getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
-  const fixedStyles = getFixedStyles({ orientation, isDragging, naturalPosition, knobHeight, knobWidth, isTrackInteractive })
+  const fixedStyles = getFixedStyles({ orientation, isClipped, isDragging, naturalPosition, knobHeight, knobWidth, isTrackInteractive })
 
   return (
     <div
@@ -200,7 +221,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
     >
       <div ref={bodyRef} style={fixedStyles.body}>
         {cloneStyledElement(components.track ?? <SliderTrack/>, {
-          className: clsx('start', fixedClassNames.track),
+          className: clsx(isInverted ? 'end' : 'start', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
             height: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
             top: '0',
@@ -211,7 +232,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
           onClick: trackClickHandler,
         }, <div style={fixedStyles.trackHitBox}/>)}
         {cloneStyledElement(components.track ?? <SliderTrack/>, {
-          className: clsx('end', fixedClassNames.track),
+          className: clsx(isInverted ? 'start' : 'end', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
             bottom: '0',
             height: `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
@@ -276,7 +297,7 @@ function getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtSta
   })
 }
 
-function getFixedStyles({ orientation = 'vertical', isDragging = false, naturalPosition = 0, knobHeight = 0, knobWidth = 0, isTrackInteractive = true }) {
+function getFixedStyles({ orientation = 'vertical', isClipped = false, isDragging = false, naturalPosition = 0, knobHeight = 0, knobWidth = 0, isTrackInteractive = true }) {
   return asStyleDict({
     body: {
       height: '100%',
@@ -291,10 +312,10 @@ function getFixedStyles({ orientation = 'vertical', isDragging = false, naturalP
       zIndex: '1',
       ...orientation === 'vertical' ? {
         left: '50%',
-        top: `${naturalPosition * 100}%`,
+        top: isClipped ? `calc(${naturalPosition * 100}% + ${knobHeight * 0.5 - naturalPosition * knobHeight}px)` : `${naturalPosition * 100}%`,
         transition: isDragging === false ? 'top 100ms ease-out' : 'none',
       } : {
-        left: `${naturalPosition * 100}%`,
+        left: isClipped ? `calc(${naturalPosition * 100}% + ${knobWidth * 0.5 - naturalPosition * knobWidth}px)` : `${naturalPosition * 100}%`,
         top: '50%',
         transition: isDragging === false ? 'left 100ms ease-out' : 'none',
       },

@@ -9,6 +9,7 @@ export function StepSliderDemo() {
   return (
     <Frame
       options={[
+        ['isClipped: false', 'isClipped: true'],
         ['isInverted: false', 'isInverted: true'],
         ['isTrackInteractive: true', 'isTrackInteractive: false'],
         ['onlyDispatchesOnDragEnd: true', 'onlyDispatchesOnDragEnd: false'],
@@ -18,13 +19,14 @@ export function StepSliderDemo() {
       usesMaxHeight={true}
       onReset={() => setIndex(0)}
     >
-      {({ isInverted, isTrackInteractive, onlyDispatchesOnDragEnd, orientation }, toast) => (
+      {({ isClipped, isInverted, isTrackInteractive, onlyDispatchesOnDragEnd, orientation }, toast) => (
         <StepSlider
           className={clsx('relative', {
             'h-1 w-44': orientation === 'horizontal',
             'h-32 w-1': orientation === 'vertical',
           })}
           index={index}
+          isClipped={isClipped === 'true'}
           isInverted={isInverted === 'true'}
           isTrackInteractive={isTrackInteractive === 'true'}
           knobHeight={28}
@@ -38,9 +40,9 @@ export function StepSliderDemo() {
             toast(`Index: ${idx}`)
           }}
         >
-          <StepSliderKnob className='bg-light ia border-dark flex items-center justify-center border'/>
-          <StepSliderLabel className='text-dark text-base'/>
-          <StepSliderTrack className='ia bg-dark/40'/>
+          <StepSliderKnob className='ia flex items-center justify-center border border-dark bg-dark'/>
+          <StepSliderLabel className='text-base text-light'/>
+          <StepSliderTrack className='ia bg-dark/40 [.start]:bg-dark'/>
         </StepSlider>
       )}
     </Frame>

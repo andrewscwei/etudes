@@ -11,6 +11,7 @@ type Range = [number, number]
 
 export type RangeSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuemax' | 'aria-valuemin' | 'role'> & {
   decimalPlaces?: number
+  isClipped?: boolean
   knobHeight?: number
   knobPadding?: number
   knobWidth?: number
@@ -26,6 +27,7 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
   children,
   className,
   decimalPlaces = 2,
+  isClipped = false,
   knobHeight = 28,
   knobPadding = 0,
   knobWidth = 40,

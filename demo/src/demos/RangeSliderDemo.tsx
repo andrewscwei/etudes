@@ -41,8 +41,8 @@ export function RangeSliderDemo() {
         >
           <RangeSliderGutter className='bg-dark/40'/>
           <RangeSliderHighlight className='bg-dark'/>
-          <RangeSliderKnob className='bg-light ia border-dark flex items-center justify-center border'/>
-          <RangeSliderLabel className='text-dark text-base'/>
+          <RangeSliderKnob className='ia flex items-center justify-center border border-dark bg-dark'/>
+          <RangeSliderLabel className='text-base text-light'/>
         </RangeSlider>
       )}
     </Frame>
