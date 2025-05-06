@@ -1,3 +1,16 @@
+# [11.4.0](https://github.com/andrewscwei/etudes/compare/v11.3.0...v11.4.0) (2025-05-06)
+
+
+### Bug Fixes
+
+* Handle track clicking for StepSlider properly ([aed139d](https://github.com/andrewscwei/etudes/commit/aed139dfc9d9cdc558b2bed544966294a55b397d))
+
+
+### Features
+
+* Optimize StepSlider ([bc5caff](https://github.com/andrewscwei/etudes/commit/bc5caff7d2df4d3359024bff264aceeed825de00))
+* Optimize TextField ([b7b5cca](https://github.com/andrewscwei/etudes/commit/b7b5cca44a4587928292defc184dacafc06c4e1f))
+
 # [11.3.0](https://github.com/andrewscwei/etudes/compare/v11.2.0...v11.3.0) (2025-05-05)
 
 
