@@ -155,22 +155,22 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
 
   const mapDragValueToPosition = useCallback((value: number, dx: number, dy: number) => {
     const rect = Rect.from(bodyRef.current) ?? Rect.make()
-    const truePosition = isInverted ? 1 - value : value
+    const truePosition = isInverted ? inverted(value) : value
 
     switch (orientation) {
       case 'horizontal': {
         const maxWidth = isClipped ? rect.width - knobWidth : rect.width
         const trueNewPositionX = truePosition * maxWidth + dx
-        const trueNewPosition = Math.max(0, Math.min(1, trueNewPositionX / maxWidth))
-        const normalizedPosition = isInverted ? 1 - trueNewPosition : trueNewPosition
+        const trueNewPosition = clamped(trueNewPositionX / maxWidth)
+        const normalizedPosition = isInverted ? inverted(trueNewPosition) : trueNewPosition
 
         return normalizedPosition
       }
       case 'vertical': {
         const maxHeight = isClipped ? rect.height - knobHeight : rect.height
         const trueNewPositionY = truePosition * maxHeight + dy
-        const trueNewPosition = Math.max(0, Math.min(1, trueNewPositionY / maxHeight))
-        const normalizedPosition = isInverted ? 1 - trueNewPosition : trueNewPosition
+        const trueNewPosition = clamped(trueNewPositionY / maxHeight)
+        const normalizedPosition = isInverted ? inverted(trueNewPosition) : trueNewPosition
 
         return normalizedPosition
       }
@@ -195,15 +195,15 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
     switch (orientation) {
       case 'horizontal': {
         const trackPosition = (event.clientX + vrect.left - rect.left) / rect.width
-        const normalizedPosition = isInverted ? 1 - trackPosition : trackPosition
+        const normalizedPosition = isInverted ? inverted(trackPosition) : trackPosition
         const nearestIndex = getNearestIndexByPosition(normalizedPosition, steps)
 
         if (nearestIndex === index) {
           if (normalizedPosition > position) {
-            setIndex(Math.max(0, Math.min(steps.length - 1, nearestIndex + 1)))
+            setIndex(clamped(nearestIndex + 1, steps.length - 1))
           }
           else {
-            setIndex(Math.max(0, Math.min(steps.length - 1, nearestIndex - 1)))
+            setIndex(clamped(nearestIndex - 1, steps.length - 1))
           }
         }
         else {
@@ -214,7 +214,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
       }
       case 'vertical': {
         const trackPosition = (event.clientY + vrect.top - rect.top) / rect.height
-        const normalizedPosition = isInverted ? 1 - trackPosition : trackPosition
+        const normalizedPosition = isInverted ? inverted(trackPosition) : trackPosition
         const nearestIndex = getNearestIndexByPosition(normalizedPosition, steps)
 
         setIndex(nearestIndex)
@@ -227,7 +227,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
 
   // Natural position is the position affecting internal components accounting
   // for `isInverted`.
-  const naturalPosition = isInverted ? 1 - position : position
+  const naturalPosition = isInverted ? inverted(position) : position
   const isAtEnd = isInverted ? position === 0 : position === 1
   const isAtStart = isInverted ? position === 1 : position === 0
   const fixedClassNames = getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
@@ -301,10 +301,10 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
           className: clsx(isInverted ? 'start' : 'end', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
             bottom: '0',
-            height: `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
+            height: `calc(${(inverted(naturalPosition)) * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
           } : {
             right: '0',
-            width: `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
+            width: `calc(${(inverted(naturalPosition)) * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
           }),
           onClick: trackClickHandler,
         }, <div style={fixedStyles.trackHitBox}/>)}
@@ -485,6 +485,14 @@ function getFixedStyles({ orientation = 'vertical', naturalPosition = 0, isClipp
       width: '100%',
     },
   })
+}
+
+function inverted(value: number): number {
+  return 1 - value
+}
+
+function clamped(value: number, max: number = 1, min: number = 0): number {
+  return Math.max(min, Math.min(max, value))
 }
 
 StepSlider.displayName = 'StepSlider'
