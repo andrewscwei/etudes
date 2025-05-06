@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttributes, type MouseEvent } from 'react'
 import { Rect } from 'spase'
-import { useDragValue } from '../hooks/index.js'
+import { useDragValue, useRect } from '../hooks/index.js'
 import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, createKey, styles } from '../utils/index.js'
 
 type Orientation = 'horizontal' | 'vertical'
@@ -151,10 +151,10 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
 }, ref) => {
   const bodyRef = useRef<HTMLDivElement>(null)
   const knobContainerRef = useRef<HTMLButtonElement>(null)
+  const rect = useRect(bodyRef)
   const [index, setIndex] = useState(externalIndex)
 
   const mapDragValueToPosition = useCallback((value: number, dx: number, dy: number) => {
-    const rect = Rect.from(bodyRef.current) ?? Rect.make()
     const truePosition = isInverted ? inverted(value) : value
 
     switch (orientation) {
@@ -177,7 +177,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
       default:
         throw Error(`Invalid orientation: ${orientation}`)
     }
-  }, [bodyRef.current, isClipped, isInverted, knobWidth, knobHeight, orientation])
+  }, [rect.width, rect.height, isClipped, isInverted, knobWidth, knobHeight, orientation])
 
   const { isDragging, isReleasing, value: position, setValue: setPosition } = useDragValue(knobContainerRef, {
     initialValue: getPositionAt(externalIndex, steps),
@@ -189,7 +189,6 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
   const trackClickHandler = useCallback((event: MouseEvent) => {
     if (!isTrackInteractive) return
 
-    const rect = Rect.from(bodyRef.current) ?? Rect.make()
     const vrect = Rect.fromViewport()
 
     switch (orientation) {
@@ -199,12 +198,8 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
         const nearestIndex = getNearestIndexByPosition(normalizedPosition, steps)
 
         if (nearestIndex === index) {
-          if (normalizedPosition > position) {
-            setIndex(clamped(nearestIndex + 1, steps.length - 1))
-          }
-          else {
-            setIndex(clamped(nearestIndex - 1, steps.length - 1))
-          }
+          const newIndex = normalizedPosition > position ? nearestIndex + 1 : nearestIndex - 1
+          setIndex(clamped(newIndex, steps.length - 1))
         }
         else {
           setIndex(nearestIndex)
@@ -217,13 +212,24 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
         const normalizedPosition = isInverted ? inverted(trackPosition) : trackPosition
         const nearestIndex = getNearestIndexByPosition(normalizedPosition, steps)
 
-        setIndex(nearestIndex)
+        if (nearestIndex === index) {
+          const newIndex = normalizedPosition > position ? nearestIndex + 1 : nearestIndex - 1
+          const newPosition = getPositionAt(newIndex, steps)
+          setPosition(newPosition)
+          setIndex(clamped(newIndex, steps.length - 1))
+        }
+        else {
+          const newPosition = getPositionAt(nearestIndex, steps)
+          setPosition(newPosition)
+          setIndex(nearestIndex)
+        }
+
         break
       }
       default:
         throw Error(`Invalid orientation: ${orientation}`)
     }
-  }, [bodyRef.current, position, isInverted, isTrackInteractive, orientation, createKey(steps)])
+  }, [rect.width, rect.height, position, isInverted, isTrackInteractive, orientation, createKey(steps)])
 
   // Natural position is the position affecting internal components accounting
   // for `isInverted`.
@@ -241,41 +247,32 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
   useEffect(() => {
     if (isDragging) return
 
-    const newPosition = getPositionAt(externalIndex, steps)
-
-    if (position !== newPosition) {
-      setPosition(newPosition)
-    }
-
-    if (externalIndex !== index) {
-      setIndex(externalIndex)
-    }
-  }, [externalIndex])
+    setPosition(getPositionAt(externalIndex, steps))
+    setIndex(externalIndex)
+  }, [externalIndex, isDragging, createKey(steps)])
 
   useEffect(() => {
-    if (isDragging && onlyDispatchesOnDragEnd) return
+    if (isDragging) {
+      if (onlyDispatchesOnDragEnd) return
 
-    onPositionChange?.(position, isDragging)
+      setIndex(getNearestIndexByPosition(position, steps))
+    }
+    else {
+      const nearestIndex = getNearestIndexByPosition(position, steps)
+      const nearestPosition = getPositionAt(nearestIndex, steps)
 
-    const newIndex = getNearestIndexByPosition(position, steps)
-    if (index !== newIndex) setIndex(newIndex)
-  }, [position])
-
-  useEffect(() => {
-    if (isDragging) return
-
-    const nearestIndex = getNearestIndexByPosition(position, steps)
-    const nearestPosition = getPositionAt(nearestIndex, steps)
-
-    if (nearestPosition !== position || onlyDispatchesOnDragEnd) {
       setPosition(nearestPosition)
-      onPositionChange?.(nearestPosition, true)
+      setIndex(nearestIndex)
     }
-  }, [isDragging])
+  }, [position, isDragging, onlyDispatchesOnDragEnd, createKey(steps)])
+
+  useEffect(() => {
+    onPositionChange?.(position, isDragging)
+  }, [position, isDragging])
 
   useEffect(() => {
     onIndexChange?.(index, isDragging)
-  }, [index])
+  }, [index, isDragging])
 
   return (
     <div
