@@ -1,6 +1,5 @@
 import clsx from 'clsx'
-import { forwardRef, useEffect, type ChangeEvent, type FocusEvent, type InputHTMLAttributes } from 'react'
-import { usePrevious } from '../hooks/index.js'
+import { forwardRef, useCallback, type ChangeEvent, type FocusEvent, type InputHTMLAttributes } from 'react'
 
 export type TextFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'aria-disabled' | 'aria-placeholder' | 'aria-required' | 'disabled' | 'placeholder' | 'required' | 'type' | 'value' | 'onBlur' | 'onChange' | 'onFocus'> & {
   emptyValue?: string
@@ -8,7 +7,7 @@ export type TextFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'aria-d
   isRequired?: boolean
   placeholder?: string
   value?: string
-  formatter?: (prevValue: string, newValue: string) => string
+  formatter?: (value: string) => string
   onFocus?: (value: string) => void
   onUnfocus?: (value: string) => void
   onChange?: (value: string) => void
@@ -20,29 +19,18 @@ export const TextField = /* #__PURE__ */ forwardRef<HTMLInputElement, Readonly<T
   isDisabled = false,
   isRequired = false,
   placeholder,
-  value: externalValue,
+  value,
   formatter,
   onFocus,
   onUnfocus,
   onChange,
   ...props
 }, ref) => {
-  const handleValueChange = (newValue: string) => {
-    const formatted = (newValue !== emptyValue) ? (formatter?.(value, newValue) ?? newValue) : emptyValue
-
-    if (formatted === value) return
+  const handleValueChange = useCallback((newValue: string) => {
+    const formatted = (formatter?.(newValue) ?? newValue) || emptyValue
 
     onChange?.(formatted)
-  }
-
-  const value = externalValue ?? emptyValue
-  const prevValue = usePrevious(value)
-
-  useEffect(() => {
-    if (prevValue === undefined) return
-
-    handleValueChange(value)
-  }, [value])
+  }, [onChange, formatter])
 
   return (
     <input
@@ -56,7 +44,7 @@ export const TextField = /* #__PURE__ */ forwardRef<HTMLInputElement, Readonly<T
       placeholder={placeholder}
       required={isRequired}
       type='text'
-      value={value}
+      value={value || emptyValue}
       onBlur={({ target }: FocusEvent<HTMLInputElement>) => onUnfocus?.(target.value)}
       onChange={({ target }: ChangeEvent<HTMLInputElement>) => handleValueChange(target.value)}
       onFocus={({ target }: FocusEvent<HTMLInputElement>) => onFocus?.(target.value)}
