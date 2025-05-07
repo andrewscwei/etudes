@@ -1,3 +1,15 @@
+# [12.0.0](https://github.com/andrewscwei/etudes/compare/v11.4.0...v12.0.0) (2025-05-07)
+
+
+### Build System
+
+* Improve tree shaking ([d73662f](https://github.com/andrewscwei/etudes/commit/d73662f52f6c843c25a95eefb9fa87738c6d4039))
+
+
+### BREAKING CHANGES
+
+* Removed barrel exports
+
 # [11.4.0](https://github.com/andrewscwei/etudes/compare/v11.3.0...v11.4.0) (2025-05-06)
 
 
