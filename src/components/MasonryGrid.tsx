@@ -1,8 +1,9 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Rect, Size } from 'spase'
-import { useSizeObserver } from '../hooks/index.js'
-import { asClassNameDict, asStyleDict } from '../utils/index.js'
+import { useSizeObserver } from '../hooks/useSizeObserver.js'
+import { asClassNameDict } from '../utils/asClassNameDict.js'
+import { asStyleDict } from '../utils/asStyleDict.js'
 
 export type MasonryGridOrientation = 'horizontal' | 'vertical'
 
@@ -335,4 +336,6 @@ function getAllImageSources(htmlString?: string): string[] {
   return out
 }
 
-MasonryGrid.displayName = 'MasonryGrid'
+if (process.env.NODE_ENV !== 'production') {
+  MasonryGrid.displayName = 'MasonryGrid'
+}

@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, type HTMLAttributes } from 'react'
 import { type Size } from 'spase'
-import { useImageSize } from '../hooks/index.js'
+import { useImageSize } from '../hooks/useImageSize.js'
 
 export type ImageProps = Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'loading' | 'sizes' | 'src' | 'srcSet' | 'onLoadStart'> & {
   /**
@@ -156,4 +156,6 @@ export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<Image
   )
 })
 
-Image.displayName = 'Image'
+if (process.env.NODE_ENV !== 'production') {
+  Image.displayName = 'Image'
+}

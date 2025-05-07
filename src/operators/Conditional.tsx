@@ -12,3 +12,7 @@ export function Conditional({ children, if: functionOrTruthyExpression }: Readon
       return functionOrTruthyExpression ? <>{children}</> : <></>
   }
 }
+
+if (process.env.NODE_ENV !== 'production') {
+  Conditional.displayName = 'Conditional'
+}

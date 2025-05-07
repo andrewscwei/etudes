@@ -1,7 +1,10 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, useState, type HTMLAttributes } from 'react'
-import { usePrevious } from '../hooks/index.js'
-import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
+import { usePrevious } from '../hooks/usePrevious.js'
+import { asComponentDict } from '../utils/asComponentDict.js'
+import { asStyleDict } from '../utils/asStyleDict.js'
+import { cloneStyledElement } from '../utils/cloneStyledElement.js'
+import { styles } from '../utils/styles.js'
 import { TextField, type TextFieldProps } from './TextField.js'
 
 export type CounterProps = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & {
@@ -150,4 +153,9 @@ const FIXED_STYLES = asStyleDict({
   },
 })
 
-Counter.displayName = 'Counter'
+if (process.env.NODE_ENV !== 'production') {
+  Counter.displayName = 'Counter'
+  CounterTextField.displayName = 'CounterTextField'
+  CounterAddButton.displayName = 'CounterAddButton'
+  CounterSubtractButton.displayName = 'CounterSubtractButton'
+}

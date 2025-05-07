@@ -1,7 +1,9 @@
 import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Size } from 'spase'
-import { useDragValue, useImageSize, useRect } from '../hooks/index.js'
-import { asStyleDict } from '../utils/index.js'
+import { useDragValue } from '../hooks/useDragValue.js'
+import { useImageSize } from '../hooks/useImageSize.js'
+import { useRect } from '../hooks/useRect.js'
+import { asStyleDict } from '../utils/asStyleDict.js'
 
 export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'role'> & {
   /**
@@ -217,4 +219,6 @@ function getAngleFromDisplacement(displacement: number, originalImageSize: Size,
   return angle
 }
 
-Panorama.displayName = 'Panorama'
+if (process.env.NODE_ENV !== 'production') {
+  Panorama.displayName = 'Panorama'
+}

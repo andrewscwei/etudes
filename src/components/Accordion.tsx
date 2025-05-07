@@ -3,10 +3,14 @@ import isDeepEqual from 'fast-deep-equal/react'
 import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref, type RefObject } from 'react'
 import { useMounted } from '../hooks/useMounted.js'
 import { useSize } from '../hooks/useSize.js'
-import { Each } from '../operators/index.js'
-import { asComponentDict, asStyleDict, cloneStyledElement, createKey, styles } from '../utils/index.js'
+import { Each } from '../operators/Each.js'
+import { asComponentDict } from '../utils/asComponentDict.js'
+import { asStyleDict } from '../utils/asStyleDict.js'
+import { cloneStyledElement } from '../utils/cloneStyledElement.js'
+import { createKey } from '../utils/createKey.js'
+import { styles } from '../utils/styles.js'
 import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection.js'
-import type { DropdownToggleProps } from './Dropdown.js'
+import { type DropdownToggleProps } from './Dropdown.js'
 
 /**
  * Type describing the current item selection of {@link Accordion}, composed of
@@ -582,4 +586,9 @@ function getFixedStyles({ orientation = 'vertical' }) {
   })
 }
 
-(Accordion as any).displayName = 'Accordion'
+if (process.env.NODE_ENV !== 'production') {
+  (Accordion as any).displayName = 'Accordion'
+  AccordionHeader.displayName = 'AccordionHeader'
+  AccordionExpandIcon.displayName = 'AccordionExpandIcon'
+  AccordionCollapseIcon.displayName = 'AccordionCollapseIcon'
+}

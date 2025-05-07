@@ -1,7 +1,10 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
-import { useRect } from '../hooks/index.js'
-import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
+import { useRect } from '../hooks/useRect.js'
+import { asComponentDict } from '../utils/asComponentDict.js'
+import { asStyleDict } from '../utils/asStyleDict.js'
+import { cloneStyledElement } from '../utils/cloneStyledElement.js'
+import { styles } from '../utils/styles.js'
 import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelection } from './Collection.js'
 
 /**
@@ -353,4 +356,9 @@ function getFixedStyles({ isCollapsed = true, isInverted = false, collectionPadd
   })
 }
 
-(Dropdown as any).displayName = 'Dropdown'
+if (process.env.NODE_ENV !== 'production') {
+  (Dropdown as any).displayName = 'Dropdown'
+  DropdownToggle.displayName = 'DropdownToggle'
+  DropdownExpandIcon.displayName = 'DropdownExpandIcon'
+  DropdownCollapseIcon.displayName = 'DropdownCollapseIcon'
+}

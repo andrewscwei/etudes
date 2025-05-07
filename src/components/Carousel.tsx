@@ -1,8 +1,10 @@
 import { forwardRef, useCallback, useEffect, useRef, useState, type ComponentType, type ForwardedRef, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactElement, type RefObject } from 'react'
 import { Point, Rect } from 'spase'
-import { useDrag, useTimeout } from '../hooks/index.js'
-import { Each } from '../operators/index.js'
-import { asStyleDict, styles } from '../utils/index.js'
+import { useDrag } from '../hooks/useDrag.js'
+import { useTimeout } from '../hooks/useTimeout.js'
+import { Each } from '../operators/Each.js'
+import { asStyleDict } from '../utils/asStyleDict.js'
+import { styles } from '../utils/styles.js'
 
 export type CarouselOrientation = 'horizontal' | 'vertical'
 
@@ -339,4 +341,6 @@ function getFixedStyles({ scrollSnapEnabled = false, orientation = 'horizontal' 
   })
 }
 
-(Carousel as any).displayName = 'Carousel'
+if (process.env.NODE_ENV !== 'production') {
+  (Carousel as any).displayName = 'Carousel'
+}

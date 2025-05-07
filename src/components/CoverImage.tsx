@@ -1,7 +1,10 @@
 import { forwardRef, useRef, useState, type HTMLAttributes, type RefObject } from 'react'
 import { Size } from 'spase'
-import { useRect } from '../hooks/index.js'
-import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
+import { useRect } from '../hooks/useRect.js'
+import { asComponentDict } from '../utils/asComponentDict.js'
+import { asStyleDict } from '../utils/asStyleDict.js'
+import { cloneStyledElement } from '../utils/cloneStyledElement.js'
+import { styles } from '../utils/styles.js'
 import { Image, type ImageProps } from './Image.js'
 
 export type CoverImageProps = Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<ImageProps, 'alt' | 'loadingMode' | 'sizes' | 'src' | 'srcSet' | 'onLoadStart' | 'onLoadComplete' | 'onLoadError'> & {
@@ -108,4 +111,8 @@ const FIXED_STYLES = asStyleDict({
   },
 })
 
-CoverImage.displayName = 'CoverImage'
+if (process.env.NODE_ENV !== 'production') {
+  CoverImage.displayName = 'CoverImage'
+  CoverImageViewport.displayName = 'CoverImageViewport'
+  CoverImageContent.displayName = 'CoverImageContent'
+}

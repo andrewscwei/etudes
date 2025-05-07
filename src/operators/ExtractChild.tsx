@@ -1,5 +1,5 @@
 import { Children, forwardRef, isValidElement, type HTMLAttributes } from 'react'
-import { cloneStyledElement } from '../utils/index.js'
+import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 
 export type ExtractChildProps = HTMLAttributes<HTMLElement>
 
@@ -33,4 +33,6 @@ export const ExtractChild = /* #__PURE__ */ forwardRef<HTMLElement, Readonly<Ext
   )
 })
 
-ExtractChild.displayName = 'ExtractChild'
+if (process.env.NODE_ENV !== 'production') {
+  ExtractChild.displayName = 'ExtractChild'
+}

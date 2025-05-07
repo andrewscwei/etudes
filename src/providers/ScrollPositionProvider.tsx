@@ -98,4 +98,6 @@ export function useScrollPosition(targetRef?: RefObject<Element> | RefObject<Ele
   }
 }
 
-ScrollPositionProvider.displayName = 'ScrollPositionProvider'
+if (process.env.NODE_ENV !== 'production') {
+  ScrollPositionProvider.displayName = 'ScrollPositionProvider'
+}

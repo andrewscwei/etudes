@@ -26,4 +26,6 @@ export function Repeat({
   )
 }
 
-Repeat.displayName = 'Repeat'
+if (process.env.NODE_ENV !== 'production') {
+  Repeat.displayName = 'Repeat'
+}

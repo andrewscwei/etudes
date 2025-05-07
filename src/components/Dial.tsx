@@ -1,5 +1,8 @@
 import { forwardRef, type HTMLAttributes, type SVGAttributes } from 'react'
-import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
+import { asComponentDict } from '../utils/asComponentDict.js'
+import { asStyleDict } from '../utils/asStyleDict.js'
+import { cloneStyledElement } from '../utils/cloneStyledElement.js'
+import { styles } from '../utils/styles.js'
 
 export type DialProps = HTMLAttributes<HTMLDivElement> & {
   /**
@@ -168,4 +171,8 @@ function getFixedStyles({ diameter = 0, angle = 0 }) {
   })
 }
 
-Dial.displayName = 'Dial'
+if (process.env.NODE_ENV !== 'production') {
+  Dial.displayName = 'Dial'
+  DialTrack.displayName = 'DialTrack'
+  DialKnob.displayName = 'DialKnob'
+}

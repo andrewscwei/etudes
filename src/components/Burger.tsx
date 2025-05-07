@@ -1,7 +1,11 @@
 import clsx from 'clsx'
 import { forwardRef, type HTMLAttributes } from 'react'
-import { Repeat } from '../operators/index.js'
-import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
+import { Repeat } from '../operators/Repeat.js'
+import { asClassNameDict } from '../utils/asClassNameDict.js'
+import { asComponentDict } from '../utils/asComponentDict.js'
+import { asStyleDict } from '../utils/asStyleDict.js'
+import { cloneStyledElement } from '../utils/cloneStyledElement.js'
+import { styles } from '../utils/styles.js'
 
 export type BurgerProps = HTMLAttributes<HTMLDivElement> & {
   isActive?: boolean
@@ -136,4 +140,7 @@ function getFixedStyles({ isActive = false, isSplit = false, isTailHidden = fals
   })
 }
 
-Burger.displayName = 'Burger'
+if (process.env.NODE_ENV !== 'production') {
+  Burger.displayName = 'Burger'
+  BurgerBar.displayName = 'BurgerBar'
+}

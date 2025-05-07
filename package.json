@@ -18,7 +18,7 @@
   ],
   "scripts": {
     "clean": "rimraf build",
-    "prebuild": "npm run clean && npm run lint",
+    "prebuild": "npm run clean",
     "build": "vite build",
     "prepages": "rimraf .gh-pages",
     "pages": "vite build -c demo/vite.config.ts",

@@ -138,4 +138,6 @@ export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<FlatS
   )
 })
 
-FlatSVG.displayName = 'FlatSVG'
+if (process.env.NODE_ENV !== 'production') {
+  FlatSVG.displayName = 'FlatSVG'
+}

@@ -1,8 +1,12 @@
 import clsx from 'clsx'
 import { forwardRef, useCallback, useEffect, useRef, type HTMLAttributes, type MouseEvent } from 'react'
 import { Rect } from 'spase'
-import { useDragValue } from '../hooks/index.js'
-import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
+import { useDragValue } from '../hooks/useDragValue.js'
+import { asClassNameDict } from '../utils/asClassNameDict.js'
+import { asComponentDict } from '../utils/asComponentDict.js'
+import { asStyleDict } from '../utils/asStyleDict.js'
+import { cloneStyledElement } from '../utils/cloneStyledElement.js'
+import { styles } from '../utils/styles.js'
 
 export type SliderOrientation = 'horizontal' | 'vertical'
 
@@ -355,4 +359,9 @@ function getFixedStyles({ orientation = 'vertical', isClipped = false, isDraggin
   })
 }
 
-Slider.displayName = 'Slider'
+if (process.env.NODE_ENV !== 'production') {
+  Slider.displayName = 'Slider'
+  SliderTrack.displayName = 'SliderTrack'
+  SliderKnob.displayName = 'SliderKnob'
+  SliderLabel.displayName = 'SliderLabel'
+}

@@ -25,4 +25,6 @@ export function Each<T>({
   )
 }
 
-Each.displayName = 'Each'
+if (process.env.NODE_ENV !== 'production') {
+  Each.displayName = 'Each'
+}

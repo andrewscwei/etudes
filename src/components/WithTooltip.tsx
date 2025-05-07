@@ -1,9 +1,10 @@
 import clsx from 'clsx'
 import { useEffect, useRef, type CSSProperties, type HTMLAttributes } from 'react'
 import { Rect, Size } from 'spase'
-import { useRect } from '../hooks/index.js'
-import { ExtractChild } from '../operators/index.js'
-import { asStyleDict, styles } from '../utils/index.js'
+import { useRect } from '../hooks/useRect.js'
+import { ExtractChild } from '../operators/ExtractChild.js'
+import { asStyleDict } from '../utils/asStyleDict.js'
+import { styles } from '../utils/styles.js'
 
 type Alignment = 'tl' | 'tc' | 'tr' | 'cl' | 'cr' | 'bl' | 'bc' | 'br'
 
@@ -307,4 +308,6 @@ function getFixedStyles({ alignment, arrowSize, fullDialogWidth, gap, maxDialogW
   })
 }
 
-WithTooltip.displayName = 'WithTooltip'
+if (process.env.NODE_ENV !== 'production') {
+  WithTooltip.displayName = 'WithTooltip'
+}

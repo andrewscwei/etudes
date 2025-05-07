@@ -1,7 +1,10 @@
 import { forwardRef, useRef, useState, type HTMLAttributes, type RefObject } from 'react'
 import { Size } from 'spase'
-import { useRect } from '../hooks/index.js'
-import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
+import { useRect } from '../hooks/useRect.js'
+import { asComponentDict } from '../utils/asComponentDict.js'
+import { asStyleDict } from '../utils/asStyleDict.js'
+import { cloneStyledElement } from '../utils/cloneStyledElement.js'
+import { styles } from '../utils/styles.js'
 import { Video, type VideoProps } from './Video.js'
 
 export type CoverVideoProps = Omit<HTMLAttributes<HTMLDivElement>, 'onCanPlay' | 'onPause' | 'onPlay'> & Pick<VideoProps, 'autoLoop' | 'autoPlay' | 'hasControls' | 'isMuted' | 'playsInline' | 'posterSrc' | 'src' | 'onPause' | 'onPlay' | 'onCanPlay' | 'onEnd' | 'onFullscreenChange' | 'onLoadMetadata' | 'onLoadMetadataComplete' | 'onLoadMetadataError' | 'onSizeChange'> & {
@@ -127,4 +130,8 @@ const FIXED_STYLES = asStyleDict({
   },
 })
 
-CoverVideo.displayName = 'CoverVideo'
+if (process.env.NODE_ENV !== 'production') {
+  CoverVideo.displayName = 'CoverVideo'
+  CoverVideoViewport.displayName = 'CoverVideoViewport'
+  CoverVideoContent.displayName = 'CoverVideoContent'
+}

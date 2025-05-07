@@ -132,4 +132,6 @@ function isButton(props: ButtonProps): props is ButtonVariantProps {
   return true
 }
 
-Button.displayName = 'Button'
+if (process.env.NODE_ENV !== 'production') {
+  Button.displayName = 'Button'
+}

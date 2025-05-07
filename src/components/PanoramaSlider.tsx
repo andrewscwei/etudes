@@ -1,8 +1,11 @@
 import clsx from 'clsx'
 import { forwardRef, useRef, useState, type HTMLAttributes } from 'react'
 import { Rect, type Size } from 'spase'
-import { useRect } from '../hooks/index.js'
-import { asComponentDict, asStyleDict, cloneStyledElement, styles } from '../utils/index.js'
+import { useRect } from '../hooks/useRect.js'
+import { asComponentDict } from '../utils/asComponentDict.js'
+import { asStyleDict } from '../utils/asStyleDict.js'
+import { cloneStyledElement } from '../utils/cloneStyledElement.js'
+import { styles } from '../utils/styles.js'
 import { Panorama, type PanoramaProps } from './Panorama.js'
 
 export type PanoramaSliderProps = PanoramaProps & {
@@ -213,4 +216,9 @@ function getFixedStyles({ autoDimension = 'width', panoramaRect = Rect.make(), a
   })
 }
 
-PanoramaSlider.displayName = 'PanoramaSlider'
+if (process.env.NODE_ENV !== 'production') {
+  PanoramaSlider.displayName = 'PanoramaSlider'
+  PanoramaSliderTrack.displayName = 'PanoramaSliderTrack'
+  PanoramaSliderReticle.displayName = 'PanoramaSliderReticle'
+  PanoramaSliderIndicator.displayName = 'PanoramaSliderIndicator'
+}

@@ -106,4 +106,6 @@ export const SwipeRegion = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<S
   )
 })
 
-SwipeRegion.displayName = 'SwipeRegion'
+if (process.env.NODE_ENV !== 'production') {
+  SwipeRegion.displayName = 'SwipeRegion'
+}

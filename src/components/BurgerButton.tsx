@@ -1,6 +1,8 @@
 import clsx from 'clsx'
 import { forwardRef, type ButtonHTMLAttributes } from 'react'
-import { asClassNameDict, asStyleDict, styles } from '../utils/index.js'
+import { asClassNameDict } from '../utils/asClassNameDict.js'
+import { asStyleDict } from '../utils/asStyleDict.js'
+import { styles } from '../utils/styles.js'
 import { Burger, BurgerBar, type BurgerProps } from './Burger.js'
 
 export type BurgerButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement> & BurgerProps, 'onToggle'> & {
@@ -81,4 +83,7 @@ function getFixedStyles() {
   })
 }
 
-BurgerButton.displayName = 'BurgerButton'
+if (process.env.NODE_ENV !== 'production') {
+  BurgerButton.displayName = 'BurgerButton'
+  BurgerButtonBar.displayName = 'BurgerButtonBar'
+}

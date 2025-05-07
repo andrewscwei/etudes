@@ -1,8 +1,14 @@
 import clsx from 'clsx'
 import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttributes, type MouseEvent } from 'react'
 import { Rect } from 'spase'
-import { useDragValue, useRect } from '../hooks/index.js'
-import { asClassNameDict, asComponentDict, asStyleDict, cloneStyledElement, createKey, styles } from '../utils/index.js'
+import { useDragValue } from '../hooks/useDragValue.js'
+import { useRect } from '../hooks/useRect.js'
+import { asClassNameDict } from '../utils/asClassNameDict.js'
+import { asComponentDict } from '../utils/asComponentDict.js'
+import { asStyleDict } from '../utils/asStyleDict.js'
+import { cloneStyledElement } from '../utils/cloneStyledElement.js'
+import { createKey } from '../utils/createKey.js'
+import { styles } from '../utils/styles.js'
 
 type Orientation = 'horizontal' | 'vertical'
 
@@ -492,4 +498,9 @@ function clamped(value: number, max: number = 1, min: number = 0): number {
   return Math.max(min, Math.min(max, value))
 }
 
-StepSlider.displayName = 'StepSlider'
+if (process.env.NODE_ENV !== 'production') {
+  StepSlider.displayName = 'StepSlider'
+  StepSliderTrack.displayName = 'StepSliderTrack'
+  StepSliderKnob.displayName = 'StepSliderKnob'
+  StepSliderLabel.displayName = 'StepSliderLabel'
+}

@@ -1,8 +1,10 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
 import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
-import { Each } from '../operators/index.js'
-import { asStyleDict, createKey, styles } from '../utils/index.js'
+import { Each } from '../operators/Each.js'
+import { asStyleDict } from '../utils/asStyleDict.js'
+import { createKey } from '../utils/createKey.js'
+import { styles } from '../utils/styles.js'
 
 /**
  * Type describing the layout orientation of items in {@link Collection}.
@@ -395,4 +397,6 @@ function getFixedStyles({ itemLength = NaN, itemPadding = 0, layout = 'collectio
   })
 }
 
-(Collection as any).displayName = 'Collection'
+if (process.env.NODE_ENV !== 'production') {
+  (Collection as any).displayName = 'Collection'
+}

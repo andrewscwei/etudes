@@ -2,8 +2,13 @@ import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
 import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import type { Rect } from 'spase'
-import { useDragValue, useRect } from '../hooks/index.js'
-import { asComponentDict, asStyleDict, cloneStyledElement, createKey, styles } from '../utils/index.js'
+import { useDragValue } from '../hooks/useDragValue.js'
+import { useRect } from '../hooks/useRect.js'
+import { asComponentDict } from '../utils/asComponentDict.js'
+import { asStyleDict } from '../utils/asStyleDict.js'
+import { cloneStyledElement } from '../utils/cloneStyledElement.js'
+import { createKey } from '../utils/createKey.js'
+import { styles } from '../utils/styles.js'
 
 type Orientation = 'horizontal' | 'vertical'
 
@@ -329,4 +334,10 @@ function getClosestSteppedValue(value: number, breakpoints: number[]) {
   return breakpoints[idx]
 }
 
-RangeSlider.displayName = 'RangeSlider'
+if (process.env.NODE_ENV !== 'production') {
+  RangeSlider.displayName = 'RangeSlider'
+  RangeSliderGutter.displayName = 'RangeSliderGutter'
+  RangeSliderLabel.displayName = 'RangeSliderLabel'
+  RangeSliderHighlight.displayName = 'RangeSliderHighlight'
+  RangeSliderKnob.displayName = 'RangeSliderKnob'
+}

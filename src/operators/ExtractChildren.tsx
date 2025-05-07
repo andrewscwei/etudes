@@ -1,5 +1,5 @@
 import { Children, isValidElement, type HTMLAttributes } from 'react'
-import { cloneStyledElement } from '../utils/index.js'
+import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 
 export type ExtractChildrenProps = HTMLAttributes<HTMLElement>
 
@@ -24,4 +24,6 @@ export function ExtractChildren({
   )
 }
 
-ExtractChildren.displayName = 'ExtractChildren'
+if (process.env.NODE_ENV !== 'production') {
+  ExtractChildren.displayName = 'ExtractChildren'
+}
