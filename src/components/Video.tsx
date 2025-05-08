@@ -133,9 +133,7 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video
 }, ref) => {
   const localRef = useRef<HTMLVideoElement>(null)
   const videoRef = ref as RefObject<HTMLVideoElement> ?? localRef
-  const size = useVideoSize({
-    src,
-  }, {
+  const size = useVideoSize({ src }, {
     onLoadStart: onLoadMetadata,
     onLoadComplete: onLoadMetadataComplete,
     onLoadError: onLoadMetadataError,

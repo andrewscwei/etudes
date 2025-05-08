@@ -1,10 +1,16 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Size } from 'spase'
 import { useVideoMetadataLoader, type UseVideoMetadataLoaderOptions, type UseVideoMetadataLoaderParams } from './useVideoMetadataLoader.js'
 
-type Params = UseVideoMetadataLoaderParams
+/**
+ * Type describing the parameters of {@link useVideoSize}.
+ */
+export type UseVideoSizeParams = UseVideoMetadataLoaderParams
 
-type Options = UseVideoMetadataLoaderOptions & {
+/**
+ * Type describing the options of {@link useVideoSize}.
+ */
+type UseVideoSizeOptions = UseVideoMetadataLoaderOptions & {
   /**
    * If `false`, the size will be reset to `undefined` when the video begins
    * loading or when an error occurs. Defaults to `true`.
@@ -15,37 +21,44 @@ type Options = UseVideoMetadataLoaderOptions & {
 /**
  * Hook for retrieving the size of a video.
  *
- * @param params See {@link Params}.
- * @param options See {@link Options}.
+ * @param params See {@link UseVideoSizeParams}.
+ * @param options See {@link UseVideoSizeOptions}.
  *
  * @returns The actual size of the video if loading was successful, `undefined`
  *          otherwise.
  */
-export function useVideoSize({ src }: Params, { preservesSizeBetweenLoads = true, onLoadStart, onLoadComplete, onLoadError }: Options = {}): Size | undefined {
-  const handleLoad = (element: HTMLVideoElement) => {
+export function useVideoSize({
+  src,
+}: UseVideoSizeParams, {
+  preservesSizeBetweenLoads = true,
+  onLoadStart,
+  onLoadComplete,
+  onLoadError,
+}: UseVideoSizeOptions = {}): Size | undefined {
+  const [size, setSize] = useState<Size | undefined>()
+
+  const loadStartHandler = useCallback((element: HTMLVideoElement) => {
     if (!preservesSizeBetweenLoads) setSize(undefined)
 
     onLoadStart?.(element)
-  }
+  }, [preservesSizeBetweenLoads, onLoadStart])
 
-  const handleLoadComplete = (element: HTMLVideoElement) => {
+  const loadCompleteHandler = useCallback((element: HTMLVideoElement) => {
     setSize(getSize(element))
 
     onLoadComplete?.(element)
-  }
+  }, [onLoadComplete])
 
-  const handleLoadError = (element: HTMLVideoElement) => {
+  const loadErrorHandler = useCallback((element: HTMLVideoElement) => {
     if (!preservesSizeBetweenLoads) setSize(undefined)
 
     onLoadError?.(element)
-  }
-
-  const [size, setSize] = useState<Size | undefined>(undefined)
+  }, [preservesSizeBetweenLoads, onLoadError])
 
   useVideoMetadataLoader({ src }, {
-    onLoadStart: t => handleLoad(t),
-    onLoadComplete: t => handleLoadComplete(t),
-    onLoadError: t => handleLoadError(t),
+    onLoadStart: loadStartHandler,
+    onLoadComplete: loadCompleteHandler,
+    onLoadError: loadErrorHandler,
   })
 
   return size

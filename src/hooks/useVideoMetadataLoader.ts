@@ -1,5 +1,8 @@
-import { useEffect, useRef, type DependencyList } from 'react'
+import { useCallback, useEffect } from 'react'
 
+/**
+ * Type describing the parameters of {@link useVideoMetadataLoader}.
+ */
 export type UseVideoMetadataLoaderParams = {
   /**
    * `src` attribute of the video.
@@ -7,6 +10,9 @@ export type UseVideoMetadataLoaderParams = {
   src?: string
 }
 
+/**
+ * Type describing the options of {@link useVideoMetadataLoader}.
+ */
 export type UseVideoMetadataLoaderOptions = {
   /**
    * Handler invoked when the video metadata starts loading.
@@ -35,35 +41,37 @@ export type UseVideoMetadataLoaderOptions = {
  *
  * @param params See {@link UseVideoMetadataLoaderParams}.
  * @param options See {@link UseVideoMetadataLoaderOptions}.
- * @param deps Additional dependencies.
  */
-export function useVideoMetadataLoader({ src }: UseVideoMetadataLoaderParams, { onLoadStart, onLoadComplete, onLoadError }: UseVideoMetadataLoaderOptions = {}, deps: DependencyList = []) {
-  const loadCompleteHandler = (event: Event) => {
+export function useVideoMetadataLoader({
+  src,
+}: UseVideoMetadataLoaderParams, {
+  onLoadStart,
+  onLoadComplete,
+  onLoadError,
+}: UseVideoMetadataLoaderOptions = {}) {
+  const loadCompleteHandler = useCallback((event: Event) => {
     const element = event.currentTarget as HTMLVideoElement
 
     onLoadComplete?.(element)
-  }
+  }, [onLoadComplete])
 
-  const loadErrorHandler = (event: Event) => {
+  const loadErrorHandler = useCallback((event: Event) => {
     const element = event.currentTarget as HTMLVideoElement
 
     onLoadError?.(element)
-  }
-
-  const ref = useRef<HTMLVideoElement | undefined>(undefined)
+  }, [onLoadError])
 
   useEffect(() => {
-    ref.current = document.createElement('video')
-    if (src) ref.current.src = src
-    ref.current.addEventListener('loadedmetadata', loadCompleteHandler)
-    ref.current.addEventListener('error', loadErrorHandler)
+    const video = document.createElement('video')
+    video.addEventListener('loadedmetadata', loadCompleteHandler)
+    video.addEventListener('error', loadErrorHandler)
+    if (src) video.src = src
 
-    onLoadStart?.(ref.current)
+    onLoadStart?.(video)
 
     return () => {
-      ref.current?.removeEventListener('loadedmetadata', loadCompleteHandler)
-      ref.current?.removeEventListener('error', loadErrorHandler)
-      ref.current = undefined
+      video.removeEventListener('loadedmetadata', loadCompleteHandler)
+      video.removeEventListener('error', loadErrorHandler)
     }
-  }, [src, ...deps])
+  }, [src, onLoadStart])
 }
