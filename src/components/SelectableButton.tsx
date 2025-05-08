@@ -1,16 +1,51 @@
 import clsx from 'clsx'
 import { forwardRef, type ButtonHTMLAttributes } from 'react'
 
+/**
+ * Type describing the props of {@link SelectableButton}.
+ */
 export type SelectableButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-disabled' | 'aria-label' | 'aria-selected' | 'disabled' | 'onClick' | 'onSelect' | 'onToggle'> & {
+  /**
+   * Specifies if the button can be deselected.
+   */
   isDeselectable?: boolean
+
+  /**
+   * Specifies if the button is disabled.
+   */
   isDisabled?: boolean
+
+  /**
+   * Specifies if the button is selected.
+   */
   isSelected?: boolean
+
+  /**
+   * The label of the button.
+   */
   label?: string
+
+  /**
+   * Handler invoked when the button is deselected.
+   */
   onDeselect?: () => void
+
+  /**
+   * Handler invoked when the button is selected.
+   */
   onSelect?: () => void
+
+  /**
+   * Handler invoked when the button's selected state is toggled.
+   *
+   * @param isSelected The new selected state of the button.
+   */
   onToggle?: (isSelected: boolean) => void
 }
 
+/**
+ * A button component that can be selected or deselected.
+ */
 export const SelectableButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readonly<SelectableButtonProps>>(({
   children,
   className,
