@@ -1,11 +1,17 @@
 import { Fragment, type ReactNode } from 'react'
 
+/**
+ * Type describing the properties of {@link Each}.
+ */
 export type EachProps<T> = {
   children?: ReactNode | ((value: T, index: number) => ReactNode)
   in?: T[]
   render?: (value: T, index: number) => ReactNode
 }
 
+/**
+ * Component for rendering a list of items.
+ */
 export function Each<T>({
   in: array,
   children,
