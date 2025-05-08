@@ -1,5 +1,8 @@
-import { useEffect, useRef, type DependencyList } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 
+/**
+ * Type describing the parameters of {@link useImageLoader}.
+ */
 export type UseImageLoaderParams = {
   /**
    * `src` attribute of the image.
@@ -17,6 +20,9 @@ export type UseImageLoaderParams = {
   sizes?: string
 }
 
+/**
+ * Type describing the options of {@link useImageLoader}.
+ */
 export type UseImageLoaderOptions = {
   /**
    * Handler invoked when the image starts loading.
@@ -45,22 +51,29 @@ export type UseImageLoaderOptions = {
  *
  * @param params See {@link UseImageLoaderParams}.
  * @param options See {@link UseImageLoaderOptions}.
- * @param deps Additional dependencies.
  */
-export function useImageLoader({ src, srcSet, sizes }: UseImageLoaderParams, { onLoadStart, onLoadComplete, onLoadError }: UseImageLoaderOptions = {}, deps: DependencyList = []) {
-  const imageLoadCompleteHandler = (event: Event) => {
+export function useImageLoader({
+  src,
+  srcSet,
+  sizes,
+}: UseImageLoaderParams, {
+  onLoadStart,
+  onLoadComplete,
+  onLoadError,
+}: UseImageLoaderOptions = {}) {
+  const imageRef = useRef<HTMLImageElement>(undefined)
+
+  const imageLoadCompleteHandler = useCallback((event: Event) => {
     const element = event.currentTarget as HTMLImageElement
 
     onLoadComplete?.(element)
-  }
+  }, [onLoadComplete])
 
-  const imageLoadErrorHandler = (event: Event) => {
+  const imageLoadErrorHandler = useCallback((event: Event) => {
     const element = event.currentTarget as HTMLImageElement
 
     onLoadError?.(element)
-  }
-
-  const imageRef = useRef<HTMLImageElement | undefined>(undefined)
+  }, [onLoadError])
 
   useEffect(() => {
     imageRef.current = new Image()
@@ -78,5 +91,5 @@ export function useImageLoader({ src, srcSet, sizes }: UseImageLoaderParams, { o
       imageRef.current?.removeEventListener('error', imageLoadErrorHandler)
       imageRef.current = undefined
     }
-  }, [src, srcSet, sizes, ...deps])
+  }, [src, srcSet, sizes, onLoadStart, imageLoadCompleteHandler, imageLoadErrorHandler])
 }
