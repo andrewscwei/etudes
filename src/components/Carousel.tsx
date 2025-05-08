@@ -95,23 +95,30 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
   ItemComponent,
   ...props
 }, ref) => {
-  const handleIndexChange = (newValue: number) => onIndexChange?.(newValue)
+  const prevIndexRef = useRef<number>(undefined)
+  const viewportRef = useRef<HTMLDivElement>(null)
+  const pointerDownPositionRef = useRef<Point>(undefined)
+  const pointerUpPositionRef = useRef<Point>(undefined)
+  const autoScrollTimeoutRef = useRef<NodeJS.Timeout>(undefined)
+  const autoScrollTimeoutMs = 1000
 
-  const handlePointerDown = (event: PointerEvent) => {
+  const [exposures, setExposures] = useState<number[] | undefined>(getItemExposures(viewportRef, orientation))
+  const [isPointerDown, setIsPointerDown] = useState(false)
+
+  const fixedStyles = getFixedStyles({ scrollSnapEnabled: !isPointerDown, orientation })
+  const shouldAutoAdvance = autoAdvanceInterval > 0
+
+  const indexChangeHandler = useCallback((newValue: number) => {
+    onIndexChange?.(newValue)
+  }, [onIndexChange])
+
+  const pointerDownHandler = useCallback((event: PointerEvent) => {
     pointerDownPositionRef.current = Point.make(event.clientX, event.clientY)
 
     setIsPointerDown(true)
-  }
+  }, [])
 
-  const handlePointerUp = (event: PointerEvent) => {
-    pointerUpPositionRef.current = Point.make(event.clientX, event.clientY)
-
-    if (!isPointerDown) return
-
-    setIsPointerDown(false)
-  }
-
-  const handleClick = (event: MouseEvent) => {
+  const clickHandler = useCallback((event: MouseEvent) => {
     const downPosition = pointerDownPositionRef.current
     const upPosition = pointerUpPositionRef.current
 
@@ -126,9 +133,17 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
 
     pointerDownPositionRef.current = undefined
     pointerUpPositionRef.current = undefined
-  }
+  }, [])
 
-  const normalizeScrollPosition = () => {
+  const pointerUpHandler = useCallback((event: PointerEvent) => {
+    pointerUpPositionRef.current = Point.make(event.clientX, event.clientY)
+
+    if (!isPointerDown) return
+
+    setIsPointerDown(false)
+  }, [isPointerDown])
+
+  const normalizeScrollPosition = useCallback(() => {
     scrollToIndex(viewportRef, index, orientation)
 
     clearTimeout(autoScrollTimeoutRef.current)
@@ -137,20 +152,13 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
       clearTimeout(autoScrollTimeoutRef.current)
       autoScrollTimeoutRef.current = undefined
     }, autoScrollTimeoutMs)
-  }
+  }, [viewportRef.current, index, orientation, autoScrollTimeoutMs])
 
-  const prevIndexRef = useRef<number>(undefined)
-  const viewportRef = useRef<HTMLDivElement>(null)
-  const pointerDownPositionRef = useRef<Point>(undefined)
-  const pointerUpPositionRef = useRef<Point>(undefined)
-  const autoScrollTimeoutRef = useRef<NodeJS.Timeout>(undefined)
-  const autoScrollTimeoutMs = 1000
+  const timeoutHandler = useCallback(() => {
+    const nextIndex = (index + items.length + 1) % items.length
 
-  const [exposures, setExposures] = useState<number[] | undefined>(getItemExposures(viewportRef, orientation))
-  const [isPointerDown, setIsPointerDown] = useState(false)
-
-  const fixedStyles = getFixedStyles({ scrollSnapEnabled: !isPointerDown, orientation })
-  const shouldAutoAdvance = autoAdvanceInterval > 0
+    indexChangeHandler(nextIndex)
+  }, [isPointerDown, index, items.length, indexChangeHandler])
 
   const dragMoveHandler = useCallback(({ x, y }: Point) => {
     const viewport = viewportRef.current
@@ -200,7 +208,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
       // between index change from scroll vs from prop.
       prevIndexRef.current = clampedIndex
 
-      handleIndexChange(clampedIndex)
+      indexChangeHandler(clampedIndex)
     }
 
     viewport.addEventListener('scroll', scrollHandler)
@@ -213,7 +221,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
       prevIndexRef.current = index
 
       if (!isInitialRender) {
-        handleIndexChange(index)
+        indexChangeHandler(index)
         normalizeScrollPosition()
       }
     }
@@ -240,23 +248,19 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
   })
 
   useTimeout((isPointerDown || !shouldAutoAdvance) ? -1 : autoAdvanceInterval, {
-    onTimeout: () => {
-      const nextIndex = (index + items.length + 1) % items.length
-
-      handleIndexChange(nextIndex)
-    },
-  }, [autoAdvanceInterval, isPointerDown, index, items.length, shouldAutoAdvance, handleIndexChange])
+    onTimeout: timeoutHandler,
+  })
 
   return (
     <div
       {...props}
       ref={ref}
       role='region'
-      onClick={event => handleClick(event)}
-      onPointerCancel={event => handlePointerUp(event)}
-      onPointerDown={event => handlePointerDown(event)}
-      onPointerLeave={event => handlePointerUp(event)}
-      onPointerUp={event => handlePointerUp(event)}
+      onClick={event => clickHandler(event)}
+      onPointerCancel={event => pointerUpHandler(event)}
+      onPointerDown={event => pointerDownHandler(event)}
+      onPointerLeave={event => pointerUpHandler(event)}
+      onPointerUp={event => pointerUpHandler(event)}
     >
       <div ref={viewportRef} style={styles(fixedStyles.viewport)}>
         <Each in={items}>

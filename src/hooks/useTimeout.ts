@@ -1,19 +1,56 @@
-import { useCallback, useEffect, useRef, type DependencyList, type RefObject } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 
-type Options = {
-  autoStart?: boolean
-  onTimeout?: () => void
-}
-
-type ReturnValue = {
+/**
+ * Type describing the output of {@link useTimeout}.
+ */
+export type UseTimeoutOutput = {
+  /**
+   * Function to start the timeout.
+   */
   start: () => void
+
+  /**
+   * Function to stop the timeout.
+   */
   stop: () => void
-  ref: RefObject<NodeJS.Timeout> | RefObject<NodeJS.Timeout | undefined> | RefObject<NodeJS.Timeout | null>
 }
 
-export function useTimeout(timeout: number = 0, { autoStart = true, onTimeout }: Options = {}, deps: DependencyList = []): ReturnValue {
+/**
+ * Type describing the options of {@link useTimeout}.
+ */
+export type UseTimeoutOptions = {
+  /**
+   * Specifies whether the timeout should start automatically.
+   */
+  autoStarts?: boolean
+
+  /**
+   * Handler invoked when the timeout is reached.
+   */
+  onTimeout: () => void
+}
+
+/**
+ * Hook for managing a timeout.
+ *
+ * @param timeout The timeout duration in milliseconds.
+ * @param options See {@link UseTimeoutOptions}.
+ *
+ * @returns See {@link UseTimeoutOutput}.
+ */
+export function useTimeout(timeout: number, {
+  autoStarts = true,
+  onTimeout,
+}: UseTimeoutOptions): UseTimeoutOutput {
   const timeoutRef = useRef<NodeJS.Timeout>(undefined)
-  const handlerRef = useRef<() => void>(undefined)
+
+  const stop = useCallback(() => {
+    if (timeoutRef.current === undefined) return
+
+    clearTimeout(timeoutRef.current)
+
+    timeoutRef.current = undefined
+  }, [])
 
   const start = useCallback(() => {
     stop()
@@ -22,25 +59,19 @@ export function useTimeout(timeout: number = 0, { autoStart = true, onTimeout }:
 
     timeoutRef.current = setTimeout(() => {
       stop()
-      handlerRef.current?.()
+      onTimeout()
     }, timeout)
-  }, [timeout])
-
-  const stop = useCallback(() => {
-    clearTimeout(timeoutRef.current)
-    timeoutRef.current = undefined
-  }, [])
-
-  useEffect(() => {
-    handlerRef.current = onTimeout
-  }, [onTimeout])
+  }, [timeout, stop, onTimeout])
 
   useEffect(() => {
     if (timeout < 0) return
-    if (autoStart) start()
+    if (autoStarts) start()
 
     return () => stop()
-  }, [timeout, ...deps])
+  }, [autoStarts, timeout, start, stop])
 
-  return { start, stop, ref: timeoutRef }
+  return {
+    start,
+    stop,
+  }
 }
