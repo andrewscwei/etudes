@@ -3,9 +3,14 @@ import { useLayoutEffect, type RefObject } from 'react'
 import { Point } from 'spase'
 import { createKey } from '../utils/createKey.js'
 
+type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
+
 type InteractDraggableOptions = Parameters<Interact.Interactable['draggable']>[0]
 
-type Options = Omit<InteractDraggableOptions, 'onstart' | 'onmove' | 'onend'> & {
+/**
+ * Type describing the options of {@link useInertiaDrag}.
+ */
+type UseInertiaDragOptions = Omit<InteractDraggableOptions, 'onstart' | 'onmove' | 'onend'> & {
   /**
    * Specifies whether this effect is enabled.
    */
@@ -46,13 +51,13 @@ type Options = Omit<InteractDraggableOptions, 'onstart' | 'onmove' | 'onend'> & 
  *
  * @returns The states created for this effect.
  */
-export function useInertiaDrag(targetRef: RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>, {
+export function useInertiaDrag(targetRef: TargetRef, {
   isEnabled = true,
   onDragStart,
   onDragMove,
   onDragEnd,
   ...options
-}: Options) {
+}: UseInertiaDragOptions) {
   useLayoutEffect(() => {
     if (!isEnabled) return
 
