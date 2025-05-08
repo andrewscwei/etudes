@@ -1,9 +1,15 @@
 import { type PropsWithChildren } from 'react'
 
+/**
+ * Type describing the properties of {@link Conditional}.
+ */
 export type ConditionalProps = PropsWithChildren<{
   if: any | (() => any)
 }>
 
+/**
+ * Component for conditionally rendering children.
+ */
 export function Conditional({ children, if: functionOrTruthyExpression }: Readonly<ConditionalProps>) {
   switch (typeof functionOrTruthyExpression) {
     case 'function':
