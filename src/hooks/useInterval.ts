@@ -1,6 +1,9 @@
-import { useEffect, useRef, type DependencyList } from 'react'
+import { useEffect, useRef } from 'react'
 
-type Options = {
+/**
+ * Type describing the options of {@link useImageLoader}.
+ */
+export type UseIntervalOptions = {
   /**
    * Specifies if the handler should be invoked initially (as opposed to waiting
    * for the specified interval for the initial invocation).
@@ -13,10 +16,9 @@ type Options = {
  *
  * @param handler The method to invoke on every interval.
  * @param interval Time (in milliseconds) between each invocation.
- * @param options See {@link Options}.
- * @param deps Dependencies that trigger this effect.
+ * @param options See {@link UseIntervalOptions}.
  */
-export function useInterval(handler: () => void, interval?: number, { shouldInvokeInitially = false }: Options = {}, deps: DependencyList = []) {
+export function useInterval(handler: () => void, interval?: number, { shouldInvokeInitially = false }: UseIntervalOptions = {}) {
   const handlerRef = useRef<() => void>(undefined)
 
   useEffect(() => {
@@ -30,5 +32,5 @@ export function useInterval(handler: () => void, interval?: number, { shouldInvo
     const timer = window.setInterval(() => handlerRef.current?.(), interval)
 
     return () => clearInterval(timer)
-  }, [interval, ...deps])
+  }, [interval])
 }
