@@ -2,6 +2,9 @@ import { forwardRef, useEffect, type HTMLAttributes } from 'react'
 import { type Size } from 'spase'
 import { useImageSize } from '../hooks/useImageSize.js'
 
+/**
+ * Type describing the props of {@link Image}.
+ */
 export type ImageProps = Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'loading' | 'sizes' | 'src' | 'srcSet' | 'onLoadStart'> & {
   /**
    * Optional alt text.
@@ -85,6 +88,10 @@ export type ImageProps = Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'loading
   onSizeChange?: (size?: Size) => void
 }
 
+/**
+ * A component that renders an image with support for lazy loading, `srcset`,
+ * and `sizes` attributes.
+ */
 export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<ImageProps>>(({
   alt,
   loadingMode = 'preload',
