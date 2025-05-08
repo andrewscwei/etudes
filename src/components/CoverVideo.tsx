@@ -7,6 +7,9 @@ import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { styles } from '../utils/styles.js'
 import { Video, type VideoProps } from './Video.js'
 
+/**
+ * Type describing the props of {@link CoverVideo}.
+ */
 export type CoverVideoProps = Omit<HTMLAttributes<HTMLDivElement>, 'onCanPlay' | 'onPause' | 'onPlay'> & Pick<VideoProps, 'autoLoop' | 'autoPlay' | 'hasControls' | 'isMuted' | 'playsInline' | 'posterSrc' | 'src' | 'onPause' | 'onPlay' | 'onCanPlay' | 'onEnd' | 'onFullscreenChange' | 'onLoadMetadata' | 'onLoadMetadataComplete' | 'onLoadMetadataError' | 'onSizeChange'> & {
   /**
    * The known aspect ratio of the video, expressed by width / height. If
@@ -15,6 +18,13 @@ export type CoverVideoProps = Omit<HTMLAttributes<HTMLDivElement>, 'onCanPlay' |
   aspectRatio?: number
 }
 
+/**
+ * A component that displays a video with a fixed aspect ratio. The video is
+ * centered and cropped to fit the container (a.k.a. viewport).
+ *
+ * @exports CoverVideoContent Component for optional content inside the video.
+ * @exports CoverVideoViewport Component for the viewport.
+ */
 export const CoverVideo = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverVideoProps>>(({
   className,
   children,
@@ -105,13 +115,19 @@ export const CoverVideo = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Co
   )
 })
 
-export const CoverVideoViewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+/**
+ * Component for optional content inside a {@link CoverVideo}.
+ */
+export const CoverVideoContent = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}>
     {children}
   </div>
 )
 
-export const CoverVideoContent = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+/**
+ * Component for the viewport of a {@link CoverVideo}.
+ */
+export const CoverVideoViewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}>
     {children}
   </div>
@@ -132,6 +148,6 @@ const FIXED_STYLES = asStyleDict({
 
 if (process.env.NODE_ENV !== 'production') {
   CoverVideo.displayName = 'CoverVideo'
-  CoverVideoViewport.displayName = 'CoverVideoViewport'
   CoverVideoContent.displayName = 'CoverVideoContent'
+  CoverVideoViewport.displayName = 'CoverVideoViewport'
 }
