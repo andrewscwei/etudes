@@ -4,8 +4,20 @@ import { Fragment, type ReactNode } from 'react'
  * Type describing the properties of {@link Each}.
  */
 export type EachProps<T> = {
+  /**
+   * The children to repeat. This is omitted if `render` is provided.
+   */
   children?: ReactNode | ((value: T, index: number) => ReactNode)
+
+  /**
+   * The array of items to iterate over.
+   */
   in?: T[]
+
+  /**
+   * Function that overrides the default rendering of the children, invoked on
+   * each item in the array.
+   */
   render?: (value: T, index: number) => ReactNode
 }
 
