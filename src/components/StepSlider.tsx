@@ -137,6 +137,7 @@ export type StepSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valueno
  * where the position is a decimal ranging between 0.0 and 1.0, inclusive.
  *
  * @exports StepSliderKnob Component for the knob.
+ * @exports StepSliderKnobContainer Component for the container of the knob.
  * @exports StepSliderLabel Component for the label on the knob.
  * @exports StepSliderTrack Component for the slide track on either side of the
  *                          knob.
@@ -252,6 +253,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
   const fixedStyles = getFixedStyles({ orientation, naturalPosition, isClipped, isDragging, knobHeight, knobWidth, isTrackInteractive })
   const components = asComponentDict(children, {
     knob: StepSliderKnob,
+    knobContainer: StepSliderKnobContainer,
     label: StepSliderLabel,
     track: StepSliderTrack,
   })
@@ -317,15 +319,17 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
           }),
           onClick: trackClickHandler,
         }, <div style={fixedStyles.trackHitBox}/>)}
-        <button ref={knobContainerRef} style={fixedStyles.knobContainer}>
-          {cloneStyledElement(components.knob ?? <StepSliderKnob/>, {
-            className: clsx(fixedClassNames.knob),
-            style: styles(fixedStyles.knob),
-          }, steps && labelProvider && cloneStyledElement(components.label ?? <StepSliderLabel/>, {
-            className: clsx(fixedClassNames.label),
-            style: styles(fixedStyles.label),
-          }, labelProvider(position, getNearestIndexByPosition(position, steps))))}
-        </button>
+        {cloneStyledElement(components.knobContainer ?? <StepSliderKnobContainer/>, {
+          className: clsx(fixedClassNames.knobContainer),
+          style: styles(fixedStyles.knobContainer),
+          ref: knobContainerRef,
+        }, cloneStyledElement(components.knob ?? <StepSliderKnob/>, {
+          className: clsx(fixedClassNames.knob),
+          style: styles(fixedStyles.knob),
+        }, steps && labelProvider && cloneStyledElement(components.label ?? <StepSliderLabel/>, {
+          className: clsx(fixedClassNames.label),
+          style: styles(fixedStyles.label),
+        }, labelProvider(position, getNearestIndexByPosition(position, steps)))))}
       </div>
     </div>
   )
@@ -336,6 +340,13 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
  */
 export const StepSliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}/>
+)
+
+/**
+ * Component for the container of the knob of a {@link StepSlider}.
+ */
+export const StepSliderKnobContainer = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => (
+  <button {...props}/>
 )
 
 /**
@@ -419,6 +430,12 @@ function getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtSta
       'dragging': isDragging,
       'releasing': isReleasing,
     }),
+    knobContainer: clsx(orientation, {
+      'at-end': isAtEnd,
+      'at-start': isAtStart,
+      'dragging': isDragging,
+      'releasing': isReleasing,
+    }),
     label: clsx(orientation, {
       'at-end': isAtEnd,
       'at-start': isAtStart,
@@ -444,11 +461,9 @@ function getFixedStyles({ orientation = 'vertical', naturalPosition = 0, isClipp
       ...orientation === 'vertical' ? {
         left: '50%',
         top: isClipped ? `calc(${naturalPosition * 100}% + ${knobHeight * 0.5 - naturalPosition * knobHeight}px)` : `${naturalPosition * 100}%`,
-        transition: isDragging === false ? 'top 100ms ease-out' : 'none',
       } : {
         left: isClipped ? `calc(${naturalPosition * 100}% + ${knobWidth * 0.5 - naturalPosition * knobWidth}px)` : `${naturalPosition * 100}%`,
         top: '50%',
-        transition: isDragging === false ? 'left 100ms ease-out' : 'none',
       },
     },
     knob: {
@@ -499,5 +514,6 @@ if (process.env.NODE_ENV !== 'production') {
   StepSlider.displayName = 'StepSlider'
   StepSliderTrack.displayName = 'StepSliderTrack'
   StepSliderKnob.displayName = 'StepSliderKnob'
+  StepSliderKnobContainer.displayName = 'StepSliderKnobContainer'
   StepSliderLabel.displayName = 'StepSliderLabel'
 }

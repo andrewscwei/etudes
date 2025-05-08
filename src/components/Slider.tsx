@@ -108,6 +108,7 @@ export type SliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-orientation
  * respectively). The size of the knob does not impact the size of the slider.
  *
  * @exports SliderKnob Component for the knob.
+ * @exports SliderKnobContainer Component for the container of the knob.
  * @exports SliderLabel Component for the label on the knob.
  * @exports SliderTrack Component for the slide track on either side of the
  *                      knob.
@@ -392,5 +393,6 @@ if (process.env.NODE_ENV !== 'production') {
   Slider.displayName = 'Slider'
   SliderTrack.displayName = 'SliderTrack'
   SliderKnob.displayName = 'SliderKnob'
+  SliderKnobContainer.displayName = 'SliderKnobContainer'
   SliderLabel.displayName = 'SliderLabel'
 }

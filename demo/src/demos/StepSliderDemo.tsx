@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { StepSlider, StepSliderKnob, StepSliderLabel, StepSliderTrack } from 'etudes'
+import { StepSlider, StepSliderKnob, StepSliderKnobContainer, StepSliderLabel, StepSliderTrack } from 'etudes'
 import { useState } from 'react'
 import { Frame } from '../components/Frame.js'
 
@@ -41,6 +41,12 @@ export function StepSliderDemo() {
           }}
         >
           <StepSliderKnob className='ia flex items-center justify-center border border-dark bg-dark'/>
+          <StepSliderKnobContainer
+            className={clsx({
+              '[:not(.dragging)]:transition-[left]': orientation === 'horizontal',
+              '[:not(.dragging)]:transition-[top]': orientation === 'vertical',
+            })}
+          />
           <StepSliderLabel className='text-base text-light'/>
           <StepSliderTrack className='ia bg-dark/40 [.start]:bg-dark'/>
         </StepSlider>
