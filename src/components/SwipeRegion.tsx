@@ -1,20 +1,46 @@
 import { forwardRef, useState, type HTMLAttributes } from 'react'
 import { Point } from 'spase'
 
-export type SwipeContainerProps = Omit<HTMLAttributes<HTMLDivElement>, 'onMouseDown' | 'onMouseLeave' | 'onMouseMove' | 'onMouseUp' | 'onTouchEnd' | 'onTouchMove' | 'onTouchStart'> & {
+/**
+ * Type describing the props of {@link SwipeRegion}.
+ */
+export type SwipeRegionProps = Omit<HTMLAttributes<HTMLDivElement>, 'onMouseDown' | 'onMouseLeave' | 'onMouseMove' | 'onMouseUp' | 'onTouchEnd' | 'onTouchMove' | 'onTouchStart'> & {
+  /**
+   * Specifies if swipe detection is enabled.
+   */
   isEnabled?: boolean
+
+  /**
+   * The minimum velocity (in pixels per millisecond) required to trigger a
+   * swipe event.
+   */
   threshold?: number
+
+  /**
+   * Handler invoked when a swipe down gesture is detected.
+   */
   onSwipeDown?: () => void
+
+  /**
+   * Handler invoked when a swipe left gesture is detected.
+   */
   onSwipeLeft?: () => void
+
+  /**
+   * Handler invoked when a swipe right gesture is detected.
+   */
   onSwipeRight?: () => void
+
+  /**
+   * Handler invoked when a swipe up gesture is detected.
+   */
   onSwipeUp?: () => void
 }
 
 /**
- * An empty component with a backing `<div>` element that detects swipe
- * gestures.
+ * An {@link HTMLDivElement} container that detects swipe gestures.
  */
-export const SwipeRegion = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<SwipeContainerProps>>(({
+export const SwipeRegion = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<SwipeRegionProps>>(({
   children,
   isEnabled = true,
   threshold = 0.5,
