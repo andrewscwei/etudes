@@ -8,8 +8,14 @@ import { asStyleDict } from '../utils/asStyleDict.js'
 import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { styles } from '../utils/styles.js'
 
+/**
+ * Type describing the orientation of {@link Slider}.
+ */
 export type SliderOrientation = 'horizontal' | 'vertical'
 
+/**
+ * Type describing the props of {@link Slider}.
+ */
 export type SliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-orientation' | 'aria-valuenow' | 'role'> & {
   /**
    * Specifies if the knob is clipped to the track.
@@ -101,9 +107,9 @@ export type SliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-orientation
  * width and height of the knob are set via props (`knobWidth` and `knobHeight`,
  * respectively). The size of the knob does not impact the size of the slider.
  *
- * @exports SliderKnob The component for the knob.
- * @exports SliderLabel The component for the label on the knob.
- * @exports SliderTrack The component for the slide track on either side of the
+ * @exports SliderKnob Component for the knob.
+ * @exports SliderLabel Component for the label on the knob.
+ * @exports SliderTrack Component for the slide track on either side of the
  *                      knob.
  */
 export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<SliderProps>>(({
@@ -259,14 +265,23 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
   )
 })
 
+/**
+ * Component for the slide track on either side of the knob of a {@link Slider}.
+ */
 export const SliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}/>
 )
 
+/**
+ * Component for the knob of a {@link Slider}.
+ */
 export const SliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}/>
 )
 
+/**
+ * Component for the label on the knob of a {@link Slider}.
+ */
 export const SliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}/>
 )
