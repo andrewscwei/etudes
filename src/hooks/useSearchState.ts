@@ -1,7 +1,15 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
+import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react'
 import { useSearchParams } from 'react-router'
 
-export type Options<T> = {
+/**
+ * Type describing the output of {@link useSearchState}.
+ */
+export type UseSearchStateOutput<T> = [T, Dispatch<SetStateAction<T>>]
+
+/**
+ * Type describing the output of {@link useSearchState}.
+ */
+export type UseSearchStateOptions<T> = {
   /**
    * Function for transforming the search param value to the value of the mapped
    * state.
@@ -36,21 +44,21 @@ export type Options<T> = {
  *
  * @param param The search param key.
  * @param defaultValue The default value of the state.
- * @param options See {@link Options}.
+ * @param options See {@link UseSearchStateOptions}.
  *
  * @returns A tuple consisting of a stateful value representing the current
  *          value of the mapped state and a function that updates it.
  */
-export function useSearchParamState<T>(
+export function useSearchState<T>(
   param: string,
   defaultValue: T,
   {
     mapSearchParamToState,
     mapStateToSearchParam,
     shouldPopulateDefaultState = false,
-  }: Options<T> = {},
-): [T, Dispatch<SetStateAction<T>>] {
-  const defaultMapSearchParamToState = (value: string | undefined, fallback: T): T => {
+  }: UseSearchStateOptions<T> = {},
+): UseSearchStateOutput<T> {
+  const defaultMapSearchParamToState = useCallback((value: string | undefined, fallback: T): T => {
     if (mapSearchParamToState) {
       return mapSearchParamToState(value)
     }
@@ -60,19 +68,19 @@ export function useSearchParamState<T>(
     else {
       return value as unknown as NonNullable<T>
     }
-  }
+  }, [mapSearchParamToState])
 
-  const defaultMapStateToSearchParam = (state: T): string | undefined => {
+  const defaultMapStateToSearchParam = useCallback((value: T): string | undefined => {
     if (mapStateToSearchParam) {
-      return mapStateToSearchParam(state)
+      return mapStateToSearchParam(value)
     }
-    else if (!shouldPopulateDefaultState && state === defaultValue) {
+    else if (!shouldPopulateDefaultState && value === defaultValue) {
       return undefined
     }
     else {
-      return `${state}`
+      return `${value}`
     }
-  }
+  }, [defaultValue, shouldPopulateDefaultState, mapStateToSearchParam])
 
   const [searchParams, setSearchParams] = useSearchParams()
   const currentState = defaultMapSearchParamToState(searchParams.get(param) ?? undefined, defaultValue)
@@ -92,7 +100,7 @@ export function useSearchParamState<T>(
     }
 
     setSearchParams(searchParams)
-  }, [state])
+  }, [state, defaultMapStateToSearchParam])
 
   return [state, setState]
 }
