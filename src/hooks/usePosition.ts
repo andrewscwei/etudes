@@ -1,4 +1,4 @@
-import { useEffect, useRef, type DependencyList } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { Point, Rect } from 'spase'
 
 export type ScrollPositionInfo = {
@@ -8,37 +8,33 @@ export type ScrollPositionInfo = {
   step: Point
 }
 
-type Props = {
+/**
+ * Type describing the options of {@link usePosition}.
+ */
+export type UsePositionProps = {
+  /**
+   * Handler invoked when the scroll position changes.
+   *
+   * @param newInfo New scroll position information.
+   * @param oldInfo Old scroll position information.
+   */
   onChange: (newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void
 }
 
-export function usePosition({ onChange }: Props, deps: DependencyList = []) {
-  const handleScrollPositionChange = () => {
+/**
+ * Hook for tracking the scroll position of the viewport.
+ *
+ * @param props See {@link UsePositionProps}.
+ */
+export function usePosition({ onChange }: UsePositionProps) {
+  const handleScrollPositionChange = useCallback(() => {
     const newValue = getScrollPositionInfo()
     if (!newValue) return
 
     onChange(newValue, prevInfo.current)
 
     prevInfo.current = newValue
-  }
-
-  const getScrollPositionInfo = (): ScrollPositionInfo | undefined => {
-    const refRect = Rect.fromViewport()
-    const refRectMin = refRect.clone({ x: 0, y: 0 })
-    const refRectFull = Rect.from(window, { overflow: true })
-
-    if (!refRectFull) return undefined
-
-    const refRectMax = refRectMin.clone({ x: refRectFull.width - refRect.width, y: refRectFull.height - refRect.height })
-    const step = Point.make(refRect.left / refRectMax.left, refRect.top / refRectMax.top)
-
-    return {
-      minPos: Point.make(refRectMin.left, refRectMin.top),
-      maxPos: Point.make(refRectMax.left, refRectMax.top),
-      pos: Point.make(refRect.left, refRect.top),
-      step,
-    }
-  }
+  }, [onChange])
 
   const prevInfo = useRef<ScrollPositionInfo>(undefined)
 
@@ -54,5 +50,23 @@ export function usePosition({ onChange }: Props, deps: DependencyList = []) {
       window.removeEventListener('resize', handleScrollPositionChange)
       window.removeEventListener('orientationchange', handleScrollPositionChange)
     }
-  }, [...deps])
+  }, [handleScrollPositionChange])
+}
+
+const getScrollPositionInfo = (): ScrollPositionInfo | undefined => {
+  const refRect = Rect.fromViewport()
+  const refRectMin = refRect.clone({ x: 0, y: 0 })
+  const refRectFull = Rect.from(window, { overflow: true })
+
+  if (!refRectFull) return undefined
+
+  const refRectMax = refRectMin.clone({ x: refRectFull.width - refRect.width, y: refRectFull.height - refRect.height })
+  const step = Point.make(refRect.left / refRectMax.left, refRect.top / refRectMax.top)
+
+  return {
+    minPos: Point.make(refRectMin.left, refRectMin.top),
+    maxPos: Point.make(refRectMax.left, refRectMax.top),
+    pos: Point.make(refRect.left, refRect.top),
+    step,
+  }
 }
