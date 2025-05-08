@@ -2,6 +2,14 @@ import { useCallback, useEffect, type RefObject } from 'react'
 
 type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
 
+/**
+ * Hook for adding click outside interaction to an element.
+ *
+ * @param targetRef The reference to the target element to add click outside
+ *                  interaction to.
+ * @param onClickOutside The handler to call when a click outside the target
+ *                       element is detected.
+ */
 export function useClickOutside(
   targetRef: TargetRef | TargetRef[],
   onClickOutside: () => void,
