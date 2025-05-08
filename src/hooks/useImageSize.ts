@@ -1,10 +1,16 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Size } from 'spase'
 import { useImageLoader, type UseImageLoaderOptions, type UseImageLoaderParams } from './useImageLoader.js'
 
-type Params = UseImageLoaderParams
+/**
+ * Type describing the parameters of {@link useImageSize}.
+ */
+export type UseImageSizeParams = UseImageLoaderParams
 
-type Options = UseImageLoaderOptions & {
+/**
+ * Type describing the options of {@link useImageSize}.
+ */
+export type UseImageSizeOptions = UseImageLoaderOptions & {
   /**
    * If `false`, the size will be reset to `undefined` when the image begins
    * loading or when an error occurs. Defaults to `true`.
@@ -15,37 +21,46 @@ type Options = UseImageLoaderOptions & {
 /**
  * Hook for retrieving the size of an image.
  *
- * @param params See {@link Params}.
- * @param options See {@link Options}.
+ * @param params See {@link UseImageSizeParams}.
+ * @param options See {@link UseImageSizeOptions}.
  *
  * @returns The actual size of the image if loading was successful, `undefined`
  *          otherwise.
  */
-export function useImageSize({ src, srcSet, sizes }: Params, { preservesSizeBetweenLoads = true, onLoadStart, onLoadComplete, onLoadError }: Options = {}): Size | undefined {
-  const handleLoad = (element: HTMLImageElement) => {
+export function useImageSize({
+  src,
+  srcSet,
+  sizes,
+}: UseImageSizeParams, {
+  preservesSizeBetweenLoads = true,
+  onLoadStart,
+  onLoadComplete,
+  onLoadError,
+}: UseImageSizeOptions = {}): Size | undefined {
+  const [imageSize, setImageSize] = useState<Size | undefined>()
+
+  const handleLoad = useCallback((element: HTMLImageElement) => {
     if (!preservesSizeBetweenLoads) setImageSize(undefined)
 
     onLoadStart?.(element)
-  }
+  }, [onLoadStart])
 
-  const handleLoadComplete = (element: HTMLImageElement) => {
+  const handleLoadComplete = useCallback((element: HTMLImageElement) => {
     setImageSize(getSize(element))
 
     onLoadComplete?.(element)
-  }
+  }, [onLoadComplete])
 
-  const handleLoadError = (element: HTMLImageElement) => {
+  const handleLoadError = useCallback((element: HTMLImageElement) => {
     if (!preservesSizeBetweenLoads) setImageSize(undefined)
 
     onLoadError?.(element)
-  }
-
-  const [imageSize, setImageSize] = useState<Size | undefined>()
+  }, [onLoadError])
 
   useImageLoader({ src, srcSet, sizes }, {
-    onLoadStart: t => handleLoad(t),
-    onLoadComplete: t => handleLoadComplete(t),
-    onLoadError: t => handleLoadError(t),
+    onLoadStart: handleLoad,
+    onLoadComplete: handleLoadComplete,
+    onLoadError: handleLoadError,
   })
 
   return imageSize
