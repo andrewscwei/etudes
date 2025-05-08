@@ -1,6 +1,9 @@
 import { XMLBuilder, XMLParser } from 'fast-xml-parser'
 import { forwardRef, type HTMLAttributes } from 'react'
 
+/**
+ * Type describing the props of {@link FlatSVG}.
+ */
 export type FlatSVGProps = Omit<HTMLAttributes<HTMLElement>, 'role'> & {
   /**
    * Specifies how the SVG should be resized:
