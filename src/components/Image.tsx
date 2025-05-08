@@ -148,7 +148,7 @@ export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<Image
 
   useEffect(() => {
     onSizeChange?.(size)
-  }, [size])
+  }, [size?.width, size?.height])
 
   return (
     <img
