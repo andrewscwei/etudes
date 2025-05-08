@@ -260,30 +260,30 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
 /**
  * Component for the gutter of a {@link RangeSlider}.
  */
-export const RangeSliderGutter = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
-  <div {...props} ref={ref}/>
-))
+export const RangeSliderGutter = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <div {...props}/>
+)
 
 /**
  * Component for the label of a {@link RangeSlider}.
  */
-export const RangeSliderLabel = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
-  <div {...props} ref={ref}/>
-))
+export const RangeSliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <div {...props}/>
+)
 
 /**
  * Component for the highlight of a {@link RangeSlider}.
  */
-export const RangeSliderHighlight = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
-  <div {...props} ref={ref}/>
-))
+export const RangeSliderHighlight = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <div {...props}/>
+)
 
 /**
  * Component for the knob of a {@link RangeSlider}.
  */
-export const RangeSliderKnob = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
-  <div {...props} ref={ref}/>
-))
+export const RangeSliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <div {...props}/>
+)
 
 function getFixedStyles({ orientation = 'horizontal', knobWidth = 0, knobHeight = 0, highlightLength = 0, start = 0, knobPadding = 0 }) {
   return asStyleDict({

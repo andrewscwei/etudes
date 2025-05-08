@@ -165,23 +165,23 @@ export const PanoramaSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonl
 /**
  * Component for the active indicator of a {@link PanoramaSlider}.
  */
-export const PanoramaSliderIndicator = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
-  <div {...props} ref={ref}/>
-))
+export const PanoramaSliderIndicator = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <div {...props}/>
+)
 
 /**
  * Component for the active reticle of a {@link PanoramaSlider}.
  */
-export const PanoramaSliderReticle = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
-  <div {...props} ref={ref}/>
-))
+export const PanoramaSliderReticle = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <div {...props}/>
+)
 
 /**
  * Component for the slide track of a {@link PanoramaSlider}.
  */
-export const PanoramaSliderTrack = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
-  <div {...props} ref={ref}/>
-))
+export const PanoramaSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <div {...props}/>
+)
 
 function getFixedStyles({ autoDimension = 'width', panoramaRect = Rect.make(), aspectRatio = 0, reticleWidth = 0 }) {
   return asStyleDict({
