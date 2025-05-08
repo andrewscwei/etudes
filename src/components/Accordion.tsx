@@ -522,21 +522,21 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
 }) as <I, S extends AccordionSection<I> = AccordionSection<I>>(props: Readonly<AccordionProps<I, S> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
 
 /**
- * The component for each section header of an {@link Accordion}.
+ * Component for each section header of an {@link Accordion}.
  */
 export const AccordionHeader = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & DropdownToggleProps) => (
   <button {...props}>{children}</button>
 )
 
 /**
- * The component for the expand icon of each section of an {@link Accordion}.
+ * Component for the expand icon of each section of an {@link Accordion}.
  */
 export const AccordionExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <figure {...props}>{children}</figure>
 )
 
 /**
- * The component for the collapse icon of each section of an {@link Accordion}.
+ * Component for the collapse icon of each section of an {@link Accordion}.
  */
 export const AccordionCollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <figure {...props}>{children}</figure>
