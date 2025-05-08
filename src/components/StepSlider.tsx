@@ -54,6 +54,11 @@ export type StepSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valueno
   knobHeight?: number
 
   /**
+   * Invisible padding around the knob in pixels, helps expand its hit box.
+   */
+  knobPadding?: number
+
+  /**
    * Width of the knob in pixels.
    */
   knobWidth?: number
@@ -150,6 +155,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
   isInverted = false,
   isTrackInteractive = true,
   knobHeight = 30,
+  knobPadding = 0,
   knobWidth = 30,
   labelProvider,
   onlyDispatchesOnDragEnd = false,
@@ -250,7 +256,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
   const isAtEnd = isInverted ? position === 0 : position === 1
   const isAtStart = isInverted ? position === 1 : position === 0
   const fixedClassNames = getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
-  const fixedStyles = getFixedStyles({ orientation, naturalPosition, isClipped, isDragging, knobHeight, knobWidth, isTrackInteractive })
+  const fixedStyles = getFixedStyles({ orientation, naturalPosition, isClipped, isDragging, knobPadding, knobHeight, knobWidth, isTrackInteractive })
   const components = asComponentDict(children, {
     knob: StepSliderKnob,
     knobContainer: StepSliderKnobContainer,
@@ -326,7 +332,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
         }, cloneStyledElement(components.knob ?? <StepSliderKnob/>, {
           className: clsx(fixedClassNames.knob),
           style: styles(fixedStyles.knob),
-        }, steps && labelProvider && cloneStyledElement(components.label ?? <StepSliderLabel/>, {
+        }, <div style={fixedStyles.knobHitBox}/>, steps && labelProvider && cloneStyledElement(components.label ?? <StepSliderLabel/>, {
           className: clsx(fixedClassNames.label),
           style: styles(fixedStyles.label),
         }, labelProvider(position, getNearestIndexByPosition(position, steps)))))}
@@ -445,7 +451,7 @@ function getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtSta
   })
 }
 
-function getFixedStyles({ orientation = 'vertical', naturalPosition = 0, isClipped = false, isDragging = false, knobHeight = 0, knobWidth = 0, isTrackInteractive = false }) {
+function getFixedStyles({ orientation = 'vertical', naturalPosition = 0, isClipped = false, knobPadding = 0, knobHeight = 0, knobWidth = 0, isTrackInteractive = false }) {
   return asStyleDict({
     body: {
       height: '100%',
@@ -470,6 +476,15 @@ function getFixedStyles({ orientation = 'vertical', naturalPosition = 0, isClipp
       height: `${knobHeight}px`,
       touchAction: 'none',
       width: `${knobWidth}px`,
+    },
+    knobHitBox: {
+      background: 'none',
+      height: `calc(100% + ${knobPadding * 2}px)`,
+      left: `-${knobPadding}px`,
+      padding: `${knobPadding}px`,
+      position: 'absolute',
+      top: `-${knobPadding}px`,
+      width: `calc(100% + ${knobPadding * 2}px)`,
     },
     label: {
       pointerEvents: 'none',

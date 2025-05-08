@@ -40,8 +40,7 @@ export type RangeSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuem
   knobHeight?: number
 
   /**
-   * Invisible padding around the knobs in pixels, helps expand the their hit
-   * boxes.
+   * Invisible padding around the knobs in pixels, helps expand their hit boxes.
    */
   knobPadding?: number
 
@@ -339,7 +338,7 @@ function getFixedStyles({ orientation = 'horizontal', knobWidth = 0, knobHeight 
       width: `${knobWidth}px`,
     },
     knobHitBox: {
-      background: 'transparent',
+      background: 'none',
       height: `calc(100% + ${knobPadding * 2}px)`,
       left: `-${knobPadding}px`,
       padding: `${knobPadding}px`,

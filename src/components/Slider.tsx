@@ -51,6 +51,11 @@ export type SliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-orientation
   knobHeight?: number
 
   /**
+   * Invisible padding around the knob in pixels, helps expand its hit box.
+   */
+  knobPadding?: number
+
+  /**
    * Width of the knob in pixels.
    */
   knobWidth?: number
@@ -120,6 +125,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
   isInverted = false,
   isTrackInteractive = true,
   knobHeight = 30,
+  knobPadding = 0,
   knobWidth = 30,
   onlyDispatchesOnDragEnd = false,
   orientation = 'vertical',
@@ -197,7 +203,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
   const isAtEnd = isInverted ? position === 0 : position === 1
   const isAtStart = isInverted ? position === 1 : position === 0
   const fixedClassNames = getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
-  const fixedStyles = getFixedStyles({ orientation, isClipped, naturalPosition, knobHeight, knobWidth, isTrackInteractive })
+  const fixedStyles = getFixedStyles({ orientation, isClipped, naturalPosition, knobPadding, knobHeight, knobWidth, isTrackInteractive })
 
   useEffect(() => {
     if (isDragging || externalPosition === position) return
@@ -262,7 +268,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
         }, cloneStyledElement(components.knob ?? <SliderKnob/>, {
           className: clsx(fixedClassNames.knob),
           style: styles(fixedStyles.knob),
-        }, labelProvider && cloneStyledElement(components.label ?? <SliderLabel/>, {
+        }, <div style={fixedStyles.knobHitBox}/>, labelProvider && cloneStyledElement(components.label ?? <SliderLabel/>, {
           className: clsx(fixedClassNames.label),
           style: styles(fixedStyles.label),
         }, labelProvider(position))))}
@@ -334,7 +340,7 @@ function getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtSta
   })
 }
 
-function getFixedStyles({ orientation = 'vertical', isClipped = false, naturalPosition = 0, knobHeight = 0, knobWidth = 0, isTrackInteractive = true }) {
+function getFixedStyles({ orientation = 'vertical', isClipped = false, naturalPosition = 0, knobPadding = 0, knobHeight = 0, knobWidth = 0, isTrackInteractive = true }) {
   return asStyleDict({
     body: {
       height: '100%',
@@ -359,6 +365,15 @@ function getFixedStyles({ orientation = 'vertical', isClipped = false, naturalPo
       height: `${knobHeight}px`,
       touchAction: 'none',
       width: `${knobWidth}px`,
+    },
+    knobHitBox: {
+      background: 'none',
+      height: `calc(100% + ${knobPadding * 2}px)`,
+      left: `-${knobPadding}px`,
+      padding: `${knobPadding}px`,
+      position: 'absolute',
+      top: `-${knobPadding}px`,
+      width: `calc(100% + ${knobPadding * 2}px)`,
     },
     label: {
       pointerEvents: 'none',
