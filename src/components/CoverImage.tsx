@@ -7,6 +7,9 @@ import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { styles } from '../utils/styles.js'
 import { Image, type ImageProps } from './Image.js'
 
+/**
+ * Type describing the props of {@link CoverImage}.
+ */
 export type CoverImageProps = Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<ImageProps, 'alt' | 'loadingMode' | 'sizes' | 'src' | 'srcSet' | 'onLoadStart' | 'onLoadComplete' | 'onLoadError'> & {
   /**
    * The known aspect ratio of the image, expressed by width / height. If
@@ -15,6 +18,13 @@ export type CoverImageProps = Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'
   aspectRatio?: number
 }
 
+/**
+ * A component that displays an image with a fixed aspect ratio. The image is
+ * centered and cropped to fit the container (a.k.a. viewport).
+ *
+ * @exports CoverImageContent Component for optional content inside the image.
+ * @exports CoverImageViewport Component for the viewport.
+ */
 export const CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverImageProps>>(({
   children,
   style,
@@ -86,13 +96,19 @@ export const CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Co
   )
 })
 
-export const CoverImageViewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+/**
+ * Component for optional content inside a {@link CoverImage}.
+ */
+export const CoverImageContent = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}>
     {children}
   </div>
 )
 
-export const CoverImageContent = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+/**
+ * Component for the viewport of a {@link CoverImage}.
+ */
+export const CoverImageViewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}>
     {children}
   </div>
