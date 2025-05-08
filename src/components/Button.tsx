@@ -29,8 +29,16 @@ type AnchorVariantProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'aria-di
   opensInNewTab?: boolean
 }
 
+/**
+ * Type describing the props of {@link Button}.
+ */
 export type ButtonProps = AnchorVariantProps | LinkVariantProps | NavLinkVariantProps | ButtonVariantProps
 
+/**
+ * A button component that can be used as a {@link Link}, {@link NavLink},
+ * {@link HTMLAnchorElement}, or {@link HTMLButtonElement} depending on the
+ * structure of its props.
+ */
 export function Button(props: Readonly<ButtonProps>) {
   switch (true) {
     case isNavLink(props): {
