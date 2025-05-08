@@ -196,7 +196,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
   const isAtEnd = isInverted ? position === 0 : position === 1
   const isAtStart = isInverted ? position === 1 : position === 0
   const fixedClassNames = getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
-  const fixedStyles = getFixedStyles({ orientation, isClipped, isDragging, naturalPosition, knobHeight, knobWidth, isTrackInteractive })
+  const fixedStyles = getFixedStyles({ orientation, isClipped, naturalPosition, knobHeight, knobWidth, isTrackInteractive })
 
   useEffect(() => {
     if (isDragging || externalPosition === position) return
@@ -215,6 +215,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
 
   const components = asComponentDict(children, {
     knob: SliderKnob,
+    knobContainer: SliderKnobContainer,
     label: SliderLabel,
     track: SliderTrack,
   })
@@ -251,15 +252,17 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
           }),
           onClick: trackClickHandler,
         }, <div style={fixedStyles.trackHitBox}/>)}
-        <button ref={knobContainerRef} style={fixedStyles.knobContainer}>
-          {cloneStyledElement(components.knob ?? <SliderKnob/>, {
-            className: clsx(fixedClassNames.knob),
-            style: styles(fixedStyles.knob),
-          }, labelProvider && cloneStyledElement(components.label ?? <SliderLabel/>, {
-            className: clsx(fixedClassNames.label),
-            style: styles(fixedStyles.label),
-          }, labelProvider(position)))}
-        </button>
+        {cloneStyledElement(components.knobContainer ?? <SliderKnobContainer/>, {
+          className: clsx(fixedClassNames.knobContainer),
+          style: fixedStyles.knobContainer,
+          ref: knobContainerRef,
+        }, cloneStyledElement(components.knob ?? <SliderKnob/>, {
+          className: clsx(fixedClassNames.knob),
+          style: styles(fixedStyles.knob),
+        }, labelProvider && cloneStyledElement(components.label ?? <SliderLabel/>, {
+          className: clsx(fixedClassNames.label),
+          style: styles(fixedStyles.label),
+        }, labelProvider(position))))}
       </div>
     </div>
   )
@@ -277,6 +280,13 @@ export const SliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
  */
 export const SliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}/>
+)
+
+/**
+ * Component for the container of the knob of a {@link Slider}.
+ */
+export const SliderKnobContainer = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => (
+  <button {...props}/>
 )
 
 /**
@@ -306,6 +316,12 @@ function getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtSta
       'dragging': isDragging,
       'releasing': isReleasing,
     }),
+    knobContainer: clsx(orientation, {
+      'at-end': isAtEnd,
+      'at-start': isAtStart,
+      'dragging': isDragging,
+      'releasing': isReleasing,
+    }),
     label: clsx(orientation, {
       'at-end': isAtEnd,
       'at-start': isAtStart,
@@ -315,7 +331,7 @@ function getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtSta
   })
 }
 
-function getFixedStyles({ orientation = 'vertical', isClipped = false, isDragging = false, naturalPosition = 0, knobHeight = 0, knobWidth = 0, isTrackInteractive = true }) {
+function getFixedStyles({ orientation = 'vertical', isClipped = false, naturalPosition = 0, knobHeight = 0, knobWidth = 0, isTrackInteractive = true }) {
   return asStyleDict({
     body: {
       height: '100%',
@@ -331,11 +347,9 @@ function getFixedStyles({ orientation = 'vertical', isClipped = false, isDraggin
       ...orientation === 'vertical' ? {
         left: '50%',
         top: isClipped ? `calc(${naturalPosition * 100}% + ${knobHeight * 0.5 - naturalPosition * knobHeight}px)` : `${naturalPosition * 100}%`,
-        transition: isDragging === false ? 'top 100ms ease-out' : 'none',
       } : {
         left: isClipped ? `calc(${naturalPosition * 100}% + ${knobWidth * 0.5 - naturalPosition * knobWidth}px)` : `${naturalPosition * 100}%`,
         top: '50%',
-        transition: isDragging === false ? 'left 100ms ease-out' : 'none',
       },
     },
     knob: {
