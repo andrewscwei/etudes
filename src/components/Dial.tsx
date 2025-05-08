@@ -4,6 +4,9 @@ import { asStyleDict } from '../utils/asStyleDict.js'
 import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { styles } from '../utils/styles.js'
 
+/**
+ * Type describing the props of {@link Dial}.
+ */
 export type DialProps = HTMLAttributes<HTMLDivElement> & {
   /**
    * Current angle reading of the compass, between 0.0 - 360.0 degrees,
@@ -47,8 +50,8 @@ export type DialProps = HTMLAttributes<HTMLDivElement> & {
 /**
  * A circular dial with a knob and a track.
  *
- * @exports DialKnob
- * @exports DialTrack
+ * @exports DialKnob Component for the knob.
+ * @exports DialTrack Component for the track.
  */
 export const Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<DialProps>>(({
   children,
@@ -98,10 +101,16 @@ export const Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<DialProp
   )
 })
 
+/**
+ * Component for the track of a {@link Dial}.
+ */
 export const DialTrack = ({ ...props }: SVGAttributes<SVGCircleElement>) => (
   <circle {...props}/>
 )
 
+/**
+ * Component for the knob of a {@link Dial}.
+ */
 export const DialKnob = ({ ...props }: SVGAttributes<SVGPathElement>) => (
   <path {...props}/>
 )
