@@ -238,6 +238,10 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
  * A collection of selectable items laid out in sections in an accordion. Items
  * are generated based on the provided `ItemComponent` while each section header
  * is optionally provided by `HeaderComponent` or generated automatically.
+ *
+ * @exports AccordionHeader Component for each section header.
+ * @exports AccordionExpandIcon Component for the expand icon of each section.
+ * @exports AccordionCollapseIcon Component for the collapse icon of each
  */
 export const Accordion = /* #__PURE__ */ forwardRef(({
   children,
@@ -517,14 +521,23 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
   )
 }) as <I, S extends AccordionSection<I> = AccordionSection<I>>(props: Readonly<AccordionProps<I, S> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
 
+/**
+ * The component for each section header of an {@link Accordion}.
+ */
 export const AccordionHeader = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & DropdownToggleProps) => (
   <button {...props}>{children}</button>
 )
 
+/**
+ * The component for the expand icon of each section of an {@link Accordion}.
+ */
 export const AccordionExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <figure {...props}>{children}</figure>
 )
 
+/**
+ * The component for the collapse icon of each section of an {@link Accordion}.
+ */
 export const AccordionCollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <figure {...props}>{children}</figure>
 )
