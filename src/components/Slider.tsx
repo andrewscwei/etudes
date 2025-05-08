@@ -242,6 +242,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
           }),
           onClick: trackClickHandler,
         }, <div style={fixedStyles.trackHitBox}/>)}
+
         {cloneStyledElement(components.track ?? <SliderTrack/>, {
           className: clsx(isInverted ? 'start' : 'end', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
@@ -253,6 +254,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
           }),
           onClick: trackClickHandler,
         }, <div style={fixedStyles.trackHitBox}/>)}
+
         {cloneStyledElement(components.knobContainer ?? <SliderKnobContainer/>, {
           className: clsx(fixedClassNames.knobContainer),
           style: fixedStyles.knobContainer,
@@ -343,7 +345,7 @@ function getFixedStyles({ orientation = 'vertical', isClipped = false, naturalPo
       border: 'none',
       outline: 'none',
       position: 'absolute',
-      transform: 'translate3d(-50%, -50%, 0)',
+      transform: 'translate(-50%, -50%)',
       zIndex: '1',
       ...orientation === 'vertical' ? {
         left: '50%',
@@ -383,7 +385,7 @@ function getFixedStyles({ orientation = 'vertical', isClipped = false, naturalPo
       minHeight: '20px',
       minWidth: '20px',
       position: 'absolute',
-      transform: orientation === 'horizontal' ? 'translate3d(0, -50%, 0)' : 'translate3d(-50%, 0, 0)',
+      transform: orientation === 'horizontal' ? 'translate(0, -50%)' : 'translate(-50%, 0)',
       width: '100%',
     },
   })

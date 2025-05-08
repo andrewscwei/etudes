@@ -88,9 +88,10 @@ export type RangeSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuem
  * A slider component that allows the user to select a range of values.
  *
  * @exports RangeSliderGutter Component for the gutter.
- * @exports RangeSliderLabel Component for the label.
  * @exports RangeSliderHighlight Component for the highlight.
  * @exports RangeSliderKnob Component for the knob.
+ * @exports RangeSliderKnobContainer Component for the container of the knob.
+ * @exports RangeSliderLabel Component for the label.
  */
 export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<RangeSliderProps>>(({
   children,
@@ -110,8 +111,8 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
 }, ref) => {
   const bodyRef = useRef<HTMLDivElement>(null)
   const bodyRect = useRect(bodyRef)
-  const startKnobRef = useRef<HTMLDivElement>(null)
-  const endKnobRef = useRef<HTMLDivElement>(null)
+  const startKnobContainerRef = useRef<HTMLDivElement>(null)
+  const endKnobContainerRef = useRef<HTMLDivElement>(null)
   const [range, setRange] = useState<RangeSliderRange>(externalRange ?? [minValue, maxValue])
   const breakpoints = createBreakpoints(minValue, maxValue, steps)
   const [start, end] = range.map(t => getDisplacementByValue(t, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped))
@@ -120,6 +121,7 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
     gutter: RangeSliderGutter,
     highlight: RangeSliderHighlight,
     knob: RangeSliderKnob,
+    knobContainer: RangeSliderKnobContainer,
     label: RangeSliderLabel,
   })
 
@@ -143,12 +145,12 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
     return getValueByDisplacement(Math.max(dMin, Math.min(dMax, dCurr)), minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
   }, [knobWidth, knobHeight, isClipped, minValue, maxValue, orientation, range[0], createKey(bodyRect.toJSON())])
 
-  const { isDragging: isDraggingStartKnob, isReleasing: isReleasingStartKnob, value: startValue, setValue: setStartValue } = useDragValue(startKnobRef, {
+  const { isDragging: isDraggingStartKnob, isReleasing: isReleasingStartKnob, value: startValue, setValue: setStartValue } = useDragValue(startKnobContainerRef, {
     initialValue: externalRange?.[0] ?? minValue,
     transform: mapStartDragValueToValue,
   })
 
-  const { isDragging: isDraggingEndKnob, isReleasing: isReleasingEndKnob, value: endValue, setValue: setEndValue } = useDragValue(endKnobRef, {
+  const { isDragging: isDraggingEndKnob, isReleasing: isReleasingEndKnob, value: endValue, setValue: setEndValue } = useDragValue(endKnobContainerRef, {
     initialValue: externalRange?.[1] ?? maxValue,
     transform: mapEndDragValueToValue,
   })
@@ -195,63 +197,66 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
         {cloneStyledElement(components.gutter ?? <RangeSliderGutter/>, {
           style: styles(fixedStyles.gutter),
         })}
+
         {cloneStyledElement(components.highlight ?? <RangeSliderHighlight/>, {
           style: styles(fixedStyles.highlight),
         })}
-        {cloneStyledElement(components.knob ?? <RangeSliderKnob
-          style={styles({
-            transitionProperty: isReleasingStartKnob ? 'opacity, transform' : 'opacity',
-          })}
-        />, {
-          ref: startKnobRef,
-          disabled: isDeepEqual([startValue, endValue], [maxValue, maxValue]),
+
+        {cloneStyledElement(components.knobContainer ?? <RangeSliderKnobContainer/>, {
           className: clsx({
             dragging: isDraggingStartKnob,
             releasing: isReleasingStartKnob,
           }),
-          style: styles(fixedStyles.knob, {
+          disabled: isDeepEqual([startValue, endValue], [maxValue, maxValue]),
+          ref: startKnobContainerRef,
+          style: styles(fixedStyles.knobContainer, {
             pointerEvents: isDeepEqual([startValue, endValue], [minValue, minValue]) ? 'none' : 'auto',
           }, orientation === 'horizontal' ? {
-            marginTop: `${-knobHeight / 2 + bodyRect.height / 2}px`,
-            marginLeft: `${start - knobWidth / 2}px`,
+            left: `${start}px`,
           } : {
-            marginTop: `${start - knobHeight / 2}px`,
-            marginLeft: `${-knobWidth / 2 + bodyRect.width / 2}px`,
+            top: `${start}px`,
           }),
+        }, cloneStyledElement(components.knob ?? <RangeSliderKnob/>, {
+          className: clsx({
+            dragging: isDraggingStartKnob,
+            releasing: isReleasingStartKnob,
+          }),
+          style: styles(fixedStyles.knob),
         }, <div style={fixedStyles.knobHitBox}/>, components.label && cloneStyledElement(components.label, {
           className: clsx({
             dragging: isDraggingStartKnob || isDraggingEndKnob,
             releasing: isReleasingStartKnob || isReleasingEndKnob,
           }),
           style: styles(fixedStyles.label),
-        }, Number(startValue.toFixed(decimalPlaces)).toLocaleString()))}
-        {cloneStyledElement(components.knob ?? <RangeSliderKnob
-          style={styles({
-            transitionProperty: isReleasingEndKnob ? 'opacity, transform' : 'opacity',
-          })}
-        />, {
-          ref: endKnobRef,
-          disabled: isDeepEqual([startValue, endValue], [maxValue, maxValue]),
+        }, Number(startValue.toFixed(decimalPlaces)).toLocaleString())))}
+
+        {cloneStyledElement(components.knobContainer ?? <RangeSliderKnobContainer/>, {
           className: clsx({
             dragging: isDraggingEndKnob,
             releasing: isDraggingEndKnob,
           }),
-          style: styles(fixedStyles.knob, {
+          disabled: isDeepEqual([startValue, endValue], [maxValue, maxValue]),
+          style: styles(fixedStyles.knobContainer, {
             pointerEvents: isDeepEqual([startValue, endValue], [maxValue, maxValue]) ? 'none' : 'auto',
           }, orientation === 'horizontal' ? {
-            marginTop: `${-knobHeight / 2 + bodyRect.height / 2}px`,
-            marginLeft: `${end - knobWidth / 2}px`,
+            left: `${end}px`,
           } : {
-            marginTop: `${end - knobHeight / 2}px`,
-            marginLeft: `${-knobWidth / 2 + bodyRect.width / 2}px`,
+            top: `${end}px`,
           }),
+          ref: endKnobContainerRef,
+        }, cloneStyledElement(components.knob ?? <RangeSliderKnob/>, {
+          className: clsx({
+            dragging: isDraggingEndKnob,
+            releasing: isDraggingEndKnob,
+          }),
+          style: styles(fixedStyles.knob),
         }, <div style={fixedStyles.knobHitBox}/>, components.label && cloneStyledElement(components.label, {
           className: clsx({
             dragging: isDraggingEndKnob,
             releasing: isReleasingEndKnob,
           }),
           style: styles(fixedStyles.label),
-        }, Number(endValue.toFixed(decimalPlaces)).toLocaleString()))}
+        }, Number(endValue.toFixed(decimalPlaces)).toLocaleString())))}
       </div>
     </div>
   )
@@ -285,6 +290,13 @@ export const RangeSliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) =>
   <div {...props}/>
 )
 
+/**
+ * Component for the container of the knob of a {@link RangeSlider}.
+ */
+export const RangeSliderKnobContainer = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => (
+  <button {...props}/>
+)
+
 function getFixedStyles({ orientation = 'horizontal', knobWidth = 0, knobHeight = 0, highlightLength = 0, start = 0, knobPadding = 0 }) {
   return asStyleDict({
     body: {
@@ -306,24 +318,25 @@ function getFixedStyles({ orientation = 'horizontal', knobWidth = 0, knobHeight 
       ...orientation === 'horizontal' ? {
         height: '100%',
         width: `${highlightLength}px`,
-        transform: `translate3d(${start}px, 0, 0)`,
+        transform: `translate(${start}px, 0)`,
       } : {
         height: `${highlightLength}px`,
         width: '100%',
-        transform: `translate3d(0, ${start}px, 0)`,
+        transform: `translate(0, ${start}px)`,
       },
     },
-    knob: {
-      bottom: '0',
-      left: '0',
-      margin: 'auto',
+    knobContainer: {
+      background: 'none',
+      border: 'none',
+      outline: 'none',
       position: 'absolute',
-      right: '0',
-      width: `${knobWidth}px`,
-      height: `${knobHeight}px`,
-      top: '0',
-      touchAction: 'none',
+      transform: 'translate(-50%, -50%)',
       zIndex: '1',
+    },
+    knob: {
+      height: `${knobHeight}px`,
+      touchAction: 'none',
+      width: `${knobWidth}px`,
     },
     knobHitBox: {
       background: 'transparent',
