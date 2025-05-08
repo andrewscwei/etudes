@@ -5,7 +5,7 @@ import { Fragment, type ReactNode } from 'react'
  */
 export type RepeatProps = {
   /**
-   * The children to repeat.
+   * The children to repeat. This is omitted if `render` is provided.
    */
   children?: ReactNode | ((index: number) => ReactNode)
 
@@ -15,7 +15,8 @@ export type RepeatProps = {
   count?: number
 
   /**
-   * Render function to be called for each index.
+   * Function that overrides the default rendering of the children, invoked on
+   * each index of `count`.
    */
   render?: (index: number) => ReactNode
 }
