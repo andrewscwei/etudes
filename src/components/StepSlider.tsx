@@ -256,7 +256,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
   const isAtEnd = isInverted ? position === 0 : position === 1
   const isAtStart = isInverted ? position === 1 : position === 0
   const fixedClassNames = getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
-  const fixedStyles = getFixedStyles({ orientation, naturalPosition, isClipped, isDragging, knobPadding, knobHeight, knobWidth, isTrackInteractive })
+  const fixedStyles = getFixedStyles({ orientation, naturalPosition, isClipped, knobPadding, knobHeight, knobWidth, isTrackInteractive })
   const components = asComponentDict(children, {
     knob: StepSliderKnob,
     knobContainer: StepSliderKnobContainer,
