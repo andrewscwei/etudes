@@ -1,5 +1,10 @@
-import { useEffect, useRef, type DependencyList, type RefObject } from 'react'
+import { useEffect, useRef, type RefObject } from 'react'
 
+type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
+
+/**
+ * Type describing the options for {@link useSizeObserver}.
+ */
 export type UseSizeObserverOptions = {
   /**
    * Handler invoked when the target element resizes.
@@ -14,10 +19,9 @@ export type UseSizeObserverOptions = {
  *
  * @param targetRef Reference to the target element.
  * @param options See {@link Options}.
- * @param deps Additional dependencies.
  */
-export function useSizeObserver(targetRef: RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>, { onResize }: UseSizeObserverOptions = {}, deps: DependencyList = []) {
-  const observerRef = useRef<ResizeObserver | undefined>(undefined)
+export function useSizeObserver(targetRef: TargetRef, { onResize }: UseSizeObserverOptions = {}) {
+  const observerRef = useRef<ResizeObserver>(undefined)
 
   useEffect(() => {
     observerRef.current = new ResizeObserver(() => {
@@ -36,5 +40,5 @@ export function useSizeObserver(targetRef: RefObject<HTMLElement> | RefObject<HT
         observerRef.current.unobserve(targetRef.current)
       }
     }
-  }, [targetRef.current, ...deps])
+  }, [targetRef.current, onResize])
 }

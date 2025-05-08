@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from 'react'
+import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Rect, Size } from 'spase'
 import { useSizeObserver } from '../hooks/useSizeObserver.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
@@ -163,19 +163,21 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
     }
   }
 
-  useSizeObserver(bodyRef, {
-    onResize: element => {
-      const maxSize = Rect.from(element)?.size ?? Size.make()
-      const currWidth = getCurrentWidth()
-      const currHeight = getCurrentHeight()
+  const resizeHandler = useCallback((element: HTMLElement) => {
+    const maxSize = Rect.from(element)?.size ?? Size.make()
+    const currWidth = getCurrentWidth()
+    const currHeight = getCurrentHeight()
 
-      if (minWidth !== currWidth || minHeight !== currHeight || maxSize.width !== maxWidth || maxSize.height !== maxHeight) {
-        repositionChildren()
-        setMaxWidth(maxSize.width)
-        setMaxHeight(maxSize.height)
-      }
-    },
+    if (minWidth !== currWidth || minHeight !== currHeight || maxSize.width !== maxWidth || maxSize.height !== maxHeight) {
+      repositionChildren()
+      setMaxWidth(maxSize.width)
+      setMaxHeight(maxSize.height)
+    }
   }, [alignSections, horizontalSpacing, isReversed, sections, verticalSpacing, orientation])
+
+  useSizeObserver(bodyRef, {
+    onResize: resizeHandler,
+  })
 
   useEffect(() => {
     const imageSources = getAllImageSources(bodyRef.current?.innerHTML)
