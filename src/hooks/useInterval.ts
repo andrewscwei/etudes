@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 
 /**
- * Type describing the options of {@link useImageLoader}.
+ * Type describing the options of {@link useInterval}.
  */
 export type UseIntervalOptions = {
   /**
