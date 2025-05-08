@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Rect, Size } from 'spase'
 
 /**
@@ -6,21 +6,23 @@ import { Rect, Size } from 'spase'
  *
  * @returns The most current viewport size.
  */
-export function useViewportSize() {
+export function useViewportSize(): Size {
   const [size, setSize] = useState<Size>(Size.make())
 
-  useEffect(() => {
-    function onViewportResize() {
-      const viewportSize = Rect.fromViewport().size
-      setSize(viewportSize)
-    }
-
-    window.addEventListener('resize', onViewportResize)
-
-    onViewportResize()
-
-    return () => window.removeEventListener('resize', onViewportResize)
+  const resizeHandler = useCallback(() => {
+    const viewportSize = Rect.fromViewport().size
+    setSize(viewportSize)
   }, [])
+
+  useEffect(() => {
+    window.addEventListener('resize', resizeHandler)
+
+    resizeHandler()
+
+    return () => {
+      window.removeEventListener('resize', resizeHandler)
+    }
+  }, [resizeHandler])
 
   return size
 }
