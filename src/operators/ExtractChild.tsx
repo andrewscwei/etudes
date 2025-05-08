@@ -1,6 +1,9 @@
 import { Children, forwardRef, isValidElement, type HTMLAttributes } from 'react'
 import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 
+/**
+ * Type describing the properties of {@link ExtractChild}.
+ */
 export type ExtractChildProps = HTMLAttributes<HTMLElement>
 
 /**
