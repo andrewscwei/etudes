@@ -6,8 +6,14 @@ import { Each } from '../operators/Each.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { styles } from '../utils/styles.js'
 
+/**
+ * Type describing the orientation of {@link Carousel}.
+ */
 export type CarouselOrientation = 'horizontal' | 'vertical'
 
+/**
+ * Type describing the props of {@link Carousel}.
+ */
 export type CarouselProps<I> = Omit<HTMLAttributes<HTMLDivElement>, 'role' | 'onClick' | 'onPointerCancel' | 'onPointerDown' | 'onPointerLeave' | 'onPointerUp'> & {
   /**
    * Current item index.
@@ -66,6 +72,16 @@ export type CarouselProps<I> = Omit<HTMLAttributes<HTMLDivElement>, 'role' | 'on
   ItemComponent: ComponentType<I>
 }
 
+/**
+ * A carousel component that displays a list of items in a scrollable view.
+ *
+ * Notable features:
+ *   - Supports horizontal and vertical orientations.
+ *   - Supports auto-advancing to the next item after a specified interval.
+ *   - Supports auto-snapping to each item when scrolling.
+ *   - Supports tracking item exposure (0-1) to determine how much of the
+ *     current item is visible in the viewport.
+ */
 export const Carousel = /* #__PURE__ */ forwardRef(({
   autoAdvanceInterval = 0,
   index = 0,
