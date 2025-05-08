@@ -10,24 +10,88 @@ import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { createKey } from '../utils/createKey.js'
 import { styles } from '../utils/styles.js'
 
-type Orientation = 'horizontal' | 'vertical'
+/**
+ * Type describing the orientation of {@link RangeSlider}.
+ */
+export type RangeSliderOrientation = 'horizontal' | 'vertical'
 
-type Range = [number, number]
+/**
+ * Type describing the range of values of {@link RangeSlider}.
+ */
+export type RangeSliderRange = [number, number]
 
+/**
+ * Type describing the props of {@link RangeSlider}.
+ */
 export type RangeSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuemax' | 'aria-valuemin' | 'role'> & {
+  /**
+   * Number of decimal places to display.
+   */
   decimalPlaces?: number
+
+  /**
+   * Specifies if the knobs are clipped to the track.
+   */
   isClipped?: boolean
+
+  /**
+   * Height of the knobs in pixels.
+   */
   knobHeight?: number
+
+  /**
+   * Invisible padding around the knobs in pixels, helps expand the their hit
+   * boxes.
+   */
   knobPadding?: number
+
+  /**
+   * Width of the knobs in pixels.
+   */
   knobWidth?: number
+
+  /**
+   * Maximum value to clamp to.
+   */
   max: number
+
+  /**
+   * Minimum value to clamp to.
+   */
   min: number
-  orientation?: Orientation
-  range?: Range
+
+  /**
+   * Orientation of the slider.
+   */
+  orientation?: RangeSliderOrientation
+
+  /**
+   * Range of values.
+   */
+  range?: RangeSliderRange
+
+  /**
+   * Number of intervals between the minimum and maximum values to snap to when
+   * either knob releases. If set to `-1`, the knobs will not snap to any value.
+   */
   steps?: number
-  onRangeChange?: (range: Range) => void
+
+  /**
+   * Handler invoked when the range of values changes.
+   *
+   * @param range The current range of values.
+   */
+  onRangeChange?: (range: RangeSliderRange) => void
 }
 
+/**
+ * A slider component that allows the user to select a range of values.
+ *
+ * @exports RangeSliderGutter Component for the gutter.
+ * @exports RangeSliderLabel Component for the label.
+ * @exports RangeSliderHighlight Component for the highlight.
+ * @exports RangeSliderKnob Component for the knob.
+ */
 export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<RangeSliderProps>>(({
   children,
   className,
@@ -48,8 +112,8 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
   const bodyRect = useRect(bodyRef)
   const startKnobRef = useRef<HTMLDivElement>(null)
   const endKnobRef = useRef<HTMLDivElement>(null)
-  const [range, setRange] = useState<Range>(externalRange ?? [minValue, maxValue])
-  const breakpoints = [minValue, ...[...Array(steps)].map((_, i) => minValue + (i + 1) * (maxValue - minValue) / (1 + steps)), maxValue]
+  const [range, setRange] = useState<RangeSliderRange>(externalRange ?? [minValue, maxValue])
+  const breakpoints = createBreakpoints(minValue, maxValue, steps)
   const [start, end] = range.map(t => getDisplacementByValue(t, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped))
   const highlightLength = end - start
   const components = asComponentDict(children, {
@@ -109,14 +173,14 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
   }, [externalRange?.[0], externalRange?.[1]])
 
   useEffect(() => {
-    if (steps < 0) return
+    if (!breakpoints) return
     setStartValue(getClosestSteppedValue(startValue, breakpoints))
-  }, [steps, isReleasingStartKnob, createKey(breakpoints)])
+  }, [isReleasingStartKnob, createKey(breakpoints)])
 
   useEffect(() => {
-    if (steps < 0 || !isReleasingEndKnob) return
+    if (!breakpoints || !isReleasingEndKnob) return
     setEndValue(getClosestSteppedValue(endValue, breakpoints))
-  }, [steps, isReleasingEndKnob, createKey(breakpoints)])
+  }, [isReleasingEndKnob, createKey(breakpoints)])
 
   return (
     <div
@@ -193,18 +257,30 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
   )
 })
 
+/**
+ * Component for the gutter of a {@link RangeSlider}.
+ */
 export const RangeSliderGutter = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
   <div {...props} ref={ref}/>
 ))
 
+/**
+ * Component for the label of a {@link RangeSlider}.
+ */
 export const RangeSliderLabel = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
   <div {...props} ref={ref}/>
 ))
 
+/**
+ * Component for the highlight of a {@link RangeSlider}.
+ */
 export const RangeSliderHighlight = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
   <div {...props} ref={ref}/>
 ))
 
+/**
+ * Component for the knob of a {@link RangeSlider}.
+ */
 export const RangeSliderKnob = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
   <div {...props} ref={ref}/>
 ))
@@ -270,7 +346,7 @@ function getPositionByValue(value: number, min: number, max: number) {
   return (value - min) / (max - min)
 }
 
-function getPositionByDisplacement(displacement: number, orientation: Orientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
+function getPositionByDisplacement(displacement: number, orientation: RangeSliderOrientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
   switch (orientation) {
     case 'horizontal': {
       const maxWidth = isClipped ? rect.width - knobWidth : rect.width
@@ -289,13 +365,13 @@ function getValueByPosition(position: number, min: number, max: number) {
   return position * (max - min) + min
 }
 
-function getValueByDisplacement(displacement: number, min: number, max: number, orientation: Orientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
+function getValueByDisplacement(displacement: number, min: number, max: number, orientation: RangeSliderOrientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
   const position = getPositionByDisplacement(displacement, orientation, rect, knobWidth, knobHeight, isClipped)
 
   return getValueByPosition(position, min, max)
 }
 
-function getDisplacementByPosition(position: number, orientation: Orientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
+function getDisplacementByPosition(position: number, orientation: RangeSliderOrientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
   switch (orientation) {
     case 'horizontal': {
       const maxWidth = isClipped ? rect.width - knobWidth : rect.width
@@ -310,7 +386,7 @@ function getDisplacementByPosition(position: number, orientation: Orientation, r
   }
 }
 
-function getDisplacementByValue(value: number, min: number, max: number, orientation: Orientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
+function getDisplacementByValue(value: number, min: number, max: number, orientation: RangeSliderOrientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
   const position = getPositionByValue(value, min, max)
 
   return getDisplacementByPosition(position, orientation, rect, knobWidth, knobHeight, isClipped)
@@ -332,6 +408,16 @@ function getClosestSteppedValue(value: number, breakpoints: number[]) {
   }
 
   return breakpoints[idx]
+}
+
+function createBreakpoints(min: number, max: number, steps: number): number[] | undefined {
+  if (steps < 0) return undefined
+
+  return [
+    min,
+    ...[...Array(steps)].map((_, i) => min + (i + 1) * (max - min) / (1 + steps)),
+    max,
+  ]
 }
 
 if (process.env.NODE_ENV !== 'production') {
