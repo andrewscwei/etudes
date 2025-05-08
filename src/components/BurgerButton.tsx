@@ -5,9 +5,25 @@ import { asStyleDict } from '../utils/asStyleDict.js'
 import { styles } from '../utils/styles.js'
 import { Burger, BurgerBar, type BurgerProps } from './Burger.js'
 
+/**
+ * Type describing the props of {@link BurgerButton}.
+ */
 export type BurgerButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement> & BurgerProps, 'onToggle'> & {
+  /**
+   * Handler invoked when the button is activated.
+   */
   onActivate?: () => void
+
+  /**
+   * Handler invoked when the button is deactivated.
+   */
   onDeactivate?: () => void
+
+  /**
+   * Handler invoked when the button's active state is toggled.
+   *
+   * @param isActive The new active state of the button.
+   */
   onToggle?: (isActive: boolean) => void
 }
 
@@ -31,13 +47,15 @@ export const BurgerButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readon
   ...props
 }, ref) => {
   const onClick = () => {
-    onToggle?.(!isActive)
+    const newIsActive = !isActive
 
-    if (isActive) {
-      onDeactivate?.()
+    onToggle?.(newIsActive)
+
+    if (newIsActive) {
+      onActivate?.()
     }
     else {
-      onActivate?.()
+      onDeactivate?.()
     }
   }
 
@@ -70,6 +88,9 @@ export const BurgerButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readon
   )
 })
 
+/**
+ * Component for each bar in a {@link BurgerButton}.
+ */
 export const BurgerButtonBar = BurgerBar
 
 function getFixedStyles() {
