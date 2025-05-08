@@ -7,6 +7,9 @@ import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { styles } from '../utils/styles.js'
 import { TextField, type TextFieldProps } from './TextField.js'
 
+/**
+ * Type describing the props of {@link Counter}.
+ */
 export type CounterProps = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & {
   min?: number
   max?: number
@@ -15,6 +18,14 @@ export type CounterProps = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & {
   onChange?: (quantity: number) => void
 }
 
+/**
+ * A component that allows the user to increment or decrement a quantity
+ * using buttons or by typing in a text field.
+ *
+ * @exports CounterTextField Component for the text field.
+ * @exports CounterAddButton Component for the add button.
+ * @exports CounterSubtractButton Component for the subtract button.
+ */
 export const Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CounterProps>>(({
   children,
   style,
@@ -119,16 +130,25 @@ export const Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Count
   )
 })
 
+/**
+ * Component for the text field in a {@link Counter}.
+ */
 export const CounterTextField = ({ ...props }: TextFieldProps) => (
   <TextField {...props}/>
 )
 
+/**
+ * Component for the add button in a {@link Counter}.
+ */
 export const CounterAddButton = ({ children, ...props }: HTMLAttributes<HTMLButtonElement>) => (
   <button {...props}>
     {children}
   </button>
 )
 
+/**
+ * Component for the subtract button in a {@link Counter}.
+ */
 export const CounterSubtractButton = ({ children, ...props }: HTMLAttributes<HTMLButtonElement>) => (
   <button {...props}>
     {children}
