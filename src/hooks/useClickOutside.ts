@@ -10,10 +10,7 @@ type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | R
  * @param onClickOutside The handler to call when a click outside the target
  *                       element is detected.
  */
-export function useClickOutside(
-  targetRef: TargetRef | TargetRef[],
-  onClickOutside: () => void,
-) {
+export function useClickOutside(targetRef: TargetRef | TargetRef[], onClickOutside: () => void) {
   const clickOutsideHandler = useCallback((event: MouseEvent) => {
     if (!(event.target instanceof Node)) return
 

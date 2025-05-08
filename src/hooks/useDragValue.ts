@@ -3,14 +3,39 @@ import { useCallback, useEffect, useRef, useState, type Dispatch, type RefObject
 import type { Point } from 'spase'
 import { useInertiaDrag } from './useInertiaDrag.js'
 
-type Output<T> = {
+type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
+
+/**
+ * Type describing the output of {@link useDragValue}.
+ */
+type UseDragValueOutput<T = [number, number]> = {
+  /**
+   * Indicates whether the drag is currently happening.
+   */
   isDragging: boolean
+
+  /**
+   * Indicates whether the drag is currently being released.
+   */
   isReleasing: boolean
+
+  /**
+   * The current associated value of this hook.
+   */
   value: T
+
+  /**
+   * A function that sets the current associated value of this hook.
+   *
+   * @param value The new associated value.
+   */
   setValue: Dispatch<SetStateAction<T>>
 }
 
-type Options<T> = Parameters<typeof useInertiaDrag>[1] & {
+/**
+ * Type describing the options of {@link useDragValue}.
+ */
+export type UseDragValueOptions<T = [number, number]> = Parameters<typeof useInertiaDrag>[1] & {
   /**
    * The initial associated value of this hook.
    */
@@ -40,14 +65,14 @@ type Options<T> = Parameters<typeof useInertiaDrag>[1] & {
  *
  * @returns The states created for this effect.
  */
-export function useDragValue<T = [number, number]>(targetRef: RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>, {
+export function useDragValue<T = [number, number]>(targetRef: TargetRef, {
   initialValue,
   transform,
   onDragStart,
   onDragMove,
   onDragEnd,
   ...options
-}: Options<T>): Output<T> {
+}: UseDragValueOptions<T>): UseDragValueOutput<T> {
   /**
    * Sets the current associated value reference. This reference object is equal
    * to the `value` state but differs slightly in how they are set. Because

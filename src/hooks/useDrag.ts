@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, type RefObject } from 'react'
 import { Point } from 'spase'
 
+type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
+
 /**
  * Type describing the options of {@link useDrag}.
  */
@@ -54,7 +56,7 @@ export type UseDragOptions = {
  *
  * @returns The states created for this effect.
  */
-export function useDrag(targetRef: RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>, {
+export function useDrag(targetRef: TargetRef, {
   isEnabled = true,
   updatesCursor = true,
   onDragStart,
