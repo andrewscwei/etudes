@@ -11,7 +11,7 @@ type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | R
  *                       element is detected.
  */
 export function useClickOutside(targetRef: TargetRef | TargetRef[], onClickOutside: () => void) {
-  const clickOutsideHandler = useCallback((event: MouseEvent) => {
+  const handler = useCallback((event: MouseEvent) => {
     if (!(event.target instanceof Node)) return
 
     let isOutside = true
@@ -37,10 +37,10 @@ export function useClickOutside(targetRef: TargetRef | TargetRef[], onClickOutsi
   }, [onClickOutside])
 
   useEffect(() => {
-    window.addEventListener('click', clickOutsideHandler, true)
+    window.addEventListener('click', handler, true)
 
     return () => {
-      window.removeEventListener('click', clickOutsideHandler, true)
+      window.removeEventListener('click', handler, true)
     }
-  }, [clickOutsideHandler])
+  }, [handler])
 }

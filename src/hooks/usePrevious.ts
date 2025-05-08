@@ -1,6 +1,9 @@
 import { useEffect, useRef } from 'react'
 
-type Options<T> = {
+/**
+ * Type describing the options of {@link usePrevious}.
+ */
+export type UsePreviousOptions<T> = {
   /**
    * Function to transform the dependency value in the dependency list, useful
    * if the value is a reference.
@@ -16,9 +19,9 @@ type Options<T> = {
  * Returns the previous value of a value.
  *
  * @param value The value.
- * @param options See {@link Options}.
+ * @param options See {@link UsePreviousOptions}.
  */
-export function usePrevious<T>(value: T, { sanitizeDependency = t => t }: Options<T> = {}): T | undefined {
+export function usePrevious<T>(value: T, { sanitizeDependency = t => t }: UsePreviousOptions<T> = {}): T | undefined {
   const ref = useRef<T>(undefined)
 
   useEffect(() => {

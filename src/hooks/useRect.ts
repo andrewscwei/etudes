@@ -1,6 +1,8 @@
-import { useState, type RefObject } from 'react'
+import { useCallback, useState, type RefObject } from 'react'
 import { Rect } from 'spase'
 import { useSizeObserver } from './useSizeObserver.js'
+
+type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
 
 /**
  * Hook for monitoring changes in and returning the size and position of the
@@ -10,18 +12,18 @@ import { useSizeObserver } from './useSizeObserver.js'
  *
  * @returns The most current {@link Rect} of the target element.
  */
-export function useRect(targetRef: RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>): Rect {
+export function useRect(targetRef: TargetRef): Rect {
   const [rect, setRect] = useState<Rect>(Rect.make())
 
-  const handleResize = (element: HTMLElement) => {
+  const resizeHandler = useCallback((element: HTMLElement) => {
     const newRect = Rect.from(element)
     if (!newRect) return
 
     setRect(newRect)
-  }
+  }, [])
 
   useSizeObserver(targetRef, {
-    onResize: element => handleResize(element),
+    onResize: resizeHandler,
   })
 
   return rect

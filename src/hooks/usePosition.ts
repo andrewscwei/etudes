@@ -27,7 +27,7 @@ export type UsePositionProps = {
  * @param props See {@link UsePositionProps}.
  */
 export function usePosition({ onChange }: UsePositionProps) {
-  const handleScrollPositionChange = useCallback(() => {
+  const scrollPositionChangeHandler = useCallback(() => {
     const newValue = getScrollPositionInfo()
     if (!newValue) return
 
@@ -39,18 +39,18 @@ export function usePosition({ onChange }: UsePositionProps) {
   const prevInfo = useRef<ScrollPositionInfo>(undefined)
 
   useEffect(() => {
-    window.addEventListener('scroll', handleScrollPositionChange)
-    window.addEventListener('resize', handleScrollPositionChange)
-    window.addEventListener('orientationchange', handleScrollPositionChange)
+    window.addEventListener('scroll', scrollPositionChangeHandler)
+    window.addEventListener('resize', scrollPositionChangeHandler)
+    window.addEventListener('orientationchange', scrollPositionChangeHandler)
 
-    handleScrollPositionChange()
+    scrollPositionChangeHandler()
 
     return () => {
-      window.removeEventListener('scroll', handleScrollPositionChange)
-      window.removeEventListener('resize', handleScrollPositionChange)
-      window.removeEventListener('orientationchange', handleScrollPositionChange)
+      window.removeEventListener('scroll', scrollPositionChangeHandler)
+      window.removeEventListener('resize', scrollPositionChangeHandler)
+      window.removeEventListener('orientationchange', scrollPositionChangeHandler)
     }
-  }, [handleScrollPositionChange])
+  }, [scrollPositionChangeHandler])
 }
 
 const getScrollPositionInfo = (): ScrollPositionInfo | undefined => {
