@@ -166,11 +166,11 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
   }, [endValue, range[1]])
 
   useEffect(() => {
-    if (isDraggingStartKnob || isDraggingEndKnob || isDeepEqual(externalRange, range)) return
+    if (isDraggingStartKnob || isDraggingEndKnob || isReleasingEndKnob || isDeepEqual(externalRange, range)) return
     setRange(externalRange ?? [minValue, maxValue])
     setStartValue(externalRange?.[0] ?? minValue)
     setEndValue(externalRange?.[1] ?? maxValue)
-  }, [externalRange?.[0], externalRange?.[1]])
+  }, [externalRange?.[0], externalRange?.[1], isDraggingStartKnob, isDraggingEndKnob, isReleasingEndKnob])
 
   useEffect(() => {
     if (!breakpoints) return
