@@ -7,10 +7,29 @@ import { asStyleDict } from '../utils/asStyleDict.js'
 import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { styles } from '../utils/styles.js'
 
+/**
+ * Type describing the props of {@link Burger}.
+ */
 export type BurgerProps = HTMLAttributes<HTMLDivElement> & {
+  /**
+   * Specifies if the burger is in its activated state.
+   */
   isActive?: boolean
+
+  /**
+   * Specifies if the bars are horizontally split to allow for an alternate
+   * transition.
+   */
   isSplit?: boolean
+
+  /**
+   * Specifies if the tail of the bottom bar is hidden.
+   */
   isTailHidden?: boolean
+
+  /**
+   * Specifies the number of bars to display.
+   */
   numberOfBars?: 2 | 3
 }
 
@@ -74,6 +93,9 @@ export const Burger = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Burger
   )
 })
 
+/**
+ * The component for each bar in a {@link Burger}.
+ */
 export const BurgerBar = ({ ...props }: HTMLAttributes<HTMLSpanElement>) => (
   <span {...props}/>
 )
