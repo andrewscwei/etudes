@@ -115,6 +115,10 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
  * A dropdown component that is invertible (i.e. can "dropup" instead) and
  * supports both horizontal and vertical orientations. Provide `items` and
  * `ItemComponent` props to populate.
+ *
+ * @exports DropdownToggle Component for the toggle button.
+ * @exports DropdownExpandIcon Component for the expand icon.
+ * @exports DropdownCollapseIcon Component for the collapse icon.
  */
 export const Dropdown = /* #__PURE__ */ forwardRef(({
   children,
@@ -285,14 +289,23 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
   )
 }) as <T extends DropdownItemData = DropdownItemData>(props: Readonly<DropdownProps<T> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
 
+/**
+ * Component for the toggle button of a {@link Dropdown}.
+ */
 export const DropdownToggle = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & DropdownToggleProps) => (
   <button {...props}>{children}</button>
 )
 
+/**
+ * Component for the expand icon of a {@link Dropdown}.
+ */
 export const DropdownExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <figure {...props} aria-hidden={true}>{children}</figure>
 )
 
+/**
+ * Component for the collapse icon of a {@link Dropdown}.
+ */
 export const DropdownCollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <figure {...props} aria-hidden={true}>{children}</figure>
 )
