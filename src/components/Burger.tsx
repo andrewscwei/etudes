@@ -94,7 +94,7 @@ export const Burger = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Burger
 })
 
 /**
- * The component for each bar in a {@link Burger}.
+ * Component for each bar in a {@link Burger}.
  */
 export const BurgerBar = ({ ...props }: HTMLAttributes<HTMLSpanElement>) => (
   <span {...props}/>
