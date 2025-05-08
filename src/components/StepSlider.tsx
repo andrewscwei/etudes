@@ -10,8 +10,14 @@ import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { createKey } from '../utils/createKey.js'
 import { styles } from '../utils/styles.js'
 
-type Orientation = 'horizontal' | 'vertical'
+/**
+ * Type describing the orientation of {@link StepSlider}.
+ */
+export type StepSliderOrientation = 'horizontal' | 'vertical'
 
+/**
+ * Type describing the props of {@link StepSlider}.
+ */
 export type StepSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'role'> & {
   /**
    * Specifies if the knob is clipped to the track.
@@ -53,9 +59,9 @@ export type StepSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valueno
   knobWidth?: number
 
   /**
-   * Orientation of the slider.
+   * StepSliderOrientation of the slider.
    */
-  orientation?: Orientation
+  orientation?: StepSliderOrientation
 
   /**
    * An array of step descriptors. A step is a position (0 - 1 inclusive) on the
@@ -130,10 +136,10 @@ export type StepSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valueno
  * the slider. While dragging, the slider still emits a position change event,
  * where the position is a decimal ranging between 0.0 and 1.0, inclusive.
  *
- * @exports StepSliderKnob The component for the knob.
- * @exports StepSliderLabel The component for the label on the knob.
- * @exports StepSliderTrack The component for the slide track on either side
- *                                of the knob.
+ * @exports StepSliderKnob Component for the knob.
+ * @exports StepSliderLabel Component for the label on the knob.
+ * @exports StepSliderTrack Component for the slide track on either side of the
+ *                          knob.
  */
 export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSliderProps>>(({
   children,
@@ -325,15 +331,24 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
   )
 })
 
-export const StepSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}/>
-)
-
+/**
+ * Component for the knob of a {@link StepSlider}.
+ */
 export const StepSliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}/>
 )
 
+/**
+ * Component for the label on the knob of a {@link StepSlider}.
+ */
 export const StepSliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <div {...props}/>
+)
+
+/**
+ * Component for the track of a {@link StepSlider}.
+ */
+export const StepSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}/>
 )
 
@@ -345,7 +360,7 @@ export const StepSliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) =>
  *
  * @returns An array of steps.
  */
-function generateSteps(length: number): readonly number[] {
+export function generateSteps(length: number): readonly number[] {
   if (length <= 1) throw new Error('`length` value must be greater than or equal to 2')
   if (Math.round(length) !== length) throw new Error('`length` value must be an integer')
 
@@ -358,15 +373,6 @@ function generateSteps(length: number): readonly number[] {
   })
 }
 
-/**
- * Gets the index of the step of which the specified position is closest to. If
- * for whatever reason the index cannot be computed, -1 is returned.
- *
- * @param position The position (0 1, inclusive).
- * @param steps The steps.
- *
- * @returns The nearest index.
- */
 function getNearestIndexByPosition(position: number, steps: readonly number[]): number {
   let index = -1
   let minDelta = NaN
@@ -387,15 +393,6 @@ function getNearestIndexByPosition(position: number, steps: readonly number[]): 
   return index
 }
 
-/**
- * Gets the position by step index. This value ranges between 0 - 1, inclusive.
- *
- * @param index The step index.
- * @param steps The steps.
- *
- * @returns The position. If for whatever reason the position cannot be
- *          determined, `NaN` is returned.
- */
 function getPositionAt(index: number, steps: readonly number[]): number {
   if (index >= steps.length) return NaN
 
