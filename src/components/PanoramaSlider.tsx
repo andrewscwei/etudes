@@ -8,6 +8,9 @@ import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { styles } from '../utils/styles.js'
 import { Panorama, type PanoramaProps } from './Panorama.js'
 
+/**
+ * Type describing the props of {@link PanoramaSlider}.
+ */
 export type PanoramaSliderProps = PanoramaProps & {
   /**
    * Field-of-view (0.0 - 360.0 degrees, inclusive) that represents the size of
@@ -35,13 +38,13 @@ export type PanoramaSliderProps = PanoramaProps & {
 }
 
 /**
- * A slider for a {@link Panorama} component.
+ * A slider for a {@link Panorama}.
  *
- * @exports PanoramaSliderIndicator The indicator that appears when the slider
- *                                  is being dragged.
- * @exports PanoramaSliderReticle The reticle that indicates the FOV of the
- *                                backing {@link Panorama}.
- * @exports PanoramaSliderTrack The slide track.
+ * @exports PanoramaSliderIndicator Component for the active indicator that
+ *                                  appears when the slider is dragged.
+ * @exports PanoramaSliderReticle Component for the reticle that indicates the
+ *                                FOV of the backing {@link Panorama}.
+ * @exports PanoramaSliderTrack Component for the slide track.
  */
 export const PanoramaSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<PanoramaSliderProps>>(({
   className,
@@ -159,15 +162,24 @@ export const PanoramaSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonl
   )
 })
 
-export const PanoramaSliderTrack = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
+/**
+ * Component for the active indicator of a {@link PanoramaSlider}.
+ */
+export const PanoramaSliderIndicator = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
   <div {...props} ref={ref}/>
 ))
 
+/**
+ * Component for the active reticle of a {@link PanoramaSlider}.
+ */
 export const PanoramaSliderReticle = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
   <div {...props} ref={ref}/>
 ))
 
-export const PanoramaSliderIndicator = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
+/**
+ * Component for the slide track of a {@link PanoramaSlider}.
+ */
+export const PanoramaSliderTrack = /* #__PURE__ */ forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
   <div {...props} ref={ref}/>
 ))
 
@@ -218,7 +230,7 @@ function getFixedStyles({ autoDimension = 'width', panoramaRect = Rect.make(), a
 
 if (process.env.NODE_ENV !== 'production') {
   PanoramaSlider.displayName = 'PanoramaSlider'
-  PanoramaSliderTrack.displayName = 'PanoramaSliderTrack'
-  PanoramaSliderReticle.displayName = 'PanoramaSliderReticle'
   PanoramaSliderIndicator.displayName = 'PanoramaSliderIndicator'
+  PanoramaSliderReticle.displayName = 'PanoramaSliderReticle'
+  PanoramaSliderTrack.displayName = 'PanoramaSliderTrack'
 }
