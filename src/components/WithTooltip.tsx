@@ -6,8 +6,14 @@ import { ExtractChild } from '../operators/ExtractChild.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { styles } from '../utils/styles.js'
 
+/**
+ * Type describing the alignment of the tooltip relative to the wrapped element.
+ */
 type Alignment = 'tl' | 'tc' | 'tr' | 'cl' | 'cr' | 'bl' | 'bc' | 'br'
 
+/**
+ * Type describing the styling options of the tooltip.
+ */
 type StyleOptions = {
   alignment: Alignment
   arrowSize: Size
@@ -17,9 +23,13 @@ type StyleOptions = {
   targetWidth: number
 }
 
+/**
+ * Type describing the props of {@link WithTooltip}.
+ */
 export type WithTooltipProps = Pick<HTMLAttributes<HTMLElement>, 'className' | 'children' | 'style'> & {
   /**
-   * Target alignment, automatically computed if not provided.
+   * Target alignment with respect to the wrapped element, automatically
+   * computed if not provided.
    */
   alignment?: Alignment
 
@@ -56,6 +66,10 @@ export type WithTooltipProps = Pick<HTMLAttributes<HTMLElement>, 'className' | '
   threshold?: number
 }
 
+/**
+ * A component that wraps a target element and displays a tooltip with a hint
+ * string when the target element is hovered.
+ */
 export function WithTooltip({
   children,
   className,
