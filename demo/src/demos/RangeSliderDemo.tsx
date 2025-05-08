@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { RangeSlider, RangeSliderGutter, RangeSliderHighlight, RangeSliderKnob, RangeSliderLabel } from 'etudes'
+import { RangeSlider, RangeSliderGutter, RangeSliderHighlight, RangeSliderKnob, RangeSliderKnobContainer, RangeSliderLabel } from 'etudes'
 import { useState } from 'react'
 import { Frame } from '../components/Frame.js'
 
@@ -44,6 +44,12 @@ export function RangeSliderDemo() {
           <RangeSliderGutter className='bg-dark/40'/>
           <RangeSliderHighlight className='bg-dark'/>
           <RangeSliderKnob className='ia flex items-center justify-center border border-dark bg-dark'/>
+          <RangeSliderKnobContainer
+            className={clsx({
+              '[:not(.dragging)]:transition-[left]': orientation === 'horizontal',
+              '[:not(.dragging)]:transition-[top]': orientation === 'vertical',
+            })}
+          />
           <RangeSliderLabel className='text-base text-light'/>
         </RangeSlider>
       )}
