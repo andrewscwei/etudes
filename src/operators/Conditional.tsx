@@ -4,6 +4,10 @@ import { type PropsWithChildren } from 'react'
  * Type describing the properties of {@link Conditional}.
  */
 export type ConditionalProps = PropsWithChildren<{
+  /**
+   * An expression or function that returns a truthy value to determine if the
+   * children should be rendered.
+   */
   if: any | (() => any)
 }>
 
