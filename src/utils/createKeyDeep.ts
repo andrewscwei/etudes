@@ -1,5 +1,13 @@
 import { createKey } from './createKey.js'
 
+/**
+ * Creates a unique key for a given value, useful for caching or memoization
+ * purposes. This function handles deep comparisons.
+ *
+ * @param value The value to create a key for.
+ *
+ * @returns A unique string key representing the value.
+ */
 export function createKeyDeep(value: any): string {
   if (value === null || value === undefined) {
     return ''
