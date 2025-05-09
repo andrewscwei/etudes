@@ -1,7 +1,15 @@
 import { createContext, useContext, useEffect, useState, type PropsWithChildren, type RefObject } from 'react'
 import { Point, Rect } from 'spase'
 
-type ScrollPosition = {
+type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
+
+/**
+ * Type describing the scroll position of a target element or the window.
+ *
+ * @param pos The current scroll position of the target element or the window.
+ * @param step The fraction scrolled (0 - 1) in either axis.
+ */
+export type ScrollPosition = {
   pos: Point
   step: Point
 }
@@ -15,7 +23,7 @@ export type ScrollPositionContextValue = ScrollPosition & {
 }
 
 /**
- * Type describing the properties of {@link ScrollPositionProvider}.
+ * Type describing the props of {@link ScrollPositionProvider}.
  */
 export type ScrollPositionProviderProps = PropsWithChildren
 
@@ -76,8 +84,6 @@ export function ScrollPositionProvider({
     </ScrollPositionContext.Provider>
   )
 }
-
-type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
 
 /**
  * Hook for accessing the current scroll position of a target element or the

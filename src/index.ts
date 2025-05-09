@@ -51,6 +51,7 @@ export * from './operators/ExtractChildren.js'
 export * from './operators/Repeat.js'
 export * from './operators/Switch.js'
 
+export * from './providers/ColorSchemeProvider.js'
 export * from './providers/ScrollPositionProvider.js'
 
 export * from './utils/asClassNameDict.js'
