@@ -35,7 +35,7 @@ export function RangeSliderDemo() {
           orientation={orientation as any}
           range={[min, max]}
           steps={99}
-          onRangeChange={range => {
+          onChange={range => {
             setMin(range[0])
             setMax(range[1])
             toast(`Min: ${Math.round(range[0])}, Max: ${Math.round(range[1])}`)

@@ -23,7 +23,7 @@ export type RangeSliderRange = [number, number]
 /**
  * Type describing the props of {@link RangeSlider}.
  */
-export type RangeSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuemax' | 'aria-valuemin' | 'role'> & {
+export type RangeSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuemax' | 'aria-valuemin' | 'role' | 'onChange'> & {
   /**
    * Number of decimal places to display.
    */
@@ -80,7 +80,7 @@ export type RangeSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuem
    *
    * @param range The current range of values.
    */
-  onRangeChange?: (range: RangeSliderRange) => void
+  onChange?: (range: RangeSliderRange) => void
 }
 
 /**
@@ -105,7 +105,7 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
   orientation = 'vertical',
   range: externalRange,
   steps = -1,
-  onRangeChange,
+  onChange,
   ...props
 }, ref) => {
   const bodyRef = useRef<HTMLDivElement>(null)
@@ -155,16 +155,12 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
   })
 
   useEffect(() => {
-    if (range[0] === startValue) return
-    setRange([startValue, range[1]])
-    onRangeChange?.(range)
-  }, [startValue, range[0]])
+    setRange([startValue, endValue])
+  }, [startValue, endValue])
 
   useEffect(() => {
-    if (range[1] === endValue) return
-    setRange([range[0], endValue])
-    onRangeChange?.(range)
-  }, [endValue, range[1]])
+    onChange?.(range)
+  }, [range[0], range[1]])
 
   useEffect(() => {
     if (isDraggingStartKnob || isDraggingEndKnob || isReleasingEndKnob || isDeepEqual(externalRange, range)) return
@@ -212,7 +208,9 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
             pointerEvents: isDeepEqual([startValue, endValue], [minValue, minValue]) ? 'none' : 'auto',
           }, orientation === 'horizontal' ? {
             left: `${start}px`,
+            top: `${bodyRect.height * 0.5}px`,
           } : {
+            left: `${bodyRect.width * 0.5}px`,
             top: `${start}px`,
           }),
         }, cloneStyledElement(components.knob ?? <RangeSliderKnob/>, {
@@ -239,7 +237,9 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
             pointerEvents: isDeepEqual([startValue, endValue], [maxValue, maxValue]) ? 'none' : 'auto',
           }, orientation === 'horizontal' ? {
             left: `${end}px`,
+            top: `${bodyRect.height * 0.5}px`,
           } : {
+            left: `${bodyRect.width * 0.5}px`,
             top: `${end}px`,
           }),
           ref: endKnobContainerRef,
