@@ -37,8 +37,8 @@ export function DropdownDemo() {
           className={clsx('relative text-base', {
             'mb-24': orientation === 'vertical' && isInverted === 'false',
             'mt-24': orientation === 'vertical' && isInverted === 'true',
-            'w-32 h-24': orientation === 'horizontal',
-            'w-44 h-9': orientation === 'vertical',
+            'h-24 w-32 [&_[role=grid]]:transition-[width] [&_[role=listbox]]:transition-[width]': orientation === 'horizontal',
+            'h-9 w-44 [&_[role=grid]]:transition-[height] [&_[role=listbox]]:transition-[height]': orientation === 'vertical',
           })}
           collapsesOnSelect={collapsesOnSelect === 'true'}
           isCollapsed={isCollapsed}
