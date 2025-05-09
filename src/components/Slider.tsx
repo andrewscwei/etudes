@@ -16,7 +16,7 @@ export type SliderOrientation = 'horizontal' | 'vertical'
 /**
  * Type describing the props of {@link Slider}.
  */
-export type SliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-orientation' | 'aria-valuenow' | 'role'> & {
+export type SliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-orientation' | 'aria-valuenow' | 'role' | 'onChange'> & {
   /**
    * Specifies if the knob is clipped to the track.
    */
@@ -90,7 +90,7 @@ export type SliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-orientation
    * @param position The current slider position.
    * @param isDragging Specifies if the position change is due to dragging.
    */
-  onPositionChange?: (position: number, isDragging: boolean) => void
+  onChange?: (position: number, isDragging: boolean) => void
 
   /**
    * Handler invoked when dragging ends.
@@ -134,7 +134,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
   labelProvider,
   onDragEnd,
   onDragStart,
-  onPositionChange,
+  onChange,
   ...props
 }, ref) => {
   const bodyRef = useRef<HTMLDivElement>(null)
@@ -212,12 +212,12 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
 
   useEffect(() => {
     if (isDragging && onlyDispatchesOnDragEnd) return
-    onPositionChange?.(position, isDragging)
+    onChange?.(position, isDragging)
   }, [position])
 
   useEffect(() => {
     if (isDragging || !onlyDispatchesOnDragEnd) return
-    onPositionChange?.(position, true)
+    onChange?.(position, true)
   }, [isDragging])
 
   const components = asComponentDict(children, {

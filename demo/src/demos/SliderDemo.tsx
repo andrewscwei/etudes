@@ -37,7 +37,7 @@ export function SliderDemo() {
           orientation={orientation as any}
           position={position}
           trackPadding={0}
-          onPositionChange={pos => {
+          onChange={pos => {
             setPosition(pos)
             toast(`Position: ${Math.round(pos * (max - min) + min)}`)
           }}
