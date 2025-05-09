@@ -22,6 +22,10 @@ export type ColorSchemeContextValue = {
  * A context provider that manages the color scheme (light or dark) of the
  * application. It uses `localStorage` to persist the user's preference across
  * sessions.
+ *
+ * @exports ColorSchemeContext Context for providing color scheme information.
+ * @exports useColorScheme Hook for accessing the current color scheme.
+ * @exports useSetColorScheme Hook for setting the color scheme.
  */
 export function ColorSchemeProvider({ children }: ColorSchemeProviderProps) {
   const getInitialColorScheme = (): ColorScheme => {
