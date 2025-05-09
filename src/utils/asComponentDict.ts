@@ -4,6 +4,15 @@ type ComponentTypeDict = Record<string, JSXElementConstructor<any>>
 
 type ComponentElementDict<T extends ComponentTypeDict> = Record<keyof T, JSX.Element>
 
+/**
+ * Inspects the children of a component and returns a dictionary of matching
+ * component types as specified in the `typeDict` parameter.
+ *
+ * @param children The children to inspect.
+ * @param typeDict A dictionary of component types to match against.
+ *
+ * @returns A dictionary of matching component types.
+ */
 export function asComponentDict<T extends ComponentTypeDict>(children?: ReactNode, typeDict: T = {} as T): Partial<ComponentElementDict<T>> {
   const keys: (keyof T)[] = Object.keys(typeDict)
   const types = Object.values(typeDict)
