@@ -39,7 +39,6 @@ export function AccordionDemo() {
       alignment='start'
       options={[
         ['autoCollapseSections: true', 'autoCollapseSections: false'],
-        ['isInverted: false', 'isInverted: true'],
         ['orientation: vertical', 'orientation: horizontal'],
         ['selectionMode: single', 'selectionMode: multiple', 'selectionMode: none'],
       ]}
@@ -50,7 +49,7 @@ export function AccordionDemo() {
         setSelection([])
       }}
     >
-      {({ autoCollapseSections, isInverted, orientation, selectionMode }, toast) => (
+      {({ autoCollapseSections, orientation, selectionMode }, toast) => (
         <Accordion
           key={orientation}
           autoCollapseSections={autoCollapseSections === 'true'}
@@ -77,9 +76,7 @@ export function AccordionDemo() {
           <AccordionExpandIcon className='size-3'>
             <FlatSVG
               className={clsx({
-                'rotate-90': orientation === 'horizontal' && isInverted === 'true',
-                '-rotate-90': orientation === 'horizontal' && isInverted === 'false',
-                'rotate-180': orientation === 'vertical' && isInverted === 'true',
+                '-rotate-90': orientation === 'horizontal',
               })}
               svg={$$ExpandIcon}
             />
