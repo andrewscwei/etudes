@@ -39,7 +39,7 @@ export function SliderDemo() {
           trackPadding={0}
           onPositionChange={pos => {
             setPosition(pos)
-            toast(`Position: ${pos.toFixed(2)}`)
+            toast(`Position: ${Math.round(pos * (max - min) + min)}`)
           }}
         >
           <SliderKnob className='ia flex items-center justify-center border border-dark bg-dark'/>
