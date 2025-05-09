@@ -46,8 +46,8 @@ export function RangeSliderDemo() {
           <RangeSliderKnob className='ia flex items-center justify-center border border-dark bg-dark'/>
           <RangeSliderKnobContainer
             className={clsx({
-              '[:not(.dragging)]:transition-[left]': orientation === 'horizontal',
-              '[:not(.dragging)]:transition-[top]': orientation === 'vertical',
+              '[.releasing]:transition-[left]': orientation === 'horizontal',
+              '[.releasing]:transition-[top]': orientation === 'vertical',
             })}
           />
           <RangeSliderLabel className='text-base text-light'/>

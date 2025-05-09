@@ -223,8 +223,8 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
           style: styles(fixedStyles.knob),
         }, <div style={fixedStyles.knobHitBox}/>, components.label && cloneStyledElement(components.label, {
           className: clsx({
-            dragging: isDraggingStartKnob || isDraggingEndKnob,
-            releasing: isReleasingStartKnob || isReleasingEndKnob,
+            dragging: isDraggingStartKnob,
+            releasing: isReleasingStartKnob,
           }),
           style: styles(fixedStyles.label),
         }, Number(startValue.toFixed(decimalPlaces)).toLocaleString())))}
@@ -232,7 +232,7 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
         {cloneStyledElement(components.knobContainer ?? <RangeSliderKnobContainer/>, {
           className: clsx({
             dragging: isDraggingEndKnob,
-            releasing: isDraggingEndKnob,
+            releasing: isReleasingEndKnob,
           }),
           disabled: isDeepEqual([startValue, endValue], [maxValue, maxValue]),
           style: styles(fixedStyles.knobContainer, {
@@ -246,7 +246,7 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
         }, cloneStyledElement(components.knob ?? <RangeSliderKnob/>, {
           className: clsx({
             dragging: isDraggingEndKnob,
-            releasing: isDraggingEndKnob,
+            releasing: isReleasingEndKnob,
           }),
           style: styles(fixedStyles.knob),
         }, <div style={fixedStyles.knobHitBox}/>, components.label && cloneStyledElement(components.label, {
