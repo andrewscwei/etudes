@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { forwardRef, useRef, useState, type HTMLAttributes } from 'react'
+import { forwardRef, useCallback, useRef, useState, type HTMLAttributes } from 'react'
 import { Rect, type Size } from 'spase'
 import { useRect } from '../hooks/useRect.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
@@ -67,45 +67,47 @@ export const PanoramaSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonl
   onPositionChange,
   ...props
 }, ref) => {
-  const getAspectRatio = () => {
-    if (!imageSize) return 0
-    const { width, height } = imageSize
-    if (height === 0) return 0
-
-    return width / height
-  }
-
-  const getReticleWidth = () => {
-    const deg = Math.min(360, Math.max(0, fov ?? (viewportSize ? viewportSize.width / (viewportSize.height * aspectRatio) * 360 : 0)))
-
-    return panoramaRect.width * (deg / 360)
-  }
-
-  const getAdjustedZeroAnchor = () => {
-    if (panoramaRect.width <= 0) return zeroAnchor
-
-    return ((panoramaRect.width - reticleWidth) * 0.5 + zeroAnchor * reticleWidth) / panoramaRect.width
-  }
-
-  const dragStartHandler = () => {
-    setIsDragging(true)
-    onDragStart?.()
-  }
-
-  const dragEndHandler = () => {
-    setIsDragging(false)
-    onDragEnd?.()
-  }
-
   const panoramaRef = useRef<HTMLDivElement>(null)
   const panoramaRect = useRect(panoramaRef)
 
   const [imageSize, setImageSize] = useState<Size | undefined>()
   const [isDragging, setIsDragging] = useState(false)
 
+  const getAspectRatio = useCallback(() => {
+    if (!imageSize) return 0
+    const { width, height } = imageSize
+    if (height === 0) return 0
+
+    return width / height
+  }, [imageSize?.width, imageSize?.height])
+
   const aspectRatio = getAspectRatio()
+
+  const getReticleWidth = useCallback(() => {
+    const deg = Math.min(360, Math.max(0, fov ?? (viewportSize ? viewportSize.width / (viewportSize.height * aspectRatio) * 360 : 0)))
+
+    return panoramaRect.width * (deg / 360)
+  }, [viewportSize?.width, viewportSize?.height, aspectRatio, panoramaRect.width, fov])
+
   const reticleWidth = getReticleWidth()
+
+  const getAdjustedZeroAnchor = useCallback(() => {
+    if (panoramaRect.width <= 0) return zeroAnchor
+
+    return ((panoramaRect.width - reticleWidth) * 0.5 + zeroAnchor * reticleWidth) / panoramaRect.width
+  }, [panoramaRect.width, reticleWidth, zeroAnchor])
+
   const adjustedZeroAnchor = getAdjustedZeroAnchor()
+
+  const dragStartHandler = useCallback(() => {
+    setIsDragging(true)
+    onDragStart?.()
+  }, [onDragStart])
+
+  const dragEndHandler = useCallback(() => {
+    setIsDragging(false)
+    onDragEnd?.()
+  }, [onDragEnd])
 
   const components = asComponentDict(children, {
     track: PanoramaSliderTrack,

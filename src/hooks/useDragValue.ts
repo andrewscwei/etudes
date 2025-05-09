@@ -73,23 +73,6 @@ export function useDragValue<T = [number, number]>(targetRef: TargetRef, {
   onDragEnd,
   ...options
 }: UseDragValueOptions<T>): UseDragValueOutput<T> {
-  /**
-   * Sets the current associated value reference. This reference object is equal
-   * to the `value` state but differs slightly in how they are set. Because
-   * states are asynchronous by nature, this reference object is used to cache
-   * time-sensitive value changes while drag event happens.
-   *
-   * @param value The value to set the associated value to.
-   *
-   * @returns `true` if the value was set, `false` otherwise.
-   */
-  const setValueRef = (value: T): boolean => {
-    if (isDeepEqual(valueRef.current, value)) return false
-    valueRef.current = value
-
-    return true
-  }
-
   const valueRef = useRef<T>(initialValue)
   const [isDragging, setIsDragging] = useState(false)
   const [isReleasing, setIsReleasing] = useState(false)
@@ -105,7 +88,7 @@ export function useDragValue<T = [number, number]>(targetRef: TargetRef, {
   const dragMoveHandler = useCallback((displacement: Point, currentPosition: Point, startPosition: Point) => {
     const newValue = transform(valueRef.current, displacement.x, displacement.y)
 
-    if (setValueRef(newValue)) {
+    if (setValueRef(valueRef, newValue)) {
       setValue(newValue)
     }
 
@@ -130,7 +113,7 @@ export function useDragValue<T = [number, number]>(targetRef: TargetRef, {
   })
 
   useEffect(() => {
-    setValueRef(value)
+    setValueRef(valueRef, value)
   }, [value])
 
   return {
@@ -139,4 +122,21 @@ export function useDragValue<T = [number, number]>(targetRef: TargetRef, {
     value,
     setValue,
   }
+}
+
+/**
+ * Sets the current associated value reference. This reference object is equal
+ * to the `value` state but differs slightly in how they are set. Because
+ * states are asynchronous by nature, this reference object is used to cache
+ * time-sensitive value changes while drag event happens.
+ *
+ * @param value The value to set the associated value to.
+ *
+ * @returns `true` if the value was set, `false` otherwise.
+ */
+function setValueRef<T>(ref: RefObject<T>, value: T): boolean {
+  if (isDeepEqual(ref.current, value)) return false
+  ref.current = value
+
+  return true
 }
