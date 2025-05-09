@@ -35,6 +35,11 @@ export const ScrollPositionContext = /* #__PURE__ */ createContext<ScrollPositio
 /**
  * A provider component that tracks the scroll position of the window and
  * provides it to its children via context.
+ *
+ * @exports ScrollPositionContext Context for providing scroll position
+ *                                information.
+ * @exports useScrollPosition Hook for accessing the current scroll position of
+ *                            a target.
  */
 export function ScrollPositionProvider({
   children,
