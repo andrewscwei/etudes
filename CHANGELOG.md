@@ -1,3 +1,48 @@
+# [13.0.0](https://github.com/andrewscwei/etudes/compare/v12.0.0...v13.0.0) (2025-05-09)
+
+
+### Bug Fixes
+
+* Fix Dropdown expand and collapse icons interfering with pointer events ([54e7d8a](https://github.com/andrewscwei/etudes/commit/54e7d8a7b58077a70dbf88c3a6a877de7f908775))
+* FIx ImageDemo ([0756037](https://github.com/andrewscwei/etudes/commit/07560373ae9c14c4bcafc093182dccef71fe9ad2))
+* Fix RangeSlider glitches ([4f78758](https://github.com/andrewscwei/etudes/commit/4f7875888b217d77972540edf6ed59fd5397dd7a))
+* Fix RangeSlider knob not snapping into place upon release ([3efd75c](https://github.com/andrewscwei/etudes/commit/3efd75c17c6128c4fe43a79930307a7b38b06d20))
+* Fix release transition in RangeSlider ([61ad0ac](https://github.com/andrewscwei/etudes/commit/61ad0acaa320c35ccb0dde04b90e5bde03997f32))
+* Fix sliding issue in PanoramaSlider ([f767fc6](https://github.com/andrewscwei/etudes/commit/f767fc69a7e580caa592959adc93d18f54429964))
+* Fix unused arg in StepSlider ([e1f42bf](https://github.com/andrewscwei/etudes/commit/e1f42bfc421898d8d73b7c908a54960b75d46d70))
+
+
+### Code Refactoring
+
+* Optimize useInterval and useTimeout ([029e1ce](https://github.com/andrewscwei/etudes/commit/029e1ced78bc16f640439d2d0346e2c1b1d8bf28))
+
+
+### Documentation
+
+* Add docs for useSearchState ([28c7562](https://github.com/andrewscwei/etudes/commit/28c75622ef4603dda502a12be99b2ad37c89db56))
+
+
+### Features
+
+* Add ColorSchemeProvider ([516b87a](https://github.com/andrewscwei/etudes/commit/516b87a1bf694f3d648e96b94bfa6cf48f6e10ba))
+* Add knob padding to Slider and StepSlider ([8c0d71c](https://github.com/andrewscwei/etudes/commit/8c0d71cd285d594fc1a41a28992347a1f133af67))
+* Create Switch operator component ([e4b1bec](https://github.com/andrewscwei/etudes/commit/e4b1bec2d8f90cef56f71fa00f829ec28da84d08))
+* Export SliderKnobContainer ([558668a](https://github.com/andrewscwei/etudes/commit/558668a21a464e1c7770ce033a44f385d0efad8f))
+* Export StepSliderKnobContainer ([363984f](https://github.com/andrewscwei/etudes/commit/363984f5c97a182013ad9cd7d77eb93e0e75b30b))
+* Support manual transition in RangeSlider ([a788d48](https://github.com/andrewscwei/etudes/commit/a788d485aaf61ea45b335b6ace48039dc0099b88))
+
+
+### refractor
+
+* Change onPositionChange to onChange for Slider ([62ee5fa](https://github.com/andrewscwei/etudes/commit/62ee5fa2971f1c8c0cbf82fba4063a34a16f803b))
+
+
+### BREAKING CHANGES
+
+* Slider's onPositionChange is now renamed to onChange
+* useInterval API changed
+* Renamed useSearchParamState to useSearchState
+
 # [12.0.0](https://github.com/andrewscwei/etudes/compare/v11.4.0...v12.0.0) (2025-05-07)
 
 
