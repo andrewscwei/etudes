@@ -299,15 +299,15 @@ export const DropdownToggle = ({ children, ...props }: HTMLAttributes<HTMLButton
 /**
  * Component for the expand icon of a {@link Dropdown}.
  */
-export const DropdownExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <figure {...props} aria-hidden={true}>{children}</figure>
+export const DropdownExpandIcon = ({ children, style, ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <figure {...props} aria-hidden={true} style={styles(style, { pointerEvents: 'none' })}>{children}</figure>
 )
 
 /**
  * Component for the collapse icon of a {@link Dropdown}.
  */
-export const DropdownCollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <figure {...props} aria-hidden={true}>{children}</figure>
+export const DropdownCollapseIcon = ({ children, style, ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <figure {...props} aria-hidden={true} style={styles(style, { pointerEvents: 'none' })}>{children}</figure>
 )
 
 function sortIndices(indices: number[]): number[] {
