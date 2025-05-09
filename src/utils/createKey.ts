@@ -1,3 +1,11 @@
+/**
+ * Creates a unique key for a given value, useful for caching or memoization
+ * purposes. This function handles shallow comparisons only.
+ *
+ * @param value The value to create a key for.
+ *
+ * @returns A unique string key representing the value.
+ */
 export function createKey(value: any): string {
   if (value === null || value === undefined) {
     return ''
