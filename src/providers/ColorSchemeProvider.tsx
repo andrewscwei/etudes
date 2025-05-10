@@ -1,9 +1,22 @@
-import { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState, type Dispatch, type PropsWithChildren, type SetStateAction } from 'react'
 
 /**
  * Type describing the available color schemes.
  */
 export type ColorScheme = 'light' | 'dark'
+
+export namespace ColorScheme {
+  /**
+   * A function that toggles a color scheme between light and dark.
+   *
+   * @param colorScheme The color scheme to toggle.
+   *
+   * @returns The toggled color scheme.
+   */
+  export function toggled(colorScheme: ColorScheme): ColorScheme {
+    return colorScheme === 'light' ? 'dark' : 'light'
+  }
+}
 
 /**
  * Type describing the props of {@link ColorSchemeProvider}.
@@ -15,7 +28,7 @@ export type ColorSchemeProviderProps = PropsWithChildren
  */
 export type ColorSchemeContextValue = {
   colorScheme: ColorScheme
-  setColorScheme: (colorScheme: ColorScheme) => void
+  setColorScheme: Dispatch<SetStateAction<ColorScheme>>
 }
 
 /**
@@ -78,9 +91,23 @@ export function useColorScheme(): ColorScheme {
  */
 export function useSetColorScheme() {
   const context = useContext(ColorSchemeContext)
-  if (!context) throw Error('useChangeColorScheme must be used within a ColorSchemeProvider')
+  if (!context) throw Error('useSetColorScheme must be used within a ColorSchemeProvider')
 
   return context.setColorScheme
+}
+
+/**
+ * A hook to toggle the color scheme between light and dark.
+ *
+ * @throws If used outside of a {@link ColorSchemeProvider}.
+ */
+export function useToggleColorScheme() {
+  const context = useContext(ColorSchemeContext)
+  if (!context) throw Error('useToggleColorScheme must be used within a ColorSchemeProvider')
+
+  return useCallback(() => {
+    context.setColorScheme(prev => ColorScheme.toggled(prev))
+  }, [])
 }
 
 if (process.env.NODE_ENV !== 'production') {
