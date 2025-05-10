@@ -1,3 +1,10 @@
+# [13.1.0](https://github.com/andrewscwei/etudes/compare/v13.0.0...v13.1.0) (2025-05-10)
+
+
+### Features
+
+* Add ColorScheme toggling functions ([15a2be5](https://github.com/andrewscwei/etudes/commit/15a2be5b41f35d3159d05d630215e2bee5ae12d6))
+
 # [13.0.0](https://github.com/andrewscwei/etudes/compare/v12.0.0...v13.0.0) (2025-05-09)
 
 
