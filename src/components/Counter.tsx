@@ -11,10 +11,31 @@ import { TextField, type TextFieldProps } from './TextField.js'
  * Type describing the props of {@link Counter}.
  */
 export type CounterProps = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & {
+  /**
+   * The minimum quantity that can be set.
+   */
   min?: number
+
+  /**
+   * The maximum quantity that can be set.
+   */
   max?: number
+
+  /**
+   * The quantity.
+   */
   quantity?: number
+
+  /**
+   * Specifies if the quantity can be modified via user text input.
+   */
   allowsInput?: boolean
+
+  /**
+   * Handler invoked when the quantity changes.
+   *
+   * @param quantity The new quantity.
+   */
   onChange?: (quantity: number) => void
 }
 
