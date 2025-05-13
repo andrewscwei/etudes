@@ -1,3 +1,10 @@
+# [14.3.0](https://github.com/andrewscwei/etudes/compare/v14.2.0...v14.3.0) (2025-05-13)
+
+
+### Features
+
+* Upgrade spase to latest ([028cdff](https://github.com/andrewscwei/etudes/commit/028cdffba6161348225cd44759fb480adeff8a87))
+
 # [14.2.0](https://github.com/andrewscwei/etudes/compare/v14.1.0...v14.2.0) (2025-05-13)
 
 
