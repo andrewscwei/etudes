@@ -365,15 +365,13 @@ export const Collection = /* #__PURE__ */ forwardRef(({
             return cloneStyledElement(
               components.item ?? <CollectionItem/>,
               {
-                'aria-selected': isSelected,
-                'className': clsx({ selected: isSelected }),
                 role,
                 selectionMode,
+                'aria-selected': isSelected,
+                'className': clsx({ selected: isSelected }),
                 'style': itemStyles,
+                'onClick': () => activateAt(idx),
                 onActivateAt,
-                ...(onActivateAt || onSelectAt) ? {
-                  onClick: () => activateAt(idx),
-                } : {},
               },
               <>{`${val}`}</>,
             )
