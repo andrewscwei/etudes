@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { Size } from 'spase'
 import { useImageLoader, type UseImageLoaderOptions, type UseImageLoaderParams } from './useImageLoader.js'
+import { useLatest } from './useLatest.js'
 
 /**
  * Type describing the parameters of {@link useImageSize}.
@@ -37,25 +38,28 @@ export function useImageSize({
   onLoadComplete,
   onLoadError,
 }: UseImageSizeOptions = {}): Size | undefined {
-  const [imageSize, setImageSize] = useState<Size | undefined>()
+  const [size, setSize] = useState<Size | undefined>()
+  const loadStartHandlerRef = useLatest(onLoadStart)
+  const loadCompleteHandlerRef = useLatest(onLoadComplete)
+  const loadErrorHandlerRef = useLatest(onLoadError)
 
   const loadStartHandler = useCallback((element: HTMLImageElement) => {
-    if (!preservesSizeBetweenLoads) setImageSize(undefined)
+    if (!preservesSizeBetweenLoads) setSize(undefined)
 
-    onLoadStart?.(element)
-  }, [preservesSizeBetweenLoads, onLoadStart])
+    loadStartHandlerRef.current?.(element)
+  }, [preservesSizeBetweenLoads])
 
   const loadCompleteHandler = useCallback((element: HTMLImageElement) => {
-    setImageSize(getSize(element))
+    setSize(_getSize(element))
 
-    onLoadComplete?.(element)
-  }, [onLoadComplete])
+    loadCompleteHandlerRef.current?.(element)
+  }, [])
 
   const loadErrorHandler = useCallback((element: HTMLImageElement) => {
-    if (!preservesSizeBetweenLoads) setImageSize(undefined)
+    if (!preservesSizeBetweenLoads) setSize(undefined)
 
-    onLoadError?.(element)
-  }, [preservesSizeBetweenLoads, onLoadError])
+    loadErrorHandlerRef.current?.(element)
+  }, [preservesSizeBetweenLoads])
 
   useImageLoader({ src, srcSet, sizes }, {
     onLoadStart: loadStartHandler,
@@ -63,10 +67,10 @@ export function useImageSize({
     onLoadError: loadErrorHandler,
   })
 
-  return imageSize
+  return size
 }
 
-function getSize(element?: HTMLImageElement): Size | undefined {
+function _getSize(element?: HTMLImageElement): Size | undefined {
   if (!element) return undefined
   if (typeof element.width !== 'number') return undefined
   if (typeof element.height !== 'number') return undefined

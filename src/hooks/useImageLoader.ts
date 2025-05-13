@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
+import { useLatest } from './useLatest.js'
 
 /**
  * Type describing the parameters of {@link useImageLoader}.
@@ -62,26 +63,29 @@ export function useImageLoader({
   onLoadError,
 }: UseImageLoaderOptions = {}) {
   const imageRef = useRef<HTMLImageElement>(undefined)
-
-  const imageLoadCompleteHandler = useCallback((event: Event) => {
-    const element = event.currentTarget as HTMLImageElement
-
-    onLoadComplete?.(element)
-  }, [onLoadComplete])
-
-  const imageLoadErrorHandler = useCallback((event: Event) => {
-    const element = event.currentTarget as HTMLImageElement
-
-    onLoadError?.(element)
-  }, [onLoadError])
+  const loadStartHandlerRef = useLatest(onLoadStart)
+  const loadCompleteHandlerRef = useLatest(onLoadComplete)
+  const loadErrorHandlerRef = useLatest(onLoadError)
 
   useEffect(() => {
+    const imageLoadCompleteHandler = (event: Event) => {
+      const element = event.currentTarget as HTMLImageElement
+
+      loadCompleteHandlerRef.current?.(element)
+    }
+
+    const imageLoadErrorHandler = (event: Event) => {
+      const element = event.currentTarget as HTMLImageElement
+
+      loadErrorHandlerRef.current?.(element)
+    }
+
     imageRef.current = new Image()
     if (src) imageRef.current.src = src
     if (srcSet) imageRef.current.srcset = srcSet
     if (sizes) imageRef.current.sizes = sizes
 
-    onLoadStart?.(imageRef.current)
+    loadStartHandlerRef.current?.(imageRef.current)
 
     imageRef.current.addEventListener('load', imageLoadCompleteHandler)
     imageRef.current.addEventListener('error', imageLoadErrorHandler)
@@ -91,5 +95,5 @@ export function useImageLoader({
       imageRef.current?.removeEventListener('error', imageLoadErrorHandler)
       imageRef.current = undefined
     }
-  }, [src, srcSet, sizes, onLoadStart, imageLoadCompleteHandler, imageLoadErrorHandler])
+  }, [src, srcSet, sizes])
 }
