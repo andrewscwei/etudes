@@ -38,6 +38,7 @@ export function DropdownDemo() {
           isCollapsed={isCollapsed}
           isInverted={isInverted === 'true'}
           isSelectionTogglable={isSelectionTogglable === 'true'}
+          itemLength={36}
           items={items}
           label={t => {
             if (t.length > 0) return `${items[t[0]]}`

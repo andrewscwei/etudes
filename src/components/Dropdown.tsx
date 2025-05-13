@@ -5,7 +5,7 @@ import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { styles } from '../utils/styles.js'
-import { Collection, CollectionItem, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelection } from './Collection.js'
+import { Collection, CollectionItem, type CollectionItemProps, type CollectionLayout, type CollectionOrientation, type CollectionProps, type CollectionSelection } from './Collection.js'
 
 /**
  * Type describing the orientation of {@link Dropdown}.
@@ -122,13 +122,13 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
   isCollapsed: externalIsCollapsed,
   isInverted = false,
   label,
-  layout,
+  layout = 'list',
   isSelectionTogglable = false,
   itemLength: externalItemLength,
   itemPadding = 0,
   items,
   maxVisibleItems = -1,
-  numSegments,
+  numSegments = 1,
   orientation = 'vertical',
   selection: externalSelection = [],
   selectionMode = 'single',
@@ -146,7 +146,7 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
   const bodyRef = useRef<HTMLDivElement>(null)
   const bodyRect = useRect(bodyRef)
   const numItems = items.length
-  const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
+  const numVisibleItems = _getNumVisibleItems(items, maxVisibleItems, numSegments, layout)
   const itemLength = externalItemLength ?? (orientation === 'vertical' ? bodyRect.height : bodyRect.width)
   const menuLength = itemLength * numVisibleItems + itemPadding * (numVisibleItems - 1)
 
@@ -323,6 +323,19 @@ function _sanitizeSelection<T>(selection: DropdownSelection, items: T[]) {
 
 function _sortIndices(indices: number[]): number[] {
   return indices.sort((a, b) => a - b)
+}
+
+function _getNumVisibleItems<T>(items: T[], maxVisible: number, numSegments: number, layout: CollectionLayout) {
+  const numItems = items.length
+
+  switch (layout) {
+    case 'grid': {
+      const numRows = numSegments < 1 ? numItems : Math.ceil(numItems / numSegments)
+      return maxVisible < 0 ? numRows : Math.min(numRows, maxVisible)
+    }
+    default:
+      return maxVisible < 0 ? numItems : Math.min(numItems, maxVisible)
+  }
 }
 
 function _getFixedStyles({ isCollapsed = true, isInverted = false, collectionPadding = 0, maxVisibleItems = 0, menuLength = NaN, numItems = 0, orientation = 'vertical' }) {
