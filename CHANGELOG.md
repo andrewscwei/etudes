@@ -1,3 +1,10 @@
+# [14.2.0](https://github.com/andrewscwei/etudes/compare/v14.1.0...v14.2.0) (2025-05-13)
+
+
+### Features
+
+* Return default context values instead of throwing errors when the provider is not present ([8656dc0](https://github.com/andrewscwei/etudes/commit/8656dc04d18a2c8cc03a7ac869afdf6bb9268d36))
+
 # [14.1.0](https://github.com/andrewscwei/etudes/compare/v14.0.0...v14.1.0) (2025-05-13)
 
 
