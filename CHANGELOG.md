@@ -1,3 +1,15 @@
+# [14.1.0](https://github.com/andrewscwei/etudes/compare/v14.0.0...v14.1.0) (2025-05-13)
+
+
+### Bug Fixes
+
+* Fix menu length of Dropdown when layout is grid ([f53e18e](https://github.com/andrewscwei/etudes/commit/f53e18eeb41ebc83d8d60ac27d040661d073e9c3))
+
+
+### Features
+
+* Support 2-way binding for isCollapsed in Dropdown ([a51fb17](https://github.com/andrewscwei/etudes/commit/a51fb170471907842b2147f8aeac566189f6747e))
+
 # [14.0.0](https://github.com/andrewscwei/etudes/compare/v13.1.0...v14.0.0) (2025-05-13)
 
 
