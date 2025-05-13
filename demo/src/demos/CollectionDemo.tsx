@@ -1,13 +1,7 @@
 import clsx from 'clsx'
-import { Collection, type CollectionItemProps, type CollectionLayout, type CollectionOrientation, type CollectionSelection, type CollectionSelectionMode } from 'etudes'
+import { Collection, CollectionItem, type CollectionLayout, type CollectionOrientation, type CollectionSelection, type CollectionSelectionMode } from 'etudes'
 import { useState } from 'react'
 import { Frame } from '../components/Frame.js'
-
-const CollectionItem = ({ className, index, isSelected, item, onCustomEvent, ...props }: CollectionItemProps<string>) => (
-  <button {...props} className={clsx(className, 'ia selected:bg-dark selected:text-light border-dark border text-base')}>
-    {item}
-  </button>
-)
 
 export function CollectionDemo() {
   const items = [...new Array(100)].map((_, i) => `${i + 1}`)
@@ -34,7 +28,6 @@ export function CollectionDemo() {
               'h-full': orientation === 'horizontal',
             })}
             isSelectionTogglable={isSelectionTogglable === 'true'}
-            ItemComponent={CollectionItem}
             itemLength={orientation === 'vertical' ? 40 : 64}
             itemPadding={12}
             items={items}
@@ -47,7 +40,9 @@ export function CollectionDemo() {
             onDeselectAt={index => toast(`<${Date.now()}>Deselected Item ${index + 1}`)}
             onSelectAt={index => toast(`<${Date.now()}>Selected Item ${index + 1}`)}
             onSelectionChange={(setCollectionSelection)}
-          />
+          >
+            <CollectionItem className='ia flex items-center justify-center border border-dark text-base selected:bg-dark selected:text-light'/>
+          </Collection>
         )
       }}
     </Frame>

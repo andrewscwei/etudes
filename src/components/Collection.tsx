@@ -1,9 +1,10 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
+import { forwardRef, useEffect, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
 import { Each } from '../operators/Each.js'
+import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
-import { createKey } from '../utils/createKey.js'
+import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { styles } from '../utils/styles.js'
 
 /**
@@ -187,7 +188,9 @@ export type CollectionProps<T> = HTMLAttributes<HTMLDivElement> & {
   onSelectionChange?: (selection: CollectionSelection) => void
 
   /**
-   * Component type for generating items in this collection.
+   * Custom component type for generating items in this collection. If this is
+   * provided, the {@link CollectionItem} provided as part of the children will
+   * be ignored.
    */
   ItemComponent?: ComponentType<CollectionItemProps<T>>
 }
@@ -196,9 +199,12 @@ export type CollectionProps<T> = HTMLAttributes<HTMLDivElement> & {
  * A collection of selectable items with generic data. Items are generated based
  * on the provided `ItemComponent`. This component supports different layouts in
  * both horizontal and vertical orientations.
+ *
+ * @exports CollectionItem Component for each item in the collection.
  */
 export const Collection = /* #__PURE__ */ forwardRef(({
   className,
+  children,
   style,
   isSelectionTogglable = false,
   itemLength,
@@ -217,15 +223,8 @@ export const Collection = /* #__PURE__ */ forwardRef(({
   ItemComponent,
   ...props
 }, ref) => {
-  const isIndexOutOfRange = (index: number) => {
-    if (isNaN(index)) return true
-    if (index >= items.length) return true
-    if (index < 0) return true
-
-    return false
-  }
-
-  const sanitizeSelection = (indices: CollectionSelection) => sortIndices(indices).filter(t => !isIndexOutOfRange(t))
+  const selection = _sanitizeSelection(externalSelection ?? [], items)
+  const fixedStyles = _getFixedStyles({ itemLength, itemPadding, layout, numSegments, orientation })
 
   const isSelectedAt = (index: number) => selection.indexOf(index) >= 0
 
@@ -245,7 +244,7 @@ export const Collection = /* #__PURE__ */ forwardRef(({
 
     switch (selectionMode) {
       case 'multiple': {
-        transform = val => sortIndices([...val.filter(t => t !== index), index])
+        transform = val => _sortIndices([...val.filter(t => t !== index), index])
         break
       }
       case 'single': {
@@ -256,20 +255,20 @@ export const Collection = /* #__PURE__ */ forwardRef(({
         return
     }
 
+    const oldValue = selection
     const newValue = transform(selection)
 
-    prevSelectionRef.current = newValue
-    handleSelectionChange(selection, newValue)
+    handleSelectionChange(oldValue, newValue)
   }
 
   const deselectAt = (index: number) => {
     if (!isSelectedAt(index)) return
 
     const transform = (val: CollectionSelection) => val.filter(t => t !== index)
+    const oldValue = selection
     const newValue = transform(selection)
 
-    prevSelectionRef.current = newValue
-    handleSelectionChange(selection, newValue)
+    handleSelectionChange(oldValue, newValue)
   }
 
   const activateAt = (index: number) => {
@@ -297,18 +296,28 @@ export const Collection = /* #__PURE__ */ forwardRef(({
     onSelectionChange?.(newValue)
   }
 
-  const selection = sanitizeSelection(externalSelection ?? [])
-  const fixedStyles = getFixedStyles({ itemLength, itemPadding, layout, numSegments, orientation })
-  const prevSelectionRef = useRef<CollectionSelection>(undefined)
-  const prevSelection = prevSelectionRef.current
-
   useEffect(() => {
-    prevSelectionRef.current = selection
+    const oldValue = selection
+    let newValue: CollectionSelection
 
-    if (prevSelection === undefined) return
+    switch (selectionMode) {
+      case 'multiple':
+        newValue = selection
+        break
+      case 'single':
+        newValue = selection.slice(-1)
+        break
+      default:
+        newValue = []
+        break
+    }
 
-    handleSelectionChange(prevSelection, selection)
-  }, [createKey(selection)])
+    handleSelectionChange(oldValue, newValue)
+  }, [selectionMode])
+
+  const components = asComponentDict(children, {
+    item: CollectionItem,
+  })
 
   return (
     <div
@@ -319,44 +328,91 @@ export const Collection = /* #__PURE__ */ forwardRef(({
       role={layout === 'grid' ? 'grid' : (selectionMode === 'none' ? 'list' : 'listbox')}
       style={styles(style, fixedStyles.root)}
     >
-      {ItemComponent && (
-        <Each in={items}>
-          {(val, idx) => (
-            <ItemComponent
-              aria-selected={isSelectedAt(idx)}
-              className={clsx({ selected: isSelectedAt(idx) })}
-              index={idx}
-              isSelected={isSelectedAt(idx)}
-              item={val}
-              orientation={orientation}
-              role={layout === 'grid' ? 'gridcell' : (selectionMode === 'none' ? 'listitem' : 'option')}
-              style={styles(fixedStyles.item, {
-                pointerEvents: isSelectionTogglable !== true && isSelectedAt(idx) ? 'none' : 'auto',
-                ...idx >= items.length - 1 ? {} : {
-                  ...layout === 'list' ? {
-                    ...orientation === 'vertical' ? {
-                      marginBottom: `${itemPadding}px`,
-                    } : {
-                      marginRight: `${itemPadding}px`,
-                    },
-                  } : {},
+      <Each in={items}>
+        {(val, idx) => {
+          const role = layout === 'grid' ? 'gridcell' : (selectionMode === 'none' ? 'listitem' : 'option')
+          const isSelected = isSelectedAt(idx)
+          const itemStyles = styles(fixedStyles.item, {
+            pointerEvents: isSelectionTogglable !== true && isSelectedAt(idx) ? 'none' : 'auto',
+            ...idx >= items.length - 1 ? {} : {
+              ...layout === 'list' ? {
+                ...orientation === 'vertical' ? {
+                  marginBottom: `${itemPadding}px`,
+                } : {
+                  marginRight: `${itemPadding}px`,
                 },
-              })}
-              onClick={() => activateAt(idx)}
-              onCustomEvent={(name, info) => onCustomEvent?.(idx, name, info)}
-            />
-          )}
-        </Each>
-      )}
+              } : {},
+            },
+          })
+
+          if (ItemComponent) {
+            return (
+              <ItemComponent
+                aria-selected={isSelected}
+                className={clsx({ selected: isSelected })}
+                index={idx}
+                isSelected={isSelectedAt(idx)}
+                item={val}
+                orientation={orientation}
+                role={role}
+                style={itemStyles}
+                onClick={() => activateAt(idx)}
+                onCustomEvent={(name, info) => onCustomEvent?.(idx, name, info)}
+              />
+            )
+          }
+          else {
+            return cloneStyledElement(
+              components.item ?? <CollectionItem/>,
+              {
+                'aria-selected': isSelected,
+                'className': clsx({ selected: isSelected }),
+                role,
+                selectionMode,
+                'style': itemStyles,
+                onActivateAt,
+                ...onActivateAt ? {
+                  onClick: () => activateAt(idx),
+                } : {},
+              },
+              <>{`${val}`}</>,
+            )
+          }
+        }}
+      </Each>
     </div>
   )
 }) as <T>(props: Readonly<CollectionProps<T> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
 
-function sortIndices(indices: number[]): number[] {
+/**
+ * Component for each item in a {@link Collection}.
+ */
+export const CollectionItem = ({ children, selectionMode, onActivateAt, ...props }: HTMLAttributes<HTMLDivElement | HTMLButtonElement> & Pick<CollectionProps<any>, 'selectionMode' | 'onActivateAt'>) => {
+  if (onActivateAt || selectionMode === 'single' || selectionMode === 'multiple') {
+    return (<button {...props}>{children}</button>)
+  }
+  else {
+    return (<div {...props}>{children}</div>)
+  }
+}
+
+function _isIndexOutOfRange<T>(index: number, items: T[]) {
+  if (isNaN(index)) return true
+  if (index >= items.length) return true
+  if (index < 0) return true
+
+  return false
+}
+
+function _sanitizeSelection<T>(indices: CollectionSelection, items: T[]) {
+  return _sortIndices(indices).filter(t => !_isIndexOutOfRange(t, items))
+}
+
+function _sortIndices(indices: number[]): number[] {
   return indices.sort((a, b) => a - b)
 }
 
-function getFixedStyles({ itemLength = NaN, itemPadding = 0, layout = 'collection', numSegments = 1, orientation = 'vertical' }) {
+function _getFixedStyles({ itemLength = NaN, itemPadding = 0, layout = 'collection', numSegments = 1, orientation = 'vertical' }) {
   return asStyleDict({
     root: {
       counterReset: 'item-counter',
@@ -399,4 +455,5 @@ function getFixedStyles({ itemLength = NaN, itemPadding = 0, layout = 'collectio
 
 if (process.env.NODE_ENV !== 'production') {
   (Collection as any).displayName = 'Collection'
+  CollectionItem.displayName = 'CollectionItem'
 }
