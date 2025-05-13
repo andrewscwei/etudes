@@ -22,7 +22,7 @@ export function asComponentDict<T extends ComponentTypeDict>(children?: ReactNod
     if (!isValidElement(child)) throw Error('Invalid child detected')
 
     const index = types.indexOf(child.type as any)
-    if (index < 0) throw Error(`Unsupported child, only the following children are allowed: ${types}`)
+    if (index < 0) throw Error(`Unsupported child, only the following children are allowed: ${types.map(type => (type as any).displayName ?? type.name).join(', ')}`)
 
     const key = keys[index]
     if (components[key]) throw Error(`Only one ${types[index]} can be provided as a child`)
