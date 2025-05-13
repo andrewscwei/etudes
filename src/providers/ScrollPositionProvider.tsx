@@ -41,9 +41,7 @@ export const ScrollPositionContext = /* #__PURE__ */ createContext<ScrollPositio
  * @exports useScrollPosition Hook for accessing the current scroll position of
  *                            a target.
  */
-export function ScrollPositionProvider({
-  children,
-}: Readonly<ScrollPositionProviderProps>) {
+export function ScrollPositionProvider({ children }: Readonly<ScrollPositionProviderProps>) {
   const isTickingRef = useRef(false)
 
   const [value, setValue] = useState<ScrollPositionContextValue>({
@@ -116,7 +114,15 @@ export function ScrollPositionProvider({
  */
 export function useScrollPosition(targetRef?: TargetRef): ScrollPosition {
   const context = useContext(ScrollPositionContext)
-  if (!context) throw Error('Cannot fetch the current scroll position context, is the corresponding provider instated?')
+
+  if (!context) {
+    console.error('Cannot fetch the current scroll position context, is the corresponding provider instated?')
+
+    return {
+      pos: Point.make(),
+      step: Point.make(),
+    }
+  }
 
   if (!targetRef) {
     return {
