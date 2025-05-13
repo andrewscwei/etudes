@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
+import { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
 import { useRect } from '../hooks/useRect.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
@@ -119,7 +119,7 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
   style,
   collapsesOnSelect = true,
   collectionPadding = 0,
-  isCollapsed = true,
+  isCollapsed: externalIsCollapsed,
   isInverted = false,
   label,
   layout,
@@ -143,19 +143,40 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
   ToggleComponent,
   ...props
 }, ref) => {
+  const bodyRef = useRef<HTMLDivElement>(null)
+  const bodyRect = useRect(bodyRef)
+  const numItems = items.length
+  const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
+  const itemLength = externalItemLength ?? (orientation === 'vertical' ? bodyRect.height : bodyRect.width)
+  const menuLength = itemLength * numVisibleItems + itemPadding * (numVisibleItems - 1)
+
+  const selection = _sanitizeSelection(externalSelection, items)
+  const [isCollapsed, setIsCollapsed] = useState(externalIsCollapsed ?? true)
+
+  const fixedStyles = _getFixedStyles({ isCollapsed, collectionPadding, isInverted, maxVisibleItems, menuLength, numItems, orientation })
+
+  const components = asComponentDict(children, {
+    collapseIcon: DropdownCollapseIcon,
+    expandIcon: DropdownExpandIcon,
+    toggle: DropdownToggle,
+    item: DropdownItem,
+  })
+
   const expand = () => {
     if (!isCollapsed) return
 
+    setIsCollapsed(false)
     onExpand?.()
   }
 
   const collapse = () => {
     if (isCollapsed) return
 
+    setIsCollapsed(true)
     onCollapse?.()
   }
 
-  const toggle = () => {
+  const toggleClickHandler = () => {
     if (isCollapsed) {
       expand()
     }
@@ -167,29 +188,16 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
   const selectAtHandler = (index: number) => {
     onSelectAt?.(index)
 
-    if (selectionMode === 'single' && collapsesOnSelect) collapse()
+    if (selectionMode === 'single' && collapsesOnSelect) {
+      collapse()
+    }
   }
 
-  const selectionChangeHandler = (value: DropdownSelection) => {
-    onSelectionChange?.(value)
-  }
+  useEffect(() => {
+    if (externalIsCollapsed === undefined) return
 
-  const selection = _sanitizeSelection(externalSelection, items)
-  const bodyRef = useRef<HTMLDivElement>(null)
-  const bodyRect = useRect(bodyRef)
-  const itemLength = externalItemLength ?? (orientation === 'vertical' ? bodyRect.height : bodyRect.width)
-  const numItems = items.length
-  const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
-  const menuLength = itemLength * numVisibleItems + itemPadding * (numVisibleItems - 1)
-
-  const fixedStyles = _getFixedStyles({ isCollapsed, collectionPadding, isInverted, maxVisibleItems, menuLength, numItems, orientation })
-
-  const components = asComponentDict(children, {
-    collapseIcon: DropdownCollapseIcon,
-    expandIcon: DropdownExpandIcon,
-    toggle: DropdownToggle,
-    item: DropdownItem,
-  })
+    setIsCollapsed(externalIsCollapsed)
+  }, [externalIsCollapsed])
 
   useEffect(() => {
     const clickOutsideHandler = (event: MouseEvent) => {
@@ -235,7 +243,7 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
             aria-expanded={!isCollapsed}
             aria-haspopup='listbox'
             style={styles(fixedStyles.toggle)}
-            onClick={() => toggle()}
+            onClick={toggleClickHandler}
             onCustomEvent={(name, info) => onToggleCustomEvent?.(name, info)}
           />
         ) : (
@@ -245,7 +253,7 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
               'aria-haspopup': 'listbox',
               'aria-expanded': !isCollapsed,
               'style': styles(fixedStyles.toggle),
-              'onClick': () => toggle(),
+              'onClick': toggleClickHandler,
             },
             <span dangerouslySetInnerHTML={{ __html: label?.(selection) ?? (selection.length > 0 ? selection.map(t => items[t]).join(', ') : '') }}/>,
             isCollapsed ? components.collapseIcon ?? components.expandIcon : components.expandIcon,
@@ -266,7 +274,7 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
           onActivateAt={onActivateAt}
           onDeselectAt={onDeselectAt}
           onSelectAt={selectAtHandler}
-          onSelectionChange={selectionChangeHandler}
+          onSelectionChange={onSelectionChange}
         >
           {!ItemComponent ? cloneStyledElement(components.item ?? <DropdownItem/>) : undefined}
         </Collection>
