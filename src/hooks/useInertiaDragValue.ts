@@ -1,12 +1,13 @@
 import isDeepEqual from 'fast-deep-equal/react'
-import { useCallback, useEffect, useRef, useState, type Dispatch, type RefObject, type SetStateAction } from 'react'
+import { useEffect, useRef, useState, type Dispatch, type RefObject, type SetStateAction } from 'react'
 import type { Point } from 'spase'
 import { useInertiaDrag } from './useInertiaDrag.js'
+import { useLatest } from './useLatest.js'
 
 type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
 
 /**
- * Type describing the output of {@link useDragValue}.
+ * Type describing the output of {@link useInertiaDragValue}.
  */
 type UseDragValueOutput<T = [number, number]> = {
   /**
@@ -33,7 +34,7 @@ type UseDragValueOutput<T = [number, number]> = {
 }
 
 /**
- * Type describing the options of {@link useDragValue}.
+ * Type describing the options of {@link useInertiaDragValue}.
  */
 export type UseDragValueOptions<T = [number, number]> = Parameters<typeof useInertiaDrag>[1] & {
   /**
@@ -65,7 +66,7 @@ export type UseDragValueOptions<T = [number, number]> = Parameters<typeof useIne
  *
  * @returns The states created for this effect.
  */
-export function useDragValue<T = [number, number]>(targetRef: TargetRef, {
+export function useInertiaDragValue<T = [number, number]>(targetRef: TargetRef, {
   initialValue,
   transform,
   onDragStart,
@@ -78,32 +79,37 @@ export function useDragValue<T = [number, number]>(targetRef: TargetRef, {
   const [isReleasing, setIsReleasing] = useState(false)
   const [value, setValue] = useState(initialValue)
 
-  const dragStartHandler = useCallback((startPosition: Point) => {
+  const dragStartHandlerRef = useLatest(onDragStart)
+  const dragMoveHandlerRef = useLatest(onDragMove)
+  const dragEndHandlerRef = useLatest(onDragEnd)
+  const transformRef = useLatest(transform)
+
+  const dragStartHandler = (startPosition: Point) => {
     setIsDragging(true)
     setIsReleasing(false)
 
-    onDragStart?.(startPosition)
-  }, [onDragStart])
+    dragStartHandlerRef.current?.(startPosition)
+  }
 
-  const dragMoveHandler = useCallback((displacement: Point, currentPosition: Point, startPosition: Point) => {
-    const newValue = transform(valueRef.current, displacement.x, displacement.y)
+  const dragMoveHandler = (displacement: Point, currentPosition: Point, startPosition: Point) => {
+    const newValue = transformRef.current(valueRef.current, displacement.x, displacement.y)
 
-    if (setValueRef(valueRef, newValue)) {
+    if (_setValueRef(valueRef, newValue)) {
       setValue(newValue)
     }
 
     setIsDragging(true)
     setIsReleasing(false)
 
-    onDragMove?.(displacement, currentPosition, startPosition)
-  }, [transform, onDragMove])
+    dragMoveHandlerRef.current?.(displacement, currentPosition, startPosition)
+  }
 
-  const dragEndHandler = useCallback((endPosition: Point, startPosition: Point) => {
+  const dragEndHandler = (endPosition: Point, startPosition: Point) => {
     setIsDragging(false)
     setIsReleasing(true)
 
-    onDragEnd?.(endPosition, startPosition)
-  }, [onDragEnd])
+    dragEndHandlerRef.current?.(endPosition, startPosition)
+  }
 
   useInertiaDrag(targetRef, {
     onDragStart: dragStartHandler,
@@ -113,7 +119,7 @@ export function useDragValue<T = [number, number]>(targetRef: TargetRef, {
   })
 
   useEffect(() => {
-    setValueRef(valueRef, value)
+    _setValueRef(valueRef, value)
   }, [value])
 
   return {
@@ -134,7 +140,7 @@ export function useDragValue<T = [number, number]>(targetRef: TargetRef, {
  *
  * @returns `true` if the value was set, `false` otherwise.
  */
-function setValueRef<T>(ref: RefObject<T>, value: T): boolean {
+function _setValueRef<T>(ref: RefObject<T>, value: T): boolean {
   if (isDeepEqual(ref.current, value)) return false
   ref.current = value
 

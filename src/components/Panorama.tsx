@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { Size } from 'spase'
-import { useDragValue } from '../hooks/useDragValue.js'
 import { useImageSize } from '../hooks/useImageSize.js'
+import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
 import { useRect } from '../hooks/useRect.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 
@@ -124,7 +124,7 @@ export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
   })
   const [angle, setAngle] = useState(externalAngle)
 
-  const { isDragging, value: displacement, setValue: setDisplacement } = useDragValue(bodyRef, {
+  const { isDragging, value: displacement, setValue: setDisplacement } = useInertiaDragValue(bodyRef, {
     initialValue: 0,
     transform: mapDragPositionToDisplacement,
     onDragStart,

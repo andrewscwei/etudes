@@ -2,6 +2,7 @@ import interact from 'interactjs'
 import { useLayoutEffect, type RefObject } from 'react'
 import { Point } from 'spase'
 import { createKey } from '../utils/createKey.js'
+import { useLatest } from './useLatest.js'
 
 type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
 
@@ -58,6 +59,10 @@ export function useInertiaDrag(targetRef: TargetRef, {
   onDragEnd,
   ...options
 }: UseInertiaDragOptions) {
+  const dragStartHandlerRef = useLatest(onDragStart)
+  const dragMoveHandlerRef = useLatest(onDragMove)
+  const dragEndHandlerRef = useLatest(onDragEnd)
+
   useLayoutEffect(() => {
     if (!isEnabled) return
 
@@ -70,27 +75,27 @@ export function useInertiaDrag(targetRef: TargetRef, {
       onstart: ({ client }) => {
         const startPosition = Point.make(client)
 
-        onDragStart?.(startPosition)
+        dragStartHandlerRef.current?.(startPosition)
       },
       onmove: ({ client, clientX0, clientY0, dx, dy }) => {
         const startPosition = Point.make(clientX0, clientY0)
         const currentPosition = Point.make(client)
         const displacement = Point.make(dx, dy)
 
-        onDragMove?.(displacement, currentPosition, startPosition)
+        dragMoveHandlerRef.current?.(displacement, currentPosition, startPosition)
       },
       onend: ({ client, clientX0, clientY0 }) => {
         const startPosition = Point.make(clientX0, clientY0)
         const endPosition = Point.make(client)
 
-        onDragEnd?.(endPosition, startPosition)
+        dragEndHandlerRef.current?.(endPosition, startPosition)
       },
     })
 
     return () => {
       interactable.unset()
 
-      onDragEnd?.(Point.make(), Point.make())
+      dragEndHandlerRef.current?.(Point.make(), Point.make())
     }
-  }, [targetRef.current, isEnabled, onDragStart, onDragMove, onDragEnd, createKey(options)])
+  }, [isEnabled, createKey(options)])
 }

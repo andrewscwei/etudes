@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { forwardRef, useCallback, useEffect, useRef, type HTMLAttributes, type MouseEvent } from 'react'
 import { Rect } from 'spase'
-import { useDragValue } from '../hooks/useDragValue.js'
+import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
@@ -190,7 +190,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
     }
   }, [bodyRef.current, isInverted, isTrackInteractive, orientation])
 
-  const { isDragging, isReleasing, value: position, setValue: setPosition } = useDragValue(knobContainerRef, {
+  const { isDragging, isReleasing, value: position, setValue: setPosition } = useInertiaDragValue(knobContainerRef, {
     initialValue: externalPosition,
     transform: mapDragValueToPosition,
     onDragStart,

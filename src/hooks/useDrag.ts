@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, type RefObject } from 'react'
 import { Point } from 'spase'
+import { useLatest } from './useLatest.js'
 
 type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
 
@@ -65,6 +66,9 @@ export function useDrag(targetRef: TargetRef, {
 }: UseDragOptions) {
   const startPositionRef = useRef<Point>(undefined)
   const dragPositionRef = useRef<Point>(undefined)
+  const dragStartHandlerRef = useLatest(onDragStart)
+  const dragMoveHandlerRef = useLatest(onDragMove)
+  const dragEndHandlerRef = useLatest(onDragEnd)
 
   const mouseMoveHandler = useCallback((event: MouseEvent) => {
     if (!startPositionRef.current) return
@@ -74,8 +78,8 @@ export function useDrag(targetRef: TargetRef, {
 
     dragPositionRef.current = position
 
-    onDragMove?.(displacement, position, startPositionRef.current)
-  }, [onDragMove])
+    dragMoveHandlerRef.current?.(displacement, position, startPositionRef.current)
+  }, [])
 
   const mouseUpHandler = useCallback((event: MouseEvent) => {
     const element = targetRef.current
@@ -84,7 +88,7 @@ export function useDrag(targetRef: TargetRef, {
     const position = Point.make(event.clientX, event.clientY)
     const displacement = (dragPositionRef.current ?? startPositionRef.current).subtract(position)
 
-    onDragEnd?.(position, displacement, startPositionRef.current)
+    dragEndHandlerRef.current?.(position, displacement, startPositionRef.current)
 
     startPositionRef.current = undefined
     dragPositionRef.current = undefined
@@ -94,7 +98,7 @@ export function useDrag(targetRef: TargetRef, {
     element.removeEventListener('mouseleave', mouseUpHandler)
 
     if (updatesCursor) element.style.cursor = 'grab'
-  }, [targetRef.current, updatesCursor, mouseMoveHandler, onDragEnd])
+  }, [updatesCursor, mouseMoveHandler])
 
   const mouseDownHandler = useCallback((event: MouseEvent) => {
     const element = targetRef.current
@@ -113,8 +117,8 @@ export function useDrag(targetRef: TargetRef, {
 
     if (updatesCursor) element.style.cursor = 'grabbing'
 
-    onDragStart?.(position)
-  }, [targetRef.current, updatesCursor, mouseMoveHandler, mouseUpHandler, onDragStart])
+    dragStartHandlerRef.current?.(position)
+  }, [updatesCursor, mouseMoveHandler, mouseUpHandler])
 
   useEffect(() => {
     const element = targetRef.current
@@ -126,7 +130,7 @@ export function useDrag(targetRef: TargetRef, {
     return () => {
       element.style.cursor = defaultCursor
     }
-  }, [targetRef.current, isEnabled, updatesCursor])
+  }, [isEnabled, updatesCursor])
 
   useEffect(() => {
     const element = targetRef.current
@@ -140,5 +144,5 @@ export function useDrag(targetRef: TargetRef, {
       element.removeEventListener('mouseup', mouseUpHandler, { capture: true })
       element.removeEventListener('mouseleave', mouseUpHandler)
     }
-  }, [targetRef.current, isEnabled, mouseMoveHandler, mouseUpHandler, mouseDownHandler])
+  }, [isEnabled, mouseMoveHandler, mouseUpHandler, mouseDownHandler])
 }

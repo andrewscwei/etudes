@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttributes, type MouseEvent } from 'react'
 import { Rect } from 'spase'
-import { useDragValue } from '../hooks/useDragValue.js'
+import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
 import { useRect } from '../hooks/useRect.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
@@ -198,7 +198,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
     }
   }, [rect.width, rect.height, isClipped, isInverted, knobWidth, knobHeight, orientation])
 
-  const { isDragging, isReleasing, value: position, setValue: setPosition } = useDragValue(knobContainerRef, {
+  const { isDragging, isReleasing, value: position, setValue: setPosition } = useInertiaDragValue(knobContainerRef, {
     initialValue: getPositionAt(externalIndex, steps),
     transform: mapDragValueToPosition,
     onDragStart,
