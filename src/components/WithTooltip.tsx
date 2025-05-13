@@ -1,9 +1,10 @@
 import clsx from 'clsx'
-import { useEffect, useRef, type CSSProperties, type HTMLAttributes } from 'react'
+import { useCallback, useEffect, useRef, type CSSProperties, type HTMLAttributes } from 'react'
 import { Rect, Size } from 'spase'
 import { useRect } from '../hooks/useRect.js'
 import { ExtractChild } from '../operators/ExtractChild.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
+import { createKey } from '../utils/createKey.js'
 import { styles } from '../utils/styles.js'
 
 /**
@@ -82,15 +83,19 @@ export function WithTooltip({
   maxWidth = 200,
   threshold = 100,
 }: Readonly<WithTooltipProps>) {
-  const createDialog = () => {
+  const targetRef = useRef<HTMLElement>(null)
+  const dialogRef = useRef<HTMLSpanElement>(undefined)
+  const targetRect = useRect(targetRef)
+
+  const createDialog = useCallback(() => {
     const dialog = document.createElement('span')
     dialog.className = clsx(className)
     dialog.innerHTML = hint
     dialog.role = 'tooltip'
 
-    const alignment = externalAlignment ?? (targetRef.current ? computeAlignment(targetRef.current, threshold) : 'tl')
-    const fullDialogSize = computeMaxSize(dialog)
-    const fixedStyles = getFixedStyles({ alignment, arrowSize: Size.make(arrowWidth, arrowHeight), gap, maxDialogWidth: maxWidth, fullDialogWidth: fullDialogSize.width, targetWidth: targetRect.width })
+    const alignment = externalAlignment ?? (targetRef.current ? _computeAlignment(targetRef.current, threshold) : 'tl')
+    const fullDialogSize = _computeMaxSize(dialog)
+    const fixedStyles = _getFixedStyles({ alignment, arrowSize: Size.make(arrowWidth, arrowHeight), gap, maxDialogWidth: maxWidth, fullDialogWidth: fullDialogSize.width, targetWidth: targetRect.width })
 
     const dialogStyle = styles(style, fixedStyles.dialog)
     Object.keys(dialogStyle).forEach(rule => (dialog.style as any)[rule] = (dialogStyle as any)[rule])
@@ -101,25 +106,21 @@ export function WithTooltip({
     dialog.appendChild(arrow)
 
     return dialog
-  }
+  }, [className, externalAlignment, hint, maxWidth, createKey(style), targetRect.width, threshold, arrowHeight, arrowWidth, gap])
 
-  const mouseEnterHandler = () => {
+  const mouseEnterHandler = useCallback(() => {
     if (!dialogRef.current) return
 
     dialogRef.current.style.opacity = '1'
     dialogRef.current.ariaHidden = 'false'
-  }
+  }, [])
 
-  const mouseLeaveHandler = () => {
+  const mouseLeaveHandler = useCallback(() => {
     if (!dialogRef.current) return
 
     dialogRef.current.style.opacity = '0'
     dialogRef.current.ariaHidden = 'true'
-  }
-
-  const targetRef = useRef<HTMLElement>(null)
-  const dialogRef = useRef<HTMLSpanElement>(undefined)
-  const targetRect = useRect(targetRef)
+  }, [])
 
   useEffect(() => {
     const dialogNode = createDialog()
@@ -130,16 +131,20 @@ export function WithTooltip({
       targetRef.current?.removeChild(dialogNode)
       dialogRef.current = undefined
     }
-  }, [externalAlignment, arrowHeight, arrowWidth, className, gap, hint, maxWidth, style, targetRef.current, threshold])
+  }, [createDialog])
 
   return (
-    <ExtractChild ref={targetRef} onMouseEnter={mouseEnterHandler} onMouseLeave={mouseLeaveHandler}>
+    <ExtractChild
+      ref={targetRef}
+      onMouseEnter={mouseEnterHandler}
+      onMouseLeave={mouseLeaveHandler}
+    >
       {children}
     </ExtractChild>
   )
 }
 
-function computeMaxSize(element: HTMLElement) {
+function _computeMaxSize(element: HTMLElement) {
   const clone = element.cloneNode(false) as HTMLElement
   clone.innerHTML = element.innerHTML
   clone.style.visibility = 'hidden'
@@ -152,7 +157,7 @@ function computeMaxSize(element: HTMLElement) {
   return Size.make(rect.width, rect.height)
 }
 
-function computeAlignment(element: HTMLElement, threshold: number) {
+function _computeAlignment(element: HTMLElement, threshold: number) {
   const vrect = Rect.fromViewport()
   const irect = Rect.intersecting(element)
 
@@ -174,7 +179,7 @@ function computeAlignment(element: HTMLElement, threshold: number) {
   return 'tc'
 }
 
-function makeDialogStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }: StyleOptions): CSSProperties {
+function _makeDialogStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }: StyleOptions): CSSProperties {
   const dialogWidth = Math.min(fullDialogWidth, maxDialogWidth)
   const shouldRealign = targetWidth > dialogWidth
 
@@ -225,7 +230,7 @@ function makeDialogStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialog
   }
 }
 
-function makeArrowStyle({ alignment, arrowSize, fullDialogWidth, maxDialogWidth, targetWidth }: StyleOptions): CSSProperties {
+function _makeArrowStyle({ alignment, arrowSize, fullDialogWidth, maxDialogWidth, targetWidth }: StyleOptions): CSSProperties {
   const dialogWidth = Math.min(fullDialogWidth, maxDialogWidth)
   const shouldRealign = targetWidth > dialogWidth
 
@@ -300,7 +305,7 @@ function makeArrowStyle({ alignment, arrowSize, fullDialogWidth, maxDialogWidth,
   }
 }
 
-function getFixedStyles({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }: StyleOptions) {
+function _getFixedStyles({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }: StyleOptions) {
   return asStyleDict({
     dialog: {
       boxSizing: 'border-box',
@@ -312,12 +317,12 @@ function getFixedStyles({ alignment, arrowSize, fullDialogWidth, gap, maxDialogW
       userSelect: 'none',
       whiteSpace: fullDialogWidth > maxDialogWidth ? 'normal' : 'pre',
       width: fullDialogWidth > maxDialogWidth ? `${maxDialogWidth}px` : '',
-      ...makeDialogStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }),
+      ..._makeDialogStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }),
     },
     arrow: {
       background: 'inherit',
       position: 'absolute',
-      ...makeArrowStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }),
+      ..._makeArrowStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }),
     },
   })
 }
