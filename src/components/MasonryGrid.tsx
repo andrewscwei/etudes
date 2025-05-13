@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttributes } from 'react'
-import { Rect, Size } from 'spase'
+import { Rect } from 'spase'
 import { useSizeObserver } from '../hooks/useSizeObserver.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
@@ -164,7 +164,7 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
   }
 
   const resizeHandler = useCallback((element: HTMLElement) => {
-    const maxSize = Rect.from(element)?.size ?? Size.make()
+    const maxSize = Rect.size(Rect.from(element) ?? Rect.zero)
     const currWidth = getCurrentWidth()
     const currHeight = getCurrentHeight()
 

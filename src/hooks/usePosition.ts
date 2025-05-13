@@ -69,12 +69,12 @@ export function usePosition({ onChange }: UsePositionProps) {
 
 function _getScrollPositionInfo(): ScrollPositionInfo | undefined {
   const refRect = Rect.fromViewport()
-  const refRectMin = refRect.clone({ x: 0, y: 0 })
+  const refRectMin = Rect.clone(refRect, { x: 0, y: 0 })
   const refRectFull = Rect.from(window, { overflow: true })
 
   if (!refRectFull) return undefined
 
-  const refRectMax = refRectMin.clone({ x: refRectFull.width - refRect.width, y: refRectFull.height - refRect.height })
+  const refRectMax = Rect.clone(refRectMin, { x: refRectFull.width - refRect.width, y: refRectFull.height - refRect.height })
   const step = Point.make(refRect.left / refRectMax.left, refRect.top / refRectMax.top)
 
   return {

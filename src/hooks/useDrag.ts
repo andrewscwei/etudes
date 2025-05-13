@@ -74,7 +74,7 @@ export function useDrag(targetRef: TargetRef, {
     if (!startPositionRef.current) return
 
     const position = Point.make(event.clientX, event.clientY)
-    const displacement = position.subtract(dragPositionRef.current ?? startPositionRef.current)
+    const displacement = Point.subtract(position, dragPositionRef.current ?? startPositionRef.current)
 
     dragPositionRef.current = position
 
@@ -86,7 +86,7 @@ export function useDrag(targetRef: TargetRef, {
     if (!element || !startPositionRef.current) return
 
     const position = Point.make(event.clientX, event.clientY)
-    const displacement = (dragPositionRef.current ?? startPositionRef.current).subtract(position)
+    const displacement = Point.subtract(dragPositionRef.current ?? startPositionRef.current, position)
 
     dragEndHandlerRef.current?.(position, displacement, startPositionRef.current)
 

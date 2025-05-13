@@ -13,7 +13,7 @@ type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | R
  * @returns The most current {@link Rect} of the target element.
  */
 export function useRect(targetRef: TargetRef): Rect {
-  const [rect, setRect] = useState<Rect>(Rect.make())
+  const [rect, setRect] = useState<Rect>(Rect.zero)
 
   useSizeObserver(targetRef, {
     onResize: element => {

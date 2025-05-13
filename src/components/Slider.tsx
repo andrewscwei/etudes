@@ -141,7 +141,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
   const knobContainerRef = useRef<HTMLButtonElement>(null)
 
   const mapDragValueToPosition = useCallback((value: number, dx: number, dy: number) => {
-    const rect = Rect.from(bodyRef.current) ?? Rect.make()
+    const rect = Rect.from(bodyRef.current) ?? Rect.zero
     const truePosition = isInverted ? 1 - value : value
 
     switch (orientation) {
@@ -169,7 +169,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
   const trackClickHandler = useCallback((event: MouseEvent) => {
     if (!isTrackInteractive) return
 
-    const rect = Rect.from(bodyRef.current) ?? Rect.make()
+    const rect = Rect.from(bodyRef.current) ?? Rect.zero
     const vrect = Rect.fromViewport()
 
     switch (orientation) {

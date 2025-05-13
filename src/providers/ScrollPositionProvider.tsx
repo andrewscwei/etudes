@@ -45,21 +45,21 @@ export function ScrollPositionProvider({ children }: Readonly<ScrollPositionProv
   const isTickingRef = useRef(false)
 
   const [value, setValue] = useState<ScrollPositionContextValue>({
-    minPos: Point.make(),
-    maxPos: Point.make(),
-    pos: Point.make(),
-    step: Point.make(),
+    minPos: Point.zero,
+    maxPos: Point.zero,
+    pos: Point.zero,
+    step: Point.zero,
   })
 
   useEffect(() => {
     const handler = () => {
       const vrect = Rect.fromViewport()
-      const refRectMin = vrect.clone({ x: 0, y: 0 })
+      const refRectMin = Rect.clone(vrect, { x: 0, y: 0 })
       const refRectFull = Rect.from(window, { overflow: true })
 
       if (!refRectFull) return
 
-      const refRectMax = refRectMin.clone({ x: refRectFull.width - vrect.width, y: refRectFull.height - vrect.height })
+      const refRectMax = Rect.clone(refRectMin, { x: refRectFull.width - vrect.width, y: refRectFull.height - vrect.height })
       const step = Point.make(vrect.left / refRectMax.left, vrect.top / refRectMax.top)
 
       setValue({
@@ -119,8 +119,8 @@ export function useScrollPosition(targetRef?: TargetRef): ScrollPosition {
     console.error('Cannot fetch the current scroll position context, is the corresponding provider instated?')
 
     return {
-      pos: Point.make(),
-      step: Point.make(),
+      pos: Point.zero,
+      step: Point.zero,
     }
   }
 
@@ -137,8 +137,8 @@ export function useScrollPosition(targetRef?: TargetRef): ScrollPosition {
 
   if (!vrect || !rect) {
     return {
-      pos: Point.make(),
-      step: Point.make(),
+      pos: Point.zero,
+      step: Point.zero,
     }
   }
 

@@ -125,7 +125,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
     if (!downPosition || !upPosition) return
 
     const threshold = 5
-    const delta = downPosition.subtract(upPosition)
+    const delta = Point.subtract(downPosition, upPosition)
 
     if (Math.abs(delta.x) > threshold || Math.abs(delta.y) > threshold) {
       event.stopPropagation()

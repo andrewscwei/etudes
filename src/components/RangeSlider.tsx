@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
 import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttributes } from 'react'
-import type { Rect } from 'spase'
+import { Rect } from 'spase'
 import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
 import { useRect } from '../hooks/useRect.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
@@ -133,7 +133,7 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
     const dCurr = _getDisplacementByValue(value, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped) + delta
 
     return _getValueByDisplacement(Math.max(dMin, Math.min(dMax, dCurr)), minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
-  }, [knobWidth, knobHeight, isClipped, minValue, maxValue, orientation, range[1], createKey(bodyRect.toJSON())])
+  }, [knobWidth, knobHeight, isClipped, minValue, maxValue, orientation, range[1], Rect.toString(bodyRect)])
 
   const mapEndDragValueToValue = useCallback((value: number, dx: number, dy: number) => {
     const delta = orientation === 'horizontal' ? dx : dy
@@ -142,7 +142,7 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
     const dCurr = _getDisplacementByValue(value, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped) + delta
 
     return _getValueByDisplacement(Math.max(dMin, Math.min(dMax, dCurr)), minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
-  }, [knobWidth, knobHeight, isClipped, minValue, maxValue, orientation, range[0], createKey(bodyRect.toJSON())])
+  }, [knobWidth, knobHeight, isClipped, minValue, maxValue, orientation, range[0], Rect.toString(bodyRect)])
 
   const { isDragging: isDraggingStartKnob, isReleasing: isReleasingStartKnob, value: startValue, setValue: setStartValue } = useInertiaDragValue(startKnobContainerRef, {
     initialValue: externalRange?.[0] ?? minValue,

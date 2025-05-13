@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttributes } from 'react'
-import { Size } from 'spase'
+import { Rect, Size } from 'spase'
 import { useImageSize } from '../hooks/useImageSize.js'
 import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
 import { useRect } from '../hooks/useRect.js'
@@ -134,7 +134,7 @@ export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
   useEffect(() => {
     if (isDragging || !imageSize) return
 
-    const newDisplacement = _getDisplacementFromAngle(externalAngle, imageSize, bodyRect.size, zeroAnchor)
+    const newDisplacement = _getDisplacementFromAngle(externalAngle, imageSize, Rect.size(bodyRect), zeroAnchor)
 
     if (newDisplacement !== displacement) {
       setDisplacement(newDisplacement)
@@ -148,7 +148,7 @@ export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
   useEffect(() => {
     if (!isDragging || !imageSize) return
 
-    const newAngle = _getAngleFromDisplacement(displacement, imageSize, bodyRect.size, zeroAnchor)
+    const newAngle = _getAngleFromDisplacement(displacement, imageSize, Rect.size(bodyRect), zeroAnchor)
 
     if (angle !== newAngle) {
       setAngle(newAngle)
@@ -196,12 +196,12 @@ function _getFilledImageSize(originalSize: Size, sizeToFill: Size): Size {
   const { width: originalWidth, height: originalHeight } = originalSize
   const { height: filledHeight } = sizeToFill
 
-  if (originalHeight <= 0) return Size.make()
+  if (originalHeight <= 0) return Size.zero
 
   const aspectRatio = filledHeight / originalHeight
   const filledWidth = aspectRatio * originalWidth
 
-  return new Size([filledWidth, filledHeight])
+  return Size.make(filledWidth, filledHeight)
 }
 
 function _getDisplacementFromAngle(angle: number, originalImageSize: Size, componentSize: Size, zeroAnchor: number): number {

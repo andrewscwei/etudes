@@ -95,7 +95,7 @@ export function useInertiaDrag(targetRef: TargetRef, {
     return () => {
       interactable.unset()
 
-      dragEndHandlerRef.current?.(Point.make(), Point.make())
+      dragEndHandlerRef.current?.(Point.zero, Point.zero)
     }
   }, [isEnabled, createKey(options)])
 }
