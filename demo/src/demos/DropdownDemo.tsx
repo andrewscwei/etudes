@@ -1,19 +1,13 @@
 import clsx from 'clsx'
-import { Dropdown, DropdownExpandIcon, DropdownToggle, FlatSVG, type DropdownItemProps, type DropdownSelection } from 'etudes'
+import { Dropdown, DropdownExpandIcon, DropdownItem, DropdownToggle, FlatSVG, type DropdownSelection } from 'etudes'
 import { useState } from 'react'
 import $$ExpandIcon from '../assets/expand-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
 
-const DropdownItem = ({ className, index, isSelected, item, orientation, onCustomEvent, ...props }: DropdownItemProps) => (
-  <button {...props} className={clsx(className, 'ia selected:bg-dark selected:text-light border-dark flex items-center justify-start border px-3')}>
-    {item.label}
-  </button>
-)
-
 export function DropdownDemo() {
   const [selection, setSelection] = useState<DropdownSelection>([])
   const [isCollapsed, setIsCollapsed] = useState(true)
-  const items = [{ label: '1' }, { label: '2' }]
+  const items = [1, 2]
 
   return (
     <Frame
@@ -44,11 +38,10 @@ export function DropdownDemo() {
           isCollapsed={isCollapsed}
           isInverted={isInverted === 'true'}
           isSelectionTogglable={isSelectionTogglable === 'true'}
-          ItemComponent={DropdownItem}
           itemLength={36}
           items={items}
           label={t => {
-            if (t.length > 0) return items[t[0]].label
+            if (t.length > 0) return `${items[t[0]]}`
 
             switch (orientation) {
               case 'horizontal':
@@ -79,6 +72,7 @@ export function DropdownDemo() {
               svg={$$ExpandIcon}
             />
           </DropdownExpandIcon>
+          <DropdownItem className='ia selected:bg-dark selected:text-light border-dark flex items-center justify-start border px-3'/>
         </Dropdown>
       )}
     </Frame>

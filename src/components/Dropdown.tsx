@@ -5,15 +5,7 @@ import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { styles } from '../utils/styles.js'
-import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelection } from './Collection.js'
-
-/**
- * Base extendable type describing the data provided to each item in
- * {@link Dropdown}.
- */
-export type DropdownItemData = {
-  label?: string
-}
+import { Collection, CollectionItem, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelection } from './Collection.js'
 
 /**
  * Type describing the orientation of {@link Dropdown}.
@@ -43,12 +35,12 @@ export type DropdownToggleProps = HTMLAttributes<HTMLButtonElement> & {
 /**
  * Type describing the props of `ItemComponent` provided to {@link Dropdown}.
  */
-export type DropdownItemProps<T extends DropdownItemData = DropdownItemData> = CollectionItemProps<T>
+export type DropdownItemProps<T> = CollectionItemProps<T>
 
 /**
  * Type describing the props of {@link Dropdown}.
  */
-export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLAttributes<HTMLDivElement> & CollectionProps<T> & {
+export type DropdownProps<T> = HTMLAttributes<HTMLDivElement> & CollectionProps<T> & {
   /**
    * Specifies if the internal collection collapses when an item is selected.
    * This only works if `selectionMode` is `single`.
@@ -119,6 +111,7 @@ export type DropdownProps<T extends DropdownItemData = DropdownItemData> = HTMLA
  * @exports DropdownToggle Component for the toggle button.
  * @exports DropdownExpandIcon Component for the expand icon.
  * @exports DropdownCollapseIcon Component for the collapse icon.
+ * @exports DropdownItem Component for each item.
  */
 export const Dropdown = /* #__PURE__ */ forwardRef(({
   children,
@@ -150,16 +143,6 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
   ToggleComponent,
   ...props
 }, ref) => {
-  const isIndexOutOfRange = (index: number) => {
-    if (isNaN(index)) return true
-    if (index >= items.length) return true
-    if (index < 0) return true
-
-    return false
-  }
-
-  const sanitizedSelection = (selection: DropdownSelection) => sortIndices(selection).filter(t => !isIndexOutOfRange(t))
-
   const expand = () => {
     if (!isCollapsed) return
 
@@ -191,7 +174,7 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
     onSelectionChange?.(value)
   }
 
-  const selection = sanitizedSelection(externalSelection)
+  const selection = _sanitizeSelection(externalSelection, items)
   const bodyRef = useRef<HTMLDivElement>(null)
   const bodyRect = useRect(bodyRef)
   const itemLength = externalItemLength ?? (orientation === 'vertical' ? bodyRect.height : bodyRect.width)
@@ -199,12 +182,13 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
   const numVisibleItems = maxVisibleItems < 0 ? numItems : Math.min(numItems, maxVisibleItems)
   const menuLength = itemLength * numVisibleItems + itemPadding * (numVisibleItems - 1)
 
-  const fixedStyles = getFixedStyles({ isCollapsed, collectionPadding, isInverted, maxVisibleItems, menuLength, numItems, orientation })
+  const fixedStyles = _getFixedStyles({ isCollapsed, collectionPadding, isInverted, maxVisibleItems, menuLength, numItems, orientation })
 
   const components = asComponentDict(children, {
     collapseIcon: DropdownCollapseIcon,
     expandIcon: DropdownExpandIcon,
     toggle: DropdownToggle,
+    item: DropdownItem,
   })
 
   useEffect(() => {
@@ -263,7 +247,7 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
               'style': styles(fixedStyles.toggle),
               'onClick': () => toggle(),
             },
-            <span dangerouslySetInnerHTML={{ __html: label?.(selection) ?? (selection.length > 0 ? selection.map(t => items[t].label).join(', ') : '') }}/>,
+            <span dangerouslySetInnerHTML={{ __html: label?.(selection) ?? (selection.length > 0 ? selection.map(t => items[t]).join(', ') : '') }}/>,
             isCollapsed ? components.collapseIcon ?? components.expandIcon : components.expandIcon,
           )
         )}
@@ -283,11 +267,13 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
           onDeselectAt={onDeselectAt}
           onSelectAt={selectAtHandler}
           onSelectionChange={selectionChangeHandler}
-        />
+        >
+          {!ItemComponent ? cloneStyledElement(components.item ?? <DropdownItem/>) : undefined}
+        </Collection>
       </div>
     </div>
   )
-}) as <T extends DropdownItemData = DropdownItemData>(props: Readonly<DropdownProps<T> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
+}) as <T>(props: Readonly<DropdownProps<T> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
 
 /**
  * Component for the toggle button of a {@link Dropdown}.
@@ -310,11 +296,28 @@ export const DropdownCollapseIcon = ({ children, style, ...props }: HTMLAttribut
   <figure {...props} aria-hidden={true} style={styles(style, { pointerEvents: 'none' })}>{children}</figure>
 )
 
-function sortIndices(indices: number[]): number[] {
+/**
+ * Component for each item in a {@link Dropdown}.
+ */
+export const DropdownItem = CollectionItem
+
+function _isIndexOutOfRange<T>(index: number, items: T[]) {
+  if (isNaN(index)) return true
+  if (index >= items.length) return true
+  if (index < 0) return true
+
+  return false
+}
+
+function _sanitizeSelection<T>(selection: DropdownSelection, items: T[]) {
+  return _sortIndices(selection).filter(t => !_isIndexOutOfRange(t, items))
+}
+
+function _sortIndices(indices: number[]): number[] {
   return indices.sort((a, b) => a - b)
 }
 
-function getFixedStyles({ isCollapsed = true, isInverted = false, collectionPadding = 0, maxVisibleItems = 0, menuLength = NaN, numItems = 0, orientation = 'vertical' }) {
+function _getFixedStyles({ isCollapsed = true, isInverted = false, collectionPadding = 0, maxVisibleItems = 0, menuLength = NaN, numItems = 0, orientation = 'vertical' }) {
   return asStyleDict({
     root: {
       alignItems: 'center',
@@ -374,4 +377,5 @@ if (process.env.NODE_ENV !== 'production') {
   DropdownToggle.displayName = 'DropdownToggle'
   DropdownExpandIcon.displayName = 'DropdownExpandIcon'
   DropdownCollapseIcon.displayName = 'DropdownCollapseIcon'
+  DropdownItem.displayName = 'DropdownItem'
 }

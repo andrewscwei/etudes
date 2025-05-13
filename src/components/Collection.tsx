@@ -371,7 +371,7 @@ export const Collection = /* #__PURE__ */ forwardRef(({
                 selectionMode,
                 'style': itemStyles,
                 onActivateAt,
-                ...onActivateAt ? {
+                ...(onActivateAt || onSelectAt) ? {
                   onClick: () => activateAt(idx),
                 } : {},
               },
