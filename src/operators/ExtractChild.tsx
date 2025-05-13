@@ -19,21 +19,17 @@ export const ExtractChild = /* #__PURE__ */ forwardRef<HTMLElement, Readonly<Ext
     console.error(`[etudes::ExtractChild] Only one child is expected, but found ${children.length}. Only the first child is extracted while the rest are discarded.`)
   }
 
-  return (
-    <>
-      {Children.map(children, (child, idx) => {
-        if (idx > 0) {
-          return undefined
-        }
-        else if (isValidElement(child)) {
-          return cloneStyledElement(child, { ...props, ref } as any)
-        }
-        else {
-          return child
-        }
-      })}
-    </>
-  )
+  return Children.map(children, (child, idx) => {
+    if (idx > 0) {
+      return undefined
+    }
+    else if (isValidElement(child)) {
+      return cloneStyledElement(child, { ...props, ref } as any)
+    }
+    else {
+      return child
+    }
+  })
 })
 
 if (process.env.NODE_ENV !== 'production') {
