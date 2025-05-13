@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react'
+import { useLatest } from './useLatest.js'
 
 /**
  * Type describing the output of {@link useTimeout}.
@@ -43,7 +44,7 @@ export function useTimeout(timeout: number, {
   onTimeout,
 }: UseTimeoutOptions): UseTimeoutOutput {
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
-  const handlerRef = useRef(onTimeout)
+  const handlerRef = useLatest(onTimeout)
 
   const stop = useCallback(() => {
     if (timeoutRef.current === undefined) return
@@ -63,10 +64,6 @@ export function useTimeout(timeout: number, {
       handlerRef.current()
     }, timeout)
   }, [timeout, stop])
-
-  useEffect(() => {
-    handlerRef.current = onTimeout
-  }, [onTimeout])
 
   useEffect(() => {
     if (autoStarts && timeout >= 0) {

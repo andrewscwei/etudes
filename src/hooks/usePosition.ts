@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Point, Rect } from 'spase'
+import { useLatest } from './useLatest.js'
 
 export type ScrollPositionInfo = {
   minPos: Point
@@ -27,33 +28,46 @@ export type UsePositionProps = {
  * @param props See {@link UsePositionProps}.
  */
 export function usePosition({ onChange }: UsePositionProps) {
-  const scrollPositionChangeHandler = useCallback(() => {
-    const newValue = getScrollPositionInfo()
-    if (!newValue) return
-
-    onChange(newValue, prevInfo.current)
-
-    prevInfo.current = newValue
-  }, [onChange])
-
-  const prevInfo = useRef<ScrollPositionInfo>(undefined)
+  const changeHandlerRef = useLatest(onChange)
+  const prevInfoRef = useRef<ScrollPositionInfo>(undefined)
+  const isTickingRef = useRef(false)
 
   useEffect(() => {
-    window.addEventListener('scroll', scrollPositionChangeHandler)
-    window.addEventListener('resize', scrollPositionChangeHandler)
-    window.addEventListener('orientationchange', scrollPositionChangeHandler)
+    const handler = () => {
+      const newInfo = _getScrollPositionInfo()
+      if (!newInfo) return
 
-    scrollPositionChangeHandler()
+      changeHandlerRef.current(newInfo, prevInfoRef.current)
+      prevInfoRef.current = newInfo
+    }
+
+    const tick = () => {
+      if (isTickingRef.current) return
+      if (typeof requestAnimationFrame !== 'function') return
+
+      isTickingRef.current = true
+
+      requestAnimationFrame(() => {
+        handler()
+        isTickingRef.current = false
+      })
+    }
+
+    window.addEventListener('scroll', tick, { passive: true })
+    window.addEventListener('resize', tick)
+    window.addEventListener('orientationchange', tick)
+
+    tick()
 
     return () => {
-      window.removeEventListener('scroll', scrollPositionChangeHandler)
-      window.removeEventListener('resize', scrollPositionChangeHandler)
-      window.removeEventListener('orientationchange', scrollPositionChangeHandler)
+      window.removeEventListener('scroll', tick)
+      window.removeEventListener('resize', tick)
+      window.removeEventListener('orientationchange', tick)
     }
-  }, [scrollPositionChangeHandler])
+  }, [])
 }
 
-const getScrollPositionInfo = (): ScrollPositionInfo | undefined => {
+function _getScrollPositionInfo(): ScrollPositionInfo | undefined {
   const refRect = Rect.fromViewport()
   const refRectMin = refRect.clone({ x: 0, y: 0 })
   const refRectFull = Rect.from(window, { overflow: true })

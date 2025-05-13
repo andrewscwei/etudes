@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react'
+import { useLatest } from './useLatest.js'
 
 /**
  * Type describing the output of {@link useInterval}.
@@ -48,7 +49,7 @@ export function useInterval(interval: number, {
   onInterval,
 }: UseIntervalOptions): UseIntervalOutput {
   const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined)
-  const handlerRef = useRef(onInterval)
+  const handlerRef = useLatest(onInterval)
 
   const stop = useCallback(() => {
     clearInterval(intervalRef.current)
@@ -68,10 +69,6 @@ export function useInterval(interval: number, {
       handlerRef.current()
     }, interval)
   }, [interval, shouldInvokeInitially, stop])
-
-  useEffect(() => {
-    handlerRef.current = onInterval
-  }, [onInterval])
 
   useEffect(() => {
     if (autoStarts && interval > 0) {

@@ -1,4 +1,5 @@
-import { useEffect, useRef, type RefObject } from 'react'
+import { useEffect, type RefObject } from 'react'
+import { useLatest } from './useLatest.js'
 
 type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
 
@@ -21,11 +22,7 @@ export type UseSizeObserverOptions = {
  * @param options See {@link UseSizeObserverOptions}.
  */
 export function useSizeObserver(targetRef: TargetRef, { onResize }: UseSizeObserverOptions) {
-  const resizeHandlerRef = useRef(onResize)
-
-  useEffect(() => {
-    resizeHandlerRef.current = onResize
-  }, [onResize])
+  const resizeHandlerRef = useLatest(onResize)
 
   useEffect(() => {
     const element = targetRef.current

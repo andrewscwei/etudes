@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type PropsWithChildren, type RefObject } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, type PropsWithChildren, type RefObject } from 'react'
 import { Point, Rect } from 'spase'
 
 type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
@@ -44,6 +44,8 @@ export const ScrollPositionContext = /* #__PURE__ */ createContext<ScrollPositio
 export function ScrollPositionProvider({
   children,
 }: Readonly<ScrollPositionProviderProps>) {
+  const isTickingRef = useRef(false)
+
   const [value, setValue] = useState<ScrollPositionContextValue>({
     minPos: Point.make(),
     maxPos: Point.make(),
@@ -52,7 +54,7 @@ export function ScrollPositionProvider({
   })
 
   useEffect(() => {
-    const updateScrollPosition = () => {
+    const handler = () => {
       const vrect = Rect.fromViewport()
       const refRectMin = vrect.clone({ x: 0, y: 0 })
       const refRectFull = Rect.from(window, { overflow: true })
@@ -70,16 +72,28 @@ export function ScrollPositionProvider({
       })
     }
 
-    window.addEventListener('scroll', updateScrollPosition)
-    window.addEventListener('resize', updateScrollPosition)
-    window.addEventListener('orientationchange', updateScrollPosition)
+    const tick = () => {
+      if (isTickingRef.current) return
+      if (typeof requestAnimationFrame !== 'function') return
 
-    updateScrollPosition()
+      isTickingRef.current = true
+
+      requestAnimationFrame(() => {
+        handler()
+        isTickingRef.current = false
+      })
+    }
+
+    window.addEventListener('scroll', tick, { passive: true })
+    window.addEventListener('resize', tick)
+    window.addEventListener('orientationchange', tick)
+
+    tick()
 
     return () => {
-      window.removeEventListener('scroll', updateScrollPosition)
-      window.removeEventListener('resize', updateScrollPosition)
-      window.removeEventListener('orientationchange', updateScrollPosition)
+      window.removeEventListener('scroll', tick)
+      window.removeEventListener('resize', tick)
+      window.removeEventListener('orientationchange', tick)
     }
   }, [])
 
