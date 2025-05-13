@@ -1,14 +1,8 @@
 import clsx from 'clsx'
-import { Accordion, AccordionExpandIcon, AccordionHeader, FlatSVG, type AccordionItemProps, type AccordionSection, type AccordionSelection } from 'etudes'
+import { Accordion, AccordionExpandIcon, AccordionHeader, AccordionItem, FlatSVG, type AccordionSection, type AccordionSelection } from 'etudes'
 import { useState } from 'react'
 import $$ExpandIcon from '../assets/expand-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
-
-const AccordionItem = ({ className, item, index, isSelected, onCustomEvent, ...props }: AccordionItemProps<string>) => (
-  <button {...props} className={clsx(className, 'ia selected:bg-dark selected:text-light border-dark flex items-center justify-start border px-3 text-base')}>
-    {item}
-  </button>
-)
 
 type Section = AccordionSection<string>
 
@@ -58,7 +52,6 @@ export function AccordionDemo() {
             'h-44 *:transition-[width]': orientation === 'horizontal',
           })}
           expandedSectionIndices={expandedSectionIndices}
-          ItemComponent={AccordionItem}
           orientation={orientation as any}
           sections={sections}
           selection={selection}
@@ -81,6 +74,7 @@ export function AccordionDemo() {
               svg={$$ExpandIcon}
             />
           </AccordionExpandIcon>
+          <AccordionItem className='ia selected:bg-dark selected:text-light border-dark flex items-center justify-start border px-3 text-base'/>
         </Accordion>
       )}
     </Frame>

@@ -1,15 +1,14 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import { forwardRef, useEffect, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref, type RefObject } from 'react'
+import { forwardRef, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref, type RefObject } from 'react'
 import { useMounted } from '../hooks/useMounted.js'
 import { useSize } from '../hooks/useSize.js'
 import { Each } from '../operators/Each.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { cloneStyledElement } from '../utils/cloneStyledElement.js'
-import { createKey } from '../utils/createKey.js'
 import { styles } from '../utils/styles.js'
-import { Collection, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection.js'
+import { Collection, CollectionItem, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection.js'
 import { type DropdownToggleProps } from './Dropdown.js'
 
 /**
@@ -242,6 +241,7 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
  * @exports AccordionHeader Component for each section header.
  * @exports AccordionExpandIcon Component for the expand icon of each section.
  * @exports AccordionCollapseIcon Component for the collapse icon of each
+ * @exports AccordionItem Component for each item in each section.
  */
 export const Accordion = /* #__PURE__ */ forwardRef(({
   children,
@@ -266,41 +266,14 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
   ItemComponent,
   ...props
 }, ref) => {
-  const isSectionIndexOutOfRange = (sectionIndex: number) => {
-    if (sectionIndex >= sections.length) return true
-    if (sectionIndex < 0) return true
-
-    return false
-  }
-
-  const isItemIndexOutOfRange = (itemIndex: number, sectionIndex: number) => {
-    if (isSectionIndexOutOfRange(sectionIndex)) return true
-
-    const items = sections[sectionIndex].items
-
-    if (itemIndex >= items.length) return true
-    if (itemIndex < 0) return true
-
-    return false
-  }
+  const isMounted = useMounted()
+  const selection = _sanitizeSelection(externalSelection ?? {}, sections)
+  const expandedSectionIndices = _sanitizeExpandedSectionIndices(externalExpandedSectionIndices ?? [], sections)
+  const fixedStyles = _getFixedStyles({ orientation })
+  const sectionHeaderRefs: RefObject<HTMLDivElement | null>[] = sections.map(() => useRef<HTMLDivElement>(null))
+  const sectionHeaderSizes = sectionHeaderRefs.map(t => useSize(t))
 
   const isSelectedAt = (itemIndex: number, sectionIndex: number) => (selection[sectionIndex]?.indexOf(itemIndex) ?? -1) >= 0
-
-  const sanitizeExpandedSectionIndices = (sectionIndices: number[]) => sortIndices(sectionIndices).filter(t => !isSectionIndexOutOfRange(t))
-
-  const sanitizeSelection = (selection: AccordionSelection) => {
-    const newValue: AccordionSelection = {}
-
-    for (const sectionIndex in sections) {
-      if (!Object.hasOwn(sections, sectionIndex)) continue
-
-      const indices = sortIndices([...selection[sectionIndex] ?? []])
-
-      newValue[Number(sectionIndex)] = sortIndices(indices).filter(t => !isItemIndexOutOfRange(t, Number(sectionIndex)))
-    }
-
-    return newValue
-  }
 
   const isSectionExpandedAt = (sectionIndex: number) => expandedSectionIndices.indexOf(sectionIndex) >= 0
 
@@ -329,7 +302,7 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
       case 'multiple':
         transform = val => ({
           ...val,
-          [sectionIndex]: sortIndices([...(val[sectionIndex] ?? []).filter(t => t !== itemIndex), itemIndex]),
+          [sectionIndex]: _sortIndices([...(val[sectionIndex] ?? []).filter(t => t !== itemIndex), itemIndex]),
         })
         break
       case 'single':
@@ -343,7 +316,6 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
 
     const newValue = transform(selection)
 
-    prevSelectionRef.current = newValue
     handleSelectionChange(selection, newValue)
   }
 
@@ -357,7 +329,6 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
 
     const newValue = transform(selection)
 
-    prevSelectionRef.current = newValue
     handleSelectionChange(selection, newValue)
   }
 
@@ -397,28 +368,12 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
     onSelectionChange?.(newValue)
   }
 
-  const isMounted = useMounted()
-  const selection = sanitizeSelection(externalSelection ?? {})
-  const expandedSectionIndices = sanitizeExpandedSectionIndices(externalExpandedSectionIndices ?? [])
-  const fixedStyles = getFixedStyles({ orientation })
-  const prevSelectionRef = useRef<AccordionSelection>(undefined)
-  const prevSelection = prevSelectionRef.current
-  const sectionHeaderRefs: RefObject<HTMLDivElement | null>[] = sections.map(() => useRef<HTMLDivElement>(null))
-  const sectionHeaderSizes = sectionHeaderRefs.map(t => useSize(t))
-
   const components = asComponentDict(children, {
     collapseIcon: AccordionCollapseIcon,
     expandIcon: AccordionExpandIcon,
     header: AccordionHeader,
+    item: AccordionItem,
   })
-
-  useEffect(() => {
-    prevSelectionRef.current = selection
-
-    if (prevSelection === undefined) return
-
-    handleSelectionChange(prevSelection, selection)
-  }, [createKey(selection)])
 
   return (
     <div {...props} ref={ref} style={styles(style, fixedStyles.root)}>
@@ -509,9 +464,11 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
                   style={styles(orientation === 'vertical' ? { width: '100%' } : { height: '100%' })}
                   onActivateAt={itemIndex => onActivateAt?.(itemIndex, sectionIndex)}
                   onCustomEvent={(itemIndex, name, info) => onItemCustomEvent?.(itemIndex, sectionIndex, name, info)}
-                  onDeselectAt={itemIndex => handleDeselectAt?.(itemIndex, sectionIndex)}
-                  onSelectAt={itemIndex => handleSelectAt?.(itemIndex, sectionIndex)}
-                />
+                  onDeselectAt={itemIndex => handleDeselectAt(itemIndex, sectionIndex)}
+                  onSelectAt={itemIndex => handleSelectAt(itemIndex, sectionIndex)}
+                >
+                  {!ItemComponent ? cloneStyledElement(components.item ?? <AccordionItem/>) : undefined}
+                </Collection>
               </div>
             </div>
           )
@@ -542,11 +499,52 @@ export const AccordionCollapseIcon = ({ children, ...props }: HTMLAttributes<HTM
   <figure {...props}>{children}</figure>
 )
 
-function sortIndices(indices: number[]): number[] {
+/**
+ * Component for each item of each section of an {@link Accordion}.
+ */
+export const AccordionItem = CollectionItem
+
+function _isSectionIndexOutOfRange<T>(sectionIndex: number, sections: AccordionSection<T>[]) {
+  if (sectionIndex >= sections.length) return true
+  if (sectionIndex < 0) return true
+
+  return false
+}
+
+function _isItemIndexOutOfRange<T>(itemIndex: number, sectionIndex: number, sections: AccordionSection<T>[]) {
+  if (_isSectionIndexOutOfRange(sectionIndex, sections)) return true
+
+  const items = sections[sectionIndex].items
+
+  if (itemIndex >= items.length) return true
+  if (itemIndex < 0) return true
+
+  return false
+}
+
+function _sanitizeExpandedSectionIndices<T>(sectionIndices: number[], sections: AccordionSection<T>[]) {
+  return _sortIndices(sectionIndices).filter(t => !_isSectionIndexOutOfRange(t, sections))
+}
+
+function _sanitizeSelection<T>(selection: AccordionSelection, sections: AccordionSection<T>[]) {
+  const newValue: AccordionSelection = {}
+
+  for (const sectionIndex in sections) {
+    if (!Object.hasOwn(sections, sectionIndex)) continue
+
+    const indices = _sortIndices([...selection[sectionIndex] ?? []])
+
+    newValue[Number(sectionIndex)] = _sortIndices(indices).filter(t => !_isItemIndexOutOfRange(t, Number(sectionIndex), sections))
+  }
+
+  return newValue
+}
+
+function _sortIndices(indices: number[]): number[] {
   return indices.sort((a, b) => a - b)
 }
 
-function getFixedStyles({ orientation = 'vertical' }) {
+function _getFixedStyles({ orientation = 'vertical' }) {
   return asStyleDict({
     root: {
       alignItems: 'center',
@@ -604,4 +602,5 @@ if (process.env.NODE_ENV !== 'production') {
   AccordionHeader.displayName = 'AccordionHeader'
   AccordionExpandIcon.displayName = 'AccordionExpandIcon'
   AccordionCollapseIcon.displayName = 'AccordionCollapseIcon'
+  AccordionItem.displayName = 'AccordionItem'
 }
