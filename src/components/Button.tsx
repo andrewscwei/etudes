@@ -41,7 +41,7 @@ export type ButtonProps = AnchorVariantProps | LinkVariantProps | NavLinkVariant
  */
 export function Button(props: Readonly<ButtonProps>) {
   switch (true) {
-    case isNavLink(props): {
+    case _isNavLink(props): {
       const { action, children, isNav: _, className, isDisabled, label, ...uniqProps } = props
 
       return (
@@ -56,7 +56,7 @@ export function Button(props: Readonly<ButtonProps>) {
         </NavLink>
       )
     }
-    case isLink(props): {
+    case _isLink(props): {
       const { action, children, className, isDisabled, label, ...uniqProps } = props
 
       return (
@@ -71,7 +71,7 @@ export function Button(props: Readonly<ButtonProps>) {
         </Link>
       )
     }
-    case isAnchor(props): {
+    case _isAnchor(props): {
       const { action, children, className, isDisabled, label, opensInNewTab, ...uniqProps } = props
 
       return (
@@ -88,7 +88,7 @@ export function Button(props: Readonly<ButtonProps>) {
         </a>
       )
     }
-    case isButton(props): {
+    case _isButton(props): {
       const { action, children, className, isDisabled, label, type = 'button', ...uniqProps } = props
 
       return (
@@ -110,7 +110,7 @@ export function Button(props: Readonly<ButtonProps>) {
   }
 }
 
-function isNavLink(props: ButtonProps): props is NavLinkVariantProps {
+function _isNavLink(props: ButtonProps): props is NavLinkVariantProps {
   if (typeof props.action !== 'string') return false
   if (!props.action.startsWith('/')) return false
   if (!('isNav' in props)) return false
@@ -119,7 +119,7 @@ function isNavLink(props: ButtonProps): props is NavLinkVariantProps {
   return true
 }
 
-function isLink(props: ButtonProps): props is LinkVariantProps {
+function _isLink(props: ButtonProps): props is LinkVariantProps {
   if (typeof props.action !== 'string') return false
   if (!props.action.startsWith('/')) return false
   if ('isNav' in props && props.isNav) return false
@@ -127,14 +127,14 @@ function isLink(props: ButtonProps): props is LinkVariantProps {
   return true
 }
 
-function isAnchor(props: ButtonProps): props is AnchorVariantProps {
+function _isAnchor(props: ButtonProps): props is AnchorVariantProps {
   if (typeof props.action !== 'string') return false
   if (props.action.startsWith('/')) return false
 
   return true
 }
 
-function isButton(props: ButtonProps): props is ButtonVariantProps {
+function _isButton(props: ButtonProps): props is ButtonVariantProps {
   if (typeof props.action !== 'function') return false
 
   return true

@@ -72,7 +72,7 @@ export const Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<DialProp
     knob: DialKnob,
   })
 
-  const fixedStyles = getFixedStyles({ angle, diameter })
+  const fixedStyles = _getFixedStyles({ angle, diameter })
 
   return (
     <div {...props} ref={ref} style={styles(style, fixedStyles.root)}>
@@ -91,7 +91,7 @@ export const Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<DialProp
       <div style={styles(fixedStyles.knobContainer)}>
         <svg style={fixedStyles.svgContainer} viewBox={`0 0 ${diameter} ${diameter}`} xmlns='http://www.w3.org/2000/svg'>
           {cloneStyledElement(components.knob ?? <DialKnob/>, {
-            d: arcPath(radius, radius, radius - knobThickness / 2 - (trackThickness - knobThickness) / 2, -clampedKnobAngle / 2, clampedKnobAngle / 2),
+            d: _arcPath(radius, radius, radius - knobThickness / 2 - (trackThickness - knobThickness) / 2, -clampedKnobAngle / 2, clampedKnobAngle / 2),
             fill: 'none',
             strokeWidth: knobThickness,
           })}
@@ -115,7 +115,7 @@ export const DialKnob = ({ ...props }: SVGAttributes<SVGPathElement>) => (
   <path {...props}/>
 )
 
-function polarToCartesian(centerX: number, centerY: number, radius: number, angleInDegrees: number) {
+function _polarToCartesian(centerX: number, centerY: number, radius: number, angleInDegrees: number) {
   const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0
 
   return {
@@ -124,9 +124,9 @@ function polarToCartesian(centerX: number, centerY: number, radius: number, angl
   }
 }
 
-function arcPath(x: number, y: number, radius: number, startAngle: number, endAngle: number) {
-  const start = polarToCartesian(x, y, radius, endAngle)
-  const end = polarToCartesian(x, y, radius, startAngle)
+function _arcPath(x: number, y: number, radius: number, startAngle: number, endAngle: number) {
+  const start = _polarToCartesian(x, y, radius, endAngle)
+  const end = _polarToCartesian(x, y, radius, startAngle)
   const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1'
   const d = [
     'M',
@@ -145,7 +145,7 @@ function arcPath(x: number, y: number, radius: number, startAngle: number, endAn
   return d.join(' ')
 }
 
-function getFixedStyles({ diameter = 0, angle = 0 }) {
+function _getFixedStyles({ diameter = 0, angle = 0 }) {
   return asStyleDict({
     root: {
       height: `${diameter}px`,

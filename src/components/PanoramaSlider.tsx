@@ -115,7 +115,7 @@ export const PanoramaSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonl
     indicator: PanoramaSliderIndicator,
   })
 
-  const fixedStyles = getFixedStyles({ autoDimension, panoramaRect, aspectRatio, reticleWidth })
+  const fixedStyles = _getFixedStyles({ autoDimension, panoramaRect, aspectRatio, reticleWidth })
 
   return (
     <div
@@ -185,7 +185,7 @@ export const PanoramaSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>
   <div {...props}/>
 )
 
-function getFixedStyles({ autoDimension = 'width', panoramaRect = Rect.make(), aspectRatio = 0, reticleWidth = 0 }) {
+function _getFixedStyles({ autoDimension = 'width', panoramaRect = Rect.make(), aspectRatio = 0, reticleWidth = 0 }) {
   return asStyleDict({
     root: {
       ...autoDimension === 'width' ? {

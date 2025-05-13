@@ -102,10 +102,10 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
   const autoScrollTimeoutRef = useRef<NodeJS.Timeout>(undefined)
   const autoScrollTimeoutMs = 1000
 
-  const [exposures, setExposures] = useState<number[] | undefined>(getItemExposures(viewportRef, orientation))
+  const [exposures, setExposures] = useState<number[] | undefined>(_getItemExposures(viewportRef, orientation))
   const [isPointerDown, setIsPointerDown] = useState(false)
 
-  const fixedStyles = getFixedStyles({ scrollSnapEnabled: !isPointerDown, orientation })
+  const fixedStyles = _getFixedStyles({ scrollSnapEnabled: !isPointerDown, orientation })
   const shouldAutoAdvance = autoAdvanceInterval > 0
 
   const indexChangeHandler = useCallback((newValue: number) => {
@@ -144,7 +144,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
   }, [isPointerDown])
 
   const normalizeScrollPosition = useCallback(() => {
-    scrollToIndex(viewportRef, index, orientation)
+    _scrollToIndex(viewportRef, index, orientation)
 
     clearTimeout(autoScrollTimeoutRef.current)
 
@@ -192,7 +192,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
 
     const scrollHandler = (_: Event) => {
       if (tracksItemExposure) {
-        setExposures(getItemExposures(viewportRef, orientation))
+        setExposures(_getItemExposures(viewportRef, orientation))
       }
 
       if (autoScrollTimeoutRef.current !== undefined) return
@@ -214,7 +214,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
     viewport.addEventListener('scroll', scrollHandler)
 
     if (tracksItemExposure) {
-      setExposures(getItemExposures(viewportRef, orientation))
+      setExposures(_getItemExposures(viewportRef, orientation))
     }
 
     if (!isIndexModifiedFromManualScrolling) {
@@ -280,7 +280,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
   )
 }) as <I extends HTMLAttributes<HTMLElement>>(props: Readonly<CarouselProps<I> & { ref?: ForwardedRef<HTMLDivElement> }>) => ReactElement
 
-function scrollToIndex(ref: RefObject<HTMLDivElement | null>, index: number, orientation: CarouselOrientation) {
+function _scrollToIndex(ref: RefObject<HTMLDivElement | null>, index: number, orientation: CarouselOrientation) {
   const viewport = ref?.current
   if (!viewport) return
 
@@ -292,20 +292,20 @@ function scrollToIndex(ref: RefObject<HTMLDivElement | null>, index: number, ori
   viewport.scrollTo({ top, left, behavior: 'smooth' })
 }
 
-function getItemExposures(ref: RefObject<HTMLDivElement | null>, orientation: CarouselOrientation) {
+function _getItemExposures(ref: RefObject<HTMLDivElement | null>, orientation: CarouselOrientation) {
   const viewport = ref?.current
   if (!viewport) return undefined
 
   const exposures = []
 
   for (let i = 0; i < viewport.children.length; i++) {
-    exposures.push(getItemExposureAt(i, ref, orientation))
+    exposures.push(_getItemExposureAt(i, ref, orientation))
   }
 
   return exposures
 }
 
-function getItemExposureAt(idx: number, ref: RefObject<HTMLDivElement | null>, orientation: CarouselOrientation) {
+function _getItemExposureAt(idx: number, ref: RefObject<HTMLDivElement | null>, orientation: CarouselOrientation) {
   const viewport = ref?.current
   const child = viewport?.children[idx]
   if (!child) return 0
@@ -323,7 +323,7 @@ function getItemExposureAt(idx: number, ref: RefObject<HTMLDivElement | null>, o
   }
 }
 
-function getFixedStyles({ scrollSnapEnabled = false, orientation = 'horizontal' }) {
+function _getFixedStyles({ scrollSnapEnabled = false, orientation = 'horizontal' }) {
   return asStyleDict({
     viewport: {
       alignItems: 'center',

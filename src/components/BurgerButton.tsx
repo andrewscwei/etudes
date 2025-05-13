@@ -65,7 +65,7 @@ export const BurgerButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readon
     }),
   })
 
-  const fixedStyles = getFixedStyles()
+  const fixedStyles = _getFixedStyles()
 
   return (
     <button
@@ -93,7 +93,7 @@ export const BurgerButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readon
  */
 export const BurgerButtonBar = BurgerBar
 
-function getFixedStyles() {
+function _getFixedStyles() {
   return asStyleDict({
     root: {
       background: 'transparent',

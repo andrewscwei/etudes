@@ -78,8 +78,8 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
       for (const child of Array.from(nodes)) {
         if (!(child instanceof HTMLElement)) continue
 
-        const base = computeBaseFromElement(child, sections)
-        const [colIdx, y] = computeNextAvailableSectionAndLengthByBase(sectionHeights, base)
+        const base = _computeBaseFromElement(child, sections)
+        const [colIdx, y] = _computeNextAvailableSectionAndLengthByBase(sectionHeights, base)
 
         child.role = 'gridcell'
         child.style.position = 'absolute'
@@ -93,7 +93,7 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
         }
 
         if (alignSections && colIdx + base === numSections) {
-          const m = computeMaxLength(sectionHeights)
+          const m = _computeMaxLength(sectionHeights)
 
           for (let j = 0; j < numSections; j++) {
             sectionHeights[j] = m
@@ -102,7 +102,7 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
       }
 
       const w = getCurrentWidth()
-      const h = computeMaxLength(sectionHeights, numSections)
+      const h = _computeMaxLength(sectionHeights, numSections)
 
       setMinWidth(w)
       setMinHeight(h)
@@ -123,8 +123,8 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
       for (const child of Array.from(nodes)) {
         if (!(child instanceof HTMLElement)) continue
 
-        const base = computeBaseFromElement(child, sections)
-        const [rowIdx, x] = computeNextAvailableSectionAndLengthByBase(sectionWidths, base)
+        const base = _computeBaseFromElement(child, sections)
+        const [rowIdx, x] = _computeNextAvailableSectionAndLengthByBase(sectionWidths, base)
 
         child.style.position = 'absolute'
         child.style.width = ''
@@ -137,7 +137,7 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
         }
 
         if (alignSections && rowIdx + base === numSections) {
-          const m = computeMaxLength(sectionWidths)
+          const m = _computeMaxLength(sectionWidths)
 
           for (let j = 0; j < numSections; j++) {
             sectionWidths[j] = m
@@ -146,7 +146,7 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
       }
 
       const h = getCurrentHeight()
-      const w = computeMaxLength(sectionWidths, numSections)
+      const w = _computeMaxLength(sectionWidths, numSections)
 
       setMinHeight(h)
       setMinWidth(w)
@@ -180,7 +180,7 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
   })
 
   useEffect(() => {
-    const imageSources = getAllImageSources(bodyRef.current?.innerHTML)
+    const imageSources = _getAllImageSources(bodyRef.current?.innerHTML)
 
     if (imageSources.length === 0) return repositionChildren()
 
@@ -194,8 +194,8 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
     }
   }, [children])
 
-  const fixedClassNames = getFixedClassNames({ orientation })
-  const fixedStyles = getFixedStyles({ orientation, minHeight, minWidth })
+  const fixedClassNames = _getFixedClassNames({ orientation })
+  const fixedStyles = _getFixedStyles({ orientation, minHeight, minWidth })
 
   return (
     <div
@@ -211,13 +211,13 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
   )
 })
 
-function getFixedClassNames({ orientation = 'horizontal' }) {
+function _getFixedClassNames({ orientation = 'horizontal' }) {
   return asClassNameDict({
     root: clsx(orientation),
   })
 }
 
-function getFixedStyles({ orientation = 'horizontal', minHeight = NaN, minWidth = NaN }) {
+function _getFixedStyles({ orientation = 'horizontal', minHeight = NaN, minWidth = NaN }) {
   return asStyleDict({
     body: {
       height: orientation === 'horizontal' ? '100%' : 'auto',
@@ -240,7 +240,7 @@ function getFixedStyles({ orientation = 'horizontal', minHeight = NaN, minWidth 
  * @returns An array consisting of the computed section index and its to-be
  *          length if a new item were to be placed in it.
  */
-function computeNextAvailableSectionAndLengthByBase(currentSectionLengths: number[], base: number): [number, number] {
+function _computeNextAvailableSectionAndLengthByBase(currentSectionLengths: number[], base: number): [number, number] {
   const numSections = currentSectionLengths.length
 
   let sectionIdx = NaN
@@ -265,7 +265,7 @@ function computeNextAvailableSectionAndLengthByBase(currentSectionLengths: numbe
   }
 
   if (isNaN(sectionIdx)) {
-    return [0, computeMaxLength(currentSectionLengths, base)]
+    return [0, _computeMaxLength(currentSectionLengths, base)]
   }
   else {
     return [sectionIdx, minLength]
@@ -284,7 +284,7 @@ function computeNextAvailableSectionAndLengthByBase(currentSectionLengths: numbe
  *
  * @returns The max section length.
  */
-function computeMaxLength(currentSectionLengths: number[], base?: number): number {
+function _computeMaxLength(currentSectionLengths: number[], base?: number): number {
   let arr = currentSectionLengths
 
   if (base !== undefined && base !== null && !isNaN(base)) {
@@ -303,7 +303,7 @@ function computeMaxLength(currentSectionLengths: number[], base?: number): numbe
  * @returns The computed base value that is clamped between 1 and max number of
  *          sections.
  */
-function computeBaseFromElement(element: HTMLElement, numSections: number): number {
+function _computeBaseFromElement(element: HTMLElement, numSections: number): number {
   const classList = element.classList
 
   for (const c of Array.from(classList)) {
@@ -323,7 +323,7 @@ function computeBaseFromElement(element: HTMLElement, numSections: number): numb
  *
  * @returns The image sources.
  */
-function getAllImageSources(htmlString?: string): string[] {
+function _getAllImageSources(htmlString?: string): string[] {
   if (!htmlString) return []
 
   const regexImg = /<img.*?src=(["'])(.*?)\1/g

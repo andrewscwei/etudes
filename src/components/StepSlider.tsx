@@ -174,22 +174,22 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
   const [index, setIndex] = useState(externalIndex)
 
   const mapDragValueToPosition = useCallback((value: number, dx: number, dy: number) => {
-    const truePosition = isInverted ? inverted(value) : value
+    const truePosition = isInverted ? _inverted(value) : value
 
     switch (orientation) {
       case 'horizontal': {
         const maxWidth = isClipped ? rect.width - knobWidth : rect.width
         const trueNewPositionX = truePosition * maxWidth + dx
-        const trueNewPosition = clamped(trueNewPositionX / maxWidth)
-        const normalizedPosition = isInverted ? inverted(trueNewPosition) : trueNewPosition
+        const trueNewPosition = _clamped(trueNewPositionX / maxWidth)
+        const normalizedPosition = isInverted ? _inverted(trueNewPosition) : trueNewPosition
 
         return normalizedPosition
       }
       case 'vertical': {
         const maxHeight = isClipped ? rect.height - knobHeight : rect.height
         const trueNewPositionY = truePosition * maxHeight + dy
-        const trueNewPosition = clamped(trueNewPositionY / maxHeight)
-        const normalizedPosition = isInverted ? inverted(trueNewPosition) : trueNewPosition
+        const trueNewPosition = _clamped(trueNewPositionY / maxHeight)
+        const normalizedPosition = isInverted ? _inverted(trueNewPosition) : trueNewPosition
 
         return normalizedPosition
       }
@@ -199,7 +199,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
   }, [rect.width, rect.height, isClipped, isInverted, knobWidth, knobHeight, orientation])
 
   const { isDragging, isReleasing, value: position, setValue: setPosition } = useInertiaDragValue(knobContainerRef, {
-    initialValue: getPositionAt(externalIndex, steps),
+    initialValue: _getPositionAt(externalIndex, steps),
     transform: mapDragValueToPosition,
     onDragStart,
     onDragEnd,
@@ -213,12 +213,12 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
     switch (orientation) {
       case 'horizontal': {
         const trackPosition = (event.clientX + vrect.left - rect.left) / rect.width
-        const normalizedPosition = isInverted ? inverted(trackPosition) : trackPosition
-        const nearestIndex = getNearestIndexByPosition(normalizedPosition, steps)
+        const normalizedPosition = isInverted ? _inverted(trackPosition) : trackPosition
+        const nearestIndex = _getNearestIndexByPosition(normalizedPosition, steps)
 
         if (nearestIndex === index) {
           const newIndex = normalizedPosition > position ? nearestIndex + 1 : nearestIndex - 1
-          setIndex(clamped(newIndex, steps.length - 1))
+          setIndex(_clamped(newIndex, steps.length - 1))
         }
         else {
           setIndex(nearestIndex)
@@ -228,17 +228,17 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
       }
       case 'vertical': {
         const trackPosition = (event.clientY + vrect.top - rect.top) / rect.height
-        const normalizedPosition = isInverted ? inverted(trackPosition) : trackPosition
-        const nearestIndex = getNearestIndexByPosition(normalizedPosition, steps)
+        const normalizedPosition = isInverted ? _inverted(trackPosition) : trackPosition
+        const nearestIndex = _getNearestIndexByPosition(normalizedPosition, steps)
 
         if (nearestIndex === index) {
           const newIndex = normalizedPosition > position ? nearestIndex + 1 : nearestIndex - 1
-          const newPosition = getPositionAt(newIndex, steps)
+          const newPosition = _getPositionAt(newIndex, steps)
           setPosition(newPosition)
-          setIndex(clamped(newIndex, steps.length - 1))
+          setIndex(_clamped(newIndex, steps.length - 1))
         }
         else {
-          const newPosition = getPositionAt(nearestIndex, steps)
+          const newPosition = _getPositionAt(nearestIndex, steps)
           setPosition(newPosition)
           setIndex(nearestIndex)
         }
@@ -252,11 +252,11 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
 
   // Natural position is the position affecting internal components accounting
   // for `isInverted`.
-  const naturalPosition = isInverted ? inverted(position) : position
+  const naturalPosition = isInverted ? _inverted(position) : position
   const isAtEnd = isInverted ? position === 0 : position === 1
   const isAtStart = isInverted ? position === 1 : position === 0
-  const fixedClassNames = getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
-  const fixedStyles = getFixedStyles({ orientation, naturalPosition, isClipped, knobPadding, knobHeight, knobWidth, isTrackInteractive })
+  const fixedClassNames = _getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
+  const fixedStyles = _getFixedStyles({ orientation, naturalPosition, isClipped, knobPadding, knobHeight, knobWidth, isTrackInteractive })
   const components = asComponentDict(children, {
     knob: StepSliderKnob,
     knobContainer: StepSliderKnobContainer,
@@ -267,7 +267,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
   useEffect(() => {
     if (isDragging) return
 
-    setPosition(getPositionAt(externalIndex, steps))
+    setPosition(_getPositionAt(externalIndex, steps))
     setIndex(externalIndex)
   }, [externalIndex, isDragging, createKey(steps)])
 
@@ -275,11 +275,11 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
     if (isDragging) {
       if (onlyDispatchesOnDragEnd) return
 
-      setIndex(getNearestIndexByPosition(position, steps))
+      setIndex(_getNearestIndexByPosition(position, steps))
     }
     else {
-      const nearestIndex = getNearestIndexByPosition(position, steps)
-      const nearestPosition = getPositionAt(nearestIndex, steps)
+      const nearestIndex = _getNearestIndexByPosition(position, steps)
+      const nearestPosition = _getPositionAt(nearestIndex, steps)
 
       setPosition(nearestPosition)
       setIndex(nearestIndex)
@@ -318,10 +318,10 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
           className: clsx(isInverted ? 'start' : 'end', fixedClassNames.track),
           style: styles(fixedStyles.track, orientation === 'vertical' ? {
             bottom: '0',
-            height: `calc(${(inverted(naturalPosition)) * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
+            height: `calc(${(_inverted(naturalPosition)) * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
           } : {
             right: '0',
-            width: `calc(${(inverted(naturalPosition)) * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
+            width: `calc(${(_inverted(naturalPosition)) * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
           }),
           onClick: trackClickHandler,
         }, <div style={fixedStyles.trackHitBox}/>)}
@@ -335,7 +335,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
         }, <div style={fixedStyles.knobHitBox}/>, steps && labelProvider && cloneStyledElement(components.label ?? <StepSliderLabel/>, {
           className: clsx(fixedClassNames.label),
           style: styles(fixedStyles.label),
-        }, labelProvider(position, getNearestIndexByPosition(position, steps)))))}
+        }, labelProvider(position, _getNearestIndexByPosition(position, steps)))))}
       </div>
     </div>
   )
@@ -390,12 +390,12 @@ export function generateSteps(length: number): readonly number[] {
   })
 }
 
-function getNearestIndexByPosition(position: number, steps: readonly number[]): number {
+function _getNearestIndexByPosition(position: number, steps: readonly number[]): number {
   let index = -1
   let minDelta = NaN
 
   for (let i = 0, n = steps.length; i < n; i++) {
-    const step = getPositionAt(i, steps)
+    const step = _getPositionAt(i, steps)
 
     if (isNaN(step)) continue
 
@@ -410,13 +410,13 @@ function getNearestIndexByPosition(position: number, steps: readonly number[]): 
   return index
 }
 
-function getPositionAt(index: number, steps: readonly number[]): number {
+function _getPositionAt(index: number, steps: readonly number[]): number {
   if (index >= steps.length) return NaN
 
   return steps[index]
 }
 
-function getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtStart = false, isDragging = false, isReleasing = false }) {
+function _getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtStart = false, isDragging = false, isReleasing = false }) {
   return asClassNameDict({
     root: clsx(orientation, {
       'at-end': isAtEnd,
@@ -451,7 +451,7 @@ function getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtSta
   })
 }
 
-function getFixedStyles({ orientation = 'vertical', naturalPosition = 0, isClipped = false, knobPadding = 0, knobHeight = 0, knobWidth = 0, isTrackInteractive = false }) {
+function _getFixedStyles({ orientation = 'vertical', naturalPosition = 0, isClipped = false, knobPadding = 0, knobHeight = 0, knobWidth = 0, isTrackInteractive = false }) {
   return asStyleDict({
     body: {
       height: '100%',
@@ -517,11 +517,11 @@ function getFixedStyles({ orientation = 'vertical', naturalPosition = 0, isClipp
   })
 }
 
-function inverted(value: number): number {
+function _inverted(value: number): number {
   return 1 - value
 }
 
-function clamped(value: number, max: number = 1, min: number = 0): number {
+function _clamped(value: number, max: number = 1, min: number = 0): number {
   return Math.max(min, Math.min(max, value))
 }
 

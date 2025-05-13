@@ -202,8 +202,8 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
   const naturalPosition = isInverted ? 1 - position : position
   const isAtEnd = isInverted ? position === 0 : position === 1
   const isAtStart = isInverted ? position === 1 : position === 0
-  const fixedClassNames = getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
-  const fixedStyles = getFixedStyles({ orientation, isClipped, naturalPosition, knobPadding, knobHeight, knobWidth, isTrackInteractive })
+  const fixedClassNames = _getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
+  const fixedStyles = _getFixedStyles({ orientation, isClipped, naturalPosition, knobPadding, knobHeight, knobWidth, isTrackInteractive })
 
   useEffect(() => {
     if (isDragging || externalPosition === position) return
@@ -305,7 +305,7 @@ export const SliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}/>
 )
 
-function getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtStart = false, isDragging = false, isReleasing = false }) {
+function _getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtStart = false, isDragging = false, isReleasing = false }) {
   return asClassNameDict({
     root: clsx(orientation, {
       'at-end': isAtEnd,
@@ -340,7 +340,7 @@ function getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtSta
   })
 }
 
-function getFixedStyles({ orientation = 'vertical', isClipped = false, naturalPosition = 0, knobPadding = 0, knobHeight = 0, knobWidth = 0, isTrackInteractive = true }) {
+function _getFixedStyles({ orientation = 'vertical', isClipped = false, naturalPosition = 0, knobPadding = 0, knobHeight = 0, knobWidth = 0, isTrackInteractive = true }) {
   return asStyleDict({
     body: {
       height: '100%',

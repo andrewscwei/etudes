@@ -134,7 +134,7 @@ export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
   useEffect(() => {
     if (isDragging || !imageSize) return
 
-    const newDisplacement = getDisplacementFromAngle(externalAngle, imageSize, bodyRect.size, zeroAnchor)
+    const newDisplacement = _getDisplacementFromAngle(externalAngle, imageSize, bodyRect.size, zeroAnchor)
 
     if (newDisplacement !== displacement) {
       setDisplacement(newDisplacement)
@@ -148,7 +148,7 @@ export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
   useEffect(() => {
     if (!isDragging || !imageSize) return
 
-    const newAngle = getAngleFromDisplacement(displacement, imageSize, bodyRect.size, zeroAnchor)
+    const newAngle = _getAngleFromDisplacement(displacement, imageSize, bodyRect.size, zeroAnchor)
 
     if (angle !== newAngle) {
       setAngle(newAngle)
@@ -164,7 +164,7 @@ export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
     onImageSizeChange?.(imageSize)
   }, [imageSize?.width, imageSize?.height])
 
-  const fixedStyles = getFixedStyles({ src, displacement })
+  const fixedStyles = _getFixedStyles({ src, displacement })
 
   return (
     <div
@@ -178,7 +178,7 @@ export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
   )
 })
 
-function getFixedStyles({ src = '', displacement = NaN }) {
+function _getFixedStyles({ src = '', displacement = NaN }) {
   return asStyleDict({
     body: {
       backgroundImage: `url(${src})`,
@@ -192,7 +192,7 @@ function getFixedStyles({ src = '', displacement = NaN }) {
   })
 }
 
-function getFilledImageSize(originalSize: Size, sizeToFill: Size): Size {
+function _getFilledImageSize(originalSize: Size, sizeToFill: Size): Size {
   const { width: originalWidth, height: originalHeight } = originalSize
   const { height: filledHeight } = sizeToFill
 
@@ -204,16 +204,16 @@ function getFilledImageSize(originalSize: Size, sizeToFill: Size): Size {
   return new Size([filledWidth, filledHeight])
 }
 
-function getDisplacementFromAngle(angle: number, originalImageSize: Size, componentSize: Size, zeroAnchor: number): number {
-  const { width: imageWidth } = getFilledImageSize(originalImageSize, componentSize)
+function _getDisplacementFromAngle(angle: number, originalImageSize: Size, componentSize: Size, zeroAnchor: number): number {
+  const { width: imageWidth } = _getFilledImageSize(originalImageSize, componentSize)
   const { width: componentWidth } = componentSize
   const offset = componentWidth * zeroAnchor
 
   return angle / 360 * imageWidth - offset
 }
 
-function getAngleFromDisplacement(displacement: number, originalImageSize: Size, componentSize: Size, zeroAnchor: number): number {
-  const { width: imageWidth } = getFilledImageSize(originalImageSize, componentSize)
+function _getAngleFromDisplacement(displacement: number, originalImageSize: Size, componentSize: Size, zeroAnchor: number): number {
+  const { width: imageWidth } = _getFilledImageSize(originalImageSize, componentSize)
   const { width: componentWidth } = componentSize
   const offset = componentWidth * zeroAnchor
 
