@@ -22,7 +22,7 @@ export function useSize(targetRef: TargetRef): Size {
   }, [])
 
   useSizeObserver(targetRef, {
-    onResize: element => resizeHandler(element),
+    onResize: resizeHandler,
   })
 
   return rect.size
