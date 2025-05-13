@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Rect, Size } from 'spase'
 
 /**
@@ -9,12 +9,12 @@ import { Rect, Size } from 'spase'
 export function useViewportSize(): Size {
   const [size, setSize] = useState<Size>(Size.make())
 
-  const resizeHandler = useCallback(() => {
-    const viewportSize = Rect.fromViewport().size
-    setSize(viewportSize)
-  }, [])
-
   useEffect(() => {
+    const resizeHandler = () => {
+      const viewportSize = Rect.fromViewport().size
+      setSize(viewportSize)
+    }
+
     window.addEventListener('resize', resizeHandler)
 
     resizeHandler()
@@ -22,7 +22,7 @@ export function useViewportSize(): Size {
     return () => {
       window.removeEventListener('resize', resizeHandler)
     }
-  }, [resizeHandler])
+  }, [])
 
   return size
 }
