@@ -7,7 +7,7 @@ type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | R
  */
 export type UseSizeObserverOptions = {
   /**
-   * A **stable** handler invoked when the target element resizes.
+   * Handler invoked when the target element resizes.
    *
    * @param element The target element.
    */
@@ -18,27 +18,27 @@ export type UseSizeObserverOptions = {
  * Hook for monitoring the resizing event of the target element.
  *
  * @param targetRef Reference to the target element.
- * @param options See {@link Options}.
+ * @param options See {@link UseSizeObserverOptions}.
  */
 export function useSizeObserver(targetRef: TargetRef, { onResize }: UseSizeObserverOptions) {
-  const observerRef = useRef<ResizeObserver>(undefined)
+  const resizeHandlerRef = useRef(onResize)
 
   useEffect(() => {
-    observerRef.current = new ResizeObserver(() => {
-      const element = targetRef.current
-      if (!element) return
+    resizeHandlerRef.current = onResize
+  }, [onResize])
 
-      onResize(element)
+  useEffect(() => {
+    const element = targetRef.current
+    if (!element) return
+
+    const observer = new ResizeObserver(() => {
+      resizeHandlerRef.current(element)
     })
 
-    if (observerRef.current && targetRef.current) {
-      observerRef.current.observe(targetRef.current)
-    }
+    observer.observe(element)
 
     return () => {
-      if (observerRef.current && targetRef.current) {
-        observerRef.current.unobserve(targetRef.current)
-      }
+      observer.disconnect()
     }
-  }, [targetRef.current, onResize])
+  }, [targetRef])
 }
