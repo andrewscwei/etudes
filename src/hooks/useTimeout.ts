@@ -42,7 +42,8 @@ export function useTimeout(timeout: number, {
   autoStarts = true,
   onTimeout,
 }: UseTimeoutOptions): UseTimeoutOutput {
-  const timeoutRef = useRef<NodeJS.Timeout>(undefined)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const handlerRef = useRef(onTimeout)
 
   const stop = useCallback(() => {
     if (timeoutRef.current === undefined) return
@@ -59,19 +60,21 @@ export function useTimeout(timeout: number, {
 
     timeoutRef.current = setTimeout(() => {
       stop()
-      onTimeout()
+      handlerRef.current()
     }, timeout)
-  }, [timeout, stop, onTimeout])
+  }, [timeout, stop])
 
   useEffect(() => {
-    if (timeout < 0) return
-    if (autoStarts) start()
+    handlerRef.current = onTimeout
+  }, [onTimeout])
 
-    return () => stop()
+  useEffect(() => {
+    if (autoStarts && timeout >= 0) {
+      start()
+    }
+
+    return stop
   }, [autoStarts, timeout, start, stop])
 
-  return {
-    start,
-    stop,
-  }
+  return { start, stop }
 }

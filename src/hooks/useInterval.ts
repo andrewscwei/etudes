@@ -47,13 +47,11 @@ export function useInterval(interval: number, {
   shouldInvokeInitially = false,
   onInterval,
 }: UseIntervalOptions): UseIntervalOutput {
-  const intervalRef = useRef<NodeJS.Timeout>(undefined)
+  const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined)
+  const handlerRef = useRef(onInterval)
 
   const stop = useCallback(() => {
-    if (intervalRef.current === undefined) return
-
     clearInterval(intervalRef.current)
-
     intervalRef.current = undefined
   }, [])
 
@@ -62,24 +60,26 @@ export function useInterval(interval: number, {
 
     if (interval < 0) return
 
-    intervalRef.current = setInterval(onInterval, interval)
-  }, [interval, stop, onInterval])
-
-  useEffect(() => {
-    if (interval <= 0) return
-    if (autoStarts) {
-      start()
-
-      if (shouldInvokeInitially === true) {
-        onInterval()
-      }
+    if (shouldInvokeInitially) {
+      handlerRef.current()
     }
 
-    return () => stop()
-  }, [autoStarts, interval, shouldInvokeInitially, onInterval])
+    intervalRef.current = setInterval(() => {
+      handlerRef.current()
+    }, interval)
+  }, [interval, shouldInvokeInitially, stop])
 
-  return {
-    start,
-    stop,
-  }
+  useEffect(() => {
+    handlerRef.current = onInterval
+  }, [onInterval])
+
+  useEffect(() => {
+    if (autoStarts && interval > 0) {
+      start()
+    }
+
+    return stop
+  }, [autoStarts, interval, start, stop])
+
+  return { start, stop }
 }

@@ -1,4 +1,4 @@
-import { useCallback, useState, type RefObject } from 'react'
+import { useState, type RefObject } from 'react'
 import { Rect, type Size } from 'spase'
 import { useSizeObserver } from './useSizeObserver.js'
 
@@ -14,15 +14,13 @@ type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | R
 export function useSize(targetRef: TargetRef): Size {
   const [rect, setRect] = useState<Rect>(Rect.make())
 
-  const resizeHandler = useCallback((element: HTMLElement) => {
-    const newRect = Rect.from(element)
-    if (!newRect) return
-
-    setRect(newRect)
-  }, [])
-
   useSizeObserver(targetRef, {
-    onResize: resizeHandler,
+    onResize: element => {
+      const newRect = Rect.from(element)
+      if (!newRect) return
+
+      setRect(newRect)
+    },
   })
 
   return rect.size
