@@ -10,17 +10,17 @@ export function useViewportSize(): Size {
   const [size, setSize] = useState<Size>(Size.make())
 
   useEffect(() => {
-    const resizeHandler = () => {
+    const handler = () => {
       const viewportSize = Rect.fromViewport().size
       setSize(viewportSize)
     }
 
-    window.addEventListener('resize', resizeHandler)
+    window.addEventListener('resize', handler)
 
-    resizeHandler()
+    handler()
 
     return () => {
-      window.removeEventListener('resize', resizeHandler)
+      window.removeEventListener('resize', handler)
     }
   }, [])
 
