@@ -1,14 +1,5 @@
-import { useCallback, useEffect } from 'react'
-
-/**
- * Type describing the parameters of {@link useVideoMetadataLoader}.
- */
-export type UseVideoMetadataLoaderParams = {
-  /**
-   * `src` attribute of the video.
-   */
-  src?: string
-}
+import { useEffect } from 'react'
+import { useLatest } from './useLatest.js'
 
 /**
  * Type describing the options of {@link useVideoMetadataLoader}.
@@ -39,39 +30,36 @@ export type UseVideoMetadataLoaderOptions = {
 /**
  * Hook for retrieving the size of a video.
  *
- * @param params See {@link UseVideoMetadataLoaderParams}.
+ * @param src Video source URL.
  * @param options See {@link UseVideoMetadataLoaderOptions}.
  */
-export function useVideoMetadataLoader({
-  src,
-}: UseVideoMetadataLoaderParams, {
+export function useVideoMetadataLoader(src?: string, {
   onLoadStart,
   onLoadComplete,
   onLoadError,
 }: UseVideoMetadataLoaderOptions = {}) {
-  const loadCompleteHandler = useCallback((event: Event) => {
-    const element = event.currentTarget as HTMLVideoElement
-
-    onLoadComplete?.(element)
-  }, [onLoadComplete])
-
-  const loadErrorHandler = useCallback((event: Event) => {
-    const element = event.currentTarget as HTMLVideoElement
-
-    onLoadError?.(element)
-  }, [onLoadError])
+  const loadStartHandlerRef = useLatest(onLoadStart)
+  const loadCompleteHandlerRef = useLatest(onLoadComplete)
+  const loadErrorHandlerRef = useLatest(onLoadError)
 
   useEffect(() => {
+    if (!src) return
+
     const video = document.createElement('video')
+
+    const loadCompleteHandler = () => loadCompleteHandlerRef.current?.(video)
+    const loadErrorHandler = () => loadErrorHandlerRef.current?.(video)
+
     video.addEventListener('loadedmetadata', loadCompleteHandler)
     video.addEventListener('error', loadErrorHandler)
-    if (src) video.src = src
+    video.src = src
 
-    onLoadStart?.(video)
+    loadStartHandlerRef.current?.(video)
 
     return () => {
       video.removeEventListener('loadedmetadata', loadCompleteHandler)
       video.removeEventListener('error', loadErrorHandler)
+      video.src = ''
     }
-  }, [src, onLoadStart])
+  }, [src])
 }

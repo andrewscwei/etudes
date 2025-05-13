@@ -133,7 +133,7 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video
 }, ref) => {
   const localRef = useRef<HTMLVideoElement>(null)
   const videoRef = ref as RefObject<HTMLVideoElement> ?? localRef
-  const size = useVideoSize({ src }, {
+  const size = useVideoSize(src, {
     onLoadStart: onLoadMetadata,
     onLoadComplete: onLoadMetadataComplete,
     onLoadError: onLoadMetadataError,
@@ -153,30 +153,31 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video
       }
     }
 
+    const handler = (_: Event) => {
+      const isFullscreen: boolean | undefined = (document as any).fullScreen || (document as any).mozFullScreen || (document as any).webkitIsFullScreen
+      if (isFullscreen === undefined) return
+
+      onFullscreenChange?.(isFullscreen)
+    }
+
     videoRef.current.muted = isMuted
     videoRef.current.load()
-    videoRef.current.addEventListener('webkitfullscreenchange', fullscreenChangeHandler)
-    videoRef.current.addEventListener('mozfullscreenchange', fullscreenChangeHandler)
-    videoRef.current.addEventListener('fullscreenchange', fullscreenChangeHandler)
+    videoRef.current.addEventListener('webkitfullscreenchange', handler)
+    videoRef.current.addEventListener('mozfullscreenchange', handler)
+    videoRef.current.addEventListener('fullscreenchange', handler)
 
     return () => {
       pause()
 
-      videoRef.current?.removeEventListener('webkitfullscreenchange', fullscreenChangeHandler)
-      videoRef.current?.removeEventListener('mozfullscreenchange', fullscreenChangeHandler)
-      videoRef.current?.removeEventListener('fullscreenchange', fullscreenChangeHandler)
+      videoRef.current?.removeEventListener('webkitfullscreenchange', handler)
+      videoRef.current?.removeEventListener('mozfullscreenchange', handler)
+      videoRef.current?.removeEventListener('fullscreenchange', handler)
     }
   }, [src])
 
   useEffect(() => {
     onSizeChange?.(size)
   }, [size])
-
-  const fullscreenChangeHandler = (_: Event) => {
-    const isFullscreen: boolean | undefined = (document as any).fullScreen || (document as any).mozFullScreen || (document as any).webkitIsFullScreen
-    if (isFullscreen === undefined) return
-    onFullscreenChange?.(isFullscreen)
-  }
 
   const canPlayHandler: ReactEventHandler<HTMLVideoElement> = event => {
     const el = event.currentTarget

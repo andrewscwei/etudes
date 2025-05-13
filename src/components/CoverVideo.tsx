@@ -53,11 +53,10 @@ export const CoverVideo = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Co
     onSizeChange?.(size)
   }
 
-  const localRef = useRef<HTMLDivElement>(null)
-  const rootRef = ref as RefObject<HTMLDivElement> ?? localRef
+  const rootRef = ref as RefObject<HTMLDivElement> ?? useRef<HTMLDivElement>(null)
+  const rootRect = useRect(rootRef)
   const [localAspectRatio, setLocalAspectRatio] = useState(NaN)
   const aspectRatio = isNaN(externalAspectRatio) ? localAspectRatio : externalAspectRatio
-  const rootRect = useRect(rootRef)
   const rootAspectRatio = rootRect.width / rootRect.height
   const videoSize = Size.make(
     rootAspectRatio > 1
