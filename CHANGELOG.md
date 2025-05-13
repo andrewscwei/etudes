@@ -1,3 +1,30 @@
+# [14.0.0](https://github.com/andrewscwei/etudes/compare/v13.1.0...v14.0.0) (2025-05-13)
+
+
+### Bug Fixes
+
+* Fix infinite render loop in useSize ([1c3c5ca](https://github.com/andrewscwei/etudes/commit/1c3c5ca8fef50dd8a79302acc4e1dcf1629eb0ab))
+
+
+### Code Refactoring
+
+* Refactor more hooks ([0bba0b3](https://github.com/andrewscwei/etudes/commit/0bba0b3495414af66fddfa4ff72160298e91efca))
+
+
+### Features
+
+* Add AccordionItem sub-component to Accordion ([3460676](https://github.com/andrewscwei/etudes/commit/3460676c0e1c6bc255b80f1f06c4adf855302e37))
+* Add CollectionItem sub-component to Collection ([9f8d5de](https://github.com/andrewscwei/etudes/commit/9f8d5def63a3fe9b6eeb30d87629510437357261))
+* Add support for DropdownItem sub-component ([f7c0b52](https://github.com/andrewscwei/etudes/commit/f7c0b52a069317cee53dfaca7e15d9da48f8a7e4))
+* Create useLatest ([713f731](https://github.com/andrewscwei/etudes/commit/713f7314e53c10947ecbe7872819d2c6f536d55e))
+* Print component names properly in asComponentDict ([28dd661](https://github.com/andrewscwei/etudes/commit/28dd6619a83e7efb24799a89a5df05d3b80d21ca))
+* Remove options in usePrevious ([651ae7f](https://github.com/andrewscwei/etudes/commit/651ae7fe9fab78fd692e4ded7727475c818e2244))
+
+
+### BREAKING CHANGES
+
+* useDragValue renamed to useIntertiaDragValue
+
 # [13.1.0](https://github.com/andrewscwei/etudes/compare/v13.0.0...v13.1.0) (2025-05-10)
 
 
