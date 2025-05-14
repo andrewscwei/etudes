@@ -3,10 +3,10 @@ import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttribut
 import { Rect } from 'spase'
 import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
 import { useRect } from '../hooks/useRect.js'
+import { Styled } from '../operators/Styled.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
-import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { createKey } from '../utils/createKey.js'
 import { styles } from '../utils/styles.js'
 
@@ -305,39 +305,49 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
       role='slider'
     >
       <div ref={bodyRef} style={fixedStyles.body}>
-        {cloneStyledElement(components.track ?? <StepSliderTrack/>, {
-          className: clsx(isInverted ? 'end' : 'start', fixedClassNames.track),
-          style: styles(fixedStyles.track, orientation === 'vertical' ? {
+        <Styled
+          className={clsx(isInverted ? 'end' : 'start', fixedClassNames.track)}
+          element={components.track ?? <StepSliderTrack/>}
+          style={styles(fixedStyles.track, orientation === 'vertical' ? {
             height: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
             top: '0',
           } : {
             left: '0',
             width: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
-          }),
-          onClick: trackClickHandler,
-        }, <div style={fixedStyles.trackHitBox}/>)}
-        {cloneStyledElement(components.track ?? <StepSliderTrack/>, {
-          className: clsx(isInverted ? 'start' : 'end', fixedClassNames.track),
-          style: styles(fixedStyles.track, orientation === 'vertical' ? {
+          })}
+          onClick={trackClickHandler}
+        >
+          <div style={fixedStyles.trackHitBox}/>
+        </Styled>
+        <Styled
+          className={clsx(isInverted ? 'start' : 'end', fixedClassNames.track)}
+          element={components.track ?? <StepSliderTrack/>}
+          style={styles(fixedStyles.track, orientation === 'vertical' ? {
             bottom: '0',
             height: `calc(${(_inverted(naturalPosition)) * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
           } : {
             right: '0',
             width: `calc(${(_inverted(naturalPosition)) * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
-          }),
-          onClick: trackClickHandler,
-        }, <div style={fixedStyles.trackHitBox}/>)}
-        {cloneStyledElement(components.knobContainer ?? <StepSliderKnobContainer/>, {
-          className: clsx(fixedClassNames.knobContainer),
-          style: styles(fixedStyles.knobContainer),
-          ref: knobContainerRef,
-        }, cloneStyledElement(components.knob ?? <StepSliderKnob/>, {
-          className: clsx(fixedClassNames.knob),
-          style: styles(fixedStyles.knob),
-        }, <div style={fixedStyles.knobHitBox}/>, steps && labelProvider && cloneStyledElement(components.label ?? <StepSliderLabel/>, {
-          className: clsx(fixedClassNames.label),
-          style: styles(fixedStyles.label),
-        }, labelProvider(position, _getNearestIndexByPosition(position, steps)))))}
+          })}
+          onClick={trackClickHandler}
+        >
+          <div style={fixedStyles.trackHitBox}/>
+        </Styled>
+        <Styled
+          ref={knobContainerRef}
+          className={clsx(fixedClassNames.knobContainer)}
+          element={components.knobContainer ?? <StepSliderKnobContainer/>}
+          style={styles(fixedStyles.knobContainer)}
+        >
+          <Styled className={clsx(fixedClassNames.knob)} element={components.knob ?? <StepSliderKnob/>} style={styles(fixedStyles.knob)}>
+            <div style={fixedStyles.knobHitBox}/>
+            {steps && labelProvider && (
+              <Styled className={clsx(fixedClassNames.label)} element={components.label ?? <StepSliderLabel/>} style={styles(fixedStyles.label)}>
+                {labelProvider(position, _getNearestIndexByPosition(position, steps))}
+              </Styled>
+            )}
+          </Styled>
+        </Styled>
       </div>
     </div>
   )

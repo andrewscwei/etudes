@@ -2,9 +2,9 @@ import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
 import { forwardRef, useEffect, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
 import { Each } from '../operators/Each.js'
+import { Styled } from '../operators/Styled.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
-import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { styles } from '../utils/styles.js'
 
 /**
@@ -362,18 +362,19 @@ export const Collection = /* #__PURE__ */ forwardRef(({
             )
           }
           else {
-            return cloneStyledElement(
-              components.item ?? <CollectionItem/>,
-              {
-                role,
-                selectionMode,
-                'aria-selected': isSelected,
-                'className': clsx({ selected: isSelected }),
-                'style': itemStyles,
-                'onClick': () => activateAt(idx),
-                onActivateAt,
-              },
-              <>{`${val}`}</>,
+            return (
+              <Styled
+                aria-selected={isSelected}
+                className={clsx({ selected: isSelected })}
+                element={components.item ?? <CollectionItem/>}
+                role={role}
+                selectionMode={selectionMode}
+                style={itemStyles}
+                onActivateAt={onActivateAt}
+                onClick={() => activateAt(idx)}
+              >
+                {`${val}`}
+              </Styled>
             )
           }
         }}

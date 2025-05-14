@@ -2,9 +2,9 @@ import clsx from 'clsx'
 import { forwardRef, useCallback, useRef, useState, type HTMLAttributes } from 'react'
 import { Rect, type Size } from 'spase'
 import { useRect } from '../hooks/useRect.js'
+import { Styled } from '../operators/Styled.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
-import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { styles } from '../utils/styles.js'
 import { Panorama, type PanoramaProps } from './Panorama.js'
 
@@ -142,24 +142,12 @@ export const PanoramaSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonl
       />
       <div style={fixedStyles.body}>
         <div style={fixedStyles.controls}>
-          {cloneStyledElement(components.track ?? <PanoramaSliderTrack/>, {
-            className: clsx({ dragging: isDragging }),
-            style: styles(fixedStyles.track),
-          })}
-          {cloneStyledElement(components.reticle ?? <PanoramaSliderReticle/>, {
-            className: clsx({ dragging: isDragging }),
-            style: styles(fixedStyles.reticle),
-          })}
-          {cloneStyledElement(components.track ?? <PanoramaSliderTrack/>, {
-            className: clsx({ dragging: isDragging }),
-            style: styles(fixedStyles.track),
-          })}
+          <Styled className={clsx({ dragging: isDragging })} element={components.track ?? <PanoramaSliderTrack/>} style={fixedStyles.track}/>
+          <Styled className={clsx({ dragging: isDragging })} element={components.reticle ?? <PanoramaSliderReticle/>} style={fixedStyles.reticle}/>
+          <Styled className={clsx({ dragging: isDragging })} element={components.track ?? <PanoramaSliderTrack/>} style={fixedStyles.track}/>
         </div>
       </div>
-      {cloneStyledElement(components.indicator ?? <PanoramaSliderIndicator/>, {
-        className: clsx({ dragging: isDragging }),
-        style: styles(fixedStyles.indicator),
-      })}
+      <Styled className={clsx({ dragging: isDragging })} element={components.indicator ?? <PanoramaSliderIndicator/>} style={fixedStyles.indicator}/>
     </div>
   )
 })

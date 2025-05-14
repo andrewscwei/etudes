@@ -1,7 +1,7 @@
 import { forwardRef, type HTMLAttributes, type SVGAttributes } from 'react'
+import { Styled } from '../operators/Styled.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
-import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { styles } from '../utils/styles.js'
 
 /**
@@ -78,23 +78,25 @@ export const Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<DialProp
     <div {...props} ref={ref} style={styles(style, fixedStyles.root)}>
       <div style={fixedStyles.trackContainer}>
         <svg height={diameter} style={fixedStyles.svgContainer} viewBox={`0 0 ${diameter} ${diameter}`} width={diameter}>
-          {cloneStyledElement(components.track ?? <DialTrack/>, {
-            cx: radius,
-            cy: radius,
-            fill: 'none',
-            r: radius - trackThickness / 2,
-            strokeDasharray: trackGap,
-            strokeWidth: trackThickness,
-          })}
+          <Styled
+            cx={radius}
+            cy={radius}
+            element={components.track ?? <DialTrack/>}
+            fill='none'
+            r={radius - trackThickness / 2}
+            strokeDasharray={trackGap}
+            strokeWidth={trackThickness}
+          />
         </svg>
       </div>
       <div style={styles(fixedStyles.knobContainer)}>
         <svg style={fixedStyles.svgContainer} viewBox={`0 0 ${diameter} ${diameter}`} xmlns='http://www.w3.org/2000/svg'>
-          {cloneStyledElement(components.knob ?? <DialKnob/>, {
-            d: _arcPath(radius, radius, radius - knobThickness / 2 - (trackThickness - knobThickness) / 2, -clampedKnobAngle / 2, clampedKnobAngle / 2),
-            fill: 'none',
-            strokeWidth: knobThickness,
-          })}
+          <Styled
+            d={_arcPath(radius, radius, radius - knobThickness / 2 - (trackThickness - knobThickness) / 2, -clampedKnobAngle / 2, clampedKnobAngle / 2)}
+            element={components.knob ?? <DialKnob/>}
+            fill='none'
+            strokeWidth={knobThickness}
+          />
         </svg>
       </div>
     </div>

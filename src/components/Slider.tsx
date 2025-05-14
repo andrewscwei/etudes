@@ -2,10 +2,10 @@ import clsx from 'clsx'
 import { forwardRef, useCallback, useEffect, useRef, type HTMLAttributes, type MouseEvent } from 'react'
 import { Rect } from 'spase'
 import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
+import { Styled } from '../operators/Styled.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
-import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { styles } from '../utils/styles.js'
 
 /**
@@ -239,41 +239,47 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
       role='slider'
     >
       <div ref={bodyRef} style={fixedStyles.body}>
-        {cloneStyledElement(components.track ?? <SliderTrack/>, {
-          className: clsx(isInverted ? 'end' : 'start', fixedClassNames.track),
-          style: styles(fixedStyles.track, orientation === 'vertical' ? {
+        <Styled
+          element={components.track ?? <SliderTrack/>}
+          style={styles(fixedStyles.track, orientation === 'vertical' ? {
             height: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
             top: '0',
           } : {
             left: '0',
             width: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
-          }),
-          onClick: trackClickHandler,
-        }, <div style={fixedStyles.trackHitBox}/>)}
-
-        {cloneStyledElement(components.track ?? <SliderTrack/>, {
-          className: clsx(isInverted ? 'start' : 'end', fixedClassNames.track),
-          style: styles(fixedStyles.track, orientation === 'vertical' ? {
+          })}
+          onClick={trackClickHandler}
+        >
+          <div style={fixedStyles.trackHitBox}/>
+        </Styled>
+        <Styled
+          element={components.track ?? <SliderTrack/>}
+          style={styles(fixedStyles.track, orientation === 'vertical' ? {
             bottom: '0',
             height: `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
           } : {
             right: '0',
             width: `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
-          }),
-          onClick: trackClickHandler,
-        }, <div style={fixedStyles.trackHitBox}/>)}
-
-        {cloneStyledElement(components.knobContainer ?? <SliderKnobContainer/>, {
-          className: clsx(fixedClassNames.knobContainer),
-          style: fixedStyles.knobContainer,
-          ref: knobContainerRef,
-        }, cloneStyledElement(components.knob ?? <SliderKnob/>, {
-          className: clsx(fixedClassNames.knob),
-          style: styles(fixedStyles.knob),
-        }, <div style={fixedStyles.knobHitBox}/>, labelProvider && cloneStyledElement(components.label ?? <SliderLabel/>, {
-          className: clsx(fixedClassNames.label),
-          style: styles(fixedStyles.label),
-        }, labelProvider(position))))}
+          })}
+          onClick={trackClickHandler}
+        >
+          <div style={fixedStyles.trackHitBox}/>
+        </Styled>
+        <Styled
+          ref={knobContainerRef}
+          className={clsx(fixedClassNames.knobContainer)}
+          element={components.knobContainer ?? <SliderKnobContainer/>}
+          style={fixedStyles.knobContainer}
+        >
+          <Styled className={clsx(fixedClassNames.knob)} element={components.knob ?? <SliderKnob/>} style={styles(fixedStyles.knob)}>
+            <div style={fixedStyles.knobHitBox}/>
+            {labelProvider && (
+              <Styled className={clsx(fixedClassNames.label)} element={components.label ?? <SliderLabel/>} style={styles(fixedStyles.label)}>
+                {labelProvider(position)}
+              </Styled>
+            )}
+          </Styled>
+        </Styled>
       </div>
     </div>
   )

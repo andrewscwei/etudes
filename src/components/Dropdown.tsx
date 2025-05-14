@@ -1,9 +1,9 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
 import { useRect } from '../hooks/useRect.js'
+import { Styled } from '../operators/Styled.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
-import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { styles } from '../utils/styles.js'
 import { Collection, CollectionItem, type CollectionItemProps, type CollectionLayout, type CollectionOrientation, type CollectionProps, type CollectionSelection } from './Collection.js'
 
@@ -249,41 +249,37 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
             onCustomEvent={(name, info) => onToggleCustomEvent?.(name, info)}
           />
         ) : (
-          cloneStyledElement(
-            components.toggle ?? <DropdownToggle/>,
-            {
-              'aria-haspopup': 'listbox',
-              'aria-expanded': !isCollapsed,
-              'style': styles(fixedStyles.toggle),
-              'onClick': toggleClickHandler,
-            },
-            <span dangerouslySetInnerHTML={{ __html: label?.(selection) ?? (selection.length > 0 ? selection.map(t => items[t]).join(', ') : '') }}/>,
-            isCollapsed ? components.collapseIcon ?? components.expandIcon : components.expandIcon,
-          )
+          <Styled
+            aria-expanded={!isCollapsed}
+            aria-haspopup='listbox'
+            element={components.toggle ?? <DropdownToggle/>}
+            style={styles(fixedStyles.toggle)}
+            onClick={toggleClickHandler}
+          >
+            <span dangerouslySetInnerHTML={{ __html: label?.(selection) ?? (selection.length > 0 ? selection.map(t => items[t]).join(', ') : '') }}/>
+            {isCollapsed ? components.collapseIcon ?? components.expandIcon : components.expandIcon}
+          </Styled>
         )}
-        {cloneStyledElement(
-          components.collection ?? <Collection items={items}/>,
-          {
-            isSelectionTogglable,
-            ItemComponent,
-            itemLength,
-            itemPadding,
-            items,
-            layout,
-            numSegments,
-            orientation,
-            selection,
-            selectionMode,
-            style: styles(fixedStyles.collection),
-            onActivateAt,
-            onDeselectAt,
-            onSelectAt: selectAtHandler,
-            onSelectionChange,
-          },
-          ...!ItemComponent ? [
-            cloneStyledElement(components.item ?? <DropdownItem/>),
-          ] : [],
-        )}
+        <Styled
+          element={components.collection ?? <DropdownCollection/>}
+          isSelectionTogglable={isSelectionTogglable}
+          ItemComponent={ItemComponent}
+          itemLength={itemLength}
+          itemPadding={itemPadding}
+          items={items}
+          layout={layout}
+          numSegments={numSegments}
+          orientation={orientation}
+          selection={selection}
+          selectionMode={selectionMode}
+          style={styles(fixedStyles.collection)}
+          onActivateAt={onActivateAt}
+          onDeselectAt={onDeselectAt}
+          onSelectAt={selectAtHandler}
+          onSelectionChange={onSelectionChange}
+        >
+          {!ItemComponent && (components.item ?? <DropdownItem/>)}
+        </Styled>
       </div>
     </div>
   )
@@ -405,9 +401,10 @@ function _getFixedStyles({ isCollapsed = true, isInverted = false, collectionPad
 }
 
 if (process.env.NODE_ENV !== 'production') {
-  (Dropdown as any).displayName = 'Dropdown'
-  DropdownToggle.displayName = 'DropdownToggle'
-  DropdownExpandIcon.displayName = 'DropdownExpandIcon'
+  (Dropdown as any).displayName = 'Dropdown';
+  (DropdownCollection as any).displayName = 'DropdownCollection'
   DropdownCollapseIcon.displayName = 'DropdownCollapseIcon'
+  DropdownExpandIcon.displayName = 'DropdownExpandIcon'
   DropdownItem.displayName = 'DropdownItem'
+  DropdownToggle.displayName = 'DropdownToggle'
 }

@@ -18,7 +18,7 @@ export function CounterDemo() {
       {({ allowsInput, min, max }, toast) => (
         <Counter
           allowsInput={allowsInput === 'true'}
-          className='text-dark relative gap-1 text-base'
+          className='text-dark relative gap-1 text-base w-48'
           max={Number(max)}
           min={Number(min)}
           quantity={quantity}
@@ -27,9 +27,9 @@ export function CounterDemo() {
             toast(`Quantity: ${t}`)
           }}
         >
-          <CounterTextField className='ia border/black h-9 w-40 border bg-transparent px-2 text-center outline-none'/>
-          <CounterSubtractButton className='ia border-dark size-9 border bg-transparent p-2'>-</CounterSubtractButton>
-          <CounterAddButton className='ia border-dark size-9 border bg-transparent p-2'>+</CounterAddButton>
+          <CounterTextField className='ia border/black border bg-transparent px-2 text-center outline-none'/>
+          <CounterSubtractButton className='ia border-dark w-9 border bg-transparent p-2'>-</CounterSubtractButton>
+          <CounterAddButton className='ia border-dark w-9 border bg-transparent p-2'>+</CounterAddButton>
         </Counter>
       )}
     </Frame>

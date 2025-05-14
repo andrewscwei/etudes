@@ -4,9 +4,9 @@ import { forwardRef, useRef, type ComponentType, type HTMLAttributes, type React
 import { useMounted } from '../hooks/useMounted.js'
 import { useSize } from '../hooks/useSize.js'
 import { Each } from '../operators/Each.js'
+import { Styled } from '../operators/Styled.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
-import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { styles } from '../utils/styles.js'
 import { Collection, CollectionItem, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection.js'
 import { type DropdownToggleProps } from './Dropdown.js'
@@ -241,6 +241,7 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
  * @exports AccordionHeader Component for each section header.
  * @exports AccordionExpandIcon Component for the expand icon of each section.
  * @exports AccordionCollapseIcon Component for the collapse icon of each
+ * @exports AccordionFoo Component for each section.
  * @exports AccordionItem Component for each item in each section.
  */
 export const Accordion = /* #__PURE__ */ forwardRef(({
@@ -370,6 +371,7 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
 
   const components = asComponentDict(children, {
     collapseIcon: AccordionCollapseIcon,
+    section: AccordionFoo,
     expandIcon: AccordionExpandIcon,
     header: AccordionHeader,
     item: AccordionItem,
@@ -379,7 +381,7 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
     <div {...props} ref={ref} style={styles(style, fixedStyles.root)}>
       <Each in={sections}>
         {(section, sectionIndex) => {
-          const { collectionPadding = 0, items, itemLength = 50, itemPadding = 0, isSelectionTogglable, layout = 'list', maxVisible = -1, numSegments = 1 } = section
+          const { collectionPadding = 0, items = [], itemLength = 50, itemPadding = 0, isSelectionTogglable, layout = 'list', maxVisible = -1, numSegments = 1 } = section
           const allVisible = layout === 'list' ? items.length : Math.ceil(items.length / numSegments)
           const numVisible = maxVisible < 0 ? allVisible : Math.min(allVisible, maxVisible)
           const maxLength = itemLength * numVisible + itemPadding * (numVisible - 1)
@@ -419,18 +421,17 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
                     onCustomEvent={(name, info) => onHeaderCustomEvent?.(sectionIndex, name, info)}
                   />
                 ) : (
-                  cloneStyledElement(
-                    components.header ?? <AccordionHeader/>,
-                    {
-                      'aria-expanded': !isCollapsed,
-                      'className': clsx({ collapsed: isCollapsed, expanded: !isCollapsed }),
-                      'style': styles(fixedStyles.header),
-                      'role': 'button',
-                      'onClick': () => toggleSectionAt(sectionIndex),
-                    },
-                    <span dangerouslySetInnerHTML={{ __html: section.label }}/>,
-                    isCollapsed ? components.collapseIcon ?? components.expandIcon : components.expandIcon,
-                  )
+                  <Styled
+                    aria-expanded={!isCollapsed}
+                    className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
+                    element={components.header ?? <AccordionHeader/>}
+                    role='button'
+                    style={styles(fixedStyles.header)}
+                    onClick={() => toggleSectionAt(sectionIndex)}
+                  >
+                    <span dangerouslySetInnerHTML={{ __html: section.label }}/>
+                    {isCollapsed ? components.collapseIcon ?? components.expandIcon : components.expandIcon}
+                  </Styled>
                 )}
               </div>
               <div
@@ -467,7 +468,7 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
                   onDeselectAt={itemIndex => handleDeselectAt(itemIndex, sectionIndex)}
                   onSelectAt={itemIndex => handleSelectAt(itemIndex, sectionIndex)}
                 >
-                  {!ItemComponent ? cloneStyledElement(components.item ?? <AccordionItem/>) : undefined}
+                  {!ItemComponent && (components.item ?? <AccordionItem/>)}
                 </Collection>
               </div>
             </div>
@@ -500,6 +501,13 @@ export const AccordionCollapseIcon = ({ children, ...props }: HTMLAttributes<HTM
 )
 
 /**
+ * Component for each section in an {@link Accordion}.
+ */
+export const AccordionFoo = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <div {...props}>{children}</div>
+)
+
+/**
  * Component for each item of each section of an {@link Accordion}.
  */
 export const AccordionItem = CollectionItem
@@ -514,7 +522,7 @@ function _isSectionIndexOutOfRange<T>(sectionIndex: number, sections: AccordionS
 function _isItemIndexOutOfRange<T>(itemIndex: number, sectionIndex: number, sections: AccordionSection<T>[]) {
   if (_isSectionIndexOutOfRange(sectionIndex, sections)) return true
 
-  const items = sections[sectionIndex].items
+  const items = sections[sectionIndex].items ?? []
 
   if (itemIndex >= items.length) return true
   if (itemIndex < 0) return true

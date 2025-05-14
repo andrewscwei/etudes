@@ -20,31 +20,29 @@ export function CollectionDemo() {
       usesMaxHeight={true}
       onReset={() => setCollectionSelection([])}
     >
-      {({ isSelectionTogglable, layout, orientation, selectionMode }, toast) => {
-        return (
-          <Collection
-            className={clsx('self-start', {
-              'w-full': orientation === 'vertical',
-              'h-full': orientation === 'horizontal',
-            })}
-            isSelectionTogglable={isSelectionTogglable === 'true'}
-            itemLength={orientation === 'vertical' ? 40 : 64}
-            itemPadding={12}
-            items={items}
-            layout={layout as CollectionLayout}
-            numSegments={3}
-            orientation={orientation as CollectionOrientation}
-            selection={collectionSelection}
-            selectionMode={selectionMode as CollectionSelectionMode}
-            onActivateAt={index => { if (selectionMode === 'none') toast(`<${Date.now()}>Activated Item ${index + 1}`) }}
-            onDeselectAt={index => toast(`<${Date.now()}>Deselected Item ${index + 1}`)}
-            onSelectAt={index => toast(`<${Date.now()}>Selected Item ${index + 1}`)}
-            onSelectionChange={(setCollectionSelection)}
-          >
-            <CollectionItem className='ia flex items-center justify-center border border-dark text-base selected:bg-dark selected:text-light'/>
-          </Collection>
-        )
-      }}
+      {({ isSelectionTogglable, layout, orientation, selectionMode }, toast) => (
+        <Collection
+          className={clsx('self-start', {
+            'w-full': orientation === 'vertical',
+            'h-full': orientation === 'horizontal',
+          })}
+          isSelectionTogglable={isSelectionTogglable === 'true'}
+          itemLength={orientation === 'vertical' ? 40 : 64}
+          itemPadding={12}
+          items={items}
+          layout={layout as CollectionLayout}
+          numSegments={3}
+          orientation={orientation as CollectionOrientation}
+          selection={collectionSelection}
+          selectionMode={selectionMode as CollectionSelectionMode}
+          onActivateAt={index => { if (selectionMode === 'none') toast(`<${Date.now()}>Activated Item ${index + 1}`) }}
+          onDeselectAt={index => toast(`<${Date.now()}>Deselected Item ${index + 1}`)}
+          onSelectAt={index => toast(`<${Date.now()}>Selected Item ${index + 1}`)}
+          onSelectionChange={(setCollectionSelection)}
+        >
+          <CollectionItem className='ia flex items-center justify-center border border-dark text-base selected:bg-dark selected:text-light'/>
+        </Collection>
+      )}
     </Frame>
   )
 }

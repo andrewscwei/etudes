@@ -4,9 +4,10 @@ import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttribut
 import { Rect } from 'spase'
 import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
 import { useRect } from '../hooks/useRect.js'
+import { Styled } from '../operators/Styled.js'
+import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
-import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { createKey } from '../utils/createKey.js'
 import { styles } from '../utils/styles.js'
 
@@ -124,8 +125,6 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
     label: RangeSliderLabel,
   })
 
-  const fixedStyles = _getFixedStyles({ orientation, highlightLength, start, knobPadding, knobWidth, knobHeight })
-
   const mapStartDragValueToValue = useCallback((value: number, dx: number, dy: number) => {
     const delta = orientation === 'horizontal' ? dx : dy
     const dMin = _getDisplacementByValue(minValue, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
@@ -153,6 +152,9 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
     initialValue: externalRange?.[1] ?? maxValue,
     transform: mapEndDragValueToValue,
   })
+
+  const fixedClassNames = _getFixedClassNames({ isDraggingEndKnob, isDraggingStartKnob, isReleasingEndKnob, isReleasingStartKnob })
+  const fixedStyles = _getFixedStyles({ orientation, highlightLength, start, knobPadding, knobWidth, knobHeight })
 
   useEffect(() => {
     setRange([startValue, endValue])
@@ -189,22 +191,14 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
       role='slider'
     >
       <div ref={bodyRef} style={fixedStyles.body}>
-        {cloneStyledElement(components.gutter ?? <RangeSliderGutter/>, {
-          style: styles(fixedStyles.gutter),
-        })}
-
-        {cloneStyledElement(components.highlight ?? <RangeSliderHighlight/>, {
-          style: styles(fixedStyles.highlight),
-        })}
-
-        {cloneStyledElement(components.knobContainer ?? <RangeSliderKnobContainer/>, {
-          className: clsx({
-            dragging: isDraggingStartKnob,
-            releasing: isReleasingStartKnob,
-          }),
-          disabled: isDeepEqual([startValue, endValue], [maxValue, maxValue]),
-          ref: startKnobContainerRef,
-          style: styles(fixedStyles.knobContainer, {
+        <Styled element={components.gutter ?? <RangeSliderGutter/>} style={styles(fixedStyles.gutter)}/>
+        <Styled element={components.highlight ?? <RangeSliderHighlight/>} style={styles(fixedStyles.highlight)}/>
+        <Styled
+          ref={startKnobContainerRef}
+          className={fixedClassNames.startKnobContainer}
+          disabled={isDeepEqual([startValue, endValue], [minValue, minValue])}
+          element={components.knobContainer ?? <RangeSliderKnobContainer/>}
+          style={styles(fixedStyles.knobContainer, {
             pointerEvents: isDeepEqual([startValue, endValue], [minValue, minValue]) ? 'none' : 'auto',
           }, orientation === 'horizontal' ? {
             left: `${start}px`,
@@ -212,28 +206,23 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
           } : {
             left: `${bodyRect.width * 0.5}px`,
             top: `${start}px`,
-          }),
-        }, cloneStyledElement(components.knob ?? <RangeSliderKnob/>, {
-          className: clsx({
-            dragging: isDraggingStartKnob,
-            releasing: isReleasingStartKnob,
-          }),
-          style: styles(fixedStyles.knob),
-        }, <div style={fixedStyles.knobHitBox}/>, components.label && cloneStyledElement(components.label, {
-          className: clsx({
-            dragging: isDraggingStartKnob,
-            releasing: isReleasingStartKnob,
-          }),
-          style: styles(fixedStyles.label),
-        }, Number(startValue.toFixed(decimalPlaces)).toLocaleString())))}
-
-        {cloneStyledElement(components.knobContainer ?? <RangeSliderKnobContainer/>, {
-          className: clsx({
-            dragging: isDraggingEndKnob,
-            releasing: isReleasingEndKnob,
-          }),
-          disabled: isDeepEqual([startValue, endValue], [maxValue, maxValue]),
-          style: styles(fixedStyles.knobContainer, {
+          })}
+        >
+          <Styled className={fixedClassNames.startKnob} element={components.knob ?? <RangeSliderKnob/>} style={styles(fixedStyles.knob)}>
+            <div style={fixedStyles.knobHitBox}/>
+            {components.label && (
+              <Styled className={fixedClassNames.startLabel} element={components.label ?? <RangeSliderLabel/>} style={styles(fixedStyles.label)}>
+                {Number(startValue.toFixed(decimalPlaces)).toLocaleString()}
+              </Styled>
+            )}
+          </Styled>
+        </Styled>
+        <Styled
+          ref={endKnobContainerRef}
+          className={fixedClassNames.endKnobContainer}
+          disabled={isDeepEqual([startValue, endValue], [maxValue, maxValue])}
+          element={components.knobContainer ?? <RangeSliderKnobContainer/>}
+          style={styles(fixedStyles.knobContainer, {
             pointerEvents: isDeepEqual([startValue, endValue], [maxValue, maxValue]) ? 'none' : 'auto',
           }, orientation === 'horizontal' ? {
             left: `${end}px`,
@@ -241,21 +230,17 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
           } : {
             left: `${bodyRect.width * 0.5}px`,
             top: `${end}px`,
-          }),
-          ref: endKnobContainerRef,
-        }, cloneStyledElement(components.knob ?? <RangeSliderKnob/>, {
-          className: clsx({
-            dragging: isDraggingEndKnob,
-            releasing: isReleasingEndKnob,
-          }),
-          style: styles(fixedStyles.knob),
-        }, <div style={fixedStyles.knobHitBox}/>, components.label && cloneStyledElement(components.label, {
-          className: clsx({
-            dragging: isDraggingEndKnob,
-            releasing: isReleasingEndKnob,
-          }),
-          style: styles(fixedStyles.label),
-        }, Number(endValue.toFixed(decimalPlaces)).toLocaleString())))}
+          })}
+        >
+          <Styled className={fixedClassNames.endKnob} element={components.knob ?? <RangeSliderKnob/>} style={styles(fixedStyles.knob)}>
+            <div style={fixedStyles.knobHitBox}/>
+            {components.label && (
+              <Styled className={fixedClassNames.endLabel} element={components.label ?? <RangeSliderLabel/>} style={styles(fixedStyles.label)}>
+                {Number(endValue.toFixed(decimalPlaces)).toLocaleString()}
+              </Styled>
+            )}
+          </Styled>
+        </Styled>
       </div>
     </div>
   )
@@ -295,6 +280,35 @@ export const RangeSliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) =>
 export const RangeSliderKnobContainer = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => (
   <button {...props}/>
 )
+
+function _getFixedClassNames({ isDraggingStartKnob = false, isReleasingStartKnob = false, isDraggingEndKnob = false, isReleasingEndKnob = false }) {
+  return asClassNameDict({
+    startKnobContainer: clsx({
+      dragging: isDraggingStartKnob,
+      releasing: isReleasingStartKnob,
+    }),
+    startKnob: clsx({
+      dragging: isDraggingStartKnob,
+      releasing: isReleasingStartKnob,
+    }),
+    startLabel: clsx({
+      dragging: isDraggingStartKnob,
+      releasing: isReleasingStartKnob,
+    }),
+    endKnobContainer: clsx({
+      dragging: isDraggingEndKnob,
+      releasing: isReleasingEndKnob,
+    }),
+    endKnob: clsx({
+      dragging: isDraggingEndKnob,
+      releasing: isReleasingEndKnob,
+    }),
+    endLabel: clsx({
+      dragging: isDraggingEndKnob,
+      releasing: isReleasingEndKnob,
+    }),
+  })
+}
 
 function _getFixedStyles({ orientation = 'horizontal', knobWidth = 0, knobHeight = 0, highlightLength = 0, start = 0, knobPadding = 0 }) {
   return asStyleDict({

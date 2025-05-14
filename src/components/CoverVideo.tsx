@@ -1,9 +1,9 @@
 import { forwardRef, useRef, useState, type HTMLAttributes, type RefObject } from 'react'
 import { Size } from 'spase'
 import { useRect } from '../hooks/useRect.js'
+import { Styled } from '../operators/Styled.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
-import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { styles } from '../utils/styles.js'
 import { Video, type VideoProps } from './Video.js'
 
@@ -102,13 +102,16 @@ export const CoverVideo = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Co
         onPlay={onPlay}
         onSizeChange={size => handleSizeChange(size)}
       />
-      {components.viewport && cloneStyledElement(components.viewport, {
-        style: styles(FIXED_STYLES.viewport, {
-          height: `${videoSize.height}px`,
-          pointerEvents: 'none',
-          width: `${videoSize.width}px`,
-        }),
-      })}
+      {components.viewport && (
+        <Styled
+          element={components.viewport}
+          style={styles(FIXED_STYLES.viewport, {
+            height: `${videoSize.height}px`,
+            pointerEvents: 'none',
+            width: `${videoSize.width}px`,
+          })}
+        />
+      )}
       {components.content}
     </div>
   )

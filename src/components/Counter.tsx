@@ -1,9 +1,9 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, useState, type HTMLAttributes } from 'react'
 import { usePrevious } from '../hooks/usePrevious.js'
+import { Styled } from '../operators/Styled.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
-import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { styles } from '../utils/styles.js'
 import { TextField, type TextFieldProps } from './TextField.js'
 
@@ -121,32 +121,26 @@ export const Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Count
 
   return (
     <div {...props} ref={ref} style={styles(style, FIXED_STYLES.root)}>
-      {cloneStyledElement(
-        components.subscribeButton ?? <CounterSubtractButton/>,
-        {
-          className: clsx({ disabled: isSubtractingDisabled }),
-          style: styles(FIXED_STYLES.subtract),
-          onClick: () => handleSubtract(),
-        },
-      )}
-      {cloneStyledElement(
-        components.textField ?? <CounterTextField/>,
-        {
-          isDisabled: !allowsInput,
-          style: styles(FIXED_STYLES.text),
-          value: text,
-          onChange: handleInputProgress,
-          onUnfocus: handleInputComplete,
-        },
-      )}
-      {cloneStyledElement(
-        components.addButton ?? <CounterAddButton/>,
-        {
-          className: clsx({ disabled: isAddingDisabled }),
-          style: styles(FIXED_STYLES.add),
-          onClick: () => handleAdd(),
-        },
-      )}
+      <Styled
+        className={clsx({ disabled: isSubtractingDisabled })}
+        element={components.subscribeButton ?? <CounterSubtractButton/>}
+        style={styles(FIXED_STYLES.subtract)}
+        onClick={() => handleSubtract()}
+      />
+      <Styled
+        element={components.textField ?? <CounterTextField/>}
+        isDisabled={!allowsInput}
+        style={styles(FIXED_STYLES.textField)}
+        value={text}
+        onChange={handleInputProgress}
+        onUnfocus={handleInputComplete}
+      />
+      <Styled
+        className={clsx({ disabled: isAddingDisabled })}
+        element={components.addButton ?? <CounterAddButton/>}
+        style={styles(FIXED_STYLES.add)}
+        onClick={() => handleAdd()}
+      />
     </div>
   )
 })
@@ -178,10 +172,10 @@ export const CounterSubtractButton = ({ children, ...props }: HTMLAttributes<HTM
 
 const FIXED_STYLES = asStyleDict({
   root: {
+    alignItems: 'stretch',
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'stretch',
+    justifyContent: 'stretch',
   },
   subtract: {
     flex: '0 0 auto',
@@ -189,14 +183,14 @@ const FIXED_STYLES = asStyleDict({
   add: {
     flex: '0 0 auto',
   },
-  text: {
-    flex: '1 1 auto',
+  textField: {
+    width: '100%',
   },
 })
 
 if (process.env.NODE_ENV !== 'production') {
   Counter.displayName = 'Counter'
-  CounterTextField.displayName = 'CounterTextField'
   CounterAddButton.displayName = 'CounterAddButton'
   CounterSubtractButton.displayName = 'CounterSubtractButton'
+  CounterTextField.displayName = 'CounterTextField'
 }

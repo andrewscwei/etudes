@@ -1,10 +1,10 @@
 import clsx from 'clsx'
 import { forwardRef, type HTMLAttributes } from 'react'
 import { Repeat } from '../operators/Repeat.js'
+import { Styled } from '../operators/Styled.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
-import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 import { styles } from '../utils/styles.js'
 
 /**
@@ -72,19 +72,22 @@ export const Burger = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Burger
         {j => (
           <div aria-hidden={true} style={styles(fixedStyles.section, (fixedStyles as any)[`section${j}`])}>
             <Repeat count={numberOfBars}>
-              {i => cloneStyledElement(components.bar ?? <BurgerBar/>, {
-                'aria-hidden': true,
-                'className': clsx(fixedClassNames.bar),
-                'style': (() => {
-                  switch (numberOfBars) {
-                    case 2:
-                      return styles(fixedStyles.bar, (fixedStyles as any)[`bar${j}${i === 0 ? 0 : 2}`])
-                    case 3:
-                    default:
-                      return styles(fixedStyles.bar, (fixedStyles as any)[`bar${j}${i}`])
-                  }
-                })(),
-              })}
+              {i => (
+                <Styled
+                  aria-hidden={true}
+                  className={clsx(fixedClassNames.bar)}
+                  element={components.bar ?? <BurgerBar/>}
+                  style={(() => {
+                    switch (numberOfBars) {
+                      case 2:
+                        return styles(fixedStyles.bar, (fixedStyles as any)[`bar${j}${i === 0 ? 0 : 2}`])
+                      case 3:
+                      default:
+                        return styles(fixedStyles.bar, (fixedStyles as any)[`bar${j}${i}`])
+                    }
+                  })()}
+                />
+              )}
             </Repeat>
           </div>
         )}
