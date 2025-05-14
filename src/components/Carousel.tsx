@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useEffect, useRef, useState, type ComponentType, type ForwardedRef, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactElement, type RefObject } from 'react'
 import { Point, Rect } from 'spase'
 import { useDrag } from '../hooks/useDrag.js'
-import { useTimeout } from '../hooks/useTimeout.js'
+import { useInterval } from '../hooks/useInterval.js'
 import { Each } from '../operators/Each.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { styles } from '../utils/styles.js'
@@ -154,7 +154,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
     }, autoScrollTimeoutMs)
   }, [viewportRef.current, index, orientation, autoScrollTimeoutMs])
 
-  const timeoutHandler = useCallback(() => {
+  const intervalHandler = useCallback(() => {
     const nextIndex = (index + items.length + 1) % items.length
 
     indexChangeHandler(nextIndex)
@@ -247,8 +247,8 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
     onDragMove: dragMoveHandler,
   })
 
-  useTimeout((isPointerDown || !shouldAutoAdvance) ? -1 : autoAdvanceInterval, {
-    onTimeout: timeoutHandler,
+  useInterval((isPointerDown || !shouldAutoAdvance) ? -1 : autoAdvanceInterval, {
+    onInterval: intervalHandler,
   })
 
   return (
