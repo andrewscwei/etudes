@@ -1,10 +1,10 @@
 import clsx from 'clsx'
-import { Accordion, AccordionExpandIcon, AccordionHeader, AccordionItem, FlatSVG, type AccordionSection, type AccordionSelection } from 'etudes'
+import { Accordion, AccordionExpandIcon, AccordionHeader, AccordionItem, AccordionSection, FlatSVG, type AccordionSectionProps, type AccordionSelection } from 'etudes'
 import { useState } from 'react'
 import $$ExpandIcon from '../assets/expand-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
 
-type Section = AccordionSection<string>
+type Section = AccordionSectionProps<string>
 
 export function AccordionDemo() {
   const [expandedSectionIndices, setExpandedSectionIndices] = useState<number[]>([])
@@ -48,8 +48,8 @@ export function AccordionDemo() {
           key={orientation}
           autoCollapseSections={autoCollapseSections === 'true'}
           className={clsx({
-            'self-start mx-auto w-44 *:transition-[height]': orientation === 'vertical',
-            'h-44 *:transition-[width]': orientation === 'horizontal',
+            'self-start mx-auto w-44': orientation === 'vertical',
+            'h-44': orientation === 'horizontal',
           })}
           expandedSectionIndices={expandedSectionIndices}
           orientation={orientation as any}
@@ -74,6 +74,12 @@ export function AccordionDemo() {
               svg={$$ExpandIcon}
             />
           </AccordionExpandIcon>
+          <AccordionSection
+            className={clsx({
+              'transition-[height]': orientation === 'vertical',
+              'transition-[width]': orientation === 'horizontal',
+            })}
+          />
           <AccordionItem className='ia selected:bg-dark selected:text-light border-dark flex items-center justify-start border px-3 text-base'/>
         </Accordion>
       )}

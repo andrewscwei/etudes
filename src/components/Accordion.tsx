@@ -23,7 +23,7 @@ export type AccordionSelection = Record<number, number[]>
 /**
  * Type describing the data of each section in {@link Accordion}.
  */
-export type AccordionSection<T> = Pick<CollectionProps<T>, 'isSelectionTogglable' | 'itemLength' | 'itemPadding' | 'items' | 'layout' | 'numSegments'> & {
+export type AccordionSectionProps<T> = Pick<CollectionProps<T>, 'isSelectionTogglable' | 'itemLength' | 'itemPadding' | 'items' | 'layout' | 'numSegments'> & {
   /**
    * Padding (in pixels) between the section header and the internal collection.
    */
@@ -52,7 +52,7 @@ export type AccordionItemProps<T> = CollectionItemProps<T>
  * Type describing the props of each `HeaderComponent` provided to
  * {@link Accordion}.
  */
-export type AccordionHeaderProps<I, S extends AccordionSection<I> = AccordionSection<I>> = HTMLAttributes<HTMLElement> & {
+export type AccordionHeaderProps<I, S extends AccordionSectionProps<I> = AccordionSectionProps<I>> = HTMLAttributes<HTMLElement> & {
   /**
    * The index of the corresponding section.
    */
@@ -80,7 +80,7 @@ export type AccordionHeaderProps<I, S extends AccordionSection<I> = AccordionSec
 /**
  * Type describing the props of {@link Accordion}.
  */
-export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I>> = HTMLAttributes<HTMLDivElement> & {
+export type AccordionProps<I, S extends AccordionSectionProps<I> = AccordionSectionProps<I>> = HTMLAttributes<HTMLDivElement> & {
   /**
    * Specifies if expanded sections should automatically collapse upon expanding
    * another section.
@@ -241,7 +241,7 @@ export type AccordionProps<I, S extends AccordionSection<I> = AccordionSection<I
  * @exports AccordionHeader Component for each section header.
  * @exports AccordionExpandIcon Component for the expand icon of each section.
  * @exports AccordionCollapseIcon Component for the collapse icon of each
- * @exports AccordionFoo Component for each section.
+ * @exports AccordionSection Component for each section.
  * @exports AccordionItem Component for each item in each section.
  */
 export const Accordion = /* #__PURE__ */ forwardRef(({
@@ -371,10 +371,10 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
 
   const components = asComponentDict(children, {
     collapseIcon: AccordionCollapseIcon,
-    section: AccordionFoo,
     expandIcon: AccordionExpandIcon,
     header: AccordionHeader,
     item: AccordionItem,
+    section: AccordionSection,
   })
 
   return (
@@ -389,7 +389,8 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
           const headerSize = sectionHeaderSizes[sectionIndex]
 
           return (
-            <div
+            <Styled
+              element={components.section ?? <AccordionSection/>}
               style={styles(fixedStyles.section, orientation === 'vertical' ? {
                 marginTop: sectionIndex === 0 ? '0px' : `${sectionPadding}px`,
                 ...headerSize.height > 0 ? {
@@ -471,13 +472,13 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
                   {!ItemComponent && (components.item ?? <AccordionItem/>)}
                 </Collection>
               </div>
-            </div>
+            </Styled>
           )
         }}
       </Each>
     </div>
   )
-}) as <I, S extends AccordionSection<I> = AccordionSection<I>>(props: Readonly<AccordionProps<I, S> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
+}) as <I, S extends AccordionSectionProps<I> = AccordionSectionProps<I>>(props: Readonly<AccordionProps<I, S> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
 
 /**
  * Component for each section header of an {@link Accordion}.
@@ -503,7 +504,7 @@ export const AccordionCollapseIcon = ({ children, ...props }: HTMLAttributes<HTM
 /**
  * Component for each section in an {@link Accordion}.
  */
-export const AccordionFoo = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+export const AccordionSection = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}>{children}</div>
 )
 
@@ -512,14 +513,14 @@ export const AccordionFoo = ({ children, ...props }: HTMLAttributes<HTMLDivEleme
  */
 export const AccordionItem = CollectionItem
 
-function _isSectionIndexOutOfRange<T>(sectionIndex: number, sections: AccordionSection<T>[]) {
+function _isSectionIndexOutOfRange<T>(sectionIndex: number, sections: AccordionSectionProps<T>[]) {
   if (sectionIndex >= sections.length) return true
   if (sectionIndex < 0) return true
 
   return false
 }
 
-function _isItemIndexOutOfRange<T>(itemIndex: number, sectionIndex: number, sections: AccordionSection<T>[]) {
+function _isItemIndexOutOfRange<T>(itemIndex: number, sectionIndex: number, sections: AccordionSectionProps<T>[]) {
   if (_isSectionIndexOutOfRange(sectionIndex, sections)) return true
 
   const items = sections[sectionIndex].items ?? []
@@ -530,11 +531,11 @@ function _isItemIndexOutOfRange<T>(itemIndex: number, sectionIndex: number, sect
   return false
 }
 
-function _sanitizeExpandedSectionIndices<T>(sectionIndices: number[], sections: AccordionSection<T>[]) {
+function _sanitizeExpandedSectionIndices<T>(sectionIndices: number[], sections: AccordionSectionProps<T>[]) {
   return _sortIndices(sectionIndices).filter(t => !_isSectionIndexOutOfRange(t, sections))
 }
 
-function _sanitizeSelection<T>(selection: AccordionSelection, sections: AccordionSection<T>[]) {
+function _sanitizeSelection<T>(selection: AccordionSelection, sections: AccordionSectionProps<T>[]) {
   const newValue: AccordionSelection = {}
 
   for (const sectionIndex in sections) {
