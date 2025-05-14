@@ -92,7 +92,7 @@ export type CollectionProps<T> = HTMLAttributes<HTMLDivElement> & {
   /**
    * Generically typed data of each item.
    */
-  items: T[]
+  items?: T[]
 
   /**
    * Specifies the layout appearance of this component.
@@ -209,7 +209,7 @@ export const Collection = /* #__PURE__ */ forwardRef(({
   isSelectionTogglable = false,
   itemLength,
   itemPadding = 0,
-  items,
+  items = [],
   layout = 'list',
   numSegments = 1,
   orientation = 'vertical',

@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { Dropdown, DropdownExpandIcon, DropdownItem, DropdownToggle, FlatSVG, type DropdownSelection } from 'etudes'
+import { Dropdown, DropdownCollection, DropdownExpandIcon, DropdownItem, DropdownToggle, FlatSVG, type DropdownSelection } from 'etudes'
 import { useState } from 'react'
 import $$ExpandIcon from '../assets/expand-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
@@ -31,8 +31,8 @@ export function DropdownDemo() {
           className={clsx('relative text-base', {
             'mb-24': orientation === 'vertical' && isInverted === 'false',
             'mt-24': orientation === 'vertical' && isInverted === 'true',
-            'h-24 w-32 [&_[role=grid]]:transition-[width] [&_[role=listbox]]:transition-[width]': orientation === 'horizontal',
-            'h-9 w-44 [&_[role=grid]]:transition-[height] [&_[role=listbox]]:transition-[height]': orientation === 'vertical',
+            'h-24 w-32': orientation === 'horizontal',
+            'h-9 w-44': orientation === 'vertical',
           })}
           collapsesOnSelect={collapsesOnSelect === 'true'}
           isCollapsed={isCollapsed}
@@ -72,6 +72,12 @@ export function DropdownDemo() {
               svg={$$ExpandIcon}
             />
           </DropdownExpandIcon>
+          <DropdownCollection
+            className={clsx({
+              'transition-[width]': orientation === 'horizontal',
+              'transition-[height]': orientation === 'vertical',
+            })}
+          />
           <DropdownItem className='ia selected:bg-dark selected:text-light border-dark flex items-center justify-start border px-3'/>
         </Dropdown>
       )}

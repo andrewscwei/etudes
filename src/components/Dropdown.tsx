@@ -108,10 +108,11 @@ export type DropdownProps<T> = HTMLAttributes<HTMLDivElement> & CollectionProps<
  * supports both horizontal and vertical orientations. Provide `items` and
  * `ItemComponent` props to populate.
  *
- * @exports DropdownToggle Component for the toggle button.
- * @exports DropdownExpandIcon Component for the expand icon.
- * @exports DropdownCollapseIcon Component for the collapse icon.
+ * @exports DropdownCollection Component containing the items.
  * @exports DropdownItem Component for each item.
+ * @exports DropdownToggle Component for the toggle button.
+ * @exports DropdownCollapseIcon Component for the collapse icon.
+ * @exports DropdownExpandIcon Component for the expand icon.
  */
 export const Dropdown = /* #__PURE__ */ forwardRef(({
   children,
@@ -126,7 +127,7 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
   isSelectionTogglable = false,
   itemLength: externalItemLength,
   itemPadding = 0,
-  items,
+  items = [],
   maxVisibleItems = -1,
   numSegments = 1,
   orientation = 'vertical',
@@ -157,9 +158,10 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
 
   const components = asComponentDict(children, {
     collapseIcon: DropdownCollapseIcon,
+    collection: DropdownCollection,
     expandIcon: DropdownExpandIcon,
-    toggle: DropdownToggle,
     item: DropdownItem,
+    toggle: DropdownToggle,
   })
 
   const expand = () => {
@@ -259,42 +261,49 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
             isCollapsed ? components.collapseIcon ?? components.expandIcon : components.expandIcon,
           )
         )}
-        <Collection
-          isSelectionTogglable={isSelectionTogglable}
-          ItemComponent={ItemComponent}
-          itemLength={itemLength}
-          itemPadding={itemPadding}
-          items={items}
-          layout={layout}
-          numSegments={numSegments}
-          orientation={orientation}
-          selection={selection}
-          selectionMode={selectionMode}
-          style={styles(fixedStyles.collection)}
-          onActivateAt={onActivateAt}
-          onDeselectAt={onDeselectAt}
-          onSelectAt={selectAtHandler}
-          onSelectionChange={onSelectionChange}
-        >
-          {!ItemComponent ? cloneStyledElement(components.item ?? <DropdownItem/>) : undefined}
-        </Collection>
+        {cloneStyledElement(
+          components.collection ?? <Collection items={items}/>,
+          {
+            isSelectionTogglable,
+            ItemComponent,
+            itemLength,
+            itemPadding,
+            items,
+            layout,
+            numSegments,
+            orientation,
+            selection,
+            selectionMode,
+            style: styles(fixedStyles.collection),
+            onActivateAt,
+            onDeselectAt,
+            onSelectAt: selectAtHandler,
+            onSelectionChange,
+          },
+          ...!ItemComponent ? [
+            cloneStyledElement(components.item ?? <DropdownItem/>),
+          ] : [],
+        )}
       </div>
     </div>
   )
 }) as <T>(props: Readonly<DropdownProps<T> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
 
 /**
+ * Component containing the items in a {@link Dropdown}.
+ */
+export const DropdownCollection = Collection
+
+/**
+ * Component for each item in a {@link Dropdown}.
+ */
+export const DropdownItem = CollectionItem
+
+/**
  * Component for the toggle button of a {@link Dropdown}.
  */
 export const DropdownToggle = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & DropdownToggleProps) => (
   <button {...props}>{children}</button>
-)
-
-/**
- * Component for the expand icon of a {@link Dropdown}.
- */
-export const DropdownExpandIcon = ({ children, style, ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <figure {...props} aria-hidden={true} style={styles(style, { pointerEvents: 'none' })}>{children}</figure>
 )
 
 /**
@@ -305,9 +314,11 @@ export const DropdownCollapseIcon = ({ children, style, ...props }: HTMLAttribut
 )
 
 /**
- * Component for each item in a {@link Dropdown}.
+ * Component for the expand icon of a {@link Dropdown}.
  */
-export const DropdownItem = CollectionItem
+export const DropdownExpandIcon = ({ children, style, ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <figure {...props} aria-hidden={true} style={styles(style, { pointerEvents: 'none' })}>{children}</figure>
+)
 
 function _isIndexOutOfRange<T>(index: number, items: T[]) {
   if (isNaN(index)) return true
