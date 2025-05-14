@@ -50,12 +50,25 @@ export function Switch<T>({
 }: SwitchProps<T>) {
   const childrenArray = Children.toArray(children)
 
-  if (childrenArray.length === 0) throw Error('`Switch` must have at least one child')
-  if (!childrenIsValidElement<T>(childrenArray)) throw Error('`Switch` children must be of `Case` type or `Default` type')
+  if (childrenArray.length === 0) {
+    console.error('[etudes::Switch] `Switch` must have at least one child')
+
+    return (<></>)
+  }
+
+  if (!childrenIsValidElement<T>(childrenArray)) {
+    console.error('[etudes::Switch] `Switch` children must be of `Case` type or `Default` type')
+
+    return (<></>)
+  }
 
   const defaultChildren = childrenArray.filter(child => child.type === Default)
 
-  if (defaultChildren.length > 1) throw Error('`Switch` can only have maximum one `Default` child')
+  if (defaultChildren.length > 1) {
+    console.error('[etudes::Switch] `Switch` can only have maximum one `Default` child')
+
+    return (<></>)
+  }
 
   const defaultChild = defaultChildren[0]
 

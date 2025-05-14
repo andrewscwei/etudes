@@ -162,7 +162,9 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
         return normalizedPosition
       }
       default:
-        throw Error(`Invalid orientation: ${orientation}`)
+        console.error(`[etudes::Slider] Invalid orientation: ${orientation}`)
+
+        return NaN
     }
   }, [bodyRef.current, isClipped, isInverted, knobWidth, knobHeight, orientation])
 
@@ -186,7 +188,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
         break
       }
       default:
-        throw Error(`Invalid orientation: ${orientation}`)
+        console.error(`[etudes::Slider] Invalid orientation: ${orientation}`)
     }
   }, [bodyRef.current, isInverted, isTrackInteractive, orientation])
 

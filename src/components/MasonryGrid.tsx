@@ -70,7 +70,11 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
     const nodes = rootNode.children
     const numSections = sections
 
-    if (numSections <= 0) throw Error('You must specify a minimum of 1 section(s) (a.k.a. row(s) for horizontal orientation, column(s) for vertical orientation) for a MasonryGrid instance')
+    if (numSections <= 0) {
+      console.error('[etudes::MasonryGrid] You must specify a minimum of 1 section(s) (a.k.a. row(s) for horizontal orientation, column(s) for vertical orientation) for a MasonryGrid instance')
+
+      return
+    }
 
     if (orientation === 'vertical') {
       const sectionHeights: number[] = [...new Array(numSections)].map(() => 0)

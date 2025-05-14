@@ -179,7 +179,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
 
         break
       default:
-        throw Error(`Unsupported orientation '${orientation}'`)
+        console.error(`[etudes::Carousel] Unsupported orientation: ${orientation}`)
     }
   }, [orientation, viewportRef.current])
 
@@ -319,7 +319,8 @@ function _getItemExposureAt(idx: number, ref: RefObject<HTMLDivElement | null>, 
     case 'vertical':
       return Math.max(0, Math.min(1, Math.round((intersection.height / viewport.clientHeight + Number.EPSILON) * 1000) / 1000))
     default:
-      throw Error(`Unsupported orientation '${orientation}'`)
+      console.error(`[etudes::Carousel] Unsupported orientation: ${orientation}`)
+      return NaN
   }
 }
 

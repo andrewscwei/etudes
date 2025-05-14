@@ -369,7 +369,9 @@ function _getPositionByDisplacement(displacement: number, orientation: RangeSlid
       return (displacement - (isClipped ? knobHeight * 0.5 : 0)) / maxHeight
     }
     default:
-      throw Error(`Invalid orientation: ${orientation}`)
+      console.error(`[etudes::RangeSlider] Invalid orientation: ${orientation}`)
+
+      return NaN
   }
 }
 
@@ -394,7 +396,9 @@ function _getDisplacementByPosition(position: number, orientation: RangeSliderOr
       return position * maxHeight + (isClipped ? knobHeight * 0.5 : 0)
     }
     default:
-      throw Error(`Invalid orientation: ${orientation}`)
+      console.error(`[etudes::RangeSlider] Invalid orientation: ${orientation}`)
+
+      return NaN
   }
 }
 

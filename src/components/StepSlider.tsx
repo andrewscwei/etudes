@@ -194,7 +194,9 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
         return normalizedPosition
       }
       default:
-        throw Error(`Invalid orientation: ${orientation}`)
+        console.error(`[etudes::StepSlider] Invalid orientation: ${orientation}`)
+
+        return NaN
     }
   }, [rect.width, rect.height, isClipped, isInverted, knobWidth, knobHeight, orientation])
 
@@ -246,7 +248,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
         break
       }
       default:
-        throw Error(`Invalid orientation: ${orientation}`)
+        console.error(`[etudes::StepSlider] Invalid orientation: ${orientation}`)
     }
   }, [rect.width, rect.height, position, isInverted, isTrackInteractive, orientation, createKey(steps)])
 
@@ -378,8 +380,17 @@ export const StepSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) =>
  * @returns An array of steps.
  */
 export function generateSteps(length: number): readonly number[] {
-  if (length <= 1) throw Error('`length` value must be greater than or equal to 2')
-  if (Math.round(length) !== length) throw Error('`length` value must be an integer')
+  if (length <= 1) {
+    console.error('[etudes::StepSlider] `length` value must be greater than or equal to 2')
+
+    return []
+  }
+
+  if (Math.round(length) !== length) {
+    console.error('[etudes::StepSlider] `length` value must be an integer')
+
+    return []
+  }
 
   const interval = 1 / (length - 1)
 

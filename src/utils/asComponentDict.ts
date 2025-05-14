@@ -20,7 +20,7 @@ export function asComponentDict<T extends ComponentTypeDict>(children?: ReactNod
 
   Children.forEach(children, child => {
     if (!isValidElement(child)) {
-      console.error('[asComponentDict] Invalid child detected')
+      console.error('[etudes::asComponentDict] Invalid child detected')
 
       return
     }
@@ -28,7 +28,7 @@ export function asComponentDict<T extends ComponentTypeDict>(children?: ReactNod
     const index = types.indexOf(child.type as any)
 
     if (index < 0) {
-      console.error(`[asComponentDict] Unsupported child, only the following children are allowed: ${types.map(type => (type as any).displayName ?? type.name).join(', ')}`)
+      console.error(`[etudes::asComponentDict] Unsupported child, only the following children are allowed: ${types.map(type => (type as any).displayName ?? type.name).join(', ')}`)
 
       return
     }
@@ -36,7 +36,7 @@ export function asComponentDict<T extends ComponentTypeDict>(children?: ReactNod
     const key = keys[index]
 
     if (components[key]) {
-      console.error(`[asComponentDict] Only one ${types[index]} can be provided as a child`)
+      console.error(`[etudes::asComponentDict] Only one ${types[index]} can be provided as a child`)
 
       return
     }

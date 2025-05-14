@@ -105,36 +105,58 @@ export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<Image
   ...props
 }, ref) => {
   const srcSetValue = srcSet?.map(({ pixelDensity, src, width }) => {
-    if (sizes && width === undefined) throw Error('`width` must be specified if `sizes` is specified')
-    if (width !== undefined && pixelDensity !== undefined) throw Error('Only one of `width` or `pixelDensity` can be specified.')
+    if (sizes && width === undefined) {
+      console.error('[etudes::Image] `width` must be specified if `sizes` is specified')
+
+      return undefined
+    }
+
+    if (width !== undefined && pixelDensity !== undefined) {
+      console.error('[etudes::Image] Only one of `width` or `pixelDensity` can be specified')
+
+      return undefined
+    }
 
     let t = src
 
     if (width !== undefined) {
       const w = Math.floor(width)
 
-      if (!isFinite(w) || String(w) !== String(width) || w <= 0) throw Error('The specified width must be a positive integer greater than 0')
+      if (!isFinite(w) || String(w) !== String(width) || w <= 0) {
+        console.error('[etudes::Image] The specified width must be a positive integer greater than 0')
+
+        return undefined
+      }
 
       t += ` ${w}w`
     }
     else if (pixelDensity !== undefined) {
-      if (!isFinite(pixelDensity) || pixelDensity <= 0) throw Error('The specified pixel density must be a positive floating number than 0')
+      if (!isFinite(pixelDensity) || pixelDensity <= 0) {
+        console.error('[etudes::Image] The specified pixel density must be a positive floating number than 0')
+
+        return undefined
+      }
 
       t += ` ${pixelDensity}x`
     }
 
     return t
-  }).join(', ')
+  }).filter(Boolean).join(', ')
 
   const sizesValue = sizes?.map(({ mediaCondition, width }, idx) => {
     const isLast = idx === sizes.length - 1
     let t = width
 
-    if (isLast && mediaCondition) throw Error('The last item in `sizes` must not have a `mediaCondition` specified.')
+    if (isLast && mediaCondition) {
+      console.error('[etudes::Image] The last item in `sizes` must not have a `mediaCondition` specified')
+
+      return undefined
+    }
+
     if (mediaCondition) t = `${mediaCondition} ${t}`
 
     return t
-  }).join(', ')
+  }).filter(Boolean).join(', ')
 
   const size = useImageSize({
     src: fallbackSrc,

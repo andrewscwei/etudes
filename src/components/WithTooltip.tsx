@@ -226,7 +226,10 @@ function _makeDialogStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialo
       top: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
       transform: `translate(${dialogWidth > targetWidth ? '0' : '-50%'}, 0)`,
     }
-    default: throw Error(`Invalid alignment: ${alignment}`)
+    default:
+      console.error(`[etudes::WithTooltip] Invalid alignment: ${alignment}`)
+
+      return {}
   }
 }
 
@@ -301,7 +304,10 @@ function _makeArrowStyle({ alignment, arrowSize, fullDialogWidth, maxDialogWidth
       transform: `translate(${shouldRealign ? '-50%' : '0'}, -100%)`,
       width: `${arrowSize.width}px`,
     }
-    default: throw Error(`Invalid alignment: ${alignment}`)
+    default:
+      console.error(`[etudes::WithTooltip] Invalid alignment: ${alignment}`)
+
+      return {}
   }
 }
 

@@ -106,7 +106,11 @@ export function Button(props: Readonly<ButtonProps>) {
       )
     }
     default:
-      throw Error('Unknown button type')
+      console.error('[etudes::Button] Unknown button type')
+
+      return (
+        <></>
+      )
   }
 }
 
