@@ -378,8 +378,8 @@ export const StepSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) =>
  * @returns An array of steps.
  */
 export function generateSteps(length: number): readonly number[] {
-  if (length <= 1) throw new Error('`length` value must be greater than or equal to 2')
-  if (Math.round(length) !== length) throw new Error('`length` value must be an integer')
+  if (length <= 1) throw Error('`length` value must be greater than or equal to 2')
+  if (Math.round(length) !== length) throw Error('`length` value must be an integer')
 
   const interval = 1 / (length - 1)
 
