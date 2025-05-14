@@ -360,6 +360,7 @@ function _getFixedStyles({ isCollapsed = true, isInverted = false, collectionPad
     },
     body: {
       height: '100%',
+      position: 'relative',
       width: '100%',
     },
     toggle: {
