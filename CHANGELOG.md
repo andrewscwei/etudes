@@ -1,3 +1,10 @@
+## [14.4.1](https://github.com/andrewscwei/etudes/compare/v14.4.0...v14.4.1) (2025-05-14)
+
+
+### Bug Fixes
+
+* Fix position in Dropdown body ([c4d86b0](https://github.com/andrewscwei/etudes/commit/c4d86b0c39f1786a3a6ac3bfe2d329251cacf3b1))
+
 # [14.4.0](https://github.com/andrewscwei/etudes/compare/v14.3.0...v14.4.0) (2025-05-14)
 
 
