@@ -19,13 +19,27 @@ export function asComponentDict<T extends ComponentTypeDict>(children?: ReactNod
   const components: Partial<ComponentElementDict<T>> = {}
 
   Children.forEach(children, child => {
-    if (!isValidElement(child)) throw Error('Invalid child detected')
+    if (!isValidElement(child)) {
+      console.error('[asComponentDict] Invalid child detected')
+
+      return
+    }
 
     const index = types.indexOf(child.type as any)
-    if (index < 0) throw Error(`Unsupported child, only the following children are allowed: ${types.map(type => (type as any).displayName ?? type.name).join(', ')}`)
+
+    if (index < 0) {
+      console.error(`[asComponentDict] Unsupported child, only the following children are allowed: ${types.map(type => (type as any).displayName ?? type.name).join(', ')}`)
+
+      return
+    }
 
     const key = keys[index]
-    if (components[key]) throw Error(`Only one ${types[index]} can be provided as a child`)
+
+    if (components[key]) {
+      console.error(`[asComponentDict] Only one ${types[index]} can be provided as a child`)
+
+      return
+    }
 
     components[key] = child
   })
