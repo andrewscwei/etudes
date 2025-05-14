@@ -1,3 +1,19 @@
+# [14.4.0](https://github.com/andrewscwei/etudes/compare/v14.3.0...v14.4.0) (2025-05-14)
+
+
+### Bug Fixes
+
+* Fix Carousel not auto advancing ([94f149d](https://github.com/andrewscwei/etudes/commit/94f149d6b4d985d1563171b5dfa8750736fd34e3))
+
+
+### Features
+
+* Create Styled operator ([e9e22ad](https://github.com/andrewscwei/etudes/commit/e9e22ad7ed8eaabf0e9905b3fe4cd3e3df17c71b))
+* Export AccordionSection for styling ([776adc5](https://github.com/andrewscwei/etudes/commit/776adc57182f0ac59019bb5cb4734f5c295593e8))
+* Export DropdownCollection ([02654f3](https://github.com/andrewscwei/etudes/commit/02654f34a6fd149bd3c9b2fb79c78e5f9506add0))
+* Gracefully handle errors ([b1fc3e2](https://github.com/andrewscwei/etudes/commit/b1fc3e278d0886f25fe1e6fb7c45c25cf8b9cd9b))
+* Instead of throwing an error in asComponentDict, gracefully ignore unsupported children ([a028176](https://github.com/andrewscwei/etudes/commit/a02817605b01e404ec44dea4296c3d01d3485d96))
+
 # [14.3.0](https://github.com/andrewscwei/etudes/compare/v14.2.0...v14.3.0) (2025-05-13)
 
 
