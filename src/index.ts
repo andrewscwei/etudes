@@ -21,6 +21,7 @@ export * from './components/Slider.js'
 export * from './components/StepSlider.js'
 export * from './components/SwipeRegion.js'
 export * from './components/TextField.js'
+export * from './components/Toggle.js'
 export * from './components/Video.js'
 export * from './components/WithTooltip.js'
 

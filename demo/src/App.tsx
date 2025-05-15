@@ -23,6 +23,7 @@ import { SliderDemo } from './demos/SliderDemo.js'
 import { StepSliderDemo } from './demos/StepSliderDemo.js'
 import { SwipeContainerDemo } from './demos/SwipeRegionDemo.js'
 import { TextFieldDemo } from './demos/TextFieldDemo.js'
+import { ToggleDemo } from './demos/ToggleDemo.js'
 import { VideoDemo } from './demos/VideoDemo.js'
 import { WithTooltipDemo } from './demos/WithTooltipDemo.js'
 
@@ -56,6 +57,7 @@ export function App() {
         <StepSliderDemo/>
         <SwipeContainerDemo/>
         <TextFieldDemo/>
+        <ToggleDemo/>
         <VideoDemo/>
         <WithTooltipDemo/>
       </main>
