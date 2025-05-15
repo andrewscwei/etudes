@@ -1,3 +1,11 @@
+# [14.6.0](https://github.com/andrewscwei/etudes/compare/v14.5.0...v14.6.0) (2025-05-15)
+
+
+### Features
+
+* Add TextArea component ([97d0796](https://github.com/andrewscwei/etudes/commit/97d07960de6ae6e48935b8716e5afcf152c7de4c))
+* Create Select component ([ced3d45](https://github.com/andrewscwei/etudes/commit/ced3d451acc1a810159593357d1db5b68da1a3fb))
+
 # [14.5.0](https://github.com/andrewscwei/etudes/compare/v14.4.1...v14.5.0) (2025-05-15)
 
 
