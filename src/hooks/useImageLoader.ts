@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import { useLatest } from './useLatest.js'
 
 /**
@@ -67,7 +67,7 @@ export function useImageLoader({
   const loadCompleteHandlerRef = useLatest(onLoadComplete)
   const loadErrorHandlerRef = useLatest(onLoadError)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const imageLoadCompleteHandler = (event: Event) => {
       const element = event.currentTarget as HTMLImageElement
 

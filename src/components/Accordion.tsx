@@ -1,7 +1,6 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
 import { forwardRef, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref, type RefObject } from 'react'
-import { useMounted } from '../hooks/useMounted.js'
 import { useSize } from '../hooks/useSize.js'
 import { Each } from '../operators/Each.js'
 import { Styled } from '../operators/Styled.js'
@@ -267,7 +266,6 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
   ItemComponent,
   ...props
 }, ref) => {
-  const isMounted = useMounted()
   const selection = _sanitizeSelection(externalSelection ?? {}, sections)
   const expandedSectionIndices = _sanitizeExpandedSectionIndices(externalExpandedSectionIndices ?? [], sections)
   const fixedStyles = _getFixedStyles({ orientation })
@@ -395,14 +393,16 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
                 marginTop: sectionIndex === 0 ? '0px' : `${sectionPadding}px`,
                 ...headerSize.height > 0 ? {
                   height: isCollapsed ? `${headerSize.height}px` : `${maxLength + headerSize.height + collectionPadding}px`,
-                } : {},
+                } : {
+                  visibility: 'hidden',
+                },
               } : {
                 marginLeft: sectionIndex === 0 ? '0px' : `${sectionPadding}px`,
                 ...headerSize.width > 0 ? {
                   width: isCollapsed ? `${headerSize.width}px` : `${maxLength + headerSize.width + collectionPadding}px`,
-                } : {},
-              }, {
-                visibility: isMounted ? 'visible' : 'hidden',
+                } : {
+                  visibility: 'hidden',
+                },
               })}
             >
               <div

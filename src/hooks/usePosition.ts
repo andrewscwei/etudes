@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import { Point, Rect } from 'spase'
 import { useLatest } from './useLatest.js'
 
@@ -32,7 +32,7 @@ export function usePosition({ onChange }: UsePositionProps) {
   const prevInfoRef = useRef<ScrollPositionInfo>(undefined)
   const isTickingRef = useRef(false)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const handler = () => {
       const newInfo = _getScrollPositionInfo()
       if (!newInfo) return

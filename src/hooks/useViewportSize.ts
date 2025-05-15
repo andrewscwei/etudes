@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import { Rect, Size } from 'spase'
 
 /**
@@ -9,7 +9,7 @@ import { Rect, Size } from 'spase'
 export function useViewportSize(): Size {
   const [size, setSize] = useState<Size>(Size.zero)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const handler = () => {
       const viewportSize = Rect.size(Rect.fromViewport())
       setSize(viewportSize)

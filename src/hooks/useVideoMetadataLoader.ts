@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useLayoutEffect } from 'react'
 import { useLatest } from './useLatest.js'
 
 /**
@@ -42,7 +42,7 @@ export function useVideoMetadataLoader(src?: string, {
   const loadCompleteHandlerRef = useLatest(onLoadComplete)
   const loadErrorHandlerRef = useLatest(onLoadError)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!src) return
 
     const video = document.createElement('video')

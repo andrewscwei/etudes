@@ -1,4 +1,4 @@
-import { useEffect, type RefObject } from 'react'
+import { useLayoutEffect, type RefObject } from 'react'
 import { useLatest } from './useLatest.js'
 
 type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
@@ -24,7 +24,7 @@ export type UseSizeObserverOptions = {
 export function useSizeObserver(targetRef: TargetRef, { onResize }: UseSizeObserverOptions) {
   const handlerRef = useLatest(onResize)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const element = targetRef.current
     if (!element) return
 

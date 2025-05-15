@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, type RefObject } from 'react'
+import { useCallback, useLayoutEffect, useRef, type RefObject } from 'react'
 import { Point } from 'spase'
 import { useLatest } from './useLatest.js'
 
@@ -120,7 +120,7 @@ export function useDrag(targetRef: TargetRef, {
     dragStartHandlerRef.current?.(position)
   }, [updatesCursor, mouseMoveHandler, mouseUpHandler])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const element = targetRef.current
     if (!element || !isEnabled || !updatesCursor) return
 
@@ -132,7 +132,7 @@ export function useDrag(targetRef: TargetRef, {
     }
   }, [isEnabled, updatesCursor])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const element = targetRef.current
     if (!element || !isEnabled) return
 

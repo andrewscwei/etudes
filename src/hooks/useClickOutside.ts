@@ -1,4 +1,4 @@
-import { useEffect, type RefObject } from 'react'
+import { useLayoutEffect, type RefObject } from 'react'
 import { useLatest } from './useLatest.js'
 
 type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
@@ -14,7 +14,7 @@ type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | R
 export function useClickOutside(targetRef: TargetRef | TargetRef[], onClickOutside: () => void) {
   const handlerRef = useLatest(onClickOutside)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const handler = (event: MouseEvent) => {
       if (!(event.target instanceof Node)) return
 

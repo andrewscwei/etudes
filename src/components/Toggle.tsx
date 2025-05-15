@@ -120,18 +120,34 @@ function _getFixedStyles({ isOn = false, isInverted = false, knobSize = Size.zer
     knob: {
       position: 'absolute',
       ...orientation === 'horizontal' ? {
-        top: `calc((100% - ${knobSize.height}px) / 2)`,
-        ...isInverted ? {
-          left: isOn ? '0' : `calc(100% - ${knobSize.width}px)`,
+        ...knobSize.height > 0 ? {
+          top: `calc((100% - ${knobSize.height}px) / 2)`,
         } : {
-          left: isOn ? `calc(100% - ${knobSize.width}px)` : '0',
+          visibility: 'hidden',
+        },
+        ...knobSize.width > 0 ? {
+          ...isInverted ? {
+            left: isOn ? '0' : `calc(100% - ${knobSize.width}px)`,
+          } : {
+            left: isOn ? `calc(100% - ${knobSize.width}px)` : '0',
+          },
+        } : {
+          visibility: 'hidden',
         },
       } : {
-        left: `calc((100% - ${knobSize.width}px) / 2)`,
-        ...isInverted ? {
-          top: isOn ? '0' : `calc(100% - ${knobSize.height}px)`,
+        ...knobSize.width > 0 ? {
+          left: `calc((100% - ${knobSize.width}px) / 2)`,
         } : {
-          top: isOn ? `calc(100% - ${knobSize.height}px)` : '0',
+          visibility: 'hidden',
+        },
+        ...knobSize.height > 0 ? {
+          ...isInverted ? {
+            top: isOn ? '0' : `calc(100% - ${knobSize.height}px)`,
+          } : {
+            top: isOn ? `calc(100% - ${knobSize.height}px)` : '0',
+          },
+        } : {
+          visibility: 'hidden',
         },
       },
     },

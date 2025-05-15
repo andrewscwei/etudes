@@ -1,4 +1,4 @@
-import { useEffect, useState, type RefObject } from 'react'
+import { useLayoutEffect, useState, type RefObject } from 'react'
 import { Rect, Size } from 'spase'
 import { useSizeObserver } from './useSizeObserver.js'
 import { useViewportSize } from './useViewportSize.js'
@@ -26,7 +26,7 @@ export function useRect(targetRef: TargetRef): Rect {
     },
   })
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const element = targetRef.current
     const newRect = Rect.from(element)
     if (!newRect) return
