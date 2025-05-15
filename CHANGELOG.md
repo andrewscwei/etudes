@@ -1,3 +1,10 @@
+# [14.7.0](https://github.com/andrewscwei/etudes/compare/v14.6.3...v14.7.0) (2025-05-15)
+
+
+### Features
+
+* Optimize components with useLayoutEffect ([f969893](https://github.com/andrewscwei/etudes/commit/f969893e6998d7f41c7516c5ed9a0326d4088bce))
+
 ## [14.6.3](https://github.com/andrewscwei/etudes/compare/v14.6.2...v14.6.3) (2025-05-15)
 
 
