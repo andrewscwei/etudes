@@ -122,9 +122,9 @@ function _getFixedStyles({ isOn = false, isInverted = false, knobSize = Size.zer
       ...orientation === 'horizontal' ? {
         top: `calc((100% - ${knobSize.height}px) / 2)`,
         ...isInverted ? {
-          left: isOn ? `calc(100% - ${knobSize.width}px)` : '0',
-        } : {
           left: isOn ? '0' : `calc(100% - ${knobSize.width}px)`,
+        } : {
+          left: isOn ? `calc(100% - ${knobSize.width}px)` : '0',
         },
       } : {
         left: `calc((100% - ${knobSize.width}px) / 2)`,
