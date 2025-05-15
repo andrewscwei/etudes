@@ -1,3 +1,10 @@
+## [14.6.2](https://github.com/andrewscwei/etudes/compare/v14.6.1...v14.6.2) (2025-05-15)
+
+
+### Bug Fixes
+
+* Account for viewport rect in useRect hook ([f40816b](https://github.com/andrewscwei/etudes/commit/f40816ba4008b0c1c13c80a622576508f59087e6))
+
 ## [14.6.1](https://github.com/andrewscwei/etudes/compare/v14.6.0...v14.6.1) (2025-05-15)
 
 
