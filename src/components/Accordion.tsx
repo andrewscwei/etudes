@@ -431,7 +431,13 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
                     onClick={() => toggleSectionAt(sectionIndex)}
                   >
                     <span dangerouslySetInnerHTML={{ __html: section.label }}/>
-                    {isCollapsed ? components.collapseIcon ?? components.expandIcon : components.expandIcon}
+                    {components.expandIcon && (
+                      <Styled
+                        className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
+                        element={isCollapsed ? (components.collapseIcon ?? components.expandIcon) : components.expandIcon}
+                        style={styles(isCollapsed ? fixedStyles.collapseIcon : fixedStyles.expandIcon)}
+                      />
+                    )}
                   </Styled>
                 )}
               </div>
@@ -569,6 +575,14 @@ function _getFixedStyles({ orientation = 'vertical' }) {
         flexDirection: 'row',
         width: 'auto',
       },
+    },
+    collapseIcon: {
+      pointerEvents: 'none',
+      zIndex: 1,
+    },
+    expandIcon: {
+      pointerEvents: 'none',
+      zIndex: 1,
     },
     section: {
       alignItems: 'flex-start',

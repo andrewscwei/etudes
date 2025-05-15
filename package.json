@@ -22,7 +22,7 @@
     "build": "vite build",
     "prepages": "rimraf .gh-pages",
     "pages": "vite build -c demo/vite.config.ts",
-    "dev": "concurrently \"vite build -w\" \"wait-on build && vite dev -c demo/vite.config.ts --port 8080\"",
+    "dev": "concurrently \"vite build -w\" \"wait-on build && vite dev --host -c demo/vite.config.ts --port 8080\"",
     "test": "npm run unit",
     "unit": "vitest run --coverage",
     "lint": "eslint",

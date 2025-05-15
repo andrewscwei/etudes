@@ -19,6 +19,7 @@ import { PanoramaDemo } from './demos/PanoramaDemo.js'
 import { PanoramaSliderDemo } from './demos/PanoramaSliderDemo.js'
 import { RangeSliderDemo } from './demos/RangeSliderDemo.js'
 import { SelectableButtonDemo } from './demos/SelectableButtonDemo.js'
+import { SelectDemo } from './demos/SelectDemo.js'
 import { SliderDemo } from './demos/SliderDemo.js'
 import { StepSliderDemo } from './demos/StepSliderDemo.js'
 import { SwipeContainerDemo } from './demos/SwipeRegionDemo.js'
@@ -53,6 +54,7 @@ export function App() {
         <PanoramaSliderDemo/>
         <RangeSliderDemo/>
         <SelectableButtonDemo/>
+        <SelectDemo/>
         <SliderDemo/>
         <StepSliderDemo/>
         <SwipeContainerDemo/>

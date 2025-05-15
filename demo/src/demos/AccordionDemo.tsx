@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { Accordion, AccordionExpandIcon, AccordionHeader, AccordionItem, AccordionSection, FlatSVG, type AccordionSectionProps, type AccordionSelection } from 'etudes'
+import { Accordion, AccordionExpandIcon, AccordionHeader, AccordionItem, AccordionSection, type AccordionSectionProps, type AccordionSelection } from 'etudes'
 import { useState } from 'react'
 import $$ExpandIcon from '../assets/expand-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
@@ -66,21 +66,20 @@ export function AccordionDemo() {
               'h-9': orientation === 'vertical',
             })}
           />
-          <AccordionExpandIcon className='size-3'>
-            <FlatSVG
-              className={clsx({
-                '-rotate-90': orientation === 'horizontal',
-              })}
-              svg={$$ExpandIcon}
-            />
-          </AccordionExpandIcon>
+          <AccordionExpandIcon
+            className={clsx('flex size-5 items-center justify-center transition-transform', {
+              '-rotate-90 [.expanded]:rotate-90': orientation === 'horizontal',
+              '[.expanded]:rotate-180': orientation === 'vertical',
+            })}
+            dangerouslySetInnerHTML={{ __html: $$ExpandIcon }}
+          />
           <AccordionSection
             className={clsx({
               'transition-[height]': orientation === 'vertical',
               'transition-[width]': orientation === 'horizontal',
             })}
           />
-          <AccordionItem className='ia selected:bg-dark selected:text-light border-dark flex items-center justify-start border px-3 text-base'/>
+          <AccordionItem className='ia flex items-center justify-start border border-dark px-3 text-base [.selected]:bg-dark [.selected]:text-light'/>
         </Accordion>
       )}
     </Frame>

@@ -40,9 +40,3 @@
     }
   }
 }
-
-@custom-variant active (&.active);
-@custom-variant selected (&.selected);
-@custom-variant disabled (&.disabled);
-@custom-variant dragging (&.dragging);
-@custom-variant svg (& svg);

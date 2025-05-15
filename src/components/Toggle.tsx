@@ -58,12 +58,7 @@ export const Toggle = forwardRef<HTMLLabelElement, ToggleProps>(({
   const fixedStyles = _getFixedStyles({ isOn, isInverted, orientation })
 
   return (
-    <label
-      {...props}
-      ref={ref}
-      className={clsx(className)}
-      style={styles(style, fixedStyles.root)}
-    >
+    <label {...props} ref={ref} className={clsx(className, fixedClassNames.root)} style={styles(style, fixedStyles.root)}>
       <input checked={isOn} style={fixedStyles.input} type='checkbox' onChange={event => onChange?.(event.target.checked)}/>
       <Styled className={fixedClassNames.track} element={components.track ?? <ToggleTrack/>} style={fixedStyles.track}>
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -73,6 +68,20 @@ export const Toggle = forwardRef<HTMLLabelElement, ToggleProps>(({
     </label>
   )
 })
+
+/**
+ * Component for the knob of a {@link Toggle}.
+ */
+export const ToggleTrack = ({ children, ...props }: HTMLAttributes<HTMLSpanElement>) => (
+  <div {...props}>{children}</div>
+)
+
+/**
+ * Component for the track of a {@link Toggle}.
+ */
+export const ToggleKnob = ({ children, ...props }: HTMLAttributes<HTMLSpanElement>) => (
+  <div {...props}>{children}</div>
+)
 
 function _getFixedClassNames({ isOn = false }) {
   return asClassNameDict({
@@ -130,20 +139,6 @@ function _getFixedStyles({ isOn = false, isInverted = false, orientation = 'hori
     },
   })
 }
-
-/**
- * Component for the knob of a {@link Toggle}.
- */
-export const ToggleTrack = ({ children, ...props }: HTMLAttributes<HTMLSpanElement>) => (
-  <div {...props}>{children}</div>
-)
-
-/**
- * Component for the track of a {@link Toggle}.
- */
-export const ToggleKnob = ({ children, ...props }: HTMLAttributes<HTMLSpanElement>) => (
-  <div {...props}>{children}</div>
-)
 
 if (process.env.NODE_ENV !== 'production') {
   Toggle.displayName = 'Toggle'

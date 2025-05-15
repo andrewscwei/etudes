@@ -244,6 +244,7 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
           <ToggleComponent
             aria-expanded={!isCollapsed}
             aria-haspopup='listbox'
+            className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
             style={styles(fixedStyles.toggle)}
             onClick={toggleClickHandler}
             onCustomEvent={(name, info) => onToggleCustomEvent?.(name, info)}
@@ -252,12 +253,19 @@ export const Dropdown = /* #__PURE__ */ forwardRef(({
           <Styled
             aria-expanded={!isCollapsed}
             aria-haspopup='listbox'
+            className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
             element={components.toggle ?? <DropdownToggle/>}
             style={styles(fixedStyles.toggle)}
             onClick={toggleClickHandler}
           >
             <span dangerouslySetInnerHTML={{ __html: label?.(selection) ?? (selection.length > 0 ? selection.map(t => items[t]).join(', ') : '') }}/>
-            {isCollapsed ? components.collapseIcon ?? components.expandIcon : components.expandIcon}
+            {components.expandIcon && (
+              <Styled
+                className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
+                element={isCollapsed ? (components.collapseIcon ?? components.expandIcon) : components.expandIcon}
+                style={styles(isCollapsed ? fixedStyles.collapseIcon : fixedStyles.expandIcon)}
+              />
+            )}
           </Styled>
         )}
         <Styled
@@ -305,15 +313,15 @@ export const DropdownToggle = ({ children, ...props }: HTMLAttributes<HTMLButton
 /**
  * Component for the collapse icon of a {@link Dropdown}.
  */
-export const DropdownCollapseIcon = ({ children, style, ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <figure {...props} aria-hidden={true} style={styles(style, { pointerEvents: 'none' })}>{children}</figure>
+export const DropdownCollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <figure {...props} aria-hidden={true}>{children}</figure>
 )
 
 /**
  * Component for the expand icon of a {@link Dropdown}.
  */
-export const DropdownExpandIcon = ({ children, style, ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <figure {...props} aria-hidden={true} style={styles(style, { pointerEvents: 'none' })}>{children}</figure>
+export const DropdownExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <figure {...props} aria-hidden={true}>{children}</figure>
 )
 
 function _isIndexOutOfRange<T>(index: number, items: T[]) {
@@ -397,6 +405,14 @@ function _getFixedStyles({ isCollapsed = true, isInverted = false, collectionPad
           marginLeft: `${collectionPadding}px`,
         },
       },
+    },
+    expandIcon: {
+      pointerEvents: 'none',
+      zIndex: 1,
+    },
+    collapseIcon: {
+      pointerEvents: 'none',
+      zIndex: 1,
     },
   })
 }

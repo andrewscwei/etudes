@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { Dropdown, DropdownCollection, DropdownExpandIcon, DropdownItem, DropdownToggle, FlatSVG, type DropdownSelection } from 'etudes'
+import { Dropdown, DropdownCollection, DropdownExpandIcon, DropdownItem, DropdownToggle, type DropdownSelection } from 'etudes'
 import { useState } from 'react'
 import $$ExpandIcon from '../assets/expand-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
@@ -61,24 +61,23 @@ export function DropdownDemo() {
           onSelectAt={t => toast(`Selected Item ${t + 1}`)}
           onSelectionChange={setSelection}
         >
-          <DropdownToggle className='ia border-dark flex items-center justify-between border px-3'/>
-          <DropdownExpandIcon className='size-3'>
-            <FlatSVG
-              className={clsx({
-                'rotate-90': orientation === 'horizontal' && isInverted === 'true',
-                '-rotate-90': orientation === 'horizontal' && isInverted === 'false',
-                'rotate-180': orientation === 'vertical' && isInverted === 'true',
-              })}
-              svg={$$ExpandIcon}
-            />
-          </DropdownExpandIcon>
+          <DropdownToggle className='ia flex items-center justify-between border border-dark px-3'/>
+          <DropdownExpandIcon
+            className={clsx('flex size-5 items-center justify-center transition-transform', {
+              'rotate-90 [.expanded]:-rotate-90': orientation === 'horizontal' && isInverted === 'true',
+              '-rotate-90 [.expanded]:rotate-90': orientation === 'horizontal' && isInverted === 'false',
+              '[.expanded]:rotate-180': orientation === 'vertical' && isInverted === 'false',
+              'rotate-180 [.expanded]:rotate-0': orientation === 'vertical' && isInverted === 'true',
+            })}
+            dangerouslySetInnerHTML={{ __html: $$ExpandIcon }}
+          />
           <DropdownCollection
             className={clsx({
               'transition-[width]': orientation === 'horizontal',
               'transition-[height]': orientation === 'vertical',
             })}
           />
-          <DropdownItem className='ia selected:bg-dark selected:text-light border-dark flex items-center justify-start border px-3'/>
+          <DropdownItem className='ia flex items-center justify-start border border-dark px-3 [.selected]:bg-dark [.selected]:text-light'/>
         </Dropdown>
       )}
     </Frame>
