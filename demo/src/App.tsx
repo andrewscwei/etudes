@@ -23,6 +23,7 @@ import { SelectDemo } from './demos/SelectDemo.js'
 import { SliderDemo } from './demos/SliderDemo.js'
 import { StepSliderDemo } from './demos/StepSliderDemo.js'
 import { SwipeContainerDemo } from './demos/SwipeRegionDemo.js'
+import { TextAreaDemo } from './demos/TextAreaDemo.js'
 import { TextFieldDemo } from './demos/TextFieldDemo.js'
 import { ToggleDemo } from './demos/ToggleDemo.js'
 import { VideoDemo } from './demos/VideoDemo.js'
@@ -58,6 +59,7 @@ export function App() {
         <SliderDemo/>
         <StepSliderDemo/>
         <SwipeContainerDemo/>
+        <TextAreaDemo/>
         <TextFieldDemo/>
         <ToggleDemo/>
         <VideoDemo/>

@@ -1,4 +1,4 @@
-import { type ChangeEvent, type HTMLAttributes } from 'react'
+import { forwardRef, type ChangeEvent, type HTMLAttributes } from 'react'
 import { Styled } from '../operators/Styled.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
@@ -50,7 +50,7 @@ export type SelectProps = Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> & {
  * @exports SelectOption Component for each option.
  * @exports SelectToggle Component for the toggle.
  */
-export function Select({
+export const Select = forwardRef<HTMLDivElement, SelectProps>(({
   children,
   id,
   isRequired = false,
@@ -60,7 +60,7 @@ export function Select({
   value = '',
   onChange,
   ...props
-}: SelectProps) {
+}, ref) => {
   const components = asComponentDict(children, {
     expandIcon: SelectExpandIcon,
     option: SelectOption,
@@ -68,7 +68,7 @@ export function Select({
   })
 
   return (
-    <div {...props} style={FIXED_STYLES.root}>
+    <div {...props} ref={ref} style={FIXED_STYLES.root}>
       <Styled
         aria-required={isRequired ? 'true' : undefined}
         element={components.toggle ?? <SelectToggle/>}
@@ -90,7 +90,7 @@ export function Select({
       )}
     </div>
   )
-}
+})
 
 /**
  * Component for the expand icon of a {@link Select}.
