@@ -8,7 +8,7 @@ export function TextFieldDemo() {
   return (
     <Frame title='TextField' onReset={() => setValue('')}>
       <TextField
-        className='border-dark placeholder:text-dark w-52 border bg-transparent p-2 text-base outline-none'
+        className='w-52 border border-dark bg-transparent p-2 text-base caret-black outline-none placeholder:text-dark'
         placeholder='Type here...'
         value={value}
         onChange={setValue}
