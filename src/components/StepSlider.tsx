@@ -250,7 +250,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
       default:
         console.error(`[etudes::StepSlider] Invalid orientation: ${orientation}`)
     }
-  }, [rect.width, rect.height, position, isInverted, isTrackInteractive, orientation, createKey(steps)])
+  }, [rect.width, rect.left, rect.top, rect.height, index, position, isInverted, isTrackInteractive, orientation, createKey(steps)])
 
   // Natural position is the position affecting internal components accounting
   // for `isInverted`.

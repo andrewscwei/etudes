@@ -1,6 +1,7 @@
-import { useState, type RefObject } from 'react'
-import { Rect } from 'spase'
+import { useEffect, useState, type RefObject } from 'react'
+import { Rect, Size } from 'spase'
 import { useSizeObserver } from './useSizeObserver.js'
+import { useViewportSize } from './useViewportSize.js'
 
 type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
 
@@ -14,6 +15,7 @@ type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | R
  */
 export function useRect(targetRef: TargetRef): Rect {
   const [rect, setRect] = useState<Rect>(Rect.zero)
+  const viewportSize = useViewportSize()
 
   useSizeObserver(targetRef, {
     onResize: element => {
@@ -23,6 +25,14 @@ export function useRect(targetRef: TargetRef): Rect {
       setRect(newRect)
     },
   })
+
+  useEffect(() => {
+    const element = targetRef.current
+    const newRect = Rect.from(element)
+    if (!newRect) return
+
+    setRect(newRect)
+  }, [Size.toString(viewportSize)])
 
   return rect
 }
