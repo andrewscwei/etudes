@@ -1,6 +1,6 @@
 {
   "name": "etudes",
-  "version": "14.4.1",
+  "version": "14.5.0",
   "description": "A study of headless React components",
   "type": "module",
   "main": "./build/etudes.umd.cjs",

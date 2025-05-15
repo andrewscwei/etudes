@@ -1,3 +1,10 @@
+# [14.5.0](https://github.com/andrewscwei/etudes/compare/v14.4.1...v14.5.0) (2025-05-15)
+
+
+### Features
+
+* Add Toggle component ([0fbe683](https://github.com/andrewscwei/etudes/commit/0fbe6837c95aa1b681458c68c551f3747f74a08f))
+
 ## [14.4.1](https://github.com/andrewscwei/etudes/compare/v14.4.0...v14.4.1) (2025-05-14)
 
 
