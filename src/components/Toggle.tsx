@@ -1,5 +1,7 @@
 import clsx from 'clsx'
-import { forwardRef, type HTMLAttributes } from 'react'
+import { forwardRef, useRef, type HTMLAttributes } from 'react'
+import { Size } from 'spase'
+import { useSize } from '../hooks/useSize.js'
 import { Styled } from '../operators/Styled.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
@@ -49,20 +51,23 @@ export const Toggle = forwardRef<HTMLLabelElement, ToggleProps>(({
   onChange,
   ...props
 }, ref) => {
+  const knobRef = useRef<HTMLSpanElement>(null)
+  const knobSize = useSize(knobRef)
+
   const components = asComponentDict(children, {
     knob: ToggleKnob,
     track: ToggleTrack,
   })
 
   const fixedClassNames = _getFixedClassNames({ isOn })
-  const fixedStyles = _getFixedStyles({ isOn, isInverted, orientation })
+  const fixedStyles = _getFixedStyles({ isOn, isInverted, orientation, knobSize })
 
   return (
     <label {...props} ref={ref} className={clsx(className, fixedClassNames.root)} style={styles(style, fixedStyles.root)}>
       <input checked={isOn} style={fixedStyles.input} type='checkbox' onChange={event => onChange?.(event.target.checked)}/>
       <Styled className={fixedClassNames.track} element={components.track ?? <ToggleTrack/>} style={fixedStyles.track}>
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-          <Styled className={fixedClassNames.knob} element={components.knob ?? <ToggleKnob/>} style={fixedStyles.knob}/>
+          <Styled ref={knobRef} className={fixedClassNames.knob} element={components.knob ?? <ToggleKnob/>} style={fixedStyles.knob}/>
         </div>
       </Styled>
     </label>
@@ -91,7 +96,7 @@ function _getFixedClassNames({ isOn = false }) {
   })
 }
 
-function _getFixedStyles({ isOn = false, isInverted = false, orientation = 'horizontal' }: ToggleProps) {
+function _getFixedStyles({ isOn = false, isInverted = false, knobSize = Size.zero, orientation = 'horizontal' }) {
   return asStyleDict({
     root: {
       alignItems: 'center',
@@ -115,22 +120,18 @@ function _getFixedStyles({ isOn = false, isInverted = false, orientation = 'hori
     knob: {
       position: 'absolute',
       ...orientation === 'horizontal' ? {
-        top: '50%',
+        top: `calc((100% - ${knobSize.height}px) / 2)`,
         ...isInverted ? {
-          left: isOn ? '0' : '100%',
-          transform: isOn ? 'translateX(0) translateY(-50%)' : 'translateX(-100%) translateY(-50%)',
+          left: isOn ? `calc(100% - ${knobSize.width}px)` : '0',
         } : {
-          left: isOn ? '100%' : '0',
-          transform: isOn ? 'translateX(-100%) translateY(-50%)' : 'translateX(0) translateY(-50%)',
+          left: isOn ? '0' : `calc(100% - ${knobSize.width}px)`,
         },
       } : {
-        left: '50%',
+        left: `calc((100% - ${knobSize.width}px) / 2)`,
         ...isInverted ? {
-          top: isOn ? '0' : '100%',
-          transform: isOn ? 'translateX(-50%) translateY(0)' : 'translateX(-50%) translateY(-100%)',
+          top: isOn ? '0' : `calc(100% - ${knobSize.height}px)`,
         } : {
-          top: isOn ? '100%' : '0',
-          transform: isOn ? 'translateX(-50%) translateY(-100%)' : 'translateX(-50%) translateY(0)',
+          top: isOn ? `calc(100% - ${knobSize.height}px)` : '0',
         },
       },
     },
