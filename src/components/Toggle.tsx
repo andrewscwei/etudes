@@ -90,9 +90,9 @@ export const ToggleKnob = ({ children, ...props }: HTMLAttributes<HTMLSpanElemen
 
 function _getFixedClassNames({ isOn = false }) {
   return asClassNameDict({
-    root: clsx({ on: isOn }),
-    knob: clsx({ on: isOn }),
-    track: clsx({ on: isOn }),
+    root: clsx({ active: isOn }),
+    knob: clsx({ active: isOn }),
+    track: clsx({ active: isOn }),
   })
 }
 

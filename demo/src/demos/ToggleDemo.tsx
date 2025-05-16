@@ -33,7 +33,7 @@ export function ToggleDemo() {
           >
             <ToggleTrack className='size-full cursor-pointer rounded-full bg-dark p-1'/>
             <ToggleKnob
-              className={clsx('aspect-square rounded-full bg-white/60 transition-all group-hover:opacity-80 [.on]:bg-white', {
+              className={clsx('aspect-square rounded-full bg-white/60 transition-all group-hover:opacity-80 [.active]:bg-white', {
                 'h-full': orientation === 'horizontal',
                 'w-full': orientation === 'vertical',
               })}
