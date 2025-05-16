@@ -1,3 +1,10 @@
+## [16.0.1](https://github.com/andrewscwei/etudes/compare/v16.0.0...v16.0.1) (2025-05-16)
+
+
+### Bug Fixes
+
+* Fix missing class name for Slider track ([b7bd35f](https://github.com/andrewscwei/etudes/commit/b7bd35fbc6c0967f00160b40cbb26dd605dec2ae))
+
 # [16.0.0](https://github.com/andrewscwei/etudes/compare/v15.0.0...v16.0.0) (2025-05-16)
 
 
