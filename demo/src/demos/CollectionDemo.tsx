@@ -40,7 +40,7 @@ export function CollectionDemo() {
           onSelectAt={index => toast(`<${Date.now()}>Selected Item ${index + 1}`)}
           onSelectionChange={(setCollectionSelection)}
         >
-          <CollectionItem className='ia flex items-center justify-center border border-dark text-base [.selected]:bg-dark [.selected]:text-light'/>
+          <CollectionItem className='ia flex items-center justify-center border border-dark text-base [.active]:bg-dark [.active]:text-light'/>
         </Collection>
       )}
     </Frame>

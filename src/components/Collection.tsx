@@ -349,7 +349,7 @@ export const Collection = /* #__PURE__ */ forwardRef(({
             return (
               <ItemComponent
                 aria-selected={isSelected}
-                className={clsx({ selected: isSelected })}
+                className={clsx({ active: isSelected })}
                 index={idx}
                 isSelected={isSelectedAt(idx)}
                 item={val}
@@ -365,7 +365,7 @@ export const Collection = /* #__PURE__ */ forwardRef(({
             return (
               <Styled
                 aria-selected={isSelected}
-                className={clsx({ selected: isSelected })}
+                className={clsx({ active: isSelected })}
                 element={components.item ?? <CollectionItem/>}
                 role={role}
                 selectionMode={selectionMode}

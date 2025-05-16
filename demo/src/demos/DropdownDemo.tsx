@@ -77,7 +77,7 @@ export function DropdownDemo() {
               'transition-[height]': orientation === 'vertical',
             })}
           />
-          <DropdownItem className='ia flex items-center justify-start border border-dark px-3 [.selected]:bg-dark [.selected]:text-light'/>
+          <DropdownItem className='ia flex items-center justify-start border border-dark px-3 [.active]:bg-dark [.active]:text-light'/>
         </Dropdown>
       )}
     </Frame>

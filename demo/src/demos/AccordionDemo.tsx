@@ -79,7 +79,7 @@ export function AccordionDemo() {
               'transition-[width]': orientation === 'horizontal',
             })}
           />
-          <AccordionItem className='ia flex items-center justify-start border border-dark px-3 text-base [.selected]:bg-dark [.selected]:text-light'/>
+          <AccordionItem className='ia flex items-center justify-start border border-dark px-3 text-base [.active]:bg-dark [.active]:text-light'/>
         </Accordion>
       )}
     </Frame>
