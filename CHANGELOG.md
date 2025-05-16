@@ -1,3 +1,15 @@
+# [15.0.0](https://github.com/andrewscwei/etudes/compare/v14.7.0...v15.0.0) (2025-05-16)
+
+
+### Features
+
+* Rename on class to active for Toggle ([098b54f](https://github.com/andrewscwei/etudes/commit/098b54fff90369f2045b67f93ce501001418f7f5))
+
+
+### BREAKING CHANGES
+
+* Renamed on class to active for Toggle
+
 # [14.7.0](https://github.com/andrewscwei/etudes/compare/v14.6.3...v14.7.0) (2025-05-15)
 
 
