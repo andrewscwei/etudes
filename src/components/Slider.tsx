@@ -240,6 +240,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
     >
       <div ref={bodyRef} style={fixedStyles.body}>
         <Styled
+          className={clsx(isInverted ? 'end' : 'start', fixedClassNames.track)}
           element={components.track ?? <SliderTrack/>}
           style={styles(fixedStyles.track, orientation === 'vertical' ? {
             height: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
@@ -253,6 +254,7 @@ export const Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider
           <div style={fixedStyles.trackHitBox}/>
         </Styled>
         <Styled
+          className={clsx(isInverted ? 'start' : 'end', fixedClassNames.track)}
           element={components.track ?? <SliderTrack/>}
           style={styles(fixedStyles.track, orientation === 'vertical' ? {
             bottom: '0',
