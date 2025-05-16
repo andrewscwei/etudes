@@ -1,3 +1,15 @@
+# [16.0.0](https://github.com/andrewscwei/etudes/compare/v15.0.0...v16.0.0) (2025-05-16)
+
+
+### Features
+
+* Change `selected` class to `active` class for Collection ([10ad86b](https://github.com/andrewscwei/etudes/commit/10ad86b1822f5862a1bbc9b65422b32066ec1161))
+
+
+### BREAKING CHANGES
+
+* Collection `selected` class renamed to `active`
+
 # [15.0.0](https://github.com/andrewscwei/etudes/compare/v14.7.0...v15.0.0) (2025-05-16)
 
 
