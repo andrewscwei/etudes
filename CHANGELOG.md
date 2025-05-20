@@ -1,3 +1,10 @@
+## [16.0.2](https://github.com/andrewscwei/etudes/compare/v16.0.1...v16.0.2) (2025-05-20)
+
+
+### Bug Fixes
+
+* Fix FlatSVG using auto width/height ([bab21d2](https://github.com/andrewscwei/etudes/commit/bab21d23139db6c930bd70290d19fb8efb71dd47))
+
 ## [16.0.1](https://github.com/andrewscwei/etudes/compare/v16.0.0...v16.0.1) (2025-05-16)
 
 
