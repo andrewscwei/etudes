@@ -1,3 +1,22 @@
+# [17.0.0](https://github.com/andrewscwei/etudes/compare/v16.0.3...v17.0.0) (2025-05-20)
+
+
+### Bug Fixes
+
+* Fix typechecks for anchor button variant ([45b1628](https://github.com/andrewscwei/etudes/commit/45b16284df170f13aba5de56c99444bcad022fef))
+
+
+### Features
+
+* Remove Link and NavLink support from Button ([35f3413](https://github.com/andrewscwei/etudes/commit/35f341391ac061ff83ab466e312dd6d829dbdf47))
+* Remove useSearchState ([2231587](https://github.com/andrewscwei/etudes/commit/2231587f8018e2d826ebedac06936cb2f022c736))
+
+
+### BREAKING CHANGES
+
+* Link and NavLink no longer supported in Button
+* useSearchState hook is removed
+
 ## [16.0.3](https://github.com/andrewscwei/etudes/compare/v16.0.2...v16.0.3) (2025-05-20)
 
 
