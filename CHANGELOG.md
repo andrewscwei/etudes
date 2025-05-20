@@ -1,3 +1,10 @@
+## [16.0.3](https://github.com/andrewscwei/etudes/compare/v16.0.2...v16.0.3) (2025-05-20)
+
+
+### Bug Fixes
+
+* Fix extraneous warnings in asComponentDict ([5fd0189](https://github.com/andrewscwei/etudes/commit/5fd0189badc82fcd12f01b3a8a5a1adf2fd29e13))
+
 ## [16.0.2](https://github.com/andrewscwei/etudes/compare/v16.0.1...v16.0.2) (2025-05-20)
 
 
