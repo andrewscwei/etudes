@@ -18,13 +18,14 @@
   ],
   "scripts": {
     "clean": "rimraf build",
-    "prebuild": "npm run clean",
+    "prebuild": "npm run clean && npm run typecheck",
     "build": "vite build",
     "prepages": "rimraf .gh-pages",
     "pages": "vite build -c demo/vite.config.ts",
     "dev": "concurrently \"vite build -w\" \"wait-on build && vite dev --host -c demo/vite.config.ts --port 8080\"",
     "test": "npm run unit",
     "unit": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint",
     "lint:fix": "eslint --fix"
   },
