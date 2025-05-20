@@ -105,10 +105,8 @@ export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<FlatS
               break
             case 'width':
               attrs[`${attributeNamePrefix}width`] = '100%'
-              attrs[`${attributeNamePrefix}height`] = 'auto'
               break
             case 'height':
-              attrs[`${attributeNamePrefix}width`] = 'auto'
               attrs[`${attributeNamePrefix}height`] = '100%'
               break
             default:
