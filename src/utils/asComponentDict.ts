@@ -19,6 +19,10 @@ export function asComponentDict<T extends ComponentTypeDict>(children?: ReactNod
   const components: Partial<ComponentElementDict<T>> = {}
 
   Children.forEach(children, child => {
+    if (child === null || child === undefined) {
+      return
+    }
+
     if (!isValidElement(child)) {
       console.error('[etudes::asComponentDict] Invalid child detected')
 
