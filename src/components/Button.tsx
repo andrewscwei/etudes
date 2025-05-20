@@ -71,7 +71,6 @@ export function Button(props: Readonly<ButtonProps>) {
 
 function _isAnchor(props: ButtonProps): props is AnchorVariantProps {
   if (typeof props.action !== 'string') return false
-  if (props.action.startsWith('/')) return false
 
   return true
 }
