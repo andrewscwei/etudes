@@ -1,24 +1,9 @@
 import clsx from 'clsx'
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from 'react'
-import { Link, NavLink, type LinkProps, type NavLinkProps } from 'react-router'
 
 type ButtonVariantProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-disabled' | 'aria-label' | 'disabled' | 'rel' | 'onClick'> & {
   action: () => void
   isDisabled?: boolean
-  label?: string
-}
-
-type LinkVariantProps = Omit<LinkProps, 'aria-disabled' | 'aria-label' | 'rel' | 'to' | 'type' | 'onClick'> & {
-  action: string
-  isDisabled?: boolean
-  isNav?: false
-  label?: string
-}
-
-type NavLinkVariantProps = Omit<NavLinkProps, 'aria-disabled' | 'aria-label' | 'rel' | 'to' | 'target' | 'type' | 'onClick'> & {
-  action: string
-  isDisabled?: boolean
-  isNav: true
   label?: string
 }
 
@@ -32,7 +17,7 @@ type AnchorVariantProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'aria-di
 /**
  * Type describing the props of {@link Button}.
  */
-export type ButtonProps = AnchorVariantProps | LinkVariantProps | NavLinkVariantProps | ButtonVariantProps
+export type ButtonProps = AnchorVariantProps | ButtonVariantProps
 
 /**
  * A button component that can be used as a {@link Link}, {@link NavLink},
@@ -41,36 +26,6 @@ export type ButtonProps = AnchorVariantProps | LinkVariantProps | NavLinkVariant
  */
 export function Button(props: Readonly<ButtonProps>) {
   switch (true) {
-    case _isNavLink(props): {
-      const { action, children, isNav: _, className, isDisabled, label, ...uniqProps } = props
-
-      return (
-        <NavLink
-          {...uniqProps}
-          aria-disabled={isDisabled}
-          aria-label={label}
-          className={clsx(className, { disabled: isDisabled })}
-          to={action}
-        >
-          {children ?? label}
-        </NavLink>
-      )
-    }
-    case _isLink(props): {
-      const { action, children, className, isDisabled, label, ...uniqProps } = props
-
-      return (
-        <Link
-          {...uniqProps}
-          aria-disabled={isDisabled}
-          aria-label={label}
-          className={clsx(className, { disabled: isDisabled })}
-          to={action}
-        >
-          {children ?? label}
-        </Link>
-      )
-    }
     case _isAnchor(props): {
       const { action, children, className, isDisabled, label, opensInNewTab, ...uniqProps } = props
 
@@ -112,23 +67,6 @@ export function Button(props: Readonly<ButtonProps>) {
         <></>
       )
   }
-}
-
-function _isNavLink(props: ButtonProps): props is NavLinkVariantProps {
-  if (typeof props.action !== 'string') return false
-  if (!props.action.startsWith('/')) return false
-  if (!('isNav' in props)) return false
-  if (!props.isNav) return false
-
-  return true
-}
-
-function _isLink(props: ButtonProps): props is LinkVariantProps {
-  if (typeof props.action !== 'string') return false
-  if (!props.action.startsWith('/')) return false
-  if ('isNav' in props && props.isNav) return false
-
-  return true
 }
 
 function _isAnchor(props: ButtonProps): props is AnchorVariantProps {

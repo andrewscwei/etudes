@@ -12,12 +12,10 @@ export default defineConfig({
     rollupOptions: {
       external: [
         'react',
-        'react-router',
       ],
       output: {
         globals: {
-          'react': 'React',
-          'react-router': 'ReactRouter',
+          react: 'React',
         },
       },
       treeshake: 'smallest',
