@@ -1,5 +1,12 @@
 @import './config.css';
 
+@font-face {
+  font-family: 'NotoMono';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/NotoSansMono-Regular.ttf') format('truetype');
+}
+
 html {
   height: 100%;
   width: 100%;
