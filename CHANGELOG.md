@@ -1,3 +1,10 @@
+# [17.1.0](https://github.com/andrewscwei/etudes/compare/v17.0.0...v17.1.0) (2025-06-27)
+
+
+### Features
+
+* Support dependency list for useInterval and useTimeout ([724da90](https://github.com/andrewscwei/etudes/commit/724da90110ad018b0dae6d8c3fb808944220dbaf))
+
 # [17.0.0](https://github.com/andrewscwei/etudes/compare/v16.0.3...v17.0.0) (2025-05-20)
 
 
