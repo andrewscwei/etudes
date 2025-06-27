@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { type DependencyList, useCallback, useEffect, useRef } from 'react'
 import { useLatest } from './useLatest.js'
 
 /**
@@ -42,7 +42,7 @@ export type UseTimeoutOptions = {
 export function useTimeout(timeout: number, {
   autoStarts = true,
   onTimeout,
-}: UseTimeoutOptions): UseTimeoutOutput {
+}: UseTimeoutOptions, deps: DependencyList = []): UseTimeoutOutput {
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const handlerRef = useLatest(onTimeout)
 
@@ -71,7 +71,7 @@ export function useTimeout(timeout: number, {
     }
 
     return stop
-  }, [autoStarts, timeout, start, stop])
+  }, [autoStarts, timeout, start, stop, ...deps])
 
   return { start, stop }
 }

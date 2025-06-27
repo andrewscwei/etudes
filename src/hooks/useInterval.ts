@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { type DependencyList, useCallback, useEffect, useRef } from 'react'
 import { useLatest } from './useLatest.js'
 
 /**
@@ -47,7 +47,7 @@ export function useInterval(interval: number, {
   autoStarts = true,
   shouldInvokeInitially = false,
   onInterval,
-}: UseIntervalOptions): UseIntervalOutput {
+}: UseIntervalOptions, deps: DependencyList = []): UseIntervalOutput {
   const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined)
   const handlerRef = useLatest(onInterval)
 
@@ -76,7 +76,7 @@ export function useInterval(interval: number, {
     }
 
     return stop
-  }, [autoStarts, interval, start, stop])
+  }, [autoStarts, interval, start, stop, ...deps])
 
   return { start, stop }
 }

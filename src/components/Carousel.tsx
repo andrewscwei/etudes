@@ -249,7 +249,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
 
   useInterval((isPointerDown || !shouldAutoAdvance) ? -1 : autoAdvanceInterval, {
     onInterval: intervalHandler,
-  })
+  }, [index])
 
   return (
     <div
