@@ -1,3 +1,10 @@
+## [18.1.1](https://github.com/andrewscwei/etudes/compare/v18.1.0...v18.1.1) (2025-07-01)
+
+
+### Bug Fixes
+
+* Make inner image of Picture full size ([6affae8](https://github.com/andrewscwei/etudes/commit/6affae804e6208f5c89d01e056d7084b8da84e54))
+
 # [18.1.0](https://github.com/andrewscwei/etudes/compare/v18.0.0...v18.1.0) (2025-07-01)
 
 
