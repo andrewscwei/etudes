@@ -22,8 +22,8 @@ export const Picture = /* #__PURE__ */ forwardRef<HTMLPictureElement, PicturePro
 }, ref) => {
   return (
     <picture {...props} ref={ref}>
-      {sources.map(source => (
-        <source {...ImageSource.asProps(source)}/>
+      {sources.map((source, idx) => (
+        <source key={idx} {...ImageSource.asProps(source)}/>
       ))}
       <Image
         alt={alt}
