@@ -1,3 +1,18 @@
+# [18.0.0](https://github.com/andrewscwei/etudes/compare/v17.1.0...v18.0.0) (2025-07-01)
+
+
+### Features
+
+* Create Picture component ([396c4f6](https://github.com/andrewscwei/etudes/commit/396c4f657edc55ea08678bf4320d867cbd4e8ab1))
+* Update PictureDemo ([4b2ac0e](https://github.com/andrewscwei/etudes/commit/4b2ac0e02bb6166c9815d222474e349266c3f68a))
+
+
+### BREAKING CHANGES
+
+* Changed API for Image component
+- `loadingMode` options changed
+- removed `srcSet` and `sizes`, migrated to `source instead
+
 # [17.1.0](https://github.com/andrewscwei/etudes/compare/v17.0.0...v17.1.0) (2025-06-27)
 
 
