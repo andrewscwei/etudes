@@ -29,6 +29,7 @@ export const Picture = /* #__PURE__ */ forwardRef<HTMLPictureElement, PicturePro
         alt={alt}
         loadingMode={loadingMode}
         src={src}
+        style={{ width: '100%', height: '100%' }}
         onLoadComplete={onLoadComplete}
         onLoadError={onLoadError}
         onLoadStart={onLoadStart}
