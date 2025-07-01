@@ -1,3 +1,10 @@
+## [18.1.2](https://github.com/andrewscwei/etudes/compare/v18.1.1...v18.1.2) (2025-07-01)
+
+
+### Bug Fixes
+
+* Fix typo for srcSet ([bac7d19](https://github.com/andrewscwei/etudes/commit/bac7d190377b5f16ccda54c16e168ad111f14a61))
+
 ## [18.1.1](https://github.com/andrewscwei/etudes/compare/v18.1.0...v18.1.1) (2025-07-01)
 
 
