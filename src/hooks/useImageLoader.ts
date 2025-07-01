@@ -11,7 +11,7 @@ export type UseImageLoaderParams = {
   src?: string
 
   /**
-   * `srcset` attribute of the image.
+   * `srcSet` attribute of the image.
    */
   srcSet?: string
 

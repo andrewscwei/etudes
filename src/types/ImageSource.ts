@@ -67,7 +67,7 @@ export namespace ImageSource {
       return {
         media: imageSource.media,
         sizes: resolveSizes(imageSource),
-        srcset: resolveSourceSet(imageSource),
+        srcSet: resolveSourceSet(imageSource),
         type: imageSource.type,
       }
     }

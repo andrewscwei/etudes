@@ -19,12 +19,12 @@ export type ImageProps = Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'loading
 
   /**
    * Optional image source. If provided, this will be used to set the `sizes`
-   * and `srcset` attributes of the `<img>` element.
+   * and `srcSet` attributes of the `<img>` element.
    */
   source?: Omit<ImageSource, 'media' | 'type'>
 
   /**
-   * Fallback image URL for browsers that do not support the `srcset` attribute.
+   * Fallback image URL for browsers that do not support the `srcSet` attribute.
    */
   src?: string
 
@@ -52,7 +52,7 @@ export type ImageProps = Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'loading
 }
 
 /**
- * A component that renders an image with support for lazy loading, `srcset`,
+ * A component that renders an image with support for lazy loading, `srcSet`,
  * and `sizes` attributes.
  */
 export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<ImageProps>>(({
@@ -70,7 +70,7 @@ export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<Image
 
   const size = useImageSize({
     src: fallbackSrc,
-    srcSet: resolvedImageSource?.srcset,
+    srcSet: resolvedImageSource?.srcSet,
     sizes: resolvedImageSource?.sizes,
   }, {
     onLoadStart,
