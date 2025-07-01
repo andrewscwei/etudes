@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, type HTMLAttributes } from 'react'
 import { type Size } from 'spase'
 import { useImageSize } from '../hooks/useImageSize.js'
+import { ImageSource } from '../types/ImageSource.js'
 
 /**
  * Type describing the props of {@link Image}.
@@ -14,51 +15,13 @@ export type ImageProps = Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'loading
   /**
    * Loading mode for the image.
    */
-  loadingMode?: 'none' | 'lazy' | 'preload'
+  loadingMode?: 'eager' | 'lazy'
 
   /**
-   * Descriptor for the `srcset` attribute of the `<img>` element. If `sizes` is
-   * also provided, then each entry in this list must have a `width` value and
-   * no `pixelDensity` value.
+   * Optional image source. If provided, this will be used to set the `sizes`
+   * and `srcset` attributes of the `<img>` element.
    */
-  srcSet?: {
-    /**
-     * A URL specifying an image location.
-     */
-    src: string
-
-    /**
-     * Optional intrinsic width (in pixels) of the image expressed as a positive
-     * integer. If set, leave `pixelDensity` unspecified (only one of `width` or
-     * `pixelDensity` can be specified).
-     */
-    width?: number
-
-    /**
-     * Optional pixel density of the image expressed as a positive floating
-     * number. If set, leave `width` unspecified (only one of `width` or
-     * `pixelDensity` can be specified.
-     */
-    pixelDensity?: number
-  }[]
-
-  /**
-   * Descriptor for the `sizes` attribute of the `<img>` element.
-   */
-  sizes?: {
-    /**
-     * Optional media query condition (without brackets, i.e. `max-width:
-     * 100px`). Note that this must be omitted for the last item in this list of
-     * sizes.
-     */
-    mediaCondition?: string
-
-    /**
-     * A CSS size value indicating the size of the image's slot on the page,
-     * i.e. `100px`, `100vw`, `50%`, etc.
-     */
-    width: string
-  }[]
+  source?: Omit<ImageSource, 'media' | 'type'>
 
   /**
    * Fallback image URL for browsers that do not support the `srcset` attribute.
@@ -94,74 +57,21 @@ export type ImageProps = Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'loading
  */
 export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<ImageProps>>(({
   alt,
-  loadingMode = 'preload',
-  sizes,
+  source,
+  loadingMode,
   src: fallbackSrc,
-  srcSet,
   onLoadStart,
   onLoadComplete,
   onLoadError,
   onSizeChange,
   ...props
 }, ref) => {
-  const srcSetValue = srcSet?.map(({ pixelDensity, src, width }) => {
-    if (sizes && width === undefined) {
-      console.error('[etudes::Image] `width` must be specified if `sizes` is specified')
-
-      return undefined
-    }
-
-    if (width !== undefined && pixelDensity !== undefined) {
-      console.error('[etudes::Image] Only one of `width` or `pixelDensity` can be specified')
-
-      return undefined
-    }
-
-    let t = src
-
-    if (width !== undefined) {
-      const w = Math.floor(width)
-
-      if (!isFinite(w) || String(w) !== String(width) || w <= 0) {
-        console.error('[etudes::Image] The specified width must be a positive integer greater than 0')
-
-        return undefined
-      }
-
-      t += ` ${w}w`
-    }
-    else if (pixelDensity !== undefined) {
-      if (!isFinite(pixelDensity) || pixelDensity <= 0) {
-        console.error('[etudes::Image] The specified pixel density must be a positive floating number than 0')
-
-        return undefined
-      }
-
-      t += ` ${pixelDensity}x`
-    }
-
-    return t
-  }).filter(Boolean).join(', ')
-
-  const sizesValue = sizes?.map(({ mediaCondition, width }, idx) => {
-    const isLast = idx === sizes.length - 1
-    let t = width
-
-    if (isLast && mediaCondition) {
-      console.error('[etudes::Image] The last item in `sizes` must not have a `mediaCondition` specified')
-
-      return undefined
-    }
-
-    if (mediaCondition) t = `${mediaCondition} ${t}`
-
-    return t
-  }).filter(Boolean).join(', ')
+  const resolvedImageSource = source ? ImageSource.asProps(source) : undefined
 
   const size = useImageSize({
     src: fallbackSrc,
-    srcSet: srcSetValue,
-    sizes: sizesValue,
+    srcSet: resolvedImageSource?.srcset,
+    sizes: resolvedImageSource?.sizes,
   }, {
     onLoadStart,
     onLoadComplete,
@@ -175,12 +85,11 @@ export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<Image
   return (
     <img
       {...props}
+      {...resolvedImageSource}
       ref={ref}
       alt={alt}
-      loading={loadingMode === 'lazy' ? 'lazy' : 'eager'}
-      sizes={sizesValue}
+      loading={loadingMode}
       src={fallbackSrc}
-      srcSet={srcSetValue}
     />
   )
 })

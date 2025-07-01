@@ -17,6 +17,7 @@ import { MasonryGridDemo } from './demos/MasonryGridDemo.js'
 import { OptionButtonDemo } from './demos/OptionButtonDemo.js'
 import { PanoramaDemo } from './demos/PanoramaDemo.js'
 import { PanoramaSliderDemo } from './demos/PanoramaSliderDemo.js'
+import { PictureDemo } from './demos/PictureDemo.js'
 import { RangeSliderDemo } from './demos/RangeSliderDemo.js'
 import { SelectableButtonDemo } from './demos/SelectableButtonDemo.js'
 import { SelectDemo } from './demos/SelectDemo.js'
@@ -53,6 +54,7 @@ export function App() {
         <OptionButtonDemo/>
         <PanoramaDemo/>
         <PanoramaSliderDemo/>
+        <PictureDemo/>
         <RangeSliderDemo/>
         <SelectableButtonDemo/>
         <SelectDemo/>

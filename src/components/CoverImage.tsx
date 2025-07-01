@@ -5,12 +5,12 @@ import { Styled } from '../operators/Styled.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { styles } from '../utils/styles.js'
-import { Image, type ImageProps } from './Image.js'
+import { Picture, type PictureProps } from './Picture.js'
 
 /**
  * Type describing the props of {@link CoverImage}.
  */
-export type CoverImageProps = Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<ImageProps, 'alt' | 'loadingMode' | 'sizes' | 'src' | 'srcSet' | 'onLoadStart' | 'onLoadComplete' | 'onLoadError'> & {
+export type CoverImageProps = Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<PictureProps, 'alt' | 'loadingMode' | 'sources' | 'src' | 'onLoadStart' | 'onLoadComplete' | 'onLoadError'> & {
   /**
    * The known aspect ratio of the image, expressed by width / height. If
    * unprovided, it will be inferred after loading the image.
@@ -27,13 +27,12 @@ export type CoverImageProps = Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'
  */
 export const CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverImageProps>>(({
   children,
-  style,
   alt,
   aspectRatio: externalAspectRatio = NaN,
+  sources,
   loadingMode,
-  sizes,
   src,
-  srcSet,
+  style,
   onLoadStart,
   onLoadComplete,
   onLoadError,
@@ -69,11 +68,10 @@ export const CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Co
       ref={rootRef}
       style={styles(style, FIXED_STYLES.root)}
     >
-      <Image
+      <Picture
         alt={alt}
-        sizes={sizes}
+        sources={sources}
         src={src}
-        srcSet={srcSet}
         style={styles(FIXED_STYLES.viewport, {
           height: `${imageSize.height}px`,
           maxWidth: 'unset',
