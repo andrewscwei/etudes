@@ -59,6 +59,8 @@ export * from './operators/Switch.js'
 export * from './providers/ColorSchemeProvider.js'
 export * from './providers/ScrollPositionProvider.js'
 
+export * from './types/ImageSource.js'
+
 export * from './utils/asClassNameDict.js'
 export * from './utils/asComponentDict.js'
 export * from './utils/asStyleDict.js'
