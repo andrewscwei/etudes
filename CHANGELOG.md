@@ -1,3 +1,10 @@
+## [18.1.3](https://github.com/andrewscwei/etudes/compare/v18.1.2...v18.1.3) (2025-07-01)
+
+
+### Bug Fixes
+
+* Fix missing key in picture sources ([55c4e21](https://github.com/andrewscwei/etudes/commit/55c4e21918c97b01fc6bc8675e40137b2e7da2d1))
+
 ## [18.1.2](https://github.com/andrewscwei/etudes/compare/v18.1.1...v18.1.2) (2025-07-01)
 
 
