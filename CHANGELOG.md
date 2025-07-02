@@ -1,3 +1,15 @@
+# [19.0.0](https://github.com/andrewscwei/etudes/compare/v18.1.4...v19.0.0) (2025-07-02)
+
+
+### Build System
+
+* Bump version ([d6b4f9c](https://github.com/andrewscwei/etudes/commit/d6b4f9c1380b942d404e73e360a159abd86593e3))
+
+
+### BREAKING CHANGES
+
+* `usePosition` now expects a single `onChange` argument, `ScrollPositionProvider` is removed
+
 ## [18.1.4](https://github.com/andrewscwei/etudes/compare/v18.1.3...v18.1.4) (2025-07-02)
 
 
