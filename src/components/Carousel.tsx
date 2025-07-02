@@ -105,6 +105,8 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
   const autoAdvancePauseHandlerRef = useLatest(onAutoAdvancePause)
   const autoAdvanceResumeHandlerRef = useLatest(onAutoAdvanceResume)
   const indexChangeHandlerRef = useLatest(onIndexChange)
+  const isDragTickingRef = useRef(false)
+  const isScrollTickingRef = useRef(false)
 
   const [exposures, setExposures] = useState<number[] | undefined>(_getItemExposures(viewportRef, orientation))
   const [isPointerDown, setIsPointerDown] = useState(false)
@@ -168,50 +170,56 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
 
   const dragHandler = useCallback(({ x, y }: Point) => {
     const viewport = viewportRef.current
+    if (!viewport || isDragTickingRef.current) return
 
-    switch (orientation) {
-      case 'horizontal':
-        requestAnimationFrame(() => {
-          if (!viewport) return
+    isDragTickingRef.current = true
+
+    requestAnimationFrame(() => {
+      switch (orientation) {
+        case 'horizontal':
           viewport.scrollLeft -= x * 1.5
-        })
-
-        break
-      case 'vertical':
-        requestAnimationFrame(() => {
-          if (!viewport) return
+          break
+        case 'vertical':
           viewport.scrollTop -= y * 1.5
-        })
+        default:
+          console.error(`[etudes::Carousel] Unsupported orientation: ${orientation}`)
+      }
 
-        break
-      default:
-        console.error(`[etudes::Carousel] Unsupported orientation: ${orientation}`)
-    }
+      isDragTickingRef.current = false
+    })
   }, [orientation])
 
   const scrollHandler = useCallback(() => {
     const viewport = viewportRef.current
-    if (!viewport) return
+    if (!viewport || isScrollTickingRef.current) return
 
-    if (tracksItemExposure) {
-      updateExposures()
-    }
+    isScrollTickingRef.current = true
 
-    const isAutoScrolling = autoScrollTimeoutRef.current !== undefined
-    if (isAutoScrolling) return
+    requestAnimationFrame(() => {
+      if (tracksItemExposure) {
+        updateExposures()
+      }
 
-    const newIndex = orientation === 'horizontal'
-      ? Math.round(viewport.scrollLeft / viewport.clientWidth)
-      : Math.round(viewport.scrollTop / viewport.clientHeight)
+      const isAutoScrolling = autoScrollTimeoutRef.current !== undefined
 
-    const clampedIndex = Math.max(0, Math.min(items.length - 1, newIndex))
-    if (clampedIndex === index) return
+      if (!isAutoScrolling) {
+        const newIndex = orientation === 'horizontal'
+          ? Math.round(viewport.scrollLeft / viewport.clientWidth)
+          : Math.round(viewport.scrollTop / viewport.clientHeight)
 
-    // Set previous index before emitting index change event to differentiate
-    // between index change from scroll vs from prop.
-    prevIndexRef.current = clampedIndex
+        const clampedIndex = Math.max(0, Math.min(items.length - 1, newIndex))
 
-    indexChangeHandlerRef.current?.(clampedIndex)
+        if (clampedIndex !== index) {
+        // Set previous index before emitting index change event to
+        // differentiate between index change from scroll vs from prop.
+          prevIndexRef.current = clampedIndex
+
+          indexChangeHandlerRef.current?.(clampedIndex)
+        }
+      }
+
+      isScrollTickingRef.current = false
+    })
   }, [items.length, index, orientation, tracksItemExposure, updateExposures])
 
   useEffect(() => {
