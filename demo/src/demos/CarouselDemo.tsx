@@ -44,13 +44,13 @@ export function CarouselDemo() {
           <div className='flex w-full justify-stretch gap-1'>
             <Each
               in={items}
-              render={(item, idx) => (
+              render={(_, idx) => (
                 <button
                   className='ia diabled:pointer-events-none flex h-6 grow items-center justify-center border border-dark px-2 text-xs disabled:bg-dark disabled:text-light'
                   disabled={index === idx}
                   onClick={() => setIndex(idx)}
                 >
-                  {item.label}
+                  {idx + 1}
                 </button>
               )}
             />

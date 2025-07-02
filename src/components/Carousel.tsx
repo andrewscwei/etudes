@@ -136,8 +136,10 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
   const pointerUpHandler = useCallback((event: PointerEvent) => {
     pointerUpPositionRef.current = Point.make(event.clientX, event.clientY)
 
+    normalizeScrollPosition()
+
     setIsPointerDown(false)
-  }, [])
+  }, [normalizeScrollPosition])
 
   const clickHandler = useCallback((event: MouseEvent) => {
     // Prevent click event from propagating if the pointer was moved enough to
@@ -340,7 +342,6 @@ function _getFixedStyles({ scrollSnapEnabled = false, orientation = 'horizontal'
       height: '100%',
       userSelect: scrollSnapEnabled ? 'auto' : 'none',
       justifyContent: 'flex-start',
-      scrollBehavior: scrollSnapEnabled ? 'smooth' : 'auto',
       scrollSnapStop: 'always',
       WebkitOverflowScrolling: 'touch',
       width: '100%',
