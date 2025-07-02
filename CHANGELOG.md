@@ -1,3 +1,11 @@
+## [18.1.4](https://github.com/andrewscwei/etudes/compare/v18.1.3...v18.1.4) (2025-07-02)
+
+
+### Bug Fixes
+
+* Fix smooth snapping into position after dragging ([05d6841](https://github.com/andrewscwei/etudes/commit/05d684199286574df31a8935b65e9f3ee7bdb989))
+* Unlock scroll effects when dragging ([4c6e602](https://github.com/andrewscwei/etudes/commit/4c6e6028a91a9f24adcbbc35e1e4deb80b6c9eed))
+
 ## [18.1.3](https://github.com/andrewscwei/etudes/compare/v18.1.2...v18.1.3) (2025-07-01)
 
 
