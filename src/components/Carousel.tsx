@@ -116,6 +116,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
 
   const unlockScrollEffect = useCallback(() => {
     clearTimeout(autoScrollTimeoutRef.current)
+    autoScrollTimeoutRef.current = undefined
   }, [])
 
   const lockScrollEffect = useCallback(() => {
