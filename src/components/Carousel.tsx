@@ -115,7 +115,10 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
   const shouldAutoAdvance = autoAdvanceInterval > 0
 
   const unlockScrollEffect = useCallback(() => {
+    if (autoScrollTimeoutRef.current === undefined) return
+
     clearTimeout(autoScrollTimeoutRef.current)
+
     autoScrollTimeoutRef.current = undefined
   }, [])
 
@@ -182,6 +185,8 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
   const dragHandler = useCallback(({ x, y }: Point) => {
     const viewport = viewportRef.current
     if (!viewport || isDragTickingRef.current) return
+
+    unlockScrollEffect()
 
     isDragTickingRef.current = true
 
