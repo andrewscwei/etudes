@@ -2,6 +2,7 @@ import { forwardRef, useCallback, useLayoutEffect, useRef, useState, type Compon
 import { Point, Rect } from 'spase'
 import { useDrag } from '../hooks/useDrag.js'
 import { useInterval } from '../hooks/useInterval.js'
+import { useIsTouchDevice } from '../hooks/useIsTouchDevice.js'
 import { useLatest } from '../hooks/useLatest.js'
 import { Each } from '../operators/Each.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
@@ -107,11 +108,12 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
   const indexChangeHandlerRef = useLatest(onIndexChange)
   const isDragTickingRef = useRef(false)
   const isScrollTickingRef = useRef(false)
+  const isTouchDevice = useIsTouchDevice()
 
   const [exposures, setExposures] = useState<number[] | undefined>(_getItemExposures(viewportRef, orientation))
   const [isPointerDown, setIsPointerDown] = useState(false)
 
-  const fixedStyles = _getFixedStyles({ scrollSnapEnabled: !isPointerDown, orientation })
+  const fixedStyles = _getFixedStyles({ scrollSnapEnabled: isTouchDevice || !isPointerDown, orientation })
   const shouldAutoAdvance = autoAdvanceInterval > 0
 
   const unlockScrollEffect = useCallback(() => {
@@ -144,18 +146,22 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
   }, [orientation])
 
   const pointerDownHandler = useCallback((event: PointerEvent) => {
+    if (isTouchDevice) return
+
     pointerDownPositionRef.current = Point.make(event.clientX, event.clientY)
 
     setIsPointerDown(true)
-  }, [])
+  }, [isTouchDevice])
 
   const pointerUpHandler = useCallback((event: PointerEvent) => {
+    if (isTouchDevice) return
+
     pointerUpPositionRef.current = Point.make(event.clientX, event.clientY)
 
     normalizeScrollPosition()
 
     setIsPointerDown(false)
-  }, [normalizeScrollPosition])
+  }, [isTouchDevice, normalizeScrollPosition])
 
   const clickHandler = useCallback((event: MouseEvent) => {
     // Prevent click event from propagating if the pointer was moved enough to
@@ -239,7 +245,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
   }, [items.length, index, orientation, tracksItemExposure, updateExposures])
 
   useDrag(viewportRef, {
-    isEnabled: isDragEnabled && items.length > 1,
+    isEnabled: !isTouchDevice && isDragEnabled && items.length > 1,
     onDragMove: dragHandler,
   })
 
@@ -248,7 +254,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
   }, [index])
 
   useLayoutEffect(() => {
-    if (!shouldAutoAdvance) return
+    if (!shouldAutoAdvance || isTouchDevice) return
 
     if (isPointerDown) {
       autoAdvancePauseHandlerRef.current?.()
@@ -256,7 +262,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
     else {
       autoAdvanceResumeHandlerRef.current?.()
     }
-  }, [isPointerDown, shouldAutoAdvance])
+  }, [isTouchDevice, isPointerDown, shouldAutoAdvance])
 
   useLayoutEffect(() => {
     const viewport = viewportRef.current
