@@ -114,16 +114,26 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
   const fixedStyles = _getFixedStyles({ scrollSnapEnabled: !isPointerDown, orientation })
   const shouldAutoAdvance = autoAdvanceInterval > 0
 
-  const normalizeScrollPosition = useCallback(() => {
-    _scrollToIndex(viewportRef, index, orientation)
-
+  const unlockScrollEffect = useCallback(() => {
     clearTimeout(autoScrollTimeoutRef.current)
+  }, [])
+
+  const lockScrollEffect = useCallback(() => {
+    unlockScrollEffect()
 
     autoScrollTimeoutRef.current = setTimeout(() => {
       clearTimeout(autoScrollTimeoutRef.current)
       autoScrollTimeoutRef.current = undefined
     }, autoScrollTimeoutMs)
-  }, [index, orientation, autoScrollTimeoutMs])
+  }, [autoScrollTimeoutMs, unlockScrollEffect])
+
+  const normalizeScrollPosition = useCallback(() => {
+    _scrollToIndex(viewportRef, index, orientation)
+
+    // Lock scroll effect temporarily to prevent auto-activating intermediate
+    // indexes while scrolling.
+    lockScrollEffect()
+  }, [index, orientation])
 
   const updateExposures = useCallback(() => {
     setExposures(_getItemExposures(viewportRef, orientation))
