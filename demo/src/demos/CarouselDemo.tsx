@@ -5,9 +5,9 @@ import { Frame } from '../components/Frame.js'
 
 function Item({ className, label, exposure, ...props }: { className?: string; exposure?: number; label: string }) {
   return (
-    <div {...props} className={clsx(className, 'border-dark flex flex-col items-center justify-center border text-base')}>
+    <div {...props} className={clsx(className, 'relative flex items-center justify-center border border-dark text-base')}>
       <span>{label}</span>
-      {exposure !== undefined && (<span>{`(exposure: ${exposure})`}</span>)}
+      {exposure !== undefined && (<span className='absolute top-1/2 left-1/2 mt-5 -translate-1/2'>{`(exposure: ${exposure})`}</span>)}
     </div>
   )
 }
