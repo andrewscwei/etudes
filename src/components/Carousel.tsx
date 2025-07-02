@@ -224,7 +224,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
     viewport.addEventListener('scroll', scrollHandler)
 
     if (tracksItemExposure) {
-      setExposures(_getItemExposures(viewportRef, orientation))
+      updateExposures()
     }
 
     if (!isIndexModifiedFromManualScrolling) {
@@ -239,7 +239,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
     return () => {
       viewport.removeEventListener('scroll', scrollHandler)
     }
-  }, [index, orientation, tracksItemExposure, normalizeScrollPosition, scrollHandler])
+  }, [index, tracksItemExposure, normalizeScrollPosition, scrollHandler, updateExposures])
 
   useEffect(() => {
     if (!shouldAutoAdvance) return
