@@ -10,24 +10,11 @@ export type ScrollPositionInfo = {
 }
 
 /**
- * Type describing the options of {@link usePosition}.
- */
-export type UsePositionProps = {
-  /**
-   * Handler invoked when the scroll position changes.
-   *
-   * @param newInfo New scroll position information.
-   * @param oldInfo Old scroll position information.
-   */
-  onChange: (newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void
-}
-
-/**
  * Hook for tracking the scroll position of the viewport.
  *
- * @param props See {@link UsePositionProps}.
+ * @param onChange Handler invoked when the scroll position changes.
  */
-export function usePosition({ onChange }: UsePositionProps) {
+export function usePosition(onChange: (newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void) {
   const changeHandlerRef = useLatest(onChange)
   const prevInfoRef = useRef<ScrollPositionInfo>(undefined)
   const isTickingRef = useRef(false)
