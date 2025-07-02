@@ -210,8 +210,8 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
         const clampedIndex = Math.max(0, Math.min(items.length - 1, newIndex))
 
         if (clampedIndex !== index) {
-        // Set previous index before emitting index change event to
-        // differentiate between index change from scroll vs from prop.
+          // Set previous index before emitting index change event to
+          // differentiate between index change from scroll vs from prop.
           prevIndexRef.current = clampedIndex
 
           indexChangeHandlerRef.current?.(clampedIndex)
