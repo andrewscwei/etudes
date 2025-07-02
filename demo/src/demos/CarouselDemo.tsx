@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { Carousel, Each } from 'etudes'
+import { Carousel, Conditional, Each } from 'etudes'
 import { useState } from 'react'
 import { Frame } from '../components/Frame.js'
 
@@ -7,7 +7,9 @@ function Item({ className, label, exposure, ...props }: { className?: string; ex
   return (
     <div {...props} className={clsx(className, 'relative flex items-center justify-center border border-dark text-base')}>
       <span>{label}</span>
-      {exposure !== undefined && (<span className='absolute top-1/2 left-1/2 mt-5 -translate-1/2'>{`(exposure: ${exposure})`}</span>)}
+      <Conditional if={exposure}>
+        <span className='absolute top-1/2 left-1/2 mt-5 -translate-1/2'>{`(exposure: ${exposure})`}</span>
+      </Conditional>
     </div>
   )
 }
