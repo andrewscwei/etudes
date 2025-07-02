@@ -1,3 +1,10 @@
+# [19.1.0](https://github.com/andrewscwei/etudes/compare/v19.0.0...v19.1.0) (2025-07-02)
+
+
+### Features
+
+* Create `useIsTouchDevice` hook and disable dragging in Carousel in touch devices ([5b568a4](https://github.com/andrewscwei/etudes/commit/5b568a4c4a6764f442d37b837e753f11020ac056))
+
 # [19.0.0](https://github.com/andrewscwei/etudes/compare/v18.1.4...v19.0.0) (2025-07-02)
 
 
