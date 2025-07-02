@@ -2,6 +2,7 @@ import { forwardRef, useCallback, useEffect, useRef, useState, type ComponentTyp
 import { Point, Rect } from 'spase'
 import { useDrag } from '../hooks/useDrag.js'
 import { useInterval } from '../hooks/useInterval.js'
+import { useLatest } from '../hooks/useLatest.js'
 import { Each } from '../operators/Each.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { styles } from '../utils/styles.js'
@@ -101,6 +102,9 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
   const pointerUpPositionRef = useRef<Point>(undefined)
   const autoScrollTimeoutRef = useRef<NodeJS.Timeout>(undefined)
   const autoScrollTimeoutMs = 1000
+  const autoAdvancePauseHandlerRef = useLatest(onAutoAdvancePause)
+  const autoAdvanceResumeHandlerRef = useLatest(onAutoAdvanceResume)
+  const indexChangeHandlerRef = useLatest(onIndexChange)
 
   const [exposures, setExposures] = useState<number[] | undefined>(_getItemExposures(viewportRef, orientation))
   const [isPointerDown, setIsPointerDown] = useState(false)
@@ -108,9 +112,20 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
   const fixedStyles = _getFixedStyles({ scrollSnapEnabled: !isPointerDown, orientation })
   const shouldAutoAdvance = autoAdvanceInterval > 0
 
-  const indexChangeHandler = useCallback((newValue: number) => {
-    onIndexChange?.(newValue)
-  }, [onIndexChange])
+  const normalizeScrollPosition = useCallback(() => {
+    _scrollToIndex(viewportRef, index, orientation)
+
+    clearTimeout(autoScrollTimeoutRef.current)
+
+    autoScrollTimeoutRef.current = setTimeout(() => {
+      clearTimeout(autoScrollTimeoutRef.current)
+      autoScrollTimeoutRef.current = undefined
+    }, autoScrollTimeoutMs)
+  }, [index, orientation, autoScrollTimeoutMs])
+
+  const updateExposures = useCallback(() => {
+    setExposures(_getItemExposures(viewportRef, orientation))
+  }, [orientation])
 
   const pointerDownHandler = useCallback((event: PointerEvent) => {
     pointerDownPositionRef.current = Point.make(event.clientX, event.clientY)
@@ -118,7 +133,15 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
     setIsPointerDown(true)
   }, [])
 
+  const pointerUpHandler = useCallback((event: PointerEvent) => {
+    pointerUpPositionRef.current = Point.make(event.clientX, event.clientY)
+
+    setIsPointerDown(false)
+  }, [])
+
   const clickHandler = useCallback((event: MouseEvent) => {
+    // Prevent click event from propagating if the pointer was moved enough to
+    // be considered a drag.
     const downPosition = pointerDownPositionRef.current
     const upPosition = pointerUpPositionRef.current
 
@@ -135,32 +158,13 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
     pointerUpPositionRef.current = undefined
   }, [])
 
-  const pointerUpHandler = useCallback((event: PointerEvent) => {
-    pointerUpPositionRef.current = Point.make(event.clientX, event.clientY)
-
-    if (!isPointerDown) return
-
-    setIsPointerDown(false)
-  }, [isPointerDown])
-
-  const normalizeScrollPosition = useCallback(() => {
-    _scrollToIndex(viewportRef, index, orientation)
-
-    clearTimeout(autoScrollTimeoutRef.current)
-
-    autoScrollTimeoutRef.current = setTimeout(() => {
-      clearTimeout(autoScrollTimeoutRef.current)
-      autoScrollTimeoutRef.current = undefined
-    }, autoScrollTimeoutMs)
-  }, [viewportRef.current, index, orientation, autoScrollTimeoutMs])
-
   const intervalHandler = useCallback(() => {
     const nextIndex = (index + items.length + 1) % items.length
 
-    indexChangeHandler(nextIndex)
-  }, [isPointerDown, index, items.length, indexChangeHandler])
+    indexChangeHandlerRef.current?.(nextIndex)
+  }, [isPointerDown, index, items.length])
 
-  const dragMoveHandler = useCallback(({ x, y }: Point) => {
+  const dragHandler = useCallback(({ x, y }: Point) => {
     const viewport = viewportRef.current
 
     switch (orientation) {
@@ -181,7 +185,32 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
       default:
         console.error(`[etudes::Carousel] Unsupported orientation: ${orientation}`)
     }
-  }, [orientation, viewportRef.current])
+  }, [orientation])
+
+  const scrollHandler = useCallback(() => {
+    const viewport = viewportRef.current
+    if (!viewport) return
+
+    if (tracksItemExposure) {
+      updateExposures()
+    }
+
+    const isAutoScrolling = autoScrollTimeoutRef.current !== undefined
+    if (isAutoScrolling) return
+
+    const newIndex = orientation === 'horizontal'
+      ? Math.round(viewport.scrollLeft / viewport.clientWidth)
+      : Math.round(viewport.scrollTop / viewport.clientHeight)
+
+    const clampedIndex = Math.max(0, Math.min(items.length - 1, newIndex))
+    if (clampedIndex === index) return
+
+    // Set previous index before emitting index change event to differentiate
+    // between index change from scroll vs from prop.
+    prevIndexRef.current = clampedIndex
+
+    indexChangeHandlerRef.current?.(clampedIndex)
+  }, [items.length, index, orientation, tracksItemExposure, updateExposures])
 
   useEffect(() => {
     const viewport = viewportRef.current
@@ -189,27 +218,6 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
 
     const isInitialRender = prevIndexRef.current === undefined
     const isIndexModifiedFromManualScrolling = prevIndexRef.current === index
-
-    const scrollHandler = (_: Event) => {
-      if (tracksItemExposure) {
-        setExposures(_getItemExposures(viewportRef, orientation))
-      }
-
-      if (autoScrollTimeoutRef.current !== undefined) return
-
-      const newIndex = orientation === 'horizontal'
-        ? Math.round(viewport.scrollLeft / viewport.clientWidth)
-        : Math.round(viewport.scrollTop / viewport.clientHeight)
-
-      const clampedIndex = Math.max(0, Math.min(items.length - 1, newIndex))
-      if (clampedIndex === index) return
-
-      // Set previous index before emitting index change event to differentiate
-      // between index change from scroll vs from prop.
-      prevIndexRef.current = clampedIndex
-
-      indexChangeHandler(clampedIndex)
-    }
 
     viewport.addEventListener('scroll', scrollHandler)
 
@@ -221,7 +229,7 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
       prevIndexRef.current = index
 
       if (!isInitialRender) {
-        indexChangeHandler(index)
+        indexChangeHandlerRef.current?.(index)
         normalizeScrollPosition()
       }
     }
@@ -229,22 +237,22 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
     return () => {
       viewport.removeEventListener('scroll', scrollHandler)
     }
-  }, [index, orientation, tracksItemExposure])
+  }, [index, orientation, tracksItemExposure, normalizeScrollPosition, scrollHandler])
 
   useEffect(() => {
     if (!shouldAutoAdvance) return
 
     if (isPointerDown) {
-      onAutoAdvancePause?.()
+      autoAdvancePauseHandlerRef.current?.()
     }
     else {
-      onAutoAdvanceResume?.()
+      autoAdvanceResumeHandlerRef.current?.()
     }
   }, [isPointerDown, shouldAutoAdvance])
 
   useDrag(viewportRef, {
     isEnabled: isDragEnabled && items.length > 1,
-    onDragMove: dragMoveHandler,
+    onDragMove: dragHandler,
   })
 
   useInterval((isPointerDown || !shouldAutoAdvance) ? -1 : autoAdvanceInterval, {
@@ -256,11 +264,11 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
       {...props}
       ref={ref}
       role='region'
-      onClick={event => clickHandler(event)}
-      onPointerCancel={event => pointerUpHandler(event)}
-      onPointerDown={event => pointerDownHandler(event)}
-      onPointerLeave={event => pointerUpHandler(event)}
-      onPointerUp={event => pointerUpHandler(event)}
+      onClick={clickHandler}
+      onPointerCancel={pointerUpHandler}
+      onPointerDown={pointerDownHandler}
+      onPointerLeave={pointerUpHandler}
+      onPointerUp={pointerUpHandler}
     >
       <div ref={viewportRef} style={styles(fixedStyles.viewport)}>
         <Each in={items}>
@@ -333,7 +341,7 @@ function _getFixedStyles({ scrollSnapEnabled = false, orientation = 'horizontal'
       userSelect: scrollSnapEnabled ? 'auto' : 'none',
       justifyContent: 'flex-start',
       scrollBehavior: scrollSnapEnabled ? 'smooth' : 'auto',
-      scrollSnapStop: scrollSnapEnabled ? 'always' : 'unset',
+      scrollSnapStop: 'always',
       WebkitOverflowScrolling: 'touch',
       width: '100%',
       ...orientation === 'horizontal' ? {

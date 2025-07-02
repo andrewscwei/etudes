@@ -38,5 +38,5 @@ button {
 }
 
 .ia {
-  @apply transition-opacity hover:opacity-60;
+  @apply transition-[opacity,background,color] hover:opacity-60;
 }

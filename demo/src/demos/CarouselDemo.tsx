@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { Carousel } from 'etudes'
+import { Carousel, Each } from 'etudes'
 import { useState } from 'react'
 import { Frame } from '../components/Frame.js'
 
@@ -40,20 +40,36 @@ export function CarouselDemo() {
       onReset={() => setIndex(0)}
     >
       {({ autoAdvanceInterval, isDragEnabled, orientation, tracksItemExposure }, toast) => (
-        <Carousel
-          autoAdvanceInterval={Number(autoAdvanceInterval)}
-          className='size-full'
-          index={index}
-          isDragEnabled={isDragEnabled === 'true'}
-          ItemComponent={Item}
-          items={items}
-          orientation={orientation as any}
-          tracksItemExposure={tracksItemExposure === 'true'}
-          onIndexChange={t => {
-            setIndex(t)
-            toast(`Slide ${t + 1}`)
-          }}
-        />
+        <div className='flex size-full flex-col items-center justify-center gap-1'>
+          <div className='flex w-full justify-stretch gap-1'>
+            <Each
+              in={items}
+              render={(item, idx) => (
+                <button
+                  className='ia diabled:pointer-events-none flex h-6 grow items-center justify-center border border-dark px-2 text-xs disabled:bg-dark disabled:text-light'
+                  disabled={index === idx}
+                  onClick={() => setIndex(idx)}
+                >
+                  {item.label}
+                </button>
+              )}
+            />
+          </div>
+          <Carousel
+            autoAdvanceInterval={Number(autoAdvanceInterval)}
+            className='w-full grow'
+            index={index}
+            isDragEnabled={isDragEnabled === 'true'}
+            ItemComponent={Item}
+            items={items}
+            orientation={orientation as any}
+            tracksItemExposure={tracksItemExposure === 'true'}
+            onIndexChange={t => {
+              setIndex(t)
+              toast(`Slide ${t + 1}`)
+            }}
+          />
+        </div>
       )}
     </Frame>
   )
