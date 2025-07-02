@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useRef, useState, type ComponentType, type ForwardedRef, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactElement, type RefObject } from 'react'
+import { forwardRef, useCallback, useLayoutEffect, useRef, useState, type ComponentType, type ForwardedRef, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactElement, type RefObject } from 'react'
 import { Point, Rect } from 'spase'
 import { useDrag } from '../hooks/useDrag.js'
 import { useInterval } from '../hooks/useInterval.js'
@@ -222,7 +222,27 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
     })
   }, [items.length, index, orientation, tracksItemExposure, updateExposures])
 
-  useEffect(() => {
+  useDrag(viewportRef, {
+    isEnabled: isDragEnabled && items.length > 1,
+    onDragMove: dragHandler,
+  })
+
+  useInterval((isPointerDown || !shouldAutoAdvance) ? -1 : autoAdvanceInterval, {
+    onInterval: intervalHandler,
+  }, [index])
+
+  useLayoutEffect(() => {
+    if (!shouldAutoAdvance) return
+
+    if (isPointerDown) {
+      autoAdvancePauseHandlerRef.current?.()
+    }
+    else {
+      autoAdvanceResumeHandlerRef.current?.()
+    }
+  }, [isPointerDown, shouldAutoAdvance])
+
+  useLayoutEffect(() => {
     const viewport = viewportRef.current
     if (!viewport) return
 
@@ -248,26 +268,6 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
       viewport.removeEventListener('scroll', scrollHandler)
     }
   }, [index, tracksItemExposure, normalizeScrollPosition, scrollHandler, updateExposures])
-
-  useEffect(() => {
-    if (!shouldAutoAdvance) return
-
-    if (isPointerDown) {
-      autoAdvancePauseHandlerRef.current?.()
-    }
-    else {
-      autoAdvanceResumeHandlerRef.current?.()
-    }
-  }, [isPointerDown, shouldAutoAdvance])
-
-  useDrag(viewportRef, {
-    isEnabled: isDragEnabled && items.length > 1,
-    onDragMove: dragHandler,
-  })
-
-  useInterval((isPointerDown || !shouldAutoAdvance) ? -1 : autoAdvanceInterval, {
-    onInterval: intervalHandler,
-  }, [index])
 
   return (
     <div
