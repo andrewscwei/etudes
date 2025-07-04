@@ -1,3 +1,10 @@
+## [19.1.1](https://github.com/andrewscwei/etudes/compare/v19.1.0...v19.1.1) (2025-07-04)
+
+
+### Bug Fixes
+
+* Use display name when NODE_ENV is equal to "development" instead ([49bccd5](https://github.com/andrewscwei/etudes/commit/49bccd5559941bd9bd9c625975591a3701689c4b))
+
 # [19.1.0](https://github.com/andrewscwei/etudes/compare/v19.0.0...v19.1.0) (2025-07-02)
 
 
