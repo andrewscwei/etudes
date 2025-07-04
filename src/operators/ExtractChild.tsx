@@ -32,6 +32,6 @@ export const ExtractChild = /* #__PURE__ */ forwardRef<HTMLElement, Readonly<Ext
   })
 })
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   ExtractChild.displayName = 'ExtractChild'
 }

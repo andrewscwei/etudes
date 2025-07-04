@@ -157,7 +157,7 @@ function _getFixedStyles({ isOn = false, isInverted = false, knobSize = Size.zer
   })
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   Toggle.displayName = 'Toggle'
   ToggleKnob.displayName = 'ToggleKnob'
   ToggleTrack.displayName = 'ToggleTrack'

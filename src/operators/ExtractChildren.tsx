@@ -27,6 +27,6 @@ export function ExtractChildren({
   )
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   ExtractChildren.displayName = 'ExtractChildren'
 }

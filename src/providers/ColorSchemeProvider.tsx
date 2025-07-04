@@ -125,6 +125,6 @@ export function useToggleColorScheme() {
   }, [])
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   ColorSchemeContext.displayName = 'ColorSchemeContext'
 }

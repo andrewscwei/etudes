@@ -23,6 +23,6 @@ export function Conditional({ children, if: functionOrTruthyExpression }: Readon
   }
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   Conditional.displayName = 'Conditional'
 }

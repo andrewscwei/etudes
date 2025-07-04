@@ -452,7 +452,7 @@ function _getFixedStyles({ itemLength = NaN, itemPadding = 0, layout = 'collecti
   })
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   (Collection as any).displayName = 'Collection'
   CollectionItem.displayName = 'CollectionItem'
 }

@@ -416,7 +416,7 @@ function _getFixedStyles({ orientation = 'vertical', isClipped = false, naturalP
   })
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   Slider.displayName = 'Slider'
   SliderTrack.displayName = 'SliderTrack'
   SliderKnob.displayName = 'SliderKnob'

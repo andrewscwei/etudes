@@ -23,6 +23,6 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(({
   )
 })
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   TextArea.displayName = 'TextArea'
 }

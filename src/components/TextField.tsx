@@ -103,6 +103,6 @@ export const TextField = /* #__PURE__ */ forwardRef<HTMLInputElement, Readonly<T
   )
 })
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   TextField.displayName = 'TextField'
 }

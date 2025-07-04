@@ -66,6 +66,6 @@ export const OptionButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readon
   )
 })
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   OptionButton.displayName = 'OptionButton'
 }

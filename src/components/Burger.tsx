@@ -165,7 +165,7 @@ function getFixedStyles({ isActive = false, isSplit = false, isTailHidden = fals
   })
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   Burger.displayName = 'Burger'
   BurgerBar.displayName = 'BurgerBar'
 }

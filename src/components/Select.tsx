@@ -136,7 +136,7 @@ const FIXED_STYLES = asStyleDict({
   },
 })
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   Select.displayName = 'Select'
   SelectExpandIcon.displayName = 'SelectExpandIcon'
   SelectOption.displayName = 'SelectOption'

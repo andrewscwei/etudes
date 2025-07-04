@@ -18,6 +18,6 @@ export function Styled<T extends ElementType>({
   )
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   Styled.displayName = 'Styled'
 }

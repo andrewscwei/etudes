@@ -546,7 +546,7 @@ function _clamped(value: number, max: number = 1, min: number = 0): number {
   return Math.max(min, Math.min(max, value))
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   StepSlider.displayName = 'StepSlider'
   StepSliderTrack.displayName = 'StepSliderTrack'
   StepSliderKnob.displayName = 'StepSliderKnob'

@@ -182,7 +182,7 @@ function _getFixedStyles({ diameter = 0, angle = 0 }) {
   })
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   Dial.displayName = 'Dial'
   DialTrack.displayName = 'DialTrack'
   DialKnob.displayName = 'DialKnob'

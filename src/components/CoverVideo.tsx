@@ -148,7 +148,7 @@ const FIXED_STYLES = asStyleDict({
   },
 })
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   CoverVideo.displayName = 'CoverVideo'
   CoverVideoContent.displayName = 'CoverVideoContent'
   CoverVideoViewport.displayName = 'CoverVideoViewport'

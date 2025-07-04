@@ -417,7 +417,7 @@ function _getFixedStyles({ isCollapsed = true, isInverted = false, collectionPad
   })
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   (Dropdown as any).displayName = 'Dropdown';
   (DropdownCollection as any).displayName = 'DropdownCollection'
   DropdownCollapseIcon.displayName = 'DropdownCollapseIcon'

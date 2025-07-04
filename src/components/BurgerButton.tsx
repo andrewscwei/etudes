@@ -104,7 +104,7 @@ function _getFixedStyles() {
   })
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   BurgerButton.displayName = 'BurgerButton'
   BurgerButtonBar.displayName = 'BurgerButtonBar'
 }

@@ -128,7 +128,7 @@ const FIXED_STYLES = asStyleDict({
   },
 })
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   CoverImage.displayName = 'CoverImage'
   CoverImageContent.displayName = 'CoverImageContent'
   CoverImageViewport.displayName = 'CoverImageViewport'

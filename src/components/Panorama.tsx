@@ -223,6 +223,6 @@ function _getAngleFromDisplacement(displacement: number, originalImageSize: Size
   return angle
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   Panorama.displayName = 'Panorama'
 }

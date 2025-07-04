@@ -218,7 +218,7 @@ function _getFixedStyles({ autoDimension = 'width', panoramaRect = Rect.zero, as
   })
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   PanoramaSlider.displayName = 'PanoramaSlider'
   PanoramaSliderIndicator.displayName = 'PanoramaSliderIndicator'
   PanoramaSliderReticle.displayName = 'PanoramaSliderReticle'

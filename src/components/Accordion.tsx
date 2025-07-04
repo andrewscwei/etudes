@@ -620,7 +620,7 @@ function _getFixedStyles({ orientation = 'vertical' }) {
   })
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   (Accordion as any).displayName = 'Accordion'
   AccordionHeader.displayName = 'AccordionHeader'
   AccordionExpandIcon.displayName = 'AccordionExpandIcon'

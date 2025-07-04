@@ -238,6 +238,6 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video
   )
 })
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   Video.displayName = 'Video'
 }

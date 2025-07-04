@@ -347,6 +347,6 @@ function _getAllImageSources(htmlString?: string): string[] {
   return out
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   MasonryGrid.displayName = 'MasonryGrid'
 }

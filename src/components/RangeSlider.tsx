@@ -450,7 +450,7 @@ function _createBreakpoints(min: number, max: number, steps: number): number[] |
   ]
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   RangeSlider.displayName = 'RangeSlider'
   RangeSliderGutter.displayName = 'RangeSliderGutter'
   RangeSliderLabel.displayName = 'RangeSliderLabel'

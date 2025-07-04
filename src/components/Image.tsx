@@ -94,6 +94,6 @@ export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<Image
   )
 })
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   Image.displayName = 'Image'
 }

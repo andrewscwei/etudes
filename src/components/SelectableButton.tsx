@@ -88,6 +88,6 @@ export const SelectableButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Re
   )
 })
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   SelectableButton.displayName = 'SelectableButton'
 }

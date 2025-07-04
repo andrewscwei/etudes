@@ -188,7 +188,7 @@ const FIXED_STYLES = asStyleDict({
   },
 })
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   Counter.displayName = 'Counter'
   CounterAddButton.displayName = 'CounterAddButton'
   CounterSubtractButton.displayName = 'CounterSubtractButton'

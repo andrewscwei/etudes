@@ -401,6 +401,6 @@ function _getFixedStyles({ scrollSnapEnabled = false, orientation = 'horizontal'
   })
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   (Carousel as any).displayName = 'Carousel'
 }

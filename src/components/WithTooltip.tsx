@@ -333,6 +333,6 @@ function _getFixedStyles({ alignment, arrowSize, fullDialogWidth, gap, maxDialog
   })
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   WithTooltip.displayName = 'WithTooltip'
 }
