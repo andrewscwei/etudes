@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@plugin 'tailwindcss-safe-area';
+@import "tailwindcss-safe-area";
 
 @theme {
   --breakpoint-tab: 640px;
