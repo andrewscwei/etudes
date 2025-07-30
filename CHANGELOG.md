@@ -1,3 +1,10 @@
+# [19.2.0](https://github.com/andrewscwei/etudes/compare/v19.1.1...v19.2.0) (2025-07-30)
+
+
+### Features
+
+* Make ColorSchemeProvider work in SSR ([5ab3efa](https://github.com/andrewscwei/etudes/commit/5ab3efa9d8288bf0931dd7781df9b24f17ac563c))
+
 ## [19.1.1](https://github.com/andrewscwei/etudes/compare/v19.1.0...v19.1.1) (2025-07-04)
 
 
