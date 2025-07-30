@@ -42,7 +42,9 @@ export type ColorSchemeContextValue = {
  */
 export function ColorSchemeProvider({ children }: ColorSchemeProviderProps) {
   const getInitialColorScheme = (): ColorScheme => {
-    const colorScheme = localStorage.getItem('color-scheme')
+    if (typeof window === 'undefined') return 'light'
+
+    const colorScheme = window.localStorage.getItem('color-scheme')
     if (colorScheme) return colorScheme as ColorScheme
 
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -56,7 +58,9 @@ export function ColorSchemeProvider({ children }: ColorSchemeProviderProps) {
   const [colorScheme, setColorScheme] = useState<ColorScheme>(getInitialColorScheme())
 
   useEffect(() => {
-    localStorage.setItem('color-scheme', colorScheme)
+    if (typeof window === 'undefined') return
+
+    window.localStorage.setItem('color-scheme', colorScheme)
     document.documentElement.classList.toggle('dark', colorScheme === 'dark')
   }, [colorScheme])
 
