@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useRef, type ReactEventHandler, type RefObject, type VideoHTMLAttributes } from 'react'
 import { type Size } from 'spase'
 import { useVideoSize } from '../hooks/useVideoSize.js'
+import { asStyleDict } from '../utils/asStyleDict.js'
 
 /**
  * Type describing the props of {@link Video}.
@@ -119,6 +120,7 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video
   playsInline = true,
   posterSrc,
   src,
+  style,
   onCanPlay,
   onEnd,
   onFullscreenChange,
@@ -138,6 +140,8 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video
     onLoadComplete: onLoadMetadataComplete,
     onLoadError: onLoadMetadataError,
   })
+
+  const fixedStyles = _getFixedStyles()
 
   useEffect(() => {
     if (!videoRef.current) return
@@ -227,6 +231,7 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video
       muted={isMuted}
       playsInline={playsInline}
       poster={posterSrc}
+      style={{ ...fixedStyles.root, ...style }}
       onCanPlay={canPlayHandler}
       onEnded={endHandler}
       onPause={pauseHandler}
@@ -237,6 +242,14 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video
     </video>
   )
 })
+
+function _getFixedStyles() {
+  return asStyleDict({
+    root: {
+      fontSize: '0',
+    },
+  })
+}
 
 if (process.env.NODE_ENV === 'development') {
   Video.displayName = 'Video'
