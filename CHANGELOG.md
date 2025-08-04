@@ -1,3 +1,10 @@
+# [19.3.0](https://github.com/andrewscwei/etudes/compare/v19.2.0...v19.3.0) (2025-08-04)
+
+
+### Features
+
+* Set font size to 0 for Image and Video ([46e5da4](https://github.com/andrewscwei/etudes/commit/46e5da4af511ff75e436c4872db254a7f6d26469))
+
 # [19.2.0](https://github.com/andrewscwei/etudes/compare/v19.1.1...v19.2.0) (2025-07-30)
 
 
