@@ -1,3 +1,8 @@
+/**
+ * Determines if the current device is a touch device.
+ *
+ * @returns `true` if the device supports touch input, otherwise `false`.
+ */
 export function isTouchDevice(): boolean {
   if (typeof window === 'undefined' || typeof document === 'undefined') return false
 
