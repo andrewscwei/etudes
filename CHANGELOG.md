@@ -1,3 +1,10 @@
+# [19.5.0](https://github.com/andrewscwei/etudes/compare/v19.4.0...v19.5.0) (2025-08-14)
+
+
+### Features
+
+* Remove unnecessary window checks ([5d8f7bf](https://github.com/andrewscwei/etudes/commit/5d8f7bf1a88517958740eb0c0a29847aa07a4766))
+
 # [19.4.0](https://github.com/andrewscwei/etudes/compare/v19.3.0...v19.4.0) (2025-08-14)
 
 
