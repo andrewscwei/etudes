@@ -29,6 +29,7 @@ export * from './components/Video.js'
 export * from './components/WithTooltip.js'
 
 export * from './hooks/useClickOutside.js'
+export * from './hooks/useCSSProperty.js'
 export * from './hooks/useDPR.js'
 export * from './hooks/useDrag.js'
 export * from './hooks/useDropzone.js'
