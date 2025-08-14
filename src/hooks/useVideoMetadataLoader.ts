@@ -45,7 +45,7 @@ export function useVideoMetadataLoader(src?: string, {
   useLayoutEffect(() => {
     if (!src) return
 
-    const video = document.createElement('video')
+    const video = window.document.createElement('video')
 
     const loadCompleteHandler = () => loadCompleteHandlerRef.current?.(video)
     const loadErrorHandler = () => loadErrorHandlerRef.current?.(video)

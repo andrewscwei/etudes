@@ -58,10 +58,8 @@ export function ColorSchemeProvider({ children }: ColorSchemeProviderProps) {
   const [colorScheme, setColorScheme] = useState<ColorScheme>(getInitialColorScheme())
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
-
     window.localStorage.setItem('color-scheme', colorScheme)
-    document.documentElement.classList.toggle('dark', colorScheme === 'dark')
+    window.document.documentElement.classList.toggle('dark', colorScheme === 'dark')
   }, [colorScheme])
 
   return (

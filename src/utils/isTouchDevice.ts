@@ -4,10 +4,10 @@
  * @returns `true` if the device supports touch input, otherwise `false`.
  */
 export function isTouchDevice(): boolean {
-  if (typeof window === 'undefined' || typeof document === 'undefined') return false
+  if (typeof window === 'undefined') return false
 
-  if (typeof navigator !== 'undefined') {
-    if (navigator.maxTouchPoints > 0 || (('msMaxTouchPoints' in navigator) && ((navigator as any).msMaxTouchPoints > 0))) {
+  if (typeof window.navigator !== 'undefined') {
+    if (window.navigator.maxTouchPoints > 0 || (('msMaxTouchPoints' in window.navigator) && ((window.navigator as any).msMaxTouchPoints > 0))) {
       return true
     }
   }
@@ -16,7 +16,7 @@ export function isTouchDevice(): boolean {
     return true
   }
 
-  if ('ontouchstart' in window || 'ontouchstart' in document.documentElement) {
+  if ('ontouchstart' in window || 'ontouchstart' in window.document.documentElement) {
     return true
   }
 

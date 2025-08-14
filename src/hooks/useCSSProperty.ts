@@ -8,10 +8,6 @@
  *          not exist.
  */
 export function useCSSProperty(name: string): string | undefined {
-  if (typeof window === 'undefined') {
-    return undefined
-  }
-
   const computedStyle = window.getComputedStyle(window.document.documentElement)
 
   return computedStyle.getPropertyValue(name) || undefined

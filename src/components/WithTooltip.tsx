@@ -88,7 +88,7 @@ export function WithTooltip({
   const targetRect = useRect(targetRef)
 
   const createDialog = useCallback(() => {
-    const dialog = document.createElement('span')
+    const dialog = window.document.createElement('span')
     dialog.className = clsx(className)
     dialog.innerHTML = hint
     dialog.role = 'tooltip'
@@ -100,7 +100,7 @@ export function WithTooltip({
     const dialogStyle = styles(style, fixedStyles.dialog)
     Object.keys(dialogStyle).forEach(rule => (dialog.style as any)[rule] = (dialogStyle as any)[rule])
 
-    const arrow = document.createElement('span')
+    const arrow = window.document.createElement('span')
     Object.keys(fixedStyles.arrow).forEach(rule => (arrow.style as any)[rule] = (fixedStyles.arrow as any)[rule])
 
     dialog.appendChild(arrow)
@@ -145,14 +145,16 @@ export function WithTooltip({
 }
 
 function _computeMaxSize(element: HTMLElement) {
+  if (typeof window === 'undefined') return Size.zero
+
   const clone = element.cloneNode(false) as HTMLElement
   clone.innerHTML = element.innerHTML
   clone.style.visibility = 'hidden'
   clone.style.whiteSpace = 'pre'
 
-  document.body.appendChild(clone)
+  window.document.body.appendChild(clone)
   const rect = clone.getBoundingClientRect()
-  document.body.removeChild(clone)
+  window.document.body.removeChild(clone)
 
   return Size.make(rect.width, rect.height)
 }

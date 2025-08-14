@@ -18,7 +18,7 @@ type Options = {
  */
 export function useDocumentStyle(style: string, { isEnabled = true }: Options = {}) {
   useLayoutEffect(() => {
-    if (!isEnabled || typeof window === 'undefined') return
+    if (!isEnabled) return
 
     window.document.documentElement.style = style
 

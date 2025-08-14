@@ -18,7 +18,7 @@ type Options = {
  */
 export function useDocumentClassName(className: string, { isEnabled = true }: Options = {}) {
   useLayoutEffect(() => {
-    if (!isEnabled || typeof window === 'undefined') return
+    if (!isEnabled) return
 
     window.document.documentElement.classList.add(className)
 

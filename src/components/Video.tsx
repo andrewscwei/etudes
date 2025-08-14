@@ -148,7 +148,7 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video
 
     if (src.toLowerCase().endsWith('.m3u8')) {
       const canMaybePlay = !!videoRef.current.canPlayType('application/x-mpegURL')
-      const Hls = typeof window !== 'undefined' && typeof (window as any).Hls !== 'undefined' ? (window as any).Hls : undefined
+      const Hls = typeof (window as any).Hls !== 'undefined' ? (window as any).Hls : undefined
 
       if (!canMaybePlay && Hls?.isSupported()) {
         const hls = new Hls()
@@ -158,7 +158,7 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video
     }
 
     const handler = (_: Event) => {
-      const isFullscreen: boolean | undefined = (document as any).fullScreen || (document as any).mozFullScreen || (document as any).webkitIsFullScreen
+      const isFullscreen: boolean | undefined = (window.document as any).fullScreen || (window.document as any).mozFullScreen || (window.document as any).webkitIsFullScreen
       if (isFullscreen === undefined) return
 
       onFullscreenChange?.(isFullscreen)
