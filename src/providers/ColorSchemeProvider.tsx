@@ -85,8 +85,6 @@ export function useColorScheme(): ColorScheme {
   const context = useContext(ColorSchemeContext)
 
   if (!context) {
-    console.error('useColorScheme must be used within a ColorSchemeProvider')
-
     return 'light'
   }
 
@@ -102,8 +100,6 @@ export function useSetColorScheme() {
   const context = useContext(ColorSchemeContext)
 
   if (!context) {
-    console.error('useSetColorScheme must be used within a ColorSchemeProvider')
-
     return () => {}
   }
 
@@ -119,8 +115,6 @@ export function useToggleColorScheme() {
   const context = useContext(ColorSchemeContext)
 
   if (!context) {
-    console.error('useToggleColorScheme must be used within a ColorSchemeProvider')
-
     return () => {}
   }
 
