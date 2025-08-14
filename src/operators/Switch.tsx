@@ -56,7 +56,7 @@ export function Switch<T>({
     return (<></>)
   }
 
-  if (!childrenIsValidElement<T>(childrenArray)) {
+  if (!_childrenIsValidElement<T>(childrenArray)) {
     console.error('[etudes::Switch] `Switch` children must be of `Case` type or `Default` type')
 
     return (<></>)
@@ -106,6 +106,6 @@ export function Default({ children }: DefaultProps) {
   return children
 }
 
-function childrenIsValidElement<T>(children: ReturnType<typeof Children.toArray>): children is ReactElement[] {
+function _childrenIsValidElement<T>(children: ReturnType<typeof Children.toArray>): children is ReactElement[] {
   return children.every(child => isValidElement(child) && (child.type === Case<T> || child.type === Default))
 }

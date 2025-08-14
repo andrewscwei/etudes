@@ -137,6 +137,7 @@ export default tseslint.config(
       '@stylistic/operator-linebreak': ['error', 'after', {
         overrides: {
           '?': 'before',
+          '|': 'before',
           ':': 'before',
         },
       }],

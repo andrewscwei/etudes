@@ -60,7 +60,7 @@ export const Burger = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Burger
     }),
   })
 
-  const fixedStyles = getFixedStyles({ isSplit, isActive, isTailHidden })
+  const fixedStyles = _getFixedStyles({ isSplit, isActive, isTailHidden })
 
   return (
     <div
@@ -103,7 +103,7 @@ export const BurgerBar = ({ ...props }: HTMLAttributes<HTMLSpanElement>) => (
   <span {...props}/>
 )
 
-function getFixedStyles({ isActive = false, isSplit = false, isTailHidden = false }) {
+function _getFixedStyles({ isActive = false, isSplit = false, isTailHidden = false }) {
   return asStyleDict({
     section: {
       height: '100%',
