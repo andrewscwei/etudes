@@ -1,3 +1,15 @@
+# [19.4.0](https://github.com/andrewscwei/etudes/compare/v19.3.0...v19.4.0) (2025-08-14)
+
+
+### Features
+
+* Add useCSSColor hook ([3015732](https://github.com/andrewscwei/etudes/commit/3015732d48bcb770fa9cd833621d9a45b2b9d013))
+* Add useCSSProperty hook ([e7efe45](https://github.com/andrewscwei/etudes/commit/e7efe450e9e6033f7ff08c78138ecdb3ac3e461b))
+* Add useDocumentStyle and useDocumentClassName ([36cccd7](https://github.com/andrewscwei/etudes/commit/36cccd7dfb56a547f06a93a07a7f5e6e06a88c64))
+* Add useDPR hook ([45542f4](https://github.com/andrewscwei/etudes/commit/45542f4d09fe56dc7bedf9503a1f56e6d80121c0))
+* Add useLocalCache and useSessionCache hooks ([a70520f](https://github.com/andrewscwei/etudes/commit/a70520fea49e816dca518164490cf6b5623dfce8))
+* Handle absence of ColorSchemeProvider ([97dfd34](https://github.com/andrewscwei/etudes/commit/97dfd3485061c4d31afa8811acf3cf44492553eb))
+
 # [19.3.0](https://github.com/andrewscwei/etudes/compare/v19.2.0...v19.3.0) (2025-08-04)
 
 
