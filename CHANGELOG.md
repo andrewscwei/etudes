@@ -1,3 +1,10 @@
+## [19.5.1](https://github.com/andrewscwei/etudes/compare/v19.5.0...v19.5.1) (2025-08-15)
+
+
+### Bug Fixes
+
+* Fix SSR environment for useCSSProperty ([4ff892f](https://github.com/andrewscwei/etudes/commit/4ff892f3d8ec72ae9c98dbf5bb532c815f858295))
+
 # [19.5.0](https://github.com/andrewscwei/etudes/compare/v19.4.0...v19.5.0) (2025-08-14)
 
 
