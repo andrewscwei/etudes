@@ -1,3 +1,10 @@
+## [19.5.2](https://github.com/andrewscwei/etudes/compare/v19.5.1...v19.5.2) (2025-08-21)
+
+
+### Bug Fixes
+
+* Fix useRect not accounting for changes in target element position ([78db327](https://github.com/andrewscwei/etudes/commit/78db32719958126d631d228333429b71b8c46853))
+
 ## [19.5.1](https://github.com/andrewscwei/etudes/compare/v19.5.0...v19.5.1) (2025-08-15)
 
 
