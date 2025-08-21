@@ -1,5 +1,6 @@
 import { useLayoutEffect, useState, type RefObject } from 'react'
 import { Rect, Size } from 'spase'
+import { useIntersectionObserver } from './useIntersectionObserver.js'
 import { useSizeObserver } from './useSizeObserver.js'
 import { useViewportSize } from './useViewportSize.js'
 
@@ -19,6 +20,15 @@ export function useRect(targetRef: TargetRef): Rect {
 
   useSizeObserver(targetRef, {
     onResize: element => {
+      const newRect = Rect.from(element)
+      if (!newRect) return
+
+      setRect(newRect)
+    },
+  })
+
+  useIntersectionObserver(targetRef, {
+    onChange: element => {
       const newRect = Rect.from(element)
       if (!newRect) return
 

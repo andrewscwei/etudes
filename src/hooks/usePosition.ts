@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useLayoutEffect, useRef, type DependencyList } from 'react'
 import { Point, Rect } from 'spase'
 import { useLatest } from './useLatest.js'
 
@@ -13,8 +13,12 @@ export type ScrollPositionInfo = {
  * Hook for tracking the scroll position of the viewport.
  *
  * @param onChange Handler invoked when the scroll position changes.
+ * @param deps Optional dependency list to control when the hook should re-run.
  */
-export function usePosition(onChange: (newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void) {
+export function usePosition(
+  onChange: (newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void,
+  deps: DependencyList = [],
+) {
   const changeHandlerRef = useLatest(onChange)
   const prevInfoRef = useRef<ScrollPositionInfo>(undefined)
   const isTickingRef = useRef(false)
@@ -51,7 +55,7 @@ export function usePosition(onChange: (newInfo: ScrollPositionInfo, oldInfo: Scr
       window.removeEventListener('resize', tick)
       window.removeEventListener('orientationchange', tick)
     }
-  }, [])
+  }, [...deps])
 }
 
 function _getScrollPositionInfo(): ScrollPositionInfo | undefined {
