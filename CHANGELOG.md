@@ -1,3 +1,10 @@
+## [19.5.3](https://github.com/andrewscwei/etudes/compare/v19.5.2...v19.5.3) (2025-10-15)
+
+
+### Bug Fixes
+
+* Don't format output for FlatSVG ([c0ae8b4](https://github.com/andrewscwei/etudes/commit/c0ae8b4e71b5df17c679ffce1e089321c7eed3ab))
+
 ## [19.5.2](https://github.com/andrewscwei/etudes/compare/v19.5.1...v19.5.2) (2025-08-21)
 
 
