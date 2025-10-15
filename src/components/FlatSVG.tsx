@@ -120,7 +120,7 @@ export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<FlatS
 
     const builder = new XMLBuilder({
       attributeNamePrefix,
-      format: true,
+      format: false,
       ignoreAttributes: false,
     })
 
