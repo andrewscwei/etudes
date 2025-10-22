@@ -29,7 +29,6 @@ export * from './components/Video.js'
 export * from './components/WithTooltip.js'
 
 export * from './hooks/useClickOutside.js'
-export * from './hooks/useCSSColor.js'
 export * from './hooks/useCSSProperty.js'
 export * from './hooks/useDocumentClassName.js'
 export * from './hooks/useDocumentStyle.js'
