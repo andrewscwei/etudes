@@ -1,3 +1,10 @@
+# [19.6.0](https://github.com/andrewscwei/etudes/compare/v19.5.3...v19.6.0) (2025-10-22)
+
+
+### Features
+
+* Remove useCSSColor ([7ac32c8](https://github.com/andrewscwei/etudes/commit/7ac32c81bbf2af86119521e8209e2c0f04c9842a))
+
 ## [19.5.3](https://github.com/andrewscwei/etudes/compare/v19.5.2...v19.5.3) (2025-10-15)
 
 
