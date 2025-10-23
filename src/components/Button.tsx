@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from 'react'
+import { forwardRef, type AnchorHTMLAttributes, type ButtonHTMLAttributes } from 'react'
 
 type ButtonVariantProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-disabled' | 'aria-label' | 'disabled' | 'rel' | 'onClick'> & {
   action: () => void
@@ -24,7 +24,7 @@ export type ButtonProps = AnchorVariantProps | ButtonVariantProps
  * {@link HTMLAnchorElement}, or {@link HTMLButtonElement} depending on the
  * structure of its props.
  */
-export function Button(props: Readonly<ButtonProps>) {
+export const Button = forwardRef<HTMLAnchorElement | HTMLButtonElement, ButtonProps>((props: Readonly<ButtonProps>, ref) => {
   switch (true) {
     case _isAnchor(props): {
       const { action, children, className, isDisabled, label, opensInNewTab, ...uniqProps } = props
@@ -32,6 +32,7 @@ export function Button(props: Readonly<ButtonProps>) {
       return (
         <a
           {...uniqProps}
+          ref={ref as React.Ref<HTMLAnchorElement>}
           aria-disabled={isDisabled}
           aria-label={label}
           className={clsx(className, { disabled: isDisabled })}
@@ -49,6 +50,7 @@ export function Button(props: Readonly<ButtonProps>) {
       return (
         <button
           {...uniqProps}
+          ref={ref as React.Ref<HTMLButtonElement>}
           aria-disabled={isDisabled}
           aria-label={label}
           className={className}
@@ -67,7 +69,7 @@ export function Button(props: Readonly<ButtonProps>) {
         <></>
       )
   }
-}
+})
 
 function _isAnchor(props: ButtonProps): props is AnchorVariantProps {
   if (typeof props.action !== 'string') return false
