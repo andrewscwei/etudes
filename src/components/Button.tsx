@@ -24,7 +24,7 @@ export type ButtonProps = AnchorVariantProps | ButtonVariantProps
  * {@link HTMLAnchorElement}, or {@link HTMLButtonElement} depending on the
  * structure of its props.
  */
-export const Button = forwardRef<HTMLAnchorElement | HTMLButtonElement, ButtonProps>((props: Readonly<ButtonProps>, ref) => {
+export const Button = /* #__PURE__ */ forwardRef<HTMLAnchorElement | HTMLButtonElement, ButtonProps>((props: Readonly<ButtonProps>, ref) => {
   switch (true) {
     case _isAnchor(props): {
       const { action, children, className, isDisabled, label, opensInNewTab, ...uniqProps } = props

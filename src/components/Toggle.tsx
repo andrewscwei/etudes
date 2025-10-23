@@ -41,7 +41,7 @@ export type ToggleProps = Omit<HTMLAttributes<HTMLLabelElement>, 'onChange' | 'o
  * @exports ToggleKnob The knob of the toggle switch.
  * @exports ToggleTrack The track of the toggle switch.
  */
-export const Toggle = forwardRef<HTMLLabelElement, ToggleProps>(({
+export const Toggle = /* #__PURE__ */ forwardRef<HTMLLabelElement, ToggleProps>(({
   className,
   children,
   isInverted = false,

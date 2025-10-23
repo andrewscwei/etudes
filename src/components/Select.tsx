@@ -50,7 +50,7 @@ export type SelectProps = Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> & {
  * @exports SelectOption Component for each option.
  * @exports SelectToggle Component for the toggle.
  */
-export const Select = forwardRef<HTMLDivElement, SelectProps>(({
+export const Select = /* #__PURE__ */ forwardRef<HTMLDivElement, SelectProps>(({
   children,
   id,
   isRequired = false,
