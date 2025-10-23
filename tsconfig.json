@@ -13,10 +13,7 @@
     "skipLibCheck": true,
     "strict": true,
     "strictNullChecks": true,
-    "target": "ESNext",
-    "types": [
-      "vitest/globals"
-    ]
+    "target": "ESNext"
   },
   "include": [
     "src"
