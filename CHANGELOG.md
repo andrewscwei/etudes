@@ -1,3 +1,15 @@
+# [19.7.0](https://github.com/andrewscwei/etudes/compare/v19.6.0...v19.7.0) (2025-10-23)
+
+
+### Bug Fixes
+
+* Add missing pure indicators ([99c761b](https://github.com/andrewscwei/etudes/commit/99c761bd1bb675b2e44fa77b8b5c5dfcb4aa427d))
+
+
+### Features
+
+* Support forwared ref for Button ([17251ae](https://github.com/andrewscwei/etudes/commit/17251ae0caa39383974379ef8ab578665672ddd6))
+
 # [19.6.0](https://github.com/andrewscwei/etudes/compare/v19.5.3...v19.6.0) (2025-10-22)
 
 
