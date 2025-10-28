@@ -8,7 +8,7 @@ export function TextAreaDemo() {
   return (
     <Frame title='TextArea' onReset={() => setValue('')}>
       <TextArea
-        className='h-40 w-full resize-none border-1 border-dark bg-transparent p-2 text-base caret-black outline-none placeholder:text-dark'
+        className='h-40 w-full resize-none border border-dark bg-transparent p-2 text-base caret-black outline-none placeholder:text-dark'
         placeholder='Type here...'
         value={value}
         onChange={setValue}
