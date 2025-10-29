@@ -1,3 +1,10 @@
+# [19.8.0](https://github.com/andrewscwei/etudes/compare/v19.7.0...v19.8.0) (2025-10-29)
+
+
+### Features
+
+* Create useSetCSSProperty ([655e3ed](https://github.com/andrewscwei/etudes/commit/655e3edf32e0d63a777d463afb104b8bd60ffcfa))
+
 # [19.7.0](https://github.com/andrewscwei/etudes/compare/v19.6.0...v19.7.0) (2025-10-23)
 
 
