@@ -25,16 +25,16 @@ export namespace ColorScheme {
  */
 export type ColorSchemeProviderProps = PropsWithChildren<{
   /**
+   * The key to use for storing the color scheme in `localStorage`. If not
+   * provided, the color scheme will not be persisted.
+   */
+  cacheKey?: string
+
+  /**
    * The initial color scheme to use. If not provided, the color scheme will be
    * determined based on the user's system preference.
    */
   colorScheme?: ColorScheme
-
-  /**
-   * The key to use for storing the color scheme in `localStorage`. If not
-   * provided, the color scheme will not be persisted.
-   */
-  key?: string
 }>
 
 /**
@@ -54,12 +54,12 @@ export type ColorSchemeContextValue = {
  * @exports useColorScheme Hook for accessing the current color scheme.
  * @exports useSetColorScheme Hook for setting the color scheme.
  */
-export function ColorSchemeProvider({ colorScheme: initialColorScheme, key, children }: ColorSchemeProviderProps) {
+export function ColorSchemeProvider({ colorScheme: initialColorScheme, cacheKey, children }: ColorSchemeProviderProps) {
   const getInitialColorScheme = (): ColorScheme => {
     if (typeof window === 'undefined') return initialColorScheme ?? DEFAULT_COLOR_SCHEME
 
-    if (key) {
-      const colorScheme = window.localStorage.getItem(key)
+    if (cacheKey) {
+      const colorScheme = window.localStorage.getItem(cacheKey)
       if (colorScheme) return colorScheme as ColorScheme
     }
 
@@ -78,12 +78,12 @@ export function ColorSchemeProvider({ colorScheme: initialColorScheme, key, chil
   const [colorScheme, setColorScheme] = useState<ColorScheme>(getInitialColorScheme())
 
   useEffect(() => {
-    if (key) {
-      window.localStorage.setItem(key, colorScheme)
+    if (cacheKey) {
+      window.localStorage.setItem(cacheKey, colorScheme)
     }
 
     window.document.documentElement.classList.toggle('dark', colorScheme === 'dark')
-  }, [key, colorScheme])
+  }, [cacheKey, colorScheme])
 
   return (
     <ColorSchemeContext.Provider value={{ colorScheme, setColorScheme }}>
