@@ -1,3 +1,28 @@
+# [20.0.0](https://github.com/andrewscwei/etudes/compare/v19.8.1...v20.0.0) (2025-10-29)
+
+
+### Bug Fixes
+
+* Clean up class names properly ([8346496](https://github.com/andrewscwei/etudes/commit/8346496f42c6aef17287ec6f73ebfa3c529ae6f6))
+
+
+### Features
+
+* Create getStyle and setStyle ([97593da](https://github.com/andrewscwei/etudes/commit/97593dae8e60736d10775a8ae3789e6e80c10b86))
+* Create NoSSR ([56e06d1](https://github.com/andrewscwei/etudes/commit/56e06d1e6c31a79b124e899273d5864d9ab98a7c))
+* Migrate useDocumentClassName to useClassName ([51b203c](https://github.com/andrewscwei/etudes/commit/51b203c5e377578600f850e48595818fe35a05f1))
+* Migrate useDocumentStyle to useStyle ([a5debbb](https://github.com/andrewscwei/etudes/commit/a5debbb355637dbf67afefa4df834b75a805ab9c))
+* Optimize useDPR ([2df8719](https://github.com/andrewscwei/etudes/commit/2df8719f6229ad74353b847e345f829a4c1ab9fd))
+* Rename useMounted to useIsMounted ([fe1040a](https://github.com/andrewscwei/etudes/commit/fe1040af7262de1fc10fa9f12b4a1d9ae26f8bad))
+* Update useStyle to target a specific property ([91271fc](https://github.com/andrewscwei/etudes/commit/91271fcd67e3c9d8bb8381f7e5ded6517e3e1192))
+
+
+### BREAKING CHANGES
+
+* Renamed useMounted to useIsMounted
+* Removed useDocumentStyle
+* Removed useCSSProperty and useSetCSSProperty
+
 ## [19.8.1](https://github.com/andrewscwei/etudes/compare/v19.8.0...v19.8.1) (2025-10-29)
 
 
