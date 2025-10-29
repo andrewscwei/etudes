@@ -5,8 +5,8 @@ import { useLayoutEffect } from 'react'
  */
 type Options = {
   /**
-   * The target element to which the class name will be added,
-   * defaults to the document's root element.
+   * The target element to which the class name will be added, defaults to the
+   * document's root element.
    */
   element?: HTMLElement
 
@@ -28,11 +28,12 @@ export function useClassName(className: string, { element, isEnabled = true }: O
     if (!isEnabled) return
 
     const target = element ?? window.document.documentElement
+    const classNames = target.className
 
     target.classList.add(className)
 
     return () => {
-      target.classList.remove(className)
+      target.className = classNames
     }
   }, [className, element, isEnabled])
 }
