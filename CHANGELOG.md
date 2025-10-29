@@ -1,3 +1,10 @@
+## [19.8.1](https://github.com/andrewscwei/etudes/compare/v19.8.0...v19.8.1) (2025-10-29)
+
+
+### Bug Fixes
+
+* Fix function signature of useSetCSSProperty ([1a61892](https://github.com/andrewscwei/etudes/commit/1a61892be609a9a285b8394166c7bb8daaaa8dcc))
+
 # [19.8.0](https://github.com/andrewscwei/etudes/compare/v19.7.0...v19.8.0) (2025-10-29)
 
 
