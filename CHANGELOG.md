@@ -1,3 +1,10 @@
+# [20.1.0](https://github.com/andrewscwei/etudes/compare/v20.0.0...v20.1.0) (2025-10-29)
+
+
+### Features
+
+* Support optional local storage persistence and custom initial color scheme for ColorSchemeProvider ([9bfe8c8](https://github.com/andrewscwei/etudes/commit/9bfe8c8386366e6ee6d66b86ba195d5646bc9488))
+
 # [20.0.0](https://github.com/andrewscwei/etudes/compare/v19.8.1...v20.0.0) (2025-10-29)
 
 
