@@ -1,3 +1,10 @@
+## [20.1.1](https://github.com/andrewscwei/etudes/compare/v20.1.0...v20.1.1) (2025-10-29)
+
+
+### Bug Fixes
+
+* Rename key to cacheKey for ColorSchemeProvider ([a10b535](https://github.com/andrewscwei/etudes/commit/a10b535d40cddcc30e58271cb504320b5ec3b93c))
+
 # [20.1.0](https://github.com/andrewscwei/etudes/compare/v20.0.0...v20.1.0) (2025-10-29)
 
 
