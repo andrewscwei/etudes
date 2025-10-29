@@ -11,7 +11,7 @@ type Options = {
   /**
    * Whether to retrieve the computed style. Defaults to `true`.
    */
-  computed?: boolean
+  computed: boolean
 }
 
 /**
@@ -26,7 +26,7 @@ type Options = {
  * @returns The value of the CSS property, or `undefined` if the property does
  *          not exist.
  */
-export function getStyle(name: string, { element, computed = true }: Options = {}): string | undefined {
+export function getStyle(name: string, { element, computed }: Options): string | undefined {
   if (typeof window === 'undefined') return undefined
 
   const target = element ?? window.document.documentElement
