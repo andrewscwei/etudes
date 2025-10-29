@@ -4,11 +4,11 @@ import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttribut
 import { Rect } from 'spase'
 import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
 import { useRect } from '../hooks/useRect.js'
-import { Styled } from '../operators/Styled.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { createKey } from '../utils/createKey.js'
+import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
 /**

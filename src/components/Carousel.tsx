@@ -1,10 +1,10 @@
 import { forwardRef, useCallback, useLayoutEffect, useRef, useState, type ComponentType, type ForwardedRef, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactElement, type RefObject } from 'react'
 import { Point, Rect } from 'spase'
+import { Each } from '../flows/Each.js'
 import { useDrag } from '../hooks/useDrag.js'
 import { useInterval } from '../hooks/useInterval.js'
 import { useIsTouchDevice } from '../hooks/useIsTouchDevice.js'
 import { useLatest } from '../hooks/useLatest.js'
-import { Each } from '../operators/Each.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { styles } from '../utils/styles.js'
 

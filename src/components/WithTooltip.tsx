@@ -2,9 +2,9 @@ import clsx from 'clsx'
 import { useCallback, useEffect, useRef, type CSSProperties, type HTMLAttributes } from 'react'
 import { Rect, Size } from 'spase'
 import { useRect } from '../hooks/useRect.js'
-import { ExtractChild } from '../operators/ExtractChild.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { createKey } from '../utils/createKey.js'
+import { ExtractChild } from '../utils/ExtractChild.js'
 import { styles } from '../utils/styles.js'
 
 /**

@@ -2,10 +2,10 @@ import clsx from 'clsx'
 import { forwardRef, useRef, type HTMLAttributes } from 'react'
 import { Size } from 'spase'
 import { useSize } from '../hooks/useSize.js'
-import { Styled } from '../operators/Styled.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
+import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
 /**

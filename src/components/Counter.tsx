@@ -1,9 +1,9 @@
 import clsx from 'clsx'
 import { forwardRef, useEffect, useState, type HTMLAttributes } from 'react'
 import { usePrevious } from '../hooks/usePrevious.js'
-import { Styled } from '../operators/Styled.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
+import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 import { TextField, type TextFieldProps } from './TextField.js'
 

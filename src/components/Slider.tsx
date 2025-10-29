@@ -2,10 +2,10 @@ import clsx from 'clsx'
 import { forwardRef, useCallback, useEffect, useRef, type HTMLAttributes, type MouseEvent } from 'react'
 import { Rect } from 'spase'
 import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
-import { Styled } from '../operators/Styled.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
+import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
 /**

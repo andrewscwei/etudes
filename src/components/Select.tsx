@@ -1,5 +1,5 @@
 import { forwardRef, type ChangeEvent, type HTMLAttributes } from 'react'
-import { Styled } from '../operators/Styled.js'
+import { Styled } from '../utils/Styled.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { styles } from '../utils/styles.js'

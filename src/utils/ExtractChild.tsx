@@ -1,5 +1,5 @@
 import { Children, forwardRef, isValidElement, type HTMLAttributes } from 'react'
-import { cloneStyledElement } from '../utils/cloneStyledElement.js'
+import { cloneStyledElement } from './cloneStyledElement.js'
 
 /**
  * Type describing the properties of {@link ExtractChild}.
