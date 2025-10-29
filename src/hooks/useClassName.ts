@@ -28,12 +28,12 @@ export function useClassName(className: string, { element, isEnabled = true }: O
     if (!isEnabled) return
 
     const target = element ?? window.document.documentElement
-    const classNames = target.className
+    const oldValue = target.className
 
     target.classList.add(className)
 
     return () => {
-      target.className = classNames
+      target.className = oldValue
     }
   }, [className, element, isEnabled])
 }
