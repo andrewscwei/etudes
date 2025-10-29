@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
  *
  * @returns `true` if the component is mounted, `false` otherwise.
  */
-export function useMounted(): boolean {
+export function useIsMounted(): boolean {
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
