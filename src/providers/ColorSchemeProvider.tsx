@@ -1,5 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState, type Dispatch, type PropsWithChildren, type SetStateAction } from 'react'
 
+const DEFAULT_COLOR_SCHEME: ColorScheme = 'light'
+
 /**
  * Type describing the available color schemes.
  */
@@ -21,7 +23,19 @@ export namespace ColorScheme {
 /**
  * Type describing the props of {@link ColorSchemeProvider}.
  */
-export type ColorSchemeProviderProps = PropsWithChildren
+export type ColorSchemeProviderProps = PropsWithChildren<{
+  /**
+   * The initial color scheme to use. If not provided, the color scheme will be
+   * determined based on the user's system preference.
+   */
+  colorScheme?: ColorScheme
+
+  /**
+   * The key to use for storing the color scheme in `localStorage`. If not
+   * provided, the color scheme will not be persisted.
+   */
+  key?: string
+}>
 
 /**
  * Type describing the value of {@link ColorSchemeContext}.
@@ -40,12 +54,18 @@ export type ColorSchemeContextValue = {
  * @exports useColorScheme Hook for accessing the current color scheme.
  * @exports useSetColorScheme Hook for setting the color scheme.
  */
-export function ColorSchemeProvider({ children }: ColorSchemeProviderProps) {
+export function ColorSchemeProvider({ colorScheme: initialColorScheme, key, children }: ColorSchemeProviderProps) {
   const getInitialColorScheme = (): ColorScheme => {
-    if (typeof window === 'undefined') return 'light'
+    if (typeof window === 'undefined') return initialColorScheme ?? DEFAULT_COLOR_SCHEME
 
-    const colorScheme = window.localStorage.getItem('color-scheme')
-    if (colorScheme) return colorScheme as ColorScheme
+    if (key) {
+      const colorScheme = window.localStorage.getItem(key)
+      if (colorScheme) return colorScheme as ColorScheme
+    }
+
+    if (initialColorScheme) {
+      return initialColorScheme
+    }
 
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return 'dark'
@@ -58,9 +78,12 @@ export function ColorSchemeProvider({ children }: ColorSchemeProviderProps) {
   const [colorScheme, setColorScheme] = useState<ColorScheme>(getInitialColorScheme())
 
   useEffect(() => {
-    window.localStorage.setItem('color-scheme', colorScheme)
+    if (key) {
+      window.localStorage.setItem(key, colorScheme)
+    }
+
     window.document.documentElement.classList.toggle('dark', colorScheme === 'dark')
-  }, [colorScheme])
+  }, [key, colorScheme])
 
   return (
     <ColorSchemeContext.Provider value={{ colorScheme, setColorScheme }}>
@@ -83,7 +106,7 @@ export function useColorScheme(): ColorScheme {
   const context = useContext(ColorSchemeContext)
 
   if (!context) {
-    return 'light'
+    return DEFAULT_COLOR_SCHEME
   }
 
   return context.colorScheme
