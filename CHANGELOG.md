@@ -1,3 +1,10 @@
+# [20.3.0](https://github.com/andrewscwei/etudes/compare/v20.2.0...v20.3.0) (2025-11-10)
+
+
+### Features
+
+* Support types in TextField ([3296b5a](https://github.com/andrewscwei/etudes/commit/3296b5aa388bb807667ca6317a4c58207c8fff40))
+
 # [20.2.0](https://github.com/andrewscwei/etudes/compare/v20.1.1...v20.2.0) (2025-11-10)
 
 
