@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { forwardRef, useCallback, type ChangeEvent, type FocusEvent, type InputHTMLAttributes } from 'react'
+import { forwardRef, useCallback, type ChangeEvent, type FocusEvent, type HTMLInputTypeAttribute, type InputHTMLAttributes } from 'react'
 
 /**
  * Type describing the props of {@link TextField}.
@@ -24,6 +24,11 @@ export type TextFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'aria-d
    * The placeholder text to display when the text field is empty.
    */
   placeholder?: string
+
+  /**
+   * The type of the text field.
+   */
+  type?: Extract<HTMLInputTypeAttribute, 'text' | 'password' | 'search' | 'email' | 'tel' | 'url'>
 
   /**
    * The value of the text field.
@@ -70,6 +75,7 @@ export const TextField = /* #__PURE__ */ forwardRef<HTMLInputElement, Readonly<T
   isDisabled = false,
   isRequired = false,
   placeholder,
+  type = 'text',
   value,
   formatter,
   onFocus,
@@ -94,7 +100,7 @@ export const TextField = /* #__PURE__ */ forwardRef<HTMLInputElement, Readonly<T
       disabled={isDisabled}
       placeholder={placeholder}
       required={isRequired}
-      type='text'
+      type={type}
       value={value || emptyValue}
       onBlur={({ target }: FocusEvent<HTMLInputElement>) => onUnfocus?.(target.value)}
       onChange={({ target }: ChangeEvent<HTMLInputElement>) => handleValueChange(target.value)}
