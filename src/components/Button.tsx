@@ -2,9 +2,9 @@ import clsx from 'clsx'
 import { forwardRef, type AnchorHTMLAttributes, type ButtonHTMLAttributes } from 'react'
 
 type ButtonVariantProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-disabled' | 'aria-label' | 'disabled' | 'rel' | 'onClick'> & {
-  action: () => void
   isDisabled?: boolean
   label?: string
+  action?: () => void
 }
 
 type AnchorVariantProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'aria-disabled' | 'aria-label' | 'href' | 'rel' | 'target' | 'type' | 'onClick'> & {
@@ -56,7 +56,7 @@ export const Button = /* #__PURE__ */ forwardRef<HTMLAnchorElement | HTMLButtonE
           className={className}
           disabled={isDisabled}
           type={type}
-          onClick={() => action()}
+          onClick={action}
         >
           {children ?? label}
         </button>
@@ -66,21 +66,21 @@ export const Button = /* #__PURE__ */ forwardRef<HTMLAnchorElement | HTMLButtonE
       console.error('[etudes::Button] Unknown button type')
 
       return (
-        <></>
+        <div>asdf</div>
       )
   }
 })
 
 function _isAnchor(props: ButtonProps): props is AnchorVariantProps {
-  if (typeof props.action !== 'string') return false
+  if (typeof props.action === 'string') return true
 
-  return true
+  return false
 }
 
 function _isButton(props: ButtonProps): props is ButtonVariantProps {
-  if (typeof props.action !== 'function') return false
+  if (typeof props.action === 'function' || typeof (props as any).type === 'string') return true
 
-  return true
+  return false
 }
 
 if (process.env.NODE_ENV === 'development') {
