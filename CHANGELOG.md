@@ -1,3 +1,10 @@
+# [20.2.0](https://github.com/andrewscwei/etudes/compare/v20.1.1...v20.2.0) (2025-11-10)
+
+
+### Features
+
+* Support optional action for Button ([57533ea](https://github.com/andrewscwei/etudes/commit/57533eab454e0ecdfd4e964feef8f053671b8ced))
+
 ## [20.1.1](https://github.com/andrewscwei/etudes/compare/v20.1.0...v20.1.1) (2025-10-29)
 
 
