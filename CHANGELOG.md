@@ -1,3 +1,10 @@
+# [20.4.0](https://github.com/andrewscwei/etudes/compare/v20.3.0...v20.4.0) (2025-11-13)
+
+
+### Features
+
+* Optimize useImageLoader ([5dcf3fe](https://github.com/andrewscwei/etudes/commit/5dcf3fe94c2a88213b636ae7266ed0a4322aa50b))
+
 # [20.3.0](https://github.com/andrewscwei/etudes/compare/v20.2.0...v20.3.0) (2025-11-10)
 
 
