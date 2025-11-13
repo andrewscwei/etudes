@@ -27,7 +27,7 @@ export type ImageProps = Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'loading
   /**
    * Fallback image URL for browsers that do not support the `srcSet` attribute.
    */
-  src?: string
+  src: string
 
   /**
    * Handler invoked when image load begins.

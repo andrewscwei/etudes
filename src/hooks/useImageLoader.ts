@@ -8,7 +8,7 @@ export type UseImageLoaderParams = {
   /**
    * `src` attribute of the image.
    */
-  src?: string
+  src: string
 
   /**
    * `srcSet` attribute of the image.
@@ -53,46 +53,49 @@ export type UseImageLoaderOptions = {
  * @param params See {@link UseImageLoaderParams}.
  * @param options See {@link UseImageLoaderOptions}.
  */
-export function useImageLoader({
-  src,
-  srcSet,
-  sizes,
-}: UseImageLoaderParams, {
-  onLoadStart,
-  onLoadComplete,
-  onLoadError,
-}: UseImageLoaderOptions = {}) {
+export function useImageLoader(
+  { src, srcSet, sizes }: UseImageLoaderParams,
+  { onLoadStart, onLoadComplete, onLoadError }: UseImageLoaderOptions = {},
+) {
   const imageRef = useRef<HTMLImageElement>(undefined)
   const loadStartHandlerRef = useLatest(onLoadStart)
   const loadCompleteHandlerRef = useLatest(onLoadComplete)
   const loadErrorHandlerRef = useLatest(onLoadError)
 
   useLayoutEffect(() => {
-    const imageLoadCompleteHandler = (event: Event) => {
-      const element = event.currentTarget as HTMLImageElement
+    let cancelled = false
 
+    const loadHandler = (event: Event) => {
+      if (cancelled) return
+
+      const element = event.currentTarget as HTMLImageElement
       loadCompleteHandlerRef.current?.(element)
     }
 
-    const imageLoadErrorHandler = (event: Event) => {
-      const element = event.currentTarget as HTMLImageElement
+    const errorHandler = (event: Event) => {
+      if (cancelled) return
 
+      const element = event.currentTarget as HTMLImageElement
       loadErrorHandlerRef.current?.(element)
     }
 
-    imageRef.current = new Image()
-    if (src) imageRef.current.src = src
-    if (srcSet) imageRef.current.srcset = srcSet
-    if (sizes) imageRef.current.sizes = sizes
+    const image = new Image()
+    image.addEventListener('load', loadHandler)
+    image.addEventListener('error', errorHandler)
 
-    loadStartHandlerRef.current?.(imageRef.current)
+    loadStartHandlerRef.current?.(image)
 
-    imageRef.current.addEventListener('load', imageLoadCompleteHandler)
-    imageRef.current.addEventListener('error', imageLoadErrorHandler)
+    if (srcSet) image.srcset = srcSet
+    if (sizes) image.sizes = sizes
+    image.src = src
+
+    imageRef.current = image
 
     return () => {
-      imageRef.current?.removeEventListener('load', imageLoadCompleteHandler)
-      imageRef.current?.removeEventListener('error', imageLoadErrorHandler)
+      cancelled = true
+
+      image.removeEventListener('load', loadHandler)
+      image.removeEventListener('error', errorHandler)
       imageRef.current = undefined
     }
   }, [src, srcSet, sizes])

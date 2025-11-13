@@ -26,7 +26,7 @@ export type PanoramaProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow'
   /**
    * The source URL of the image.
    */
-  src?: string
+  src: string
 
   /**
    * A decimal percentage of the image width indicating where 0° should be,
