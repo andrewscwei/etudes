@@ -1,11 +1,11 @@
 import { forwardRef, useRef, useState, type HTMLAttributes, type RefObject } from 'react'
 import { Size } from 'spase'
 import { useRect } from '../hooks/useRect.js'
+import { Video, type VideoProps } from '../primitives/Video.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
-import { Video, type VideoProps } from './Video.js'
 
 /**
  * Type describing the props of {@link CoverVideo}.
