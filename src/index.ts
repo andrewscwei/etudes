@@ -64,8 +64,6 @@ export * from './primitives/TextField.js'
 export * from './primitives/Toggle.js'
 export * from './primitives/Video.js'
 
-export * from './providers/ColorSchemeProvider.js'
-
 export * from './types/ImageSource.js'
 
 export * from './utils/asClassNameDict.js'
