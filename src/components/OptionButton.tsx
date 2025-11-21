@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, type ButtonHTMLAttributes } from 'react'
-import { Button } from './Button.js'
+import { Button } from '../primitives/Button.js'
 
 /**
  * Type describing the props of {@link OptionButton}.
