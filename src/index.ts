@@ -13,6 +13,7 @@ export * from './flows/Switch.js'
 
 export * from './hocs/WithTooltip.js'
 
+export * from './hooks/useAgent.js'
 export * from './hooks/useClassName.js'
 export * from './hooks/useClickOutside.js'
 export * from './hooks/useDPR.js'
