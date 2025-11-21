@@ -1,4 +1,5 @@
-import { forwardRef, type ButtonHTMLAttributes } from 'react'
+import { forwardRef, useCallback, type ButtonHTMLAttributes } from 'react'
+import { Button } from './Button.js'
 
 /**
  * Type describing the props of {@link OptionButton}.
@@ -42,7 +43,7 @@ export const OptionButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readon
   const option = options[index]
   const label = typeof option === 'string' ? option : option?.label
 
-  const onClick = () => {
+  const action = useCallback(() => {
     if (isDisabled) return
 
     const nextIndex = index < maxIndex ? index + 1 : 0
@@ -50,19 +51,16 @@ export const OptionButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readon
     const nextValue = typeof nextOption === 'string' ? nextOption : nextOption?.value
 
     onChange?.(nextValue, nextIndex)
-  }
+  }, [maxIndex, isDisabled, index, options, onChange])
 
   return (
-    <button
+    <Button
       {...props}
       ref={ref}
-      aria-disabled={isDisabled}
-      aria-label={label}
-      disabled={isDisabled}
-      onClick={onClick}
-    >
-      {label}
-    </button>
+      action={action}
+      isDisabled={isDisabled}
+      label={label}
+    />
   )
 })
 
