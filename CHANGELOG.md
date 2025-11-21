@@ -1,3 +1,17 @@
+# [21.0.0](https://github.com/andrewscwei/etudes/compare/v20.4.0...v21.0.0) (2025-11-21)
+
+
+### Features
+
+* Create Form component ([528df4f](https://github.com/andrewscwei/etudes/commit/528df4f6a941af28faed0b416295cdb8075e3416))
+* Create useAgent hook ([147b5ff](https://github.com/andrewscwei/etudes/commit/147b5ff418689b7ee4d9be752ba426c29a06eb92))
+* Remove ColorSchemeProvider ([75dbafa](https://github.com/andrewscwei/etudes/commit/75dbafacadb92ced717810eab49ea9b003a2ec4b))
+
+
+### BREAKING CHANGES
+
+* Removed ColorSchemeProvider
+
 # [20.4.0](https://github.com/andrewscwei/etudes/compare/v20.3.0...v20.4.0) (2025-11-13)
 
 
