@@ -5,12 +5,13 @@ export * from './components/CoverVideo.js'
 export * from './components/OptionButton.js'
 export * from './components/PanoramaSlider.js'
 export * from './components/SelectableButton.js'
-export * from './components/WithTooltip.js'
 
 export * from './flows/Conditional.js'
 export * from './flows/Each.js'
 export * from './flows/Repeat.js'
 export * from './flows/Switch.js'
+
+export * from './hocs/WithTooltip.js'
 
 export * from './hooks/useClassName.js'
 export * from './hooks/useClickOutside.js'
