@@ -1,3 +1,10 @@
+## [21.2.1](https://github.com/andrewscwei/etudes/compare/v21.2.0...v21.2.1) (2025-11-22)
+
+
+### Bug Fixes
+
+* Fix CodeInput inconsistent input behavior ([8419a6f](https://github.com/andrewscwei/etudes/commit/8419a6f5738d0da94a1b0142c8c34b18498825d5))
+
 # [21.2.0](https://github.com/andrewscwei/etudes/compare/v21.1.0...v21.2.0) (2025-11-22)
 
 
