@@ -5,6 +5,7 @@ import { AccordionDemo } from './demos/AccordionDemo.js'
 import { BurgerButtonDemo } from './demos/BurgerButtonDemo.js'
 import { ButtonDemo } from './demos/ButtonDemo.js'
 import { CarouselDemo } from './demos/CarouselDemo.js'
+import { CodeInputDemo } from './demos/CodeInputDemo.js'
 import { CollectionDemo } from './demos/CollectionDemo.js'
 import { CounterDemo } from './demos/CounterDemo.js'
 import { CoverImageDemo } from './demos/CoverImageDemo.js'
@@ -42,6 +43,7 @@ export function App() {
         <BurgerButtonDemo/>
         <ButtonDemo/>
         <CarouselDemo/>
+        <CodeInputDemo/>
         <CollectionDemo/>
         <CounterDemo/>
         <CoverImageDemo/>

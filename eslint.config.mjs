@@ -58,7 +58,7 @@ export default tseslint.config(
       }],
       '@stylistic/jsx-newline': 'off',
       '@stylistic/jsx-one-expression-per-line': ['error', { allow: 'single-child' }],
-      '@stylistic/jsx-pascal-case': 'error',
+      '@stylistic/jsx-pascal-case': ['error', { allowAllCaps: true, allowLeadingUnderscore: true }],
       '@stylistic/jsx-props-no-multi-spaces': 'error',
       '@stylistic/jsx-quotes': ['error', 'prefer-single'],
       '@stylistic/jsx-self-closing-comp': 'error',
