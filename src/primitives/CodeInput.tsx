@@ -8,7 +8,7 @@ import { styles } from '../utils/styles.js'
 const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>(({
   children,
   autoFocus = false,
-  inputMode,
+  inputMode = 'numeric',
   isDisabled = false,
   isRequired = true,
   placeholder,
@@ -218,7 +218,7 @@ export namespace CodeInput {
     /**
      * Specifies the input mode for each field.
      */
-    inputMode: 'text' | 'numeric'
+    inputMode?: 'text' | 'numeric'
 
     /**
      * Specifies if each field in the code input is disabled.
