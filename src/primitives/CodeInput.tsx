@@ -39,7 +39,9 @@ const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
 
   const changeHandler = (index: number) => {
     return (e: ChangeEvent<HTMLInputElement>) => {
-      const char = e.target.value.slice(-1)
+      const prev = fields[index]
+      const curr = e.target.value
+      const char = _replaceFirst(curr, prev).slice(-1)
 
       const newValue = fields.slice()
       newValue[index] = char
@@ -59,10 +61,19 @@ const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
     return (e: KeyboardEvent<HTMLInputElement>) => {
       switch (e.key) {
         case 'Backspace': {
-          if (fields[index]) return
-
           e.preventDefault()
-          focusOn(index - 1)
+
+          if (fields[index]) {
+            const newValue = fields.slice()
+            newValue[index] = ''
+
+            onChange(newValue)
+            focusOn(index - 1)
+          }
+          else {
+            focusOn(index - 1)
+          }
+
           break
         }
         case 'ArrowLeft': {
@@ -176,6 +187,14 @@ function _insertFields(source: string[], target: string[], start: number = 0) {
   }
 
   return source
+}
+
+function _replaceFirst(str: string, search: string, replacement: string = '') {
+  const index = str.indexOf(search)
+
+  if (index === -1) return str
+
+  return (str.slice(0, index) + replacement + str.slice(index + search.length))
 }
 
 export namespace CodeInput {
