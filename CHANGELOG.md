@@ -1,3 +1,10 @@
+## [21.2.2](https://github.com/andrewscwei/etudes/compare/v21.2.1...v21.2.2) (2025-11-22)
+
+
+### Bug Fixes
+
+* Fix inconsistent auto focus in CodeInput ([05752c0](https://github.com/andrewscwei/etudes/commit/05752c06f8cdbaf97868cb50ae2fd8b38321f209))
+
 ## [21.2.1](https://github.com/andrewscwei/etudes/compare/v21.2.0...v21.2.1) (2025-11-22)
 
 
