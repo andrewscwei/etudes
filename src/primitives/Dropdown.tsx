@@ -306,7 +306,7 @@ export const DropdownItem = CollectionItem
 /**
  * Component for the toggle button of a {@link Dropdown}.
  */
-export const DropdownToggle = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & DropdownToggleProps) => (
+export const DropdownToggle = ({ children, ...props }: DropdownToggleProps) => (
   <button {...props}>{children}</button>
 )
 

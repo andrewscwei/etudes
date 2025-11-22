@@ -8,6 +8,8 @@ import { styles } from '../utils/styles.js'
 const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>(({
   children,
   autoFocus = false,
+  isDisabled = false,
+  isRequired = true,
   placeholder,
   size,
   style,
@@ -110,8 +112,12 @@ const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
         {i => (
           <Styled
             ref={(el: HTMLInputElement) => (fieldRefs.current[i] = el)}
+            aria-disabled={isDisabled}
+            aria-required={isRequired}
+            disabled={isDisabled}
             element={components.field ?? <_Field/>}
             placeholder={placeholder}
+            required={isRequired}
             style={styles(fixedStyles.field)}
             value={fields[i]}
             onChange={changeHandler(i)}
@@ -124,7 +130,7 @@ const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
   )
 })
 
-const _Field = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+const _Field = ({ ...props }: HTMLAttributes<HTMLInputElement>) => (
   <input {...props} type='text'/>
 )
 
@@ -181,6 +187,16 @@ export namespace CodeInput {
      * Specifies if the first empty field should be focused on mount.
      */
     autoFocus?: boolean
+
+    /**
+     * Specifies if each field in the code input is disabled.
+     */
+    isDisabled?: boolean
+
+    /**
+     * Specifies if each field in the code input is required.
+     */
+    isRequired?: boolean
 
     /**
      * Placeholder text for each field.
