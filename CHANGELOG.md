@@ -1,3 +1,10 @@
+# [21.1.0](https://github.com/andrewscwei/etudes/compare/v21.0.0...v21.1.0) (2025-11-22)
+
+
+### Features
+
+* Create CodeInput component ([88377bf](https://github.com/andrewscwei/etudes/commit/88377bf36a5ae0524c35b1ed5e507b4e12b514a6))
+
 # [21.0.0](https://github.com/andrewscwei/etudes/compare/v20.4.0...v21.0.0) (2025-11-21)
 
 
