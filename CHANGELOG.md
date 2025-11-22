@@ -1,3 +1,10 @@
+# [21.4.0](https://github.com/andrewscwei/etudes/compare/v21.3.0...v21.4.0) (2025-11-22)
+
+
+### Features
+
+* Default `inputMode` to `numeric` for CodeInput ([0e2d938](https://github.com/andrewscwei/etudes/commit/0e2d938080e8884d550369c3dd784f1aa313a5ca))
+
 # [21.3.0](https://github.com/andrewscwei/etudes/compare/v21.2.2...v21.3.0) (2025-11-22)
 
 
