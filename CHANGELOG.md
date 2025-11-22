@@ -1,3 +1,10 @@
+# [21.3.0](https://github.com/andrewscwei/etudes/compare/v21.2.2...v21.3.0) (2025-11-22)
+
+
+### Features
+
+* Support `inputMode` for CodeInput ([be29454](https://github.com/andrewscwei/etudes/commit/be294543a77547ee65bd2e6c7004ba84ab9f6072))
+
 ## [21.2.2](https://github.com/andrewscwei/etudes/compare/v21.2.1...v21.2.2) (2025-11-22)
 
 
