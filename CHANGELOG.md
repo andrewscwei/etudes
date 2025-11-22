@@ -1,3 +1,10 @@
+# [21.2.0](https://github.com/andrewscwei/etudes/compare/v21.1.0...v21.2.0) (2025-11-22)
+
+
+### Features
+
+* Support isDisabled and isRequired for CodeInput ([52f1594](https://github.com/andrewscwei/etudes/commit/52f1594411ffab7979aa4e7f6d4fedd022bf1f8b))
+
 # [21.1.0](https://github.com/andrewscwei/etudes/compare/v21.0.0...v21.1.0) (2025-11-22)
 
 
