@@ -115,7 +115,7 @@ const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
     if (firstEmpty !== -1) {
       focusOn(firstEmpty)
     }
-  }, [fields, autoFocus])
+  }, [autoFocus])
 
   return (
     <div {...props} ref={ref} style={styles(style, fixedStyles.root)}>
