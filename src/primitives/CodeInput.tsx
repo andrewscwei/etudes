@@ -8,6 +8,7 @@ import { styles } from '../utils/styles.js'
 const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>(({
   children,
   autoFocus = false,
+  inputMode,
   isDisabled = false,
   isRequired = true,
   placeholder,
@@ -127,6 +128,7 @@ const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
             aria-required={isRequired}
             disabled={isDisabled}
             element={components.field ?? <_Field/>}
+            inputMode={inputMode}
             placeholder={placeholder}
             required={isRequired}
             style={styles(fixedStyles.field)}
@@ -142,7 +144,13 @@ const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
 })
 
 const _Field = ({ ...props }: HTMLAttributes<HTMLInputElement>) => (
-  <input {...props} type='text'/>
+  <input
+    {...props}
+    autoCapitalize='off'
+    autoComplete='off'
+    autoCorrect='off'
+    type='text'
+  />
 )
 
 function _getFixedStyles() {
@@ -206,6 +214,11 @@ export namespace CodeInput {
      * Specifies if the first empty field should be focused on mount.
      */
     autoFocus?: boolean
+
+    /**
+     * Specifies the input mode for each field.
+     */
+    inputMode: 'text' | 'numeric'
 
     /**
      * Specifies if each field in the code input is disabled.
