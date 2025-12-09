@@ -277,14 +277,16 @@ export namespace Collection {
   export type SelectionMode = 'none' | 'single' | 'multiple'
 
   /**
-   * Type describing the current item selection of {@link Collection}, composed of
-   * an array of indices of items that are selected. If the selection mode of the
-   * {@link Collection} is `single`, only one index is expected in this array.
+   * Type describing the current item selection of {@link Collection}, composed
+   * of an array of indices of items that are selected. If the selection mode of
+   * the {@link Collection} is `single`, only one index is expected in this
+   * array.
    */
   export type Selection = number[]
 
   /**
-   * Type describing the props of `ItemComponent` provided to {@link Collection}.
+   * Type describing the props of `ItemComponent` provided to
+   * {@link Collection}.
    */
   export type ItemProps<T> = HTMLAttributes<HTMLElement> & {
     /**
@@ -321,8 +323,8 @@ export namespace Collection {
    */
   export type Props<T> = HTMLAttributes<HTMLDivElement> & {
     /**
-     * Indicates if item selection can be toggled, i.e. they can be deselected if
-     * selected again.
+     * Indicates if item selection can be toggled, i.e. they can be deselected
+     * if selected again.
      */
     isSelectionTogglable?: boolean
 
@@ -407,7 +409,8 @@ export namespace Collection {
      *
      * @param index Index of the item.
      * @param eventName User-defined name of the dispatched custom event.
-     * @param eventInfo Optional user-defined info of the dispatched custom event.
+     * @param eventInfo Optional user-defined info of the dispatched custom
+     *                  event.
      */
     onCustomEvent?: (index: number, eventName: string, eventInfo?: any) => void
 
@@ -459,6 +462,6 @@ export const Collection = Object.assign(_Collection, {
 })
 
 if (process.env.NODE_ENV === 'development') {
-  (Collection as any).displayName = 'Collection'
-  _Item.displayName = 'CollectionItem'
+  (_Collection as any).displayName = 'Collection'
+  _Item.displayName = 'Collection.Item'
 }

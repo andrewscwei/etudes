@@ -10,240 +10,7 @@ import { styles } from '../utils/styles.js'
 import { Collection } from './Collection.js'
 import { type DropdownToggleProps } from './Dropdown.js'
 
-/**
- * Type describing the current item selection of {@link Accordion}, composed of
- * a dictionary whose key corresponds the section index and value corresponds to
- * an array of selected item indices. If the selection mode of the
- * {@link Accordion} is `single`, only one key will be present and one index in
- * the array value.
- */
-export type AccordionSelection = Record<number, number[]>
-
-/**
- * Type describing the data of each section in {@link Accordion}.
- */
-export type AccordionSectionProps<T> = Pick<Collection.Props<T>, 'isSelectionTogglable' | 'itemLength' | 'itemPadding' | 'items' | 'layout' | 'numSegments'> & {
-  /**
-   * Padding (in pixels) between the section header and the internal collection.
-   */
-  collectionPadding?: number
-
-  /**
-   * Label for the section header.
-   */
-  label: string
-
-  /**
-   * Maximum number of visible rows (if section orientation is `vertical`) or
-   * columns (if section orientation is `horizontal`). If number of rows exceeds
-   * the number of visible, a scrollbar will be put in place.
-   */
-  maxVisible?: number
-}
-
-/**
- * Type describing the props of each `ItemComponent` provided to
- * {@link Accordion}.
- */
-export type AccordionItemProps<T> = Collection.ItemProps<T>
-
-/**
- * Type describing the props of each `HeaderComponent` provided to
- * {@link Accordion}.
- */
-export type AccordionHeaderProps<I, S extends AccordionSectionProps<I> = AccordionSectionProps<I>> = HTMLAttributes<HTMLElement> & {
-  /**
-   * The index of the corresponding section.
-   */
-  index: number
-
-  /**
-   * Indicates whether the corresponding section is collapsed.
-   */
-  isCollapsed: boolean
-
-  /**
-   * Data provided to the corresponding section.
-   */
-  section: S
-
-  /**
-   * Handler invoked to dispatch a custom event.
-   *
-   * @param name User-defined name of the custom event.
-   * @param info Optional user-defined info of the custom event.
-   */
-  onCustomEvent?: (name: string, info?: any) => void
-}
-
-/**
- * Type describing the props of {@link Accordion}.
- */
-export type AccordionProps<I, S extends AccordionSectionProps<I> = AccordionSectionProps<I>> = HTMLAttributes<HTMLDivElement> & {
-  /**
-   * Specifies if expanded sections should automatically collapse upon expanding
-   * another section.
-   */
-  autoCollapseSections?: boolean
-
-  /**
-   * Indices of sections that are expanded. If specified, the component will not
-   * manage expansion states.
-   */
-  expandedSectionIndices?: number[]
-
-  /**
-   * Orientation of this component.
-   *
-   * @see {@link CollectionOrientation}
-   */
-  orientation?: Collection.Orientation
-
-  /**
-   * Padding (in pixels) between each section.
-   */
-  sectionPadding?: number
-
-  /**
-   * Data provided to each section.
-   */
-  sections: S[]
-
-  /**
-   * Indices of selected items per section.
-   *
-   * @see {@link AccordionSelection}
-   */
-  selection?: AccordionSelection
-
-  /**
-   * Selection mode of each section.
-   *
-   * @see {@link CollectionSelectionMode}
-   */
-  selectionMode?: Collection.SelectionMode
-
-  /**
-   * Handler invoked when an item is activated in a section. The order of
-   * handlers invoked when any selection changes take place is:
-   *   1. `onActivateAt`
-   *   2. `onDeselectAt`
-   *   3. `onSelectAt`
-   *   4. `onSelectionChange`
-   *
-   * @param itemIndex Item index.
-   * @param sectionIndex Section index.
-   */
-  onActivateAt?: (itemIndex: number, sectionIndex: number) => void
-
-  /**
-   * Handler invoked when a section is collapsed. The order of handlers invoked
-   * when any section expansion changes take place is:
-   *   1. `onCollapseSectionAt`
-   *   2. `onExpandSectionAt`
-   *
-   * @param sectionIndex Section index.
-   */
-  onCollapseSectionAt?: (sectionIndex: number) => void
-
-  /**
-   * Handler invoked when an item is deselected in a section. The order of
-   * handlers invoked when any selection changes take place is:
-   *   1. `onActivateAt`
-   *   2. `onDeselectAt`
-   *   3. `onSelectAt`
-   *   4. `onSelectionChange`
-   *
-   * @param itemIndex Item index.
-   * @param sectionIndex Section index.
-   */
-  onDeselectAt?: (itemIndex: number, sectionIndex: number) => void
-
-  /**
-   * Handler invoked when the expansion state of any section changes.
-   *
-   * @param expandedSectionIndices Indices of sections that are expanded.
-   */
-  onExpandedSectionsChange?: (expandedSectionIndices: number[]) => void
-
-  /**
-   * Handler invoked when a section is expanded. The order of handlers invoked
-   * when any section expansion changes take place is:
-   *   1. `onCollapseSectionAt`
-   *   2. `onExpandSectionAt`
-   *
-   * @param sectionIndex Section index.
-   */
-  onExpandSectionAt?: (sectionIndex: number) => void
-
-  /**
-   * Handler invoked when a custom event is dispatched from a section header.
-   *
-   * @param sectionIndex Index of the section which the header belongs.
-   * @param eventName User-defined name of the dispatched event.
-   * @param eventInfo Optional user-defined info of the dispatched event.
-   */
-  onHeaderCustomEvent?: (sectionIndex: number, eventName: string, eventInfo?: any) => void
-
-  /**
-   * Handler invoked when a custom event is dispatched from an item.
-   *
-   * @param itemIndex Item index.
-   * @param sectionIndex Section index.
-   * @param eventName User-defined name of the dispatched event.
-   * @param eventInfo Optional user-defined info of the dispatched event.
-   */
-  onItemCustomEvent?: (itemIndex: number, sectionIndex: number, eventName: string, eventInfo?: any) => void
-
-  /**
-   * Handler invoked when an item is selected in a section. The order of
-   * handlers invoked when any selection changes take place is:
-   *   1. `onActivateAt`
-   *   2. `onDeselectAt`
-   *   3. `onSelectAt`
-   *   4. `onSelectionChange`
-   *
-   * @param itemIndex Item index.
-   * @param sectionIndex Section index.
-   */
-  onSelectAt?: (itemIndex: number, sectionIndex: number) => void
-
-  /**
-   * Handler invoked when selected items have changed. The order of handlers
-   * invoked when any selection changes take place is:
-   *   1. `onActivateAt`
-   *   2. `onDeselectAt`
-   *   3. `onSelectAt`
-   *   4. `onSelectionChange`
-   *
-   * @param selectedIndices Dictionary of indices of selected items per section.
-   */
-  onSelectionChange?: (selection: AccordionSelection) => void
-
-  /**
-   * Component type for generating section headers inside the component. When
-   * absent, one will be generated automatically.
-   */
-  HeaderComponent?: ComponentType<AccordionHeaderProps<I, S>>
-
-  /**
-   * Component type for generating items for each section.
-   */
-  ItemComponent?: ComponentType<AccordionItemProps<I>>
-}
-
-/**
- * A collection of selectable items laid out in sections in an accordion. Items
- * are generated based on the provided `ItemComponent` while each section header
- * is optionally provided by `HeaderComponent` or generated automatically.
- *
- * @exports AccordionHeader Component for each section header.
- * @exports AccordionExpandIcon Component for the expand icon of each section.
- * @exports AccordionCollapseIcon Component for the collapse icon of each
- * @exports AccordionSection Component for each section.
- * @exports AccordionItem Component for each item in each section.
- */
-export const Accordion = /* #__PURE__ */ forwardRef(({
+const _Accordion = /* #__PURE__ */ forwardRef(({
   children,
   style,
   autoCollapseSections = false,
@@ -295,7 +62,7 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
   const handleSelectAt = (itemIndex: number, sectionIndex: number) => {
     if (isSelectedAt(itemIndex, sectionIndex)) return
 
-    let transform: (val: AccordionSelection) => AccordionSelection
+    let transform: (val: Accordion.Selection) => Accordion.Selection
 
     switch (selectionMode) {
       case 'multiple':
@@ -321,7 +88,7 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
   const handleDeselectAt = (itemIndex: number, sectionIndex: number) => {
     if (!isSelectedAt(itemIndex, sectionIndex)) return
 
-    const transform = (val: AccordionSelection) => ({
+    const transform = (val: Accordion.Selection) => ({
       ...val,
       [sectionIndex]: (val[sectionIndex] ?? []).filter(t => t !== itemIndex),
     })
@@ -343,7 +110,7 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
     onExpandedSectionsChange?.(newValue)
   }
 
-  const handleSelectionChange = (oldValue: AccordionSelection | undefined, newValue: AccordionSelection) => {
+  const handleSelectionChange = (oldValue: Accordion.Selection | undefined, newValue: Accordion.Selection) => {
     if (isDeepEqual(oldValue, newValue)) return
 
     const numSections = sections.length
@@ -368,11 +135,11 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
   }
 
   const components = asComponentDict(children, {
-    collapseIcon: AccordionCollapseIcon,
-    expandIcon: AccordionExpandIcon,
-    header: AccordionHeader,
-    item: AccordionItem,
-    section: AccordionSection,
+    collapseIcon: _CollapseIcon,
+    expandIcon: _ExpandIcon,
+    header: _Header,
+    item: _Item,
+    section: _Section,
   })
 
   return (
@@ -388,7 +155,7 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
 
           return (
             <Styled
-              element={components.section ?? <AccordionSection/>}
+              element={components.section ?? <_Section/>}
               style={styles(fixedStyles.section, orientation === 'vertical' ? {
                 marginTop: sectionIndex === 0 ? '0px' : `${sectionPadding}px`,
                 ...headerSize.height > 0 ? {
@@ -425,7 +192,7 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
                   <Styled
                     aria-expanded={!isCollapsed}
                     className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
-                    element={components.header ?? <AccordionHeader/>}
+                    element={components.header ?? <_Header/>}
                     role='button'
                     style={styles(fixedStyles.header)}
                     onClick={() => toggleSectionAt(sectionIndex)}
@@ -475,7 +242,7 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
                   onDeselectAt={itemIndex => handleDeselectAt(itemIndex, sectionIndex)}
                   onSelectAt={itemIndex => handleSelectAt(itemIndex, sectionIndex)}
                 >
-                  {!ItemComponent && (components.item ?? <AccordionItem/>)}
+                  {!ItemComponent && (components.item ?? <_Item/>)}
                 </Collection>
               </div>
             </Styled>
@@ -484,49 +251,34 @@ export const Accordion = /* #__PURE__ */ forwardRef(({
       </Each>
     </div>
   )
-}) as <I, S extends AccordionSectionProps<I> = AccordionSectionProps<I>>(props: Readonly<AccordionProps<I, S> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
+}) as <I, S extends Accordion.SectionProps<I> = Accordion.SectionProps<I>>(props: Readonly<Accordion.Props<I, S> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
 
-/**
- * Component for each section header of an {@link Accordion}.
- */
-export const AccordionHeader = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & DropdownToggleProps) => (
+const _Header = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & DropdownToggleProps) => (
   <button {...props}>{children}</button>
 )
 
-/**
- * Component for the expand icon of each section of an {@link Accordion}.
- */
-export const AccordionExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+const _ExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <figure {...props}>{children}</figure>
 )
 
-/**
- * Component for the collapse icon of each section of an {@link Accordion}.
- */
-export const AccordionCollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+const _CollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <figure {...props}>{children}</figure>
 )
 
-/**
- * Component for each section in an {@link Accordion}.
- */
-export const AccordionSection = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+const _Section = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}>{children}</div>
 )
 
-/**
- * Component for each item of each section of an {@link Accordion}.
- */
-export const AccordionItem = Collection.Item
+const _Item = Collection.Item
 
-function _isSectionIndexOutOfRange<T>(sectionIndex: number, sections: AccordionSectionProps<T>[]) {
+function _isSectionIndexOutOfRange<T>(sectionIndex: number, sections: Accordion.SectionProps<T>[]) {
   if (sectionIndex >= sections.length) return true
   if (sectionIndex < 0) return true
 
   return false
 }
 
-function _isItemIndexOutOfRange<T>(itemIndex: number, sectionIndex: number, sections: AccordionSectionProps<T>[]) {
+function _isItemIndexOutOfRange<T>(itemIndex: number, sectionIndex: number, sections: Accordion.SectionProps<T>[]) {
   if (_isSectionIndexOutOfRange(sectionIndex, sections)) return true
 
   const items = sections[sectionIndex].items ?? []
@@ -537,12 +289,12 @@ function _isItemIndexOutOfRange<T>(itemIndex: number, sectionIndex: number, sect
   return false
 }
 
-function _sanitizeExpandedSectionIndices<T>(sectionIndices: number[], sections: AccordionSectionProps<T>[]) {
+function _sanitizeExpandedSectionIndices<T>(sectionIndices: number[], sections: Accordion.SectionProps<T>[]) {
   return _sortIndices(sectionIndices).filter(t => !_isSectionIndexOutOfRange(t, sections))
 }
 
-function _sanitizeSelection<T>(selection: AccordionSelection, sections: AccordionSectionProps<T>[]) {
-  const newValue: AccordionSelection = {}
+function _sanitizeSelection<T>(selection: Accordion.Selection, sections: Accordion.SectionProps<T>[]) {
+  const newValue: Accordion.Selection = {}
 
   for (const sectionIndex in sections) {
     if (!Object.hasOwn(sections, sectionIndex)) continue
@@ -620,10 +372,274 @@ function _getFixedStyles({ orientation = 'vertical' }) {
   })
 }
 
+export namespace Accordion {
+  /**
+   * Type describing the current item selection of {@link Accordion}, composed
+   * of a dictionary whose key corresponds the section index and value
+   * corresponds to an array of selected item indices. If the selection mode of
+   * the {@link Accordion} is `single`, only one key will be present and one
+   * index in the array value.
+   */
+  export type Selection = Record<number, number[]>
+
+  /**
+   * Type describing the data of each section in {@link Accordion}.
+   */
+  export type SectionProps<T> = Pick<Collection.Props<T>, 'isSelectionTogglable' | 'itemLength' | 'itemPadding' | 'items' | 'layout' | 'numSegments'> & {
+    /**
+     * Padding (in pixels) between the section header and the internal
+     * collection.
+     */
+    collectionPadding?: number
+
+    /**
+     * Label for the section header.
+     */
+    label: string
+
+    /**
+     * Maximum number of visible rows (if section orientation is `vertical`) or
+     * columns (if section orientation is `horizontal`). If number of rows
+     * exceeds the number of visible, a scrollbar will be put in place.
+     */
+    maxVisible?: number
+  }
+
+  /**
+   * Type describing the props of each `ItemComponent` provided to
+   * {@link Accordion}.
+   */
+  export type ItemProps<T> = Collection.ItemProps<T>
+
+  /**
+   * Type describing the props of each `HeaderComponent` provided to
+   * {@link Accordion}.
+   */
+  export type HeaderProps<I, S extends SectionProps<I> = SectionProps<I>> = HTMLAttributes<HTMLElement> & {
+    /**
+     * The index of the corresponding section.
+     */
+    index: number
+
+    /**
+     * Indicates whether the corresponding section is collapsed.
+     */
+    isCollapsed: boolean
+
+    /**
+     * Data provided to the corresponding section.
+     */
+    section: S
+
+    /**
+     * Handler invoked to dispatch a custom event.
+     *
+     * @param name User-defined name of the custom event.
+     * @param info Optional user-defined info of the custom event.
+     */
+    onCustomEvent?: (name: string, info?: any) => void
+  }
+
+  /**
+   * Type describing the props of {@link Accordion}.
+   */
+  export type Props<I, S extends SectionProps<I> = SectionProps<I>> = HTMLAttributes<HTMLDivElement> & {
+    /**
+     * Specifies if expanded sections should automatically collapse upon
+     * expanding another section.
+     */
+    autoCollapseSections?: boolean
+
+    /**
+     * Indices of sections that are expanded. If specified, the component will
+     * not manage expansion states.
+     */
+    expandedSectionIndices?: number[]
+
+    /**
+     * Orientation of this component.
+     *
+     * @see {@link CollectionOrientation}
+     */
+    orientation?: Collection.Orientation
+
+    /**
+     * Padding (in pixels) between each section.
+     */
+    sectionPadding?: number
+
+    /**
+     * Data provided to each section.
+     */
+    sections: S[]
+
+    /**
+     * Indices of selected items per section.
+     *
+     * @see {@link AccordionSelection}
+     */
+    selection?: Selection
+
+    /**
+     * Selection mode of each section.
+     *
+     * @see {@link CollectionSelectionMode}
+     */
+    selectionMode?: Collection.SelectionMode
+
+    /**
+     * Handler invoked when an item is activated in a section. The order of
+     * handlers invoked when any selection changes take place is:
+     *   1. `onActivateAt`
+     *   2. `onDeselectAt`
+     *   3. `onSelectAt`
+     *   4. `onSelectionChange`
+     *
+     * @param itemIndex Item index.
+     * @param sectionIndex Section index.
+     */
+    onActivateAt?: (itemIndex: number, sectionIndex: number) => void
+
+    /**
+     * Handler invoked when a section is collapsed. The order of handlers
+     * invoked when any section expansion changes take place is:
+     *   1. `onCollapseSectionAt`
+     *   2. `onExpandSectionAt`
+     *
+     * @param sectionIndex Section index.
+     */
+    onCollapseSectionAt?: (sectionIndex: number) => void
+
+    /**
+     * Handler invoked when an item is deselected in a section. The order of
+     * handlers invoked when any selection changes take place is:
+     *   1. `onActivateAt`
+     *   2. `onDeselectAt`
+     *   3. `onSelectAt`
+     *   4. `onSelectionChange`
+     *
+     * @param itemIndex Item index.
+     * @param sectionIndex Section index.
+     */
+    onDeselectAt?: (itemIndex: number, sectionIndex: number) => void
+
+    /**
+     * Handler invoked when the expansion state of any section changes.
+     *
+     * @param expandedSectionIndices Indices of sections that are expanded.
+     */
+    onExpandedSectionsChange?: (expandedSectionIndices: number[]) => void
+
+    /**
+     * Handler invoked when a section is expanded. The order of handlers invoked
+     * when any section expansion changes take place is:
+     *   1. `onCollapseSectionAt`
+     *   2. `onExpandSectionAt`
+     *
+     * @param sectionIndex Section index.
+     */
+    onExpandSectionAt?: (sectionIndex: number) => void
+
+    /**
+     * Handler invoked when a custom event is dispatched from a section header.
+     *
+     * @param sectionIndex Index of the section which the header belongs.
+     * @param eventName User-defined name of the dispatched event.
+     * @param eventInfo Optional user-defined info of the dispatched event.
+     */
+    onHeaderCustomEvent?: (sectionIndex: number, eventName: string, eventInfo?: any) => void
+
+    /**
+     * Handler invoked when a custom event is dispatched from an item.
+     *
+     * @param itemIndex Item index.
+     * @param sectionIndex Section index.
+     * @param eventName User-defined name of the dispatched event.
+     * @param eventInfo Optional user-defined info of the dispatched event.
+     */
+    onItemCustomEvent?: (itemIndex: number, sectionIndex: number, eventName: string, eventInfo?: any) => void
+
+    /**
+     * Handler invoked when an item is selected in a section. The order of
+     * handlers invoked when any selection changes take place is:
+     *   1. `onActivateAt`
+     *   2. `onDeselectAt`
+     *   3. `onSelectAt`
+     *   4. `onSelectionChange`
+     *
+     * @param itemIndex Item index.
+     * @param sectionIndex Section index.
+     */
+    onSelectAt?: (itemIndex: number, sectionIndex: number) => void
+
+    /**
+     * Handler invoked when selected items have changed. The order of handlers
+     * invoked when any selection changes take place is:
+     *   1. `onActivateAt`
+     *   2. `onDeselectAt`
+     *   3. `onSelectAt`
+     *   4. `onSelectionChange`
+     *
+     * @param selectedIndices Dictionary of indices of selected items per
+     *                        section.
+     */
+    onSelectionChange?: (selection: Selection) => void
+
+    /**
+     * Component type for generating section headers inside the component. When
+     * absent, one will be generated automatically.
+     */
+    HeaderComponent?: ComponentType<HeaderProps<I, S>>
+
+    /**
+     * Component type for generating items for each section.
+     */
+    ItemComponent?: ComponentType<ItemProps<I>>
+  }
+}
+
+/**
+ * A collection of selectable items laid out in sections in an accordion. Items
+ * are generated based on the provided `ItemComponent` while each section header
+ * is optionally provided by `HeaderComponent` or generated automatically.
+ *
+ * @exports Accordion.Header Component for each section header.
+ * @exports Accordion.ExpandIcon Component for the expand icon of each section.
+ * @exports Accordion.CollapseIcon Component for the collapse icon of each
+ * @exports Accordion.Section Component for each section.
+ * @exports Accordion.Item Component for each item in each section.
+ */
+export const Accordion = Object.assign(_Accordion, {
+  /**
+   * Component for each section header of an {@link Accordion}.
+   */
+  Header: _Header,
+
+  /**
+   * Component for the expand icon of each section of an {@link Accordion}.
+   */
+  ExpandIcon: _ExpandIcon,
+
+  /**
+   * Component for the collapse icon of each section of an {@link Accordion}.
+   */
+  CollapseIcon: _CollapseIcon,
+
+  /**
+   * Component for each section in an {@link Accordion}.
+   */
+  Section: _Section,
+
+  /**
+   * Component for each item of each section of an {@link Accordion}.
+   */
+  Item: _Item,
+})
+
 if (process.env.NODE_ENV === 'development') {
-  (Accordion as any).displayName = 'Accordion'
-  AccordionHeader.displayName = 'AccordionHeader'
-  AccordionExpandIcon.displayName = 'AccordionExpandIcon'
-  AccordionCollapseIcon.displayName = 'AccordionCollapseIcon'
-  AccordionItem.displayName = 'AccordionItem'
+  (_Accordion as any).displayName = 'Accordion'
+  _Header.displayName = 'Accordion.Header'
+  _ExpandIcon.displayName = 'Accordion.ExpandIcon'
+  _CollapseIcon.displayName = 'Accordion.CollapseIcon'
+  _Item.displayName = 'Accordion.Item'
 }
