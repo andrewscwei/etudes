@@ -1,51 +1,53 @@
 import { XMLBuilder, XMLParser } from 'fast-xml-parser'
 import { forwardRef, type HTMLAttributes } from 'react'
 
-/**
- * Type describing the props of {@link FlatSVG}.
- */
-export type FlatSVGProps = Omit<HTMLAttributes<HTMLElement>, 'role'> & {
+export namespace FlatSVG {
   /**
-   * Specifies how the SVG should be resized:
-   * - `preserve`: Default: the SVG size attributes are unchanged.
-   * - `none`: The SVG size attributes are stripped.
-   * - `fill`: The SVG will fill the container, i.e. `width="100%"` and
-   *   `height="100%"`.
-   * - `height`: The SVG will maintain its aspect ratio and fill the height of
-   *   the container, i.e. `width="auto"` and `height="100%"`.
-   * - `width`: The SVG will maintain its aspect ratio and fill the width of the
-   *   container, i.e. `width="100%"` and `height="auto"`.
+   * Type describing the props of {@link FlatSVG}.
    */
-  fillMode?: 'preserve' | 'none' | 'fill' | 'height' | 'width'
+  export type Props = Omit<HTMLAttributes<HTMLElement>, 'role'> & {
+    /**
+     * Specifies how the SVG should be resized:
+     * - `preserve`: Default: the SVG size attributes are unchanged.
+     * - `none`: The SVG size attributes are stripped.
+     * - `fill`: The SVG will fill the container, i.e. `width="100%"` and
+     *   `height="100%"`.
+     * - `height`: The SVG will maintain its aspect ratio and fill the height of
+     *   the container, i.e. `width="auto"` and `height="100%"`.
+     * - `width`: The SVG will maintain its aspect ratio and fill the width of
+     *   the container, i.e. `width="100%"` and `height="auto"`.
+     */
+    fillMode?: 'preserve' | 'none' | 'fill' | 'height' | 'width'
 
-  /**
-   * The SVG string markup, i.e. "<svg>...</svg>".
-   */
-  svg: string
+    /**
+     * The SVG string markup, i.e. "<svg>...</svg>".
+     */
+    svg: string
 
-  /**
-   * Specifies whether the 'class' should be removed in the SVG root node and
-   * all of its child nodes.
-   */
-  shouldStripClasses?: boolean
+    /**
+     * Specifies whether the 'class' should be removed in the SVG root node and
+     * all of its child nodes.
+     */
+    shouldStripClasses?: boolean
 
-  /**
-   * Specifies whether the 'id' attribute should be removed in the SVG root node
-   * and all of its child nodes.
-   */
-  shouldStripIds?: boolean
+    /**
+     * Specifies whether the 'id' attribute should be removed in the SVG root
+     * node and all of its child nodes.
+     */
+    shouldStripIds?: boolean
 
-  /**
-   * Specifies whether the 'x' and 'y' attributes should be removed in the SVG
-   * root node.
-   */
-  shouldStripPositions?: boolean
+    /**
+     * Specifies whether the 'x' and 'y' attributes should be removed in the SVG
+     * root node.
+     */
+    shouldStripPositions?: boolean
 
-  /**
-   * Specifies whether the 'style' attribute and any <style> nodes should be
-   * removed in the SVG root node and all of its child nodes.
-   */
-  shouldStripStyles?: boolean
+    /**
+     * Specifies whether the 'style' attribute and any <style> nodes should be
+     * removed in the SVG root node and all of its child nodes.
+     */
+    shouldStripStyles?: boolean
+  }
 }
 
 /**
@@ -53,15 +55,18 @@ export type FlatSVGProps = Omit<HTMLAttributes<HTMLElement>, 'role'> & {
  * will attempt to sanitize the markup (i.e. stripping useless attributes)
  * according to the props specified.
  */
-export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<FlatSVGProps>>(({
-  fillMode = 'preserve',
-  svg,
-  shouldStripClasses = true,
-  shouldStripIds = true,
-  shouldStripPositions = true,
-  shouldStripStyles = true,
-  ...props
-}, ref) => {
+export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<FlatSVG.Props>>((
+  {
+    fillMode = 'preserve',
+    svg,
+    shouldStripClasses = true,
+    shouldStripIds = true,
+    shouldStripPositions = true,
+    shouldStripStyles = true,
+    ...props
+  },
+  ref,
+) => {
   const attributeNamePrefix = '@_'
   const idAttributes = ['id'].map(t => `${attributeNamePrefix}${t}`)
   const classAttributes = ['class'].map(t => `${attributeNamePrefix}${t}`)
