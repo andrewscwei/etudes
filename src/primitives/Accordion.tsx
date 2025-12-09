@@ -10,29 +10,32 @@ import { styles } from '../utils/styles.js'
 import { Collection } from './Collection.js'
 import { type DropdownToggleProps } from './Dropdown.js'
 
-const _Accordion = /* #__PURE__ */ forwardRef(({
-  children,
-  style,
-  autoCollapseSections = false,
-  expandedSectionIndices: externalExpandedSectionIndices,
-  orientation = 'vertical',
-  sectionPadding = 0,
-  sections,
-  selection: externalSelection,
-  selectionMode = 'single',
-  onActivateAt,
-  onCollapseSectionAt,
-  onDeselectAt,
-  onExpandedSectionsChange,
-  onExpandSectionAt,
-  onHeaderCustomEvent,
-  onItemCustomEvent,
-  onSelectAt,
-  onSelectionChange,
-  HeaderComponent,
-  ItemComponent,
-  ...props
-}, ref) => {
+const _Accordion = /* #__PURE__ */ forwardRef((
+  {
+    children,
+    style,
+    autoCollapseSections = false,
+    expandedSectionIndices: externalExpandedSectionIndices,
+    orientation = 'vertical',
+    sectionPadding = 0,
+    sections,
+    selection: externalSelection,
+    selectionMode = 'single',
+    onActivateAt,
+    onCollapseSectionAt,
+    onDeselectAt,
+    onExpandedSectionsChange,
+    onExpandSectionAt,
+    onHeaderCustomEvent,
+    onItemCustomEvent,
+    onSelectAt,
+    onSelectionChange,
+    HeaderComponent,
+    ItemComponent,
+    ...props
+  },
+  ref,
+) => {
   const selection = _sanitizeSelection(externalSelection ?? {}, sections)
   const expandedSectionIndices = _sanitizeExpandedSectionIndices(externalExpandedSectionIndices ?? [], sections)
   const fixedStyles = _getFixedStyles({ orientation })
@@ -609,7 +612,7 @@ export namespace Accordion {
  * @exports Accordion.Section Component for each section.
  * @exports Accordion.Item Component for each item in each section.
  */
-export const Accordion = Object.assign(_Accordion, {
+export const Accordion = /* #__PURE__ */ Object.assign(_Accordion, {
   /**
    * Component for each section header of an {@link Accordion}.
    */
@@ -638,6 +641,7 @@ export const Accordion = Object.assign(_Accordion, {
 
 if (process.env.NODE_ENV === 'development') {
   (_Accordion as any).displayName = 'Accordion'
+
   _Header.displayName = 'Accordion.Header'
   _ExpandIcon.displayName = 'Accordion.ExpandIcon'
   _CollapseIcon.displayName = 'Accordion.CollapseIcon'

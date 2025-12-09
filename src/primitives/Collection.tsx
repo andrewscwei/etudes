@@ -454,7 +454,7 @@ export namespace Collection {
  *
  * @exports Collection.Item Component for each item in the collection.
  */
-export const Collection = Object.assign(_Collection, {
+export const Collection = /* #__PURE__ */ Object.assign(_Collection, {
   /**
    * Component for each item in a {@link Collection}.
    */
@@ -463,5 +463,6 @@ export const Collection = Object.assign(_Collection, {
 
 if (process.env.NODE_ENV === 'development') {
   (_Collection as any).displayName = 'Collection'
+
   _Item.displayName = 'Collection.Item'
 }
