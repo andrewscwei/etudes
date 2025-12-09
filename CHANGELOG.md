@@ -1,3 +1,10 @@
+# [21.5.0](https://github.com/andrewscwei/etudes/compare/v21.4.0...v21.5.0) (2025-12-09)
+
+
+### Features
+
+* Update useKeyboardShortcut to handle multiple keys ([ac5e571](https://github.com/andrewscwei/etudes/commit/ac5e571f1162928184fa87f345d61045e9fb4681))
+
 # [21.4.0](https://github.com/andrewscwei/etudes/compare/v21.3.0...v21.4.0) (2025-11-22)
 
 
