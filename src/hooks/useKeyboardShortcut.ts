@@ -1,31 +1,31 @@
-import { useEffect } from 'react'
+import { type KeyboardEvent, type RefObject, useEffect, useMemo } from 'react'
 import { useLatest } from './useLatest.js'
 
 /**
  * A type representing the keys that can be used in a keyboard shortcut.
  */
 export type KeyboardKey =
-  | 'Backspace'
-  | 'Tab'
-  | 'Enter'
-  | 'Shift'
-  | 'Control'
-  | 'Alt'
-  | 'Pause'
-  | 'CapsLock'
-  | 'Escape'
-  | 'Space'
-  | 'PageUp'
-  | 'PageDown'
-  | 'End'
-  | 'Home'
-  | 'ArrowLeft'
-  | 'ArrowUp'
-  | 'ArrowRight'
-  | 'ArrowDown'
-  | 'PrintScreen'
-  | 'Insert'
-  | 'Delete'
+  | 'backspace'
+  | 'tab'
+  | 'enter'
+  | 'shift'
+  | 'control'
+  | 'alt'
+  | 'pause'
+  | 'capslock'
+  | 'escape'
+  | 'space'
+  | 'pageup'
+  | 'pagedown'
+  | 'end'
+  | 'home'
+  | 'arrowleft'
+  | 'arrowup'
+  | 'arrowright'
+  | 'arrowdown'
+  | 'printscreen'
+  | 'insert'
+  | 'delete'
   | '0'
   | '1'
   | '2'
@@ -62,50 +62,109 @@ export type KeyboardKey =
   | 'x'
   | 'y'
   | 'z'
-  | 'Meta'
-  | 'ContextMenu'
-  | 'F1'
-  | 'F2'
-  | 'F3'
-  | 'F4'
-  | 'F5'
-  | 'F6'
-  | 'F7'
-  | 'F8'
-  | 'F9'
-  | 'F10'
-  | 'F11'
-  | 'F12'
-  | 'NumLock'
-  | 'ScrollLock'
-  | 'AudioVolumeMute'
-  | 'AudioVolumeDown'
-  | 'AudioVolumeUp'
-  | 'MediaTrackNext'
-  | 'MediaTrackPrevious'
-  | 'MediaStop'
-  | 'MediaPlayPause'
+  | 'meta'
+  | 'contextmenu'
+  | 'f1'
+  | 'f2'
+  | 'f3'
+  | 'f4'
+  | 'f5'
+  | 'f6'
+  | 'f7'
+  | 'f8'
+  | 'f9'
+  | 'f10'
+  | 'f11'
+  | 'f12'
+  | 'numlock'
+  | 'scrolllock'
+  | 'audiovolumemute'
+  | 'audiovolumedown'
+  | 'audiovolumeup'
+  | 'mediatracknext'
+  | 'mediatrackprevious'
+  | 'mediastop'
+  | 'mediaplaypause'
+
+/**
+ * Options for the {@link useKeyboardShortcut} hook.
+ */
+type Options = {
+  /**
+   * Specifies whether the keyboard shortcut is enabled.
+   */
+  isEnabled?: boolean
+
+  /**
+   * Specifies whether to prevent the default action for the keyboard event.
+   */
+  preventDefault?: boolean
+
+  /**
+   * Specifies whether to use event capturing.
+   */
+  capture?: boolean
+
+  /**
+   * The target element to attach the event listener to. Defaults to `window`.
+   */
+  target?: Window | HTMLElement | RefObject<Window | HTMLElement> | RefObject<Window | HTMLElement | null> | RefObject<Window | HTMLElement | undefined>
+}
 
 /**
  * A hook that listens for a keyboard shortcut and triggers an action.
  *
- * @param key The key to listen for.
+ * @param keyOrKeys The key or keys that make up the keyboard shortcut.
  * @param action The action to trigger when the key is pressed.
+ * @param options See {@link Options}.
  */
-export function useKeyboardShortcut(key: KeyboardKey, action: () => void) {
+export function useKeyboardShortcut(
+  keyOrKeys: KeyboardKey | KeyboardKey[],
+  action: () => void,
+  {
+    isEnabled = true,
+    preventDefault = true,
+    capture = true,
+    target,
+  }: Options = {},
+) {
   const actionRef = useLatest(action)
+  const keys = Array.isArray(keyOrKeys) ? keyOrKeys : [keyOrKeys]
+  const normalizedKeys = useMemo(() => keys.map(k => k.toLowerCase()).sort(), [keys])
 
   useEffect(() => {
+    if (!isEnabled || normalizedKeys.length === 0) return
+
+    const eventTarget = target && typeof target === 'object' && 'current' in target
+      ? target.current
+      : target || window
+
+    if (!eventTarget) return
+
     const handler = (event: KeyboardEvent) => {
-      if (event.key === key) {
-        actionRef.current?.()
+      const pressed = new Set([
+        event.key.toLowerCase(),
+        event.ctrlKey && 'control',
+        event.metaKey && 'meta',
+        event.shiftKey && 'shift',
+        event.altKey && 'alt',
+      ].filter(Boolean))
+
+      const match = normalizedKeys.every(k => pressed.has(k)) && pressed.size === normalizedKeys.length
+
+      if (!match) return
+
+      if (preventDefault) {
+        event.preventDefault()
       }
+
+      actionRef.current?.()
     }
 
-    window.addEventListener('keydown', handler)
+    eventTarget.addEventListener('keydown', handler as any, { capture })
 
     return () => {
-      window.removeEventListener('keydown', handler)
+      eventTarget.removeEventListener('keydown', handler as any, { capture })
     }
-  }, [key])
+  }, [isEnabled, preventDefault, capture, normalizedKeys.join(',')])
 }
