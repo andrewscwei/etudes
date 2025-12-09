@@ -197,63 +197,6 @@ const _Item = ({ children, selectionMode, onActivateAt, ...props }: HTMLAttribut
   }
 }
 
-function _isIndexOutOfRange<T>(index: number, items: T[]) {
-  if (isNaN(index)) return true
-  if (index >= items.length) return true
-  if (index < 0) return true
-
-  return false
-}
-
-function _sanitizeSelection<T>(indices: Collection.Selection, items: T[]) {
-  return _sortIndices(indices).filter(t => !_isIndexOutOfRange(t, items))
-}
-
-function _sortIndices(indices: number[]): number[] {
-  return indices.sort((a, b) => a - b)
-}
-
-function _getFixedStyles({ itemLength = NaN, itemPadding = 0, layout = 'collection', numSegments = 1, orientation = 'vertical' }) {
-  return asStyleDict({
-    root: {
-      counterReset: 'item-counter',
-      listStyle: 'none',
-      ...layout === 'list' ? {
-        alignItems: 'flex-start',
-        display: 'flex',
-        flex: '0 0 auto',
-        flexDirection: orientation === 'horizontal' ? 'row' : 'column',
-        justifyContent: 'flex-start',
-      } : {
-        display: 'grid',
-        gap: `${itemPadding}px`,
-        ...orientation === 'vertical' ? {
-          gridAutoRows: isNaN(itemLength) ? undefined : `${itemLength}px`,
-          gridTemplateColumns: `repeat(${numSegments}, 1fr)`,
-          gridAutoFlow: 'row',
-        } : {
-          gridAutoColumns: isNaN(itemLength) ? undefined : `${itemLength}px`,
-          gridTemplateRows: `repeat(${numSegments}, 1fr)`,
-          gridAutoFlow: 'column',
-        },
-      },
-    },
-    item: {
-      counterIncrement: 'item-counter',
-      flex: '0 0 auto',
-      ...layout === 'list' ? {
-        ...orientation === 'vertical' ? {
-          width: '100%',
-          height: isNaN(itemLength) ? undefined : `${itemLength}px`,
-        } : {
-          width: isNaN(itemLength) ? undefined : `${itemLength}px`,
-          height: '100%',
-        },
-      } : {},
-    },
-  })
-}
-
 export namespace Collection {
   /**
    * Type describing the layout orientation of items in {@link Collection}.
@@ -460,6 +403,63 @@ export const Collection = /* #__PURE__ */ Object.assign(_Collection, {
    */
   Item: _Item,
 })
+
+function _isIndexOutOfRange<T>(index: number, items: T[]) {
+  if (isNaN(index)) return true
+  if (index >= items.length) return true
+  if (index < 0) return true
+
+  return false
+}
+
+function _sanitizeSelection<T>(indices: Collection.Selection, items: T[]) {
+  return _sortIndices(indices).filter(t => !_isIndexOutOfRange(t, items))
+}
+
+function _sortIndices(indices: number[]): number[] {
+  return indices.sort((a, b) => a - b)
+}
+
+function _getFixedStyles({ itemLength = NaN, itemPadding = 0, layout = 'collection', numSegments = 1, orientation = 'vertical' }) {
+  return asStyleDict({
+    root: {
+      counterReset: 'item-counter',
+      listStyle: 'none',
+      ...layout === 'list' ? {
+        alignItems: 'flex-start',
+        display: 'flex',
+        flex: '0 0 auto',
+        flexDirection: orientation === 'horizontal' ? 'row' : 'column',
+        justifyContent: 'flex-start',
+      } : {
+        display: 'grid',
+        gap: `${itemPadding}px`,
+        ...orientation === 'vertical' ? {
+          gridAutoRows: isNaN(itemLength) ? undefined : `${itemLength}px`,
+          gridTemplateColumns: `repeat(${numSegments}, 1fr)`,
+          gridAutoFlow: 'row',
+        } : {
+          gridAutoColumns: isNaN(itemLength) ? undefined : `${itemLength}px`,
+          gridTemplateRows: `repeat(${numSegments}, 1fr)`,
+          gridAutoFlow: 'column',
+        },
+      },
+    },
+    item: {
+      counterIncrement: 'item-counter',
+      flex: '0 0 auto',
+      ...layout === 'list' ? {
+        ...orientation === 'vertical' ? {
+          width: '100%',
+          height: isNaN(itemLength) ? undefined : `${itemLength}px`,
+        } : {
+          width: isNaN(itemLength) ? undefined : `${itemLength}px`,
+          height: '100%',
+        },
+      } : {},
+    },
+  })
+}
 
 if (process.env.NODE_ENV === 'development') {
   (_Collection as any).displayName = 'Collection'

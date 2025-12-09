@@ -274,107 +274,6 @@ const _Section = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
 
 const _Item = Collection.Item
 
-function _isSectionIndexOutOfRange<T>(sectionIndex: number, sections: Accordion.SectionProps<T>[]) {
-  if (sectionIndex >= sections.length) return true
-  if (sectionIndex < 0) return true
-
-  return false
-}
-
-function _isItemIndexOutOfRange<T>(itemIndex: number, sectionIndex: number, sections: Accordion.SectionProps<T>[]) {
-  if (_isSectionIndexOutOfRange(sectionIndex, sections)) return true
-
-  const items = sections[sectionIndex].items ?? []
-
-  if (itemIndex >= items.length) return true
-  if (itemIndex < 0) return true
-
-  return false
-}
-
-function _sanitizeExpandedSectionIndices<T>(sectionIndices: number[], sections: Accordion.SectionProps<T>[]) {
-  return _sortIndices(sectionIndices).filter(t => !_isSectionIndexOutOfRange(t, sections))
-}
-
-function _sanitizeSelection<T>(selection: Accordion.Selection, sections: Accordion.SectionProps<T>[]) {
-  const newValue: Accordion.Selection = {}
-
-  for (const sectionIndex in sections) {
-    if (!Object.hasOwn(sections, sectionIndex)) continue
-
-    const indices = _sortIndices([...selection[sectionIndex] ?? []])
-
-    newValue[Number(sectionIndex)] = _sortIndices(indices).filter(t => !_isItemIndexOutOfRange(t, Number(sectionIndex), sections))
-  }
-
-  return newValue
-}
-
-function _sortIndices(indices: number[]): number[] {
-  return indices.sort((a, b) => a - b)
-}
-
-function _getFixedStyles({ orientation = 'vertical' }) {
-  return asStyleDict({
-    root: {
-      alignItems: 'center',
-      boxSizing: 'border-box',
-      display: 'flex',
-      flex: '0 0 auto',
-      justifyContent: 'flex-start',
-      padding: '0',
-      ...orientation === 'vertical' ? {
-        flexDirection: 'column',
-        height: 'auto',
-      } : {
-        flexDirection: 'row',
-        width: 'auto',
-      },
-    },
-    collapseIcon: {
-      pointerEvents: 'none',
-      zIndex: 1,
-    },
-    expandIcon: {
-      pointerEvents: 'none',
-      zIndex: 1,
-    },
-    section: {
-      alignItems: 'flex-start',
-      display: 'flex',
-      flex: '0 0 auto',
-      justifyContent: 'flex-start',
-      margin: '0',
-      overflow: 'hidden',
-      padding: '0',
-      ...orientation === 'vertical' ? {
-        flexDirection: 'column',
-        width: '100%',
-      } : {
-        flexDirection: 'row',
-        height: '100%',
-      },
-    },
-    headerContainer: {
-      flexShrink: '0',
-      ...orientation === 'vertical' ? {
-        width: '100%',
-      } : {
-        height: '100%',
-      },
-    },
-    header: {
-      cursor: 'pointer',
-      margin: '0',
-      ...orientation === 'vertical' ? {
-        width: '100%',
-      } : {
-        height: '100%',
-      },
-    },
-  })
-}
-
 export namespace Accordion {
   /**
    * Type describing the current item selection of {@link Accordion}, composed
@@ -638,6 +537,107 @@ export const Accordion = /* #__PURE__ */ Object.assign(_Accordion, {
    */
   Item: _Item,
 })
+
+function _isSectionIndexOutOfRange<T>(sectionIndex: number, sections: Accordion.SectionProps<T>[]) {
+  if (sectionIndex >= sections.length) return true
+  if (sectionIndex < 0) return true
+
+  return false
+}
+
+function _isItemIndexOutOfRange<T>(itemIndex: number, sectionIndex: number, sections: Accordion.SectionProps<T>[]) {
+  if (_isSectionIndexOutOfRange(sectionIndex, sections)) return true
+
+  const items = sections[sectionIndex].items ?? []
+
+  if (itemIndex >= items.length) return true
+  if (itemIndex < 0) return true
+
+  return false
+}
+
+function _sanitizeExpandedSectionIndices<T>(sectionIndices: number[], sections: Accordion.SectionProps<T>[]) {
+  return _sortIndices(sectionIndices).filter(t => !_isSectionIndexOutOfRange(t, sections))
+}
+
+function _sanitizeSelection<T>(selection: Accordion.Selection, sections: Accordion.SectionProps<T>[]) {
+  const newValue: Accordion.Selection = {}
+
+  for (const sectionIndex in sections) {
+    if (!Object.hasOwn(sections, sectionIndex)) continue
+
+    const indices = _sortIndices([...selection[sectionIndex] ?? []])
+
+    newValue[Number(sectionIndex)] = _sortIndices(indices).filter(t => !_isItemIndexOutOfRange(t, Number(sectionIndex), sections))
+  }
+
+  return newValue
+}
+
+function _sortIndices(indices: number[]): number[] {
+  return indices.sort((a, b) => a - b)
+}
+
+function _getFixedStyles({ orientation = 'vertical' }) {
+  return asStyleDict({
+    root: {
+      alignItems: 'center',
+      boxSizing: 'border-box',
+      display: 'flex',
+      flex: '0 0 auto',
+      justifyContent: 'flex-start',
+      padding: '0',
+      ...orientation === 'vertical' ? {
+        flexDirection: 'column',
+        height: 'auto',
+      } : {
+        flexDirection: 'row',
+        width: 'auto',
+      },
+    },
+    collapseIcon: {
+      pointerEvents: 'none',
+      zIndex: 1,
+    },
+    expandIcon: {
+      pointerEvents: 'none',
+      zIndex: 1,
+    },
+    section: {
+      alignItems: 'flex-start',
+      display: 'flex',
+      flex: '0 0 auto',
+      justifyContent: 'flex-start',
+      margin: '0',
+      overflow: 'hidden',
+      padding: '0',
+      ...orientation === 'vertical' ? {
+        flexDirection: 'column',
+        width: '100%',
+      } : {
+        flexDirection: 'row',
+        height: '100%',
+      },
+    },
+    headerContainer: {
+      flexShrink: '0',
+      ...orientation === 'vertical' ? {
+        width: '100%',
+      } : {
+        height: '100%',
+      },
+    },
+    header: {
+      cursor: 'pointer',
+      margin: '0',
+      ...orientation === 'vertical' ? {
+        width: '100%',
+      } : {
+        height: '100%',
+      },
+    },
+  })
+}
 
 if (process.env.NODE_ENV === 'development') {
   (_Accordion as any).displayName = 'Accordion'

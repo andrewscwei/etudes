@@ -153,58 +153,6 @@ const _Field = ({ ...props }: HTMLAttributes<HTMLInputElement>) => (
   />
 )
 
-function _getFixedStyles() {
-  return asStyleDict({
-    root: {
-      alignItems: 'stretch',
-      display: 'flex',
-      justifyContent: 'stretch',
-    },
-    field: {
-      caretColor: 'transparent',
-      flex: '1',
-      minWidth: '0',
-    },
-  })
-}
-
-function _normalizeFields(value: string[], size: number) {
-  const out = value.slice(0, size)
-
-  while (out.length < size) {
-    out.push('')
-  }
-
-  return out
-}
-
-function _insertFields(source: string[], target: string[], start: number = 0) {
-  let writeIdx = start
-  let readIdx = 0
-
-  while (readIdx < target.length && writeIdx < source.length) {
-    source[writeIdx] = target[readIdx]
-    writeIdx++
-    readIdx++
-  }
-
-  while (readIdx < target.length) {
-    source.shift()
-    source.push(target[readIdx])
-    readIdx++
-  }
-
-  return source
-}
-
-function _replaceFirst(str: string, search: string, replacement: string = '') {
-  const index = str.indexOf(search)
-
-  if (index === -1) return str
-
-  return (str.slice(0, index) + replacement + str.slice(index + search.length))
-}
-
 export namespace CodeInput {
   /**
    * Type describing the properties of {@link CodeInput}.
@@ -266,6 +214,58 @@ export const CodeInput = Object.assign(_CodeInput, {
    */
   Field: _Field,
 })
+
+function _getFixedStyles() {
+  return asStyleDict({
+    root: {
+      alignItems: 'stretch',
+      display: 'flex',
+      justifyContent: 'stretch',
+    },
+    field: {
+      caretColor: 'transparent',
+      flex: '1',
+      minWidth: '0',
+    },
+  })
+}
+
+function _normalizeFields(value: string[], size: number) {
+  const out = value.slice(0, size)
+
+  while (out.length < size) {
+    out.push('')
+  }
+
+  return out
+}
+
+function _insertFields(source: string[], target: string[], start: number = 0) {
+  let writeIdx = start
+  let readIdx = 0
+
+  while (readIdx < target.length && writeIdx < source.length) {
+    source[writeIdx] = target[readIdx]
+    writeIdx++
+    readIdx++
+  }
+
+  while (readIdx < target.length) {
+    source.shift()
+    source.push(target[readIdx])
+    readIdx++
+  }
+
+  return source
+}
+
+function _replaceFirst(str: string, search: string, replacement: string = '') {
+  const index = str.indexOf(search)
+
+  if (index === -1) return str
+
+  return (str.slice(0, index) + replacement + str.slice(index + search.length))
+}
 
 if (process.env.NODE_ENV === 'development') {
   _CodeInput.displayName = 'CodeInput'

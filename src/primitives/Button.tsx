@@ -14,6 +14,13 @@ type AnchorVariantProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'aria-di
   opensInNewTab?: boolean
 }
 
+export namespace Button {
+  /**
+   * Type describing the props of {@link Button}.
+   */
+  export type Props = AnchorVariantProps | ButtonVariantProps
+}
+
 /**
  * A button component that can be used as a {@link Link}, {@link NavLink},
  * {@link HTMLAnchorElement}, or {@link HTMLButtonElement} depending on the
@@ -74,13 +81,6 @@ function _isButton(props: Button.Props): props is ButtonVariantProps {
   if (typeof props.action === 'function' || typeof (props as any).type === 'string') return true
 
   return false
-}
-
-export namespace Button {
-  /**
-   * Type describing the props of {@link Button}.
-   */
-  export type Props = AnchorVariantProps | ButtonVariantProps
 }
 
 if (process.env.NODE_ENV === 'development') {

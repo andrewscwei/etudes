@@ -8,70 +8,72 @@ import { useLatest } from '../hooks/useLatest.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { styles } from '../utils/styles.js'
 
-/**
- * Type describing the orientation of {@link Carousel}.
- */
-export type CarouselOrientation = 'horizontal' | 'vertical'
-
-/**
- * Type describing the props of {@link Carousel}.
- */
-export type CarouselProps<I> = Omit<HTMLAttributes<HTMLDivElement>, 'role' | 'onClick' | 'onPointerCancel' | 'onPointerDown' | 'onPointerLeave' | 'onPointerUp'> & {
+export namespace Carousel {
   /**
-   * Current item index.
+   * Type describing the orientation of {@link Carousel}.
    */
-  index?: number
+  export type Orientation = 'horizontal' | 'vertical'
 
   /**
-   * The interval in milliseconds to wait before automatically advancing to the
-   * next item (auto loops).
+   * Type describing the props of {@link Carousel}.
    */
-  autoAdvanceInterval?: number
+  export type Props<I> = Omit<HTMLAttributes<HTMLDivElement>, 'role' | 'onClick' | 'onPointerCancel' | 'onPointerDown' | 'onPointerLeave' | 'onPointerUp'> & {
+    /**
+     * Current item index.
+     */
+    index?: number
 
-  /**
-   * Whether the carousel is draggable.
-   */
-  isDragEnabled?: boolean
+    /**
+     * The interval in milliseconds to wait before automatically advancing to the
+     * next item (auto loops).
+     */
+    autoAdvanceInterval?: number
 
-  /**
-   * Props for each item component
-   */
-  items?: Omit<I, 'exposure'>[]
+    /**
+     * Whether the carousel is draggable.
+     */
+    isDragEnabled?: boolean
 
-  /**
-   * Orientation of the carousel.
-   */
-  orientation?: CarouselOrientation
+    /**
+     * Props for each item component
+     */
+    items?: Omit<I, 'exposure'>[]
 
-  /**
-   * Whether to track item exposure (0-1, 0 meaning the item is fully scrolled
-   * out of view, 1 meaning the item is fully scrolled into view).
-   */
-  tracksItemExposure?: boolean
+    /**
+     * Orientation of the carousel.
+     */
+    orientation?: Orientation
 
-  /**
-   * Handler invoked when auto advance pauses. This is invoked only when
-   * {@link autoAdvanceInterval} is greater than 0.
-   */
-  onAutoAdvancePause?: () => void
+    /**
+     * Whether to track item exposure (0-1, 0 meaning the item is fully scrolled
+     * out of view, 1 meaning the item is fully scrolled into view).
+     */
+    tracksItemExposure?: boolean
 
-  /**
-   * Handler invoked when auto advance resumes. This is invoked only when
-   * {@link autoAdvanceInterval} is greater than 0.
-   */
-  onAutoAdvanceResume?: () => void
+    /**
+     * Handler invoked when auto advance pauses. This is invoked only when
+     * {@link autoAdvanceInterval} is greater than 0.
+     */
+    onAutoAdvancePause?: () => void
 
-  /**
-   * Handler invoked when the item index changes.
-   *
-   * @param index The item index.
-   */
-  onIndexChange?: (index: number) => void
+    /**
+     * Handler invoked when auto advance resumes. This is invoked only when
+     * {@link autoAdvanceInterval} is greater than 0.
+     */
+    onAutoAdvanceResume?: () => void
 
-  /**
-   * The component to render for each item.
-   */
-  ItemComponent: ComponentType<I>
+    /**
+     * Handler invoked when the item index changes.
+     *
+     * @param index The item index.
+     */
+    onIndexChange?: (index: number) => void
+
+    /**
+     * The component to render for each item.
+     */
+    ItemComponent: ComponentType<I>
+  }
 }
 
 /**
@@ -84,19 +86,22 @@ export type CarouselProps<I> = Omit<HTMLAttributes<HTMLDivElement>, 'role' | 'on
  *   - Supports tracking item exposure (0-1) to determine how much of the
  *     current item is visible in the viewport.
  */
-export const Carousel = /* #__PURE__ */ forwardRef(({
-  autoAdvanceInterval = 0,
-  index = 0,
-  isDragEnabled = true,
-  items = [],
-  orientation = 'horizontal',
-  tracksItemExposure = false,
-  onAutoAdvancePause,
-  onAutoAdvanceResume,
-  onIndexChange,
-  ItemComponent,
-  ...props
-}, ref) => {
+export const Carousel = /* #__PURE__ */ forwardRef((
+  {
+    autoAdvanceInterval = 0,
+    index = 0,
+    isDragEnabled = true,
+    items = [],
+    orientation = 'horizontal',
+    tracksItemExposure = false,
+    onAutoAdvancePause,
+    onAutoAdvanceResume,
+    onIndexChange,
+    ItemComponent,
+    ...props
+  },
+  ref,
+) => {
   const prevIndexRef = useRef<number>(undefined)
   const viewportRef = useRef<HTMLDivElement>(null)
   const pointerDownPositionRef = useRef<Point>(undefined)
@@ -318,9 +323,9 @@ export const Carousel = /* #__PURE__ */ forwardRef(({
       </div>
     </div>
   )
-}) as <I extends HTMLAttributes<HTMLElement>>(props: Readonly<CarouselProps<I> & { ref?: ForwardedRef<HTMLDivElement> }>) => ReactElement
+}) as <I extends HTMLAttributes<HTMLElement>>(props: Readonly<Carousel.Props<I> & { ref?: ForwardedRef<HTMLDivElement> }>) => ReactElement
 
-function _scrollToIndex(ref: RefObject<HTMLDivElement | null>, index: number, orientation: CarouselOrientation) {
+function _scrollToIndex(ref: RefObject<HTMLDivElement | null>, index: number, orientation: Carousel.Orientation) {
   const viewport = ref?.current
   if (!viewport) return
 
@@ -332,7 +337,7 @@ function _scrollToIndex(ref: RefObject<HTMLDivElement | null>, index: number, or
   viewport.scrollTo({ top, left, behavior: 'smooth' })
 }
 
-function _getItemExposures(ref: RefObject<HTMLDivElement | null>, orientation: CarouselOrientation) {
+function _getItemExposures(ref: RefObject<HTMLDivElement | null>, orientation: Carousel.Orientation) {
   const viewport = ref?.current
   if (!viewport) return undefined
 
@@ -345,7 +350,7 @@ function _getItemExposures(ref: RefObject<HTMLDivElement | null>, orientation: C
   return exposures
 }
 
-function _getItemExposureAt(idx: number, ref: RefObject<HTMLDivElement | null>, orientation: CarouselOrientation) {
+function _getItemExposureAt(idx: number, ref: RefObject<HTMLDivElement | null>, orientation: Carousel.Orientation) {
   const viewport = ref?.current
   const child = viewport?.children[idx]
   if (!child) return 0
