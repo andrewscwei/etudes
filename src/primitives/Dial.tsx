@@ -196,6 +196,6 @@ function _getFixedStyles({ diameter = 0, angle = 0 }) {
 if (process.env.NODE_ENV === 'development') {
   Dial.displayName = 'Dial'
 
-  _Track.displayName = 'DialTrack'
-  _Knob.displayName = 'DialKnob'
+  _Track.displayName = 'Dial.Track'
+  _Knob.displayName = 'Dial.Knob'
 }

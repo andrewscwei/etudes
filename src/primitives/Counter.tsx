@@ -204,7 +204,7 @@ const FIXED_STYLES = asStyleDict({
 if (process.env.NODE_ENV === 'development') {
   _Counter.displayName = 'Counter'
 
-  _AddButton.displayName = 'CounterAddButton'
-  _SubtractButton.displayName = 'CounterSubtractButton'
-  _TextField.displayName = 'CounterTextField'
+  _AddButton.displayName = 'Counter.AddButton'
+  _SubtractButton.displayName = 'Counter.SubtractButton'
+  _TextField.displayName = 'Counter.TextField'
 }

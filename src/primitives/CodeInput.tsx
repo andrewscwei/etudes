@@ -269,5 +269,6 @@ function _replaceFirst(str: string, search: string, replacement: string = '') {
 
 if (process.env.NODE_ENV === 'development') {
   _CodeInput.displayName = 'CodeInput'
+
   _Field.displayName = 'CodeInput.Field'
 }

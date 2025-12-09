@@ -8,7 +8,7 @@ import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 import { Collection } from './Collection.js'
-import { type DropdownToggleProps } from './Dropdown.js'
+import { type Dropdown } from './Dropdown.js'
 
 const _Accordion = /* #__PURE__ */ forwardRef((
   {
@@ -256,7 +256,7 @@ const _Accordion = /* #__PURE__ */ forwardRef((
   )
 }) as <I, S extends Accordion.SectionProps<I> = Accordion.SectionProps<I>>(props: Readonly<Accordion.Props<I, S> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
 
-const _Header = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & DropdownToggleProps) => (
+const _Header = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & Dropdown.ToggleProps) => (
   <button {...props}>{children}</button>
 )
 

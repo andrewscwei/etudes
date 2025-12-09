@@ -1,11 +1,11 @@
 import clsx from 'clsx'
-import { Dropdown, DropdownCollection, DropdownExpandIcon, DropdownItem, DropdownToggle, type DropdownSelection } from 'etudes'
+import { Dropdown } from 'etudes'
 import { useState } from 'react'
 import $$ExpandIcon from '../assets/expand-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
 
 export function DropdownDemo() {
-  const [selection, setSelection] = useState<DropdownSelection>([])
+  const [selection, setSelection] = useState<Dropdown.Selection>([])
   const [isCollapsed, setIsCollapsed] = useState(true)
   const items = [1, 2]
 
@@ -61,8 +61,8 @@ export function DropdownDemo() {
           onSelectAt={t => toast(`Selected Item ${t + 1}`)}
           onSelectionChange={setSelection}
         >
-          <DropdownToggle className='ia flex items-center justify-between border border-dark px-3'/>
-          <DropdownExpandIcon
+          <Dropdown.Toggle className='ia flex items-center justify-between border border-dark px-3'/>
+          <Dropdown.ExpandIcon
             className={clsx('flex size-5 items-center justify-center transition-transform', {
               'rotate-90 [.expanded]:-rotate-90': orientation === 'horizontal' && isInverted === 'true',
               '-rotate-90 [.expanded]:rotate-90': orientation === 'horizontal' && isInverted === 'false',
@@ -71,13 +71,13 @@ export function DropdownDemo() {
             })}
             dangerouslySetInnerHTML={{ __html: $$ExpandIcon }}
           />
-          <DropdownCollection
+          <Dropdown.Collection
             className={clsx({
               'transition-[width]': orientation === 'horizontal',
               'transition-[height]': orientation === 'vertical',
             })}
           />
-          <DropdownItem className='ia flex items-center justify-start border border-dark px-3 [.active]:bg-dark [.active]:text-light'/>
+          <Dropdown.Item className='ia flex items-center justify-start border border-dark px-3 [.active]:bg-dark [.active]:text-light'/>
         </Dropdown>
       )}
     </Frame>
