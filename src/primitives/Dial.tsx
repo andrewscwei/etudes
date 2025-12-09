@@ -4,51 +4,6 @@ import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { styles } from '../utils/styles.js'
 
-export namespace Dial {
-  /**
-   * Type describing the props of {@link Dial}.
-   */
-  export type Props = HTMLAttributes<HTMLDivElement> & {
-    /**
-     * Current angle reading of the compass, between 0.0 - 360.0 degrees,
-     * inclusive.
-     */
-    angle?: number
-
-    /**
-     * Gap between each dashed line on the track.
-     */
-    trackGap?: number
-
-    /**
-     * Length of the knob along the track expressed in degrees, between 0.0 and
-     * 360.0 degrees, exclusive. If set to 0 or 360, the knob disappears.
-     *
-     * @example Suppose the compass were to be used to control a photosphere of an
-     *          image that is 1000 x 500, and the window size is 500 x 500, that
-     *          would mean the FOV is 500 / 1000 * 360 = 180 degrees.
-     */
-    knobLength?: number
-
-    /**
-     * Radius of the compass.
-     */
-    radius?: number
-
-    /**
-     * The thickness of the knob, which is equivalent to the `stroke-width` of the
-     * `<path>` element.
-     */
-    knobThickness?: number
-
-    /**
-     * The thickness of the circular track, which is equivalent to the
-     * `stroke-width` of the `<circle>` element.
-     */
-    trackThickness?: number
-  }
-}
-
 const _Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Dial.Props>>((
   {
     children,
@@ -102,13 +57,58 @@ const _Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Dial.Props>>((
   )
 })
 
-export const _Track = ({ ...props }: SVGAttributes<SVGCircleElement>) => (
+const _Track = ({ ...props }: SVGAttributes<SVGCircleElement>) => (
   <circle {...props}/>
 )
 
-export const _Knob = ({ ...props }: SVGAttributes<SVGPathElement>) => (
+const _Knob = ({ ...props }: SVGAttributes<SVGPathElement>) => (
   <path {...props}/>
 )
+
+export namespace Dial {
+  /**
+   * Type describing the props of {@link Dial}.
+   */
+  export type Props = HTMLAttributes<HTMLDivElement> & {
+    /**
+     * Current angle reading of the compass, between 0.0 - 360.0 degrees,
+     * inclusive.
+     */
+    angle?: number
+
+    /**
+     * Gap between each dashed line on the track.
+     */
+    trackGap?: number
+
+    /**
+     * Length of the knob along the track expressed in degrees, between 0.0 and
+     * 360.0 degrees, exclusive. If set to 0 or 360, the knob disappears.
+     *
+     * @example Suppose the compass were to be used to control a photosphere of
+     *          an image that is 1000 x 500, and the window size is 500 x 500,
+     *          that would mean the FOV is 500 / 1000 * 360 = 180 degrees.
+     */
+    knobLength?: number
+
+    /**
+     * Radius of the compass.
+     */
+    radius?: number
+
+    /**
+     * The thickness of the knob, which is equivalent to the `stroke-width` of
+     * the `<path>` element.
+     */
+    knobThickness?: number
+
+    /**
+     * The thickness of the circular track, which is equivalent to the
+     * `stroke-width` of the `<circle>` element.
+     */
+    trackThickness?: number
+  }
+}
 
 /**
  * A circular dial with a knob and a track.

@@ -7,107 +7,6 @@ import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 import { Collection } from './Collection.js'
 
-export namespace Dropdown {
-  /**
-   * Type describing the orientation of {@link Dropdown}.
-   */
-  export type Orientation = Collection.Orientation
-
-  /**
-   * Type describing the current item selection of {@link Dropdown}, composed of
-   * an array of indices of items that are selected. If the selection mode of
-   * the {@link Dropdown} is `single`, only one index is expected in this array.
-   */
-  export type Selection = Collection.Selection
-
-  /**
-   * Type describing the props of `ToggleComponent` provided to
-   * {@link Dropdown}.
-   */
-  export type ToggleProps = HTMLAttributes<HTMLButtonElement> & {
-    /**
-     * Handler invoked to dispatch a custom event.
-     *
-     * @param name User-defined name of the custom event.
-     * @param info User-defined info of the custom event.
-     */
-    onCustomEvent?: (name: string, info?: any) => void
-  }
-
-  /**
-   * Type describing the props of `ItemComponent` provided to {@link Dropdown}.
-   */
-  export type ItemProps<T> = Collection.ItemProps<T>
-
-  /**
-   * Type describing the props of {@link Dropdown}.
-   */
-  export type Props<T> = HTMLAttributes<HTMLDivElement> & Collection.Props<T> & {
-    /**
-     * Specifies if the internal collection collapses when an item is selected.
-     * This only works if `selectionMode` is `single`.
-     */
-    collapsesOnSelect?: boolean
-
-    /**
-     * Padding (in pixels) between the toggle button and the internal
-     * collection.
-     */
-    collectionPadding?: number
-
-    /**
-     * The label to appear on the toggle button.
-     *
-     * @param selection The current selection.
-     */
-    label?: (selection: Selection) => string
-
-    /**
-     * Specifies if the internal collection is collapsed.
-     */
-    isCollapsed?: boolean
-
-    /**
-     * Indicates if the component is inverted (i.e. "dropup" instead of dropdown).
-     */
-    isInverted?: boolean
-
-    /**
-     * Maximum number of items that are visible when the component expands. When
-     * a value greater than or equal to 0 is specified, only that number of
-     * items will be visible at a time and a scrollbar will appear to enable
-     * scrolling to remaining items. Any value less than 0 indicates that all
-     * items will be visible when the component expands.
-     */
-    maxVisibleItems?: number
-
-    /**
-     * Handler invoked when the component is collapsed.
-     */
-    onCollapse?: () => void
-
-    /**
-     * Handler invoked when the component is expanded.
-     */
-    onExpand?: () => void
-
-    /**
-     * Handler invoked when the toggle dispatches a custom event.
-     *
-     * @param eventName User-defined name of the dispatched custom event.
-     * @param eventInfo Optional user-defined info of the dispatched custom
-     *                  event.
-     */
-    onToggleCustomEvent?: (eventName: string, eventInfo?: any) => void
-
-    /**
-     * React component type to be used for generating the toggle button inside
-     * the component. When absent, one will be generated automatically.
-     */
-    ToggleComponent?: ComponentType<ToggleProps>
-  }
-}
-
 const _Dropdown = /* #__PURE__ */ forwardRef((
   {
     children,
@@ -290,21 +189,122 @@ const _Dropdown = /* #__PURE__ */ forwardRef((
   )
 }) as <T>(props: Readonly<Dropdown.Props<T> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
 
-export const _Collection = Collection
+const _Collection = Collection
 
-export const _Item = Collection.Item
+const _Item = Collection.Item
 
-export const _Toggle = ({ children, ...props }: Dropdown.ToggleProps) => (
+const _Toggle = ({ children, ...props }: Dropdown.ToggleProps) => (
   <button {...props}>{children}</button>
 )
 
-export const _CollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+const _CollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <figure {...props} aria-hidden={true}>{children}</figure>
 )
 
-export const _ExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+const _ExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <figure {...props} aria-hidden={true}>{children}</figure>
 )
+
+export namespace Dropdown {
+  /**
+   * Type describing the orientation of {@link Dropdown}.
+   */
+  export type Orientation = Collection.Orientation
+
+  /**
+   * Type describing the current item selection of {@link Dropdown}, composed of
+   * an array of indices of items that are selected. If the selection mode of
+   * the {@link Dropdown} is `single`, only one index is expected in this array.
+   */
+  export type Selection = Collection.Selection
+
+  /**
+   * Type describing the props of `ToggleComponent` provided to
+   * {@link Dropdown}.
+   */
+  export type ToggleProps = HTMLAttributes<HTMLButtonElement> & {
+    /**
+     * Handler invoked to dispatch a custom event.
+     *
+     * @param name User-defined name of the custom event.
+     * @param info User-defined info of the custom event.
+     */
+    onCustomEvent?: (name: string, info?: any) => void
+  }
+
+  /**
+   * Type describing the props of `ItemComponent` provided to {@link Dropdown}.
+   */
+  export type ItemProps<T> = Collection.ItemProps<T>
+
+  /**
+   * Type describing the props of {@link Dropdown}.
+   */
+  export type Props<T> = HTMLAttributes<HTMLDivElement> & Collection.Props<T> & {
+    /**
+     * Specifies if the internal collection collapses when an item is selected.
+     * This only works if `selectionMode` is `single`.
+     */
+    collapsesOnSelect?: boolean
+
+    /**
+     * Padding (in pixels) between the toggle button and the internal
+     * collection.
+     */
+    collectionPadding?: number
+
+    /**
+     * The label to appear on the toggle button.
+     *
+     * @param selection The current selection.
+     */
+    label?: (selection: Selection) => string
+
+    /**
+     * Specifies if the internal collection is collapsed.
+     */
+    isCollapsed?: boolean
+
+    /**
+     * Indicates if the component is inverted (i.e. "dropup" instead of dropdown).
+     */
+    isInverted?: boolean
+
+    /**
+     * Maximum number of items that are visible when the component expands. When
+     * a value greater than or equal to 0 is specified, only that number of
+     * items will be visible at a time and a scrollbar will appear to enable
+     * scrolling to remaining items. Any value less than 0 indicates that all
+     * items will be visible when the component expands.
+     */
+    maxVisibleItems?: number
+
+    /**
+     * Handler invoked when the component is collapsed.
+     */
+    onCollapse?: () => void
+
+    /**
+     * Handler invoked when the component is expanded.
+     */
+    onExpand?: () => void
+
+    /**
+     * Handler invoked when the toggle dispatches a custom event.
+     *
+     * @param eventName User-defined name of the dispatched custom event.
+     * @param eventInfo Optional user-defined info of the dispatched custom
+     *                  event.
+     */
+    onToggleCustomEvent?: (eventName: string, eventInfo?: any) => void
+
+    /**
+     * React component type to be used for generating the toggle button inside
+     * the component. When absent, one will be generated automatically.
+     */
+    ToggleComponent?: ComponentType<ToggleProps>
+  }
+}
 
 /**
  * A dropdown component that is invertible (i.e. can "dropup" instead) and

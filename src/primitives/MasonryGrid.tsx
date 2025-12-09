@@ -42,17 +42,20 @@ export namespace MasonryGrid {
  * sections* refers to the *number of rows*, whereas in a horizontally oriented
  * grid, *number of sections* refers to the *number of columns*.
  */
-export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<MasonryGrid.Props>>(({
-  alignSections = false,
-  children,
-  className,
-  horizontalSpacing = 0,
-  isReversed = false,
-  orientation = 'vertical',
-  sections = 3,
-  verticalSpacing = 0,
-  ...props
-}, ref) => {
+export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<MasonryGrid.Props>>((
+  {
+    alignSections = false,
+    children,
+    className,
+    horizontalSpacing = 0,
+    isReversed = false,
+    orientation = 'vertical',
+    sections = 3,
+    verticalSpacing = 0,
+    ...props
+  },
+  ref,
+) => {
   const bodyRef = useRef<HTMLDivElement>(null)
 
   const [minWidth, setMinWidth] = useState(NaN)
