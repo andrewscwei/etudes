@@ -1,19 +1,21 @@
 import { forwardRef, type HTMLAttributes } from 'react'
 
-/**
- * Type describing the props of {@link Form}.
- */
-export type FormProps = HTMLAttributes<HTMLFormElement> & {
+export namespace Form {
   /**
-   * Handler invoked when the form is submitted.
+   * Type describing the props of {@link Form}.
    */
-  onSubmit: () => void
+  export type Props = HTMLAttributes<HTMLFormElement> & {
+    /**
+     * Handler invoked when the form is submitted.
+     */
+    onSubmit: () => void
+  }
 }
 
 /**
  * A form component overrides the default submission behavior.
  */
-export const Form = /* #__PURE__ */ forwardRef<HTMLFormElement, FormProps>(({
+export const Form = /* #__PURE__ */ forwardRef<HTMLFormElement, Form.Props>(({
   onSubmit,
   ...props
 }, ref) => {
