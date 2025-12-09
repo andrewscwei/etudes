@@ -5,24 +5,26 @@ import { useSizeObserver } from '../hooks/useSizeObserver.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 
-/**
- * Type describing the orientation of {@link MasonryGrid}.
- */
-export type MasonryGridOrientation = 'horizontal' | 'vertical'
-
-/**
- * Type describing the props of {@link MasonryGrid}.
- */
-export type MasonryGridProps = Omit<HTMLAttributes<HTMLDivElement>, 'role'> & {
-  alignSections?: boolean
-  horizontalSpacing?: number
-  isReversed?: boolean
-  orientation?: MasonryGridOrientation
-  sections?: number
-  verticalSpacing?: number
-}
-
 const BASE_MODIFIER_CLASS_PREFIX = 'base-'
+
+export namespace MasonryGrid {
+  /**
+   * Type describing the orientation of {@link MasonryGrid}.
+   */
+  export type Orientation = 'horizontal' | 'vertical'
+
+  /**
+   * Type describing the props of {@link MasonryGrid}.
+   */
+  export type Props = Omit<HTMLAttributes<HTMLDivElement>, 'role'> & {
+    alignSections?: boolean
+    horizontalSpacing?: number
+    isReversed?: boolean
+    orientation?: Orientation
+    sections?: number
+    verticalSpacing?: number
+  }
+}
 
 /**
  * A component that arranges all of its immediate children in a masonry grid.
@@ -40,7 +42,7 @@ const BASE_MODIFIER_CLASS_PREFIX = 'base-'
  * sections* refers to the *number of rows*, whereas in a horizontally oriented
  * grid, *number of sections* refers to the *number of columns*.
  */
-export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<MasonryGridProps>>(({
+export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<MasonryGrid.Props>>(({
   alignSections = false,
   children,
   className,

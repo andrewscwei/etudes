@@ -7,19 +7,6 @@ import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
-export namespace CoverImage {
-  /**
-   * Type describing the props of {@link CoverImage}.
-   */
-  export type Props = Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<Picture.Props, 'alt' | 'loadingMode' | 'sources' | 'src' | 'onLoadStart' | 'onLoadComplete' | 'onLoadError'> & {
-    /**
-     * The known aspect ratio of the image, expressed by width / height. If
-     * unprovided, it will be inferred after loading the image.
-     */
-    aspectRatio?: number
-  }
-}
-
 const _CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverImage.Props>>((
   {
     children,
@@ -106,6 +93,19 @@ export const _Viewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement>
     {children}
   </div>
 )
+
+export namespace CoverImage {
+  /**
+   * Type describing the props of {@link CoverImage}.
+   */
+  export type Props = Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<Picture.Props, 'alt' | 'loadingMode' | 'sources' | 'src' | 'onLoadStart' | 'onLoadComplete' | 'onLoadError'> & {
+    /**
+     * The known aspect ratio of the image, expressed by width / height. If
+     * unprovided, it will be inferred after loading the image.
+     */
+    aspectRatio?: number
+  }
+}
 
 /**
  * A component that displays an image with a fixed aspect ratio. The image is
