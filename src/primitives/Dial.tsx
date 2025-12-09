@@ -4,72 +4,71 @@ import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { styles } from '../utils/styles.js'
 
-/**
- * Type describing the props of {@link Dial}.
- */
-export type DialProps = HTMLAttributes<HTMLDivElement> & {
+export namespace Dial {
   /**
-   * Current angle reading of the compass, between 0.0 - 360.0 degrees,
-   * inclusive.
+   * Type describing the props of {@link Dial}.
    */
-  angle?: number
+  export type Props = HTMLAttributes<HTMLDivElement> & {
+    /**
+     * Current angle reading of the compass, between 0.0 - 360.0 degrees,
+     * inclusive.
+     */
+    angle?: number
 
-  /**
-   * Gap between each dashed line on the track.
-   */
-  trackGap?: number
+    /**
+     * Gap between each dashed line on the track.
+     */
+    trackGap?: number
 
-  /**
-   * Length of the knob along the track expressed in degrees, between 0.0 and
-   * 360.0 degrees, exclusive. If set to 0 or 360, the knob disappears.
-   *
-   * @example Suppose the compass were to be used to control a photosphere of an
-   *          image that is 1000 x 500, and the window size is 500 x 500, that
-   *          would mean the FOV is 500 / 1000 * 360 = 180 degrees.
-   */
-  knobLength?: number
+    /**
+     * Length of the knob along the track expressed in degrees, between 0.0 and
+     * 360.0 degrees, exclusive. If set to 0 or 360, the knob disappears.
+     *
+     * @example Suppose the compass were to be used to control a photosphere of an
+     *          image that is 1000 x 500, and the window size is 500 x 500, that
+     *          would mean the FOV is 500 / 1000 * 360 = 180 degrees.
+     */
+    knobLength?: number
 
-  /**
-   * Radius of the compass.
-   */
-  radius?: number
+    /**
+     * Radius of the compass.
+     */
+    radius?: number
 
-  /**
-   * The thickness of the knob, which is equivalent to the `stroke-width` of the
-   * `<path>` element.
-   */
-  knobThickness?: number
+    /**
+     * The thickness of the knob, which is equivalent to the `stroke-width` of the
+     * `<path>` element.
+     */
+    knobThickness?: number
 
-  /**
-   * The thickness of the circular track, which is equivalent to the
-   * `stroke-width` of the `<circle>` element.
-   */
-  trackThickness?: number
+    /**
+     * The thickness of the circular track, which is equivalent to the
+     * `stroke-width` of the `<circle>` element.
+     */
+    trackThickness?: number
+  }
 }
 
-/**
- * A circular dial with a knob and a track.
- *
- * @exports DialKnob Component for the knob.
- * @exports DialTrack Component for the track.
- */
-export const Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<DialProps>>(({
-  children,
-  style,
-  angle = 0,
-  knobLength = 30,
-  knobThickness = 10,
-  radius = 50,
-  trackGap = 0,
-  trackThickness = 2,
-  ...props
-}, ref) => {
+const _Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Dial.Props>>((
+  {
+    children,
+    style,
+    angle = 0,
+    knobLength = 30,
+    knobThickness = 10,
+    radius = 50,
+    trackGap = 0,
+    trackThickness = 2,
+    ...props
+  },
+  ref,
+) => {
   const diameter = radius * 2
   const clampedKnobAngle = Math.max(0, Math.min(360, knobLength))
 
   const components = asComponentDict(children, {
-    track: DialTrack,
-    knob: DialKnob,
+    track: _Track,
+    knob: _Knob,
   })
 
   const fixedStyles = _getFixedStyles({ angle, diameter })
@@ -81,7 +80,7 @@ export const Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<DialProp
           <Styled
             cx={radius}
             cy={radius}
-            element={components.track ?? <DialTrack/>}
+            element={components.track ?? <_Track/>}
             fill='none'
             r={radius - trackThickness / 2}
             strokeDasharray={trackGap}
@@ -93,7 +92,7 @@ export const Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<DialProp
         <svg style={fixedStyles.svgContainer} viewBox={`0 0 ${diameter} ${diameter}`} xmlns='http://www.w3.org/2000/svg'>
           <Styled
             d={_arcPath(radius, radius, radius - knobThickness / 2 - (trackThickness - knobThickness) / 2, -clampedKnobAngle / 2, clampedKnobAngle / 2)}
-            element={components.knob ?? <DialKnob/>}
+            element={components.knob ?? <_Knob/>}
             fill='none'
             strokeWidth={knobThickness}
           />
@@ -103,19 +102,31 @@ export const Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<DialProp
   )
 })
 
-/**
- * Component for the track of a {@link Dial}.
- */
-export const DialTrack = ({ ...props }: SVGAttributes<SVGCircleElement>) => (
+export const _Track = ({ ...props }: SVGAttributes<SVGCircleElement>) => (
   <circle {...props}/>
 )
 
-/**
- * Component for the knob of a {@link Dial}.
- */
-export const DialKnob = ({ ...props }: SVGAttributes<SVGPathElement>) => (
+export const _Knob = ({ ...props }: SVGAttributes<SVGPathElement>) => (
   <path {...props}/>
 )
+
+/**
+ * A circular dial with a knob and a track.
+ *
+ * @exports Dial.Knob Component for the knob.
+ * @exports Dial.Track Component for the track.
+ */
+export const Dial = /* #__PURE__ */ Object.assign(_Dial, {
+  /**
+   * Component for the track of a {@link Dial}.
+   */
+  Track: _Track,
+
+  /**
+   * Component for the knob of a {@link Dial}.
+   */
+  Knob: _Knob,
+})
 
 function _polarToCartesian(centerX: number, centerY: number, radius: number, angleInDegrees: number) {
   const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0
@@ -184,6 +195,7 @@ function _getFixedStyles({ diameter = 0, angle = 0 }) {
 
 if (process.env.NODE_ENV === 'development') {
   Dial.displayName = 'Dial'
-  DialTrack.displayName = 'DialTrack'
-  DialKnob.displayName = 'DialKnob'
+
+  _Track.displayName = 'DialTrack'
+  _Knob.displayName = 'DialKnob'
 }

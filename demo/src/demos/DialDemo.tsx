@@ -1,4 +1,4 @@
-import { Dial, DialKnob, DialTrack } from 'etudes'
+import { Dial } from 'etudes'
 import { Frame } from '../components/Frame.js'
 
 export function DialDemo() {
@@ -23,8 +23,8 @@ export function DialDemo() {
           trackGap={Number(trackGap)}
           trackThickness={Number(trackThickness)}
         >
-          <DialKnob className='stroke-dark'/>
-          <DialTrack className='stroke-dark/20'/>
+          <Dial.Knob className='stroke-dark'/>
+          <Dial.Track className='stroke-dark/20'/>
         </Dial>
       )}
     </Frame>
