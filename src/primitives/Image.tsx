@@ -4,70 +4,76 @@ import { useImageSize } from '../hooks/useImageSize.js'
 import { ImageSource } from '../types/ImageSource.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 
-/**
- * Type describing the props of {@link Image}.
- */
-export type ImageProps = Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'loading' | 'sizes' | 'src' | 'srcSet' | 'onLoadStart'> & {
+export namespace Image {
   /**
-   * Optional alt text.
+   * Type describing the props of {@link Image}.
    */
-  alt?: string
+  export type Props = Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'loading' | 'sizes' | 'src' | 'srcSet' | 'onLoadStart'> & {
+    /**
+     * Optional alt text.
+     */
+    alt?: string
 
-  /**
-   * Loading mode for the image.
-   */
-  loadingMode?: 'eager' | 'lazy'
+    /**
+     * Loading mode for the image.
+     */
+    loadingMode?: 'eager' | 'lazy'
 
-  /**
-   * Optional image source. If provided, this will be used to set the `sizes`
-   * and `srcSet` attributes of the `<img>` element.
-   */
-  source?: Omit<ImageSource, 'media' | 'type'>
+    /**
+     * Optional image source. If provided, this will be used to set the `sizes`
+     * and `srcSet` attributes of the `<img>` element.
+     */
+    source?: Omit<ImageSource, 'media' | 'type'>
 
-  /**
-   * Fallback image URL for browsers that do not support the `srcSet` attribute.
-   */
-  src: string
+    /**
+     * Fallback image URL for browsers that do not support the `srcSet`
+     * attribute.
+     */
+    src: string
 
-  /**
-   * Handler invoked when image load begins.
-   */
-  onLoadStart?: () => void
+    /**
+     * Handler invoked when image load begins.
+     */
+    onLoadStart?: () => void
 
-  /**
-   * Handler invoked when image load completes.
-   */
-  onLoadComplete?: () => void
+    /**
+     * Handler invoked when image load completes.
+     */
+    onLoadComplete?: () => void
 
-  /**
-   * Handler invoked when image load encounters an error.
-   */
-  onLoadError?: () => void
+    /**
+     * Handler invoked when image load encounters an error.
+     */
+    onLoadError?: () => void
 
-  /**
-   * Handler invoked when the size of the loaded image changes.
-   *
-   * @param size Size of the loaded image.
-   */
-  onSizeChange?: (size?: Size) => void
+    /**
+     * Handler invoked when the size of the loaded image changes.
+     *
+     * @param size Size of the loaded image.
+     */
+    onSizeChange?: (size?: Size) => void
+  }
 }
 
 /**
  * A component that renders an image with support for lazy loading, `srcSet`,
  * and `sizes` attributes.
  */
-export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<ImageProps>>(({
-  alt,
-  source,
-  loadingMode,
-  src: fallbackSrc,
-  style,
-  onLoadStart,
-  onLoadComplete,
-  onLoadError,
-  onSizeChange,
-  ...props
-}, ref) => {
+export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<Image.Props>>((
+  {
+    alt,
+    source,
+    loadingMode,
+    src: fallbackSrc,
+    style,
+    onLoadStart,
+    onLoadComplete,
+    onLoadError,
+    onSizeChange,
+    ...props
+  },
+  ref,
+) => {
   const resolvedImageSource = source ? ImageSource.asProps(source) : undefined
 
   const size = useImageSize({

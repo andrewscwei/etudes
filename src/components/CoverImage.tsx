@@ -1,43 +1,41 @@
 import { forwardRef, useRef, useState, type HTMLAttributes, type RefObject } from 'react'
 import { Size } from 'spase'
 import { useRect } from '../hooks/useRect.js'
-import { Picture, type PictureProps } from '../primitives/Picture.js'
+import { Picture } from '../primitives/Picture.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
-/**
- * Type describing the props of {@link CoverImage}.
- */
-export type CoverImageProps = Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<PictureProps, 'alt' | 'loadingMode' | 'sources' | 'src' | 'onLoadStart' | 'onLoadComplete' | 'onLoadError'> & {
+export namespace CoverImage {
   /**
-   * The known aspect ratio of the image, expressed by width / height. If
-   * unprovided, it will be inferred after loading the image.
+   * Type describing the props of {@link CoverImage}.
    */
-  aspectRatio?: number
+  export type Props = Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<Picture.Props, 'alt' | 'loadingMode' | 'sources' | 'src' | 'onLoadStart' | 'onLoadComplete' | 'onLoadError'> & {
+    /**
+     * The known aspect ratio of the image, expressed by width / height. If
+     * unprovided, it will be inferred after loading the image.
+     */
+    aspectRatio?: number
+  }
 }
 
-/**
- * A component that displays an image with a fixed aspect ratio. The image is
- * centered and cropped to fit the container (a.k.a. viewport).
- *
- * @exports CoverImageContent Component for optional content inside the image.
- * @exports CoverImageViewport Component for the viewport.
- */
-export const CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverImageProps>>(({
-  children,
-  alt,
-  aspectRatio: externalAspectRatio = NaN,
-  sources,
-  loadingMode,
-  src,
-  style,
-  onLoadStart,
-  onLoadComplete,
-  onLoadError,
-  ...props
-}, ref) => {
+const _CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverImage.Props>>((
+  {
+    children,
+    alt,
+    aspectRatio: externalAspectRatio = NaN,
+    sources,
+    loadingMode,
+    src,
+    style,
+    onLoadStart,
+    onLoadComplete,
+    onLoadError,
+    ...props
+  },
+  ref,
+) => {
   const handleSizeChange = (size?: Size) => {
     setLocalAspectRatio(size ? size.width / size.height : NaN)
   }
@@ -58,8 +56,8 @@ export const CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Co
       : Math.max(rootRect.height, rootRect.width / aspectRatio),
   )
   const components = asComponentDict(children, {
-    content: CoverImageContent,
-    viewport: CoverImageViewport,
+    content: _Content,
+    viewport: _Viewport,
   })
 
   return (
@@ -97,23 +95,36 @@ export const CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Co
   )
 })
 
-/**
- * Component for optional content inside a {@link CoverImage}.
- */
-export const CoverImageContent = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+export const _Content = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <div {...props}>
+    {children}
+  </div>
+)
+
+export const _Viewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}>
     {children}
   </div>
 )
 
 /**
- * Component for the viewport of a {@link CoverImage}.
+ * A component that displays an image with a fixed aspect ratio. The image is
+ * centered and cropped to fit the container (a.k.a. viewport).
+ *
+ * @exports CoverImage.Content Component for optional content inside the image.
+ * @exports CoverImage.Viewport Component for the viewport.
  */
-export const CoverImageViewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}>
-    {children}
-  </div>
-)
+export const CoverImage = /* #__PURE__ */ Object.assign(_CoverImage, {
+  /**
+   * Component for optional content inside a {@link CoverImage}.
+   */
+  Content: _Content,
+
+  /**
+   * Component for the viewport of a {@link CoverImage}.
+   */
+  Viewport: _Viewport,
+})
 
 const FIXED_STYLES = asStyleDict({
   root: {
@@ -129,7 +140,8 @@ const FIXED_STYLES = asStyleDict({
 })
 
 if (process.env.NODE_ENV === 'development') {
-  CoverImage.displayName = 'CoverImage'
-  CoverImageContent.displayName = 'CoverImageContent'
-  CoverImageViewport.displayName = 'CoverImageViewport'
+  _CoverImage.displayName = 'CoverImage'
+
+  _Content.displayName = 'CoverImage.Content'
+  _Viewport.displayName = 'CoverImage.Viewport'
 }
