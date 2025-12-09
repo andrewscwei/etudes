@@ -15,16 +15,11 @@ type AnchorVariantProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'aria-di
 }
 
 /**
- * Type describing the props of {@link Button}.
- */
-export type ButtonProps = AnchorVariantProps | ButtonVariantProps
-
-/**
  * A button component that can be used as a {@link Link}, {@link NavLink},
  * {@link HTMLAnchorElement}, or {@link HTMLButtonElement} depending on the
  * structure of its props.
  */
-export const Button = /* #__PURE__ */ forwardRef<HTMLAnchorElement | HTMLButtonElement, ButtonProps>((props: Readonly<ButtonProps>, ref) => {
+export const Button = /* #__PURE__ */ forwardRef<HTMLAnchorElement | HTMLButtonElement, Button.Props>((props: Readonly<Button.Props>, ref) => {
   switch (true) {
     case _isAnchor(props): {
       const { action, children, className, isDisabled, label, opensInNewTab, ...uniqProps } = props
@@ -65,22 +60,27 @@ export const Button = /* #__PURE__ */ forwardRef<HTMLAnchorElement | HTMLButtonE
     default:
       console.error('[etudes::Button] Unknown button type')
 
-      return (
-        <div>asdf</div>
-      )
+      return undefined
   }
 })
 
-function _isAnchor(props: ButtonProps): props is AnchorVariantProps {
+function _isAnchor(props: Button.Props): props is AnchorVariantProps {
   if (typeof props.action === 'string') return true
 
   return false
 }
 
-function _isButton(props: ButtonProps): props is ButtonVariantProps {
+function _isButton(props: Button.Props): props is ButtonVariantProps {
   if (typeof props.action === 'function' || typeof (props as any).type === 'string') return true
 
   return false
+}
+
+export namespace Button {
+  /**
+   * Type describing the props of {@link Button}.
+   */
+  export type Props = AnchorVariantProps | ButtonVariantProps
 }
 
 if (process.env.NODE_ENV === 'development') {
