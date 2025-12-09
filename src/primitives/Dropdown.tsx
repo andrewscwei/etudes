@@ -5,19 +5,19 @@ import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
-import { Collection, CollectionItem, type CollectionItemProps, type CollectionLayout, type CollectionOrientation, type CollectionProps, type CollectionSelection } from './Collection.js'
+import { Collection } from './Collection.js'
 
 /**
  * Type describing the orientation of {@link Dropdown}.
  */
-export type DropdownOrientation = CollectionOrientation
+export type DropdownOrientation = Collection.Orientation
 
 /**
  * Type describing the current item selection of {@link Dropdown}, composed of
  * an array of indices of items that are selected. If the selection mode of the
  * {@link Dropdown} is `single`, only one index is expected in this array.
  */
-export type DropdownSelection = CollectionSelection
+export type DropdownSelection = Collection.Selection
 
 /**
  * Type describing the props of `ToggleComponent` provided to {@link Dropdown}.
@@ -35,12 +35,12 @@ export type DropdownToggleProps = HTMLAttributes<HTMLButtonElement> & {
 /**
  * Type describing the props of `ItemComponent` provided to {@link Dropdown}.
  */
-export type DropdownItemProps<T> = CollectionItemProps<T>
+export type DropdownItemProps<T> = Collection.ItemProps<T>
 
 /**
  * Type describing the props of {@link Dropdown}.
  */
-export type DropdownProps<T> = HTMLAttributes<HTMLDivElement> & CollectionProps<T> & {
+export type DropdownProps<T> = HTMLAttributes<HTMLDivElement> & Collection.Props<T> & {
   /**
    * Specifies if the internal collection collapses when an item is selected.
    * This only works if `selectionMode` is `single`.
@@ -301,7 +301,7 @@ export const DropdownCollection = Collection
 /**
  * Component for each item in a {@link Dropdown}.
  */
-export const DropdownItem = CollectionItem
+export const DropdownItem = Collection.Item
 
 /**
  * Component for the toggle button of a {@link Dropdown}.
@@ -340,7 +340,7 @@ function _sortIndices(indices: number[]): number[] {
   return indices.sort((a, b) => a - b)
 }
 
-function _getNumVisibleItems<T>(items: T[], maxVisible: number, numSegments: number, layout: CollectionLayout) {
+function _getNumVisibleItems<T>(items: T[], maxVisible: number, numSegments: number, layout: Collection.Layout) {
   const numItems = items.length
 
   switch (layout) {

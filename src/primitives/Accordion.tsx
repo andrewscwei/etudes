@@ -7,7 +7,7 @@ import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
-import { Collection, CollectionItem, type CollectionItemProps, type CollectionOrientation, type CollectionProps, type CollectionSelectionMode } from './Collection.js'
+import { Collection } from './Collection.js'
 import { type DropdownToggleProps } from './Dropdown.js'
 
 /**
@@ -22,7 +22,7 @@ export type AccordionSelection = Record<number, number[]>
 /**
  * Type describing the data of each section in {@link Accordion}.
  */
-export type AccordionSectionProps<T> = Pick<CollectionProps<T>, 'isSelectionTogglable' | 'itemLength' | 'itemPadding' | 'items' | 'layout' | 'numSegments'> & {
+export type AccordionSectionProps<T> = Pick<Collection.Props<T>, 'isSelectionTogglable' | 'itemLength' | 'itemPadding' | 'items' | 'layout' | 'numSegments'> & {
   /**
    * Padding (in pixels) between the section header and the internal collection.
    */
@@ -45,7 +45,7 @@ export type AccordionSectionProps<T> = Pick<CollectionProps<T>, 'isSelectionTogg
  * Type describing the props of each `ItemComponent` provided to
  * {@link Accordion}.
  */
-export type AccordionItemProps<T> = CollectionItemProps<T>
+export type AccordionItemProps<T> = Collection.ItemProps<T>
 
 /**
  * Type describing the props of each `HeaderComponent` provided to
@@ -97,7 +97,7 @@ export type AccordionProps<I, S extends AccordionSectionProps<I> = AccordionSect
    *
    * @see {@link CollectionOrientation}
    */
-  orientation?: CollectionOrientation
+  orientation?: Collection.Orientation
 
   /**
    * Padding (in pixels) between each section.
@@ -121,7 +121,7 @@ export type AccordionProps<I, S extends AccordionSectionProps<I> = AccordionSect
    *
    * @see {@link CollectionSelectionMode}
    */
-  selectionMode?: CollectionSelectionMode
+  selectionMode?: Collection.SelectionMode
 
   /**
    * Handler invoked when an item is activated in a section. The order of
@@ -517,7 +517,7 @@ export const AccordionSection = ({ children, ...props }: HTMLAttributes<HTMLDivE
 /**
  * Component for each item of each section of an {@link Accordion}.
  */
-export const AccordionItem = CollectionItem
+export const AccordionItem = Collection.Item
 
 function _isSectionIndexOutOfRange<T>(sectionIndex: number, sections: AccordionSectionProps<T>[]) {
   if (sectionIndex >= sections.length) return true

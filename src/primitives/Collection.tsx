@@ -7,202 +7,7 @@ import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { styles } from '../utils/styles.js'
 
-/**
- * Type describing the layout orientation of items in {@link Collection}.
- */
-export type CollectionOrientation = 'horizontal' | 'vertical'
-
-/**
- * Type describing the layout appearance of {@link Collection}:
- *   - `list`: Items will be laid out in a list.
- *   - `grid`: Items will be laid out in a grid.
- */
-export type CollectionLayout = 'list' | 'grid'
-
-/**
- *  Type describing the item selection behavior of {@link Collection}:
- *    - `none`: No selection permitted at all.
- *    - `single`: Only one item can be selected at a time (the previously
- *                selected item will be automatically deselected).
- *    - `multiple`: Multiple items can be selected simultaneously.
- */
-export type CollectionSelectionMode = 'none' | 'single' | 'multiple'
-
-/**
- * Type describing the current item selection of {@link Collection}, composed of
- * an array of indices of items that are selected. If the selection mode of the
- * {@link Collection} is `single`, only one index is expected in this array.
- */
-export type CollectionSelection = number[]
-
-/**
- * Type describing the props of `ItemComponent` provided to {@link Collection}.
- */
-export type CollectionItemProps<T> = HTMLAttributes<HTMLElement> & {
-  /**
-   * The index of the item.
-   */
-  index: number
-
-  /**
-   * Indicates whether the item is selected.
-   */
-  isSelected: boolean
-
-  /**
-   * Data provided to the item.
-   */
-  item: T
-
-  /**
-   * Orientation of the parent collection.
-   */
-  orientation: CollectionOrientation
-
-  /**
-   * Handler invoked to dispatch a custom event.
-   *
-   * @param name User-defined name of the custom event.
-   * @param info Optional user-defined info of the custom event.
-   */
-  onCustomEvent?: (name: string, info?: any) => void
-}
-
-/**
- * Type describing the props of {@link Collection}.
- */
-export type CollectionProps<T> = HTMLAttributes<HTMLDivElement> & {
-  /**
-   * Indicates if item selection can be toggled, i.e. they can be deselected if
-   * selected again.
-   */
-  isSelectionTogglable?: boolean
-
-  /**
-   * Optional length (in pixels) of each item. Length refers to the height in
-   * vertical orientation and width in horizontal orientation.
-   */
-  itemLength?: number
-
-  /**
-   * Padding between every item (in pixels).
-   */
-  itemPadding?: number
-
-  /**
-   * Generically typed data of each item.
-   */
-  items?: T[]
-
-  /**
-   * Specifies the layout appearance of this component.
-   *
-   * @see {@link CollectionLayout}
-   */
-  layout?: CollectionLayout
-
-  /**
-   * Specifies the number of columns of this collection if the orientation is
-   * `vertical` or number of rows if the orientation is `horizontal`. This
-   * property is only used if the layout is set to `grid`.
-   */
-  numSegments?: number
-
-  /**
-   * Orientation of the component.
-   *
-   * @see {@link CollectionOrientation}
-   */
-  orientation?: CollectionOrientation
-
-  /**
-   * The selected indices. If `selectionMode` is `single`, only only the first
-   * value will be used.
-   *
-   * @see {@link CollectionSelection}
-   */
-  selection?: CollectionSelection
-
-  /**
-   * The item selection behavior.
-   *
-   * @see {@link CollectionSelectionMode}
-   */
-  selectionMode?: CollectionSelectionMode
-
-  /**
-   * Handler invoked when an item is activated (i.e. clicked). The order of
-   * handlers invoked when any selection changes take place is:
-   *   1. `onActivateAt`
-   *   2. `onDeselectAt`
-   *   3. `onSelectAt`
-   *   4. `onSelectionChange`
-   *
-   * @param index Item index.
-   */
-  onActivateAt?: (index: number) => void
-
-  /**
-   * Handler invoked when an item is deselected. The order of handlers invoked
-   * when any selection changes take place is:
-   *   1. `onActivateAt`
-   *   2. `onDeselectAt`
-   *   3. `onSelectAt`
-   *   4. `onSelectionChange`
-   *
-   * @param index Item index.
-   */
-  onDeselectAt?: (index: number) => void
-
-  /**
-   * Handler invoked when a custom event is dispatched from the item.
-   *
-   * @param index Index of the item.
-   * @param eventName User-defined name of the dispatched custom event.
-   * @param eventInfo Optional user-defined info of the dispatched custom event.
-   */
-  onCustomEvent?: (index: number, eventName: string, eventInfo?: any) => void
-
-  /**
-   * Handler invoked when an item is selected. The order of handlers invoked
-   * when any selection changes take place is:
-   *   1. `onActivateAt`
-   *   2. `onDeselectAt`
-   *   3. `onSelectAt`
-   *   4. `onSelectionChange`
-   *
-   * @param index Item index.
-   */
-  onSelectAt?: (index: number) => void
-
-  /**
-   * Handler invoked when the selected items changed. The order of handlers
-   * invoked when any selection changes take place is:
-   *   1. `onActivateAt`
-   *   2. `onDeselectAt`
-   *   3. `onSelectAt`
-   *   4. `onSelectionChange`
-   *
-   * @param selection Indices of selected items.
-   */
-  onSelectionChange?: (selection: CollectionSelection) => void
-
-  /**
-   * Custom component type for generating items in this collection. If this is
-   * provided, the {@link CollectionItem} provided as part of the children will
-   * be ignored.
-   */
-  ItemComponent?: ComponentType<CollectionItemProps<T>>
-}
-
-/**
- * A collection of selectable items with generic data. Items are generated based
- * on the provided `ItemComponent`. This component supports different layouts in
- * both horizontal and vertical orientations.
- *
- * @exports CollectionItem Component for each item in the collection.
- */
-export const Collection = /* #__PURE__ */ forwardRef(({
+const _Collection = /* #__PURE__ */ forwardRef(({
   className,
   children,
   style,
@@ -240,7 +45,7 @@ export const Collection = /* #__PURE__ */ forwardRef(({
   const selectAt = (index: number) => {
     if (isSelectedAt(index)) return
 
-    let transform: (val: CollectionSelection) => CollectionSelection
+    let transform: (val: Collection.Selection) => Collection.Selection
 
     switch (selectionMode) {
       case 'multiple': {
@@ -264,7 +69,7 @@ export const Collection = /* #__PURE__ */ forwardRef(({
   const deselectAt = (index: number) => {
     if (!isSelectedAt(index)) return
 
-    const transform = (val: CollectionSelection) => val.filter(t => t !== index)
+    const transform = (val: Collection.Selection) => val.filter(t => t !== index)
     const oldValue = selection
     const newValue = transform(selection)
 
@@ -284,7 +89,7 @@ export const Collection = /* #__PURE__ */ forwardRef(({
     }
   }
 
-  const handleSelectionChange = (oldValue: CollectionSelection | undefined, newValue: CollectionSelection) => {
+  const handleSelectionChange = (oldValue: Collection.Selection | undefined, newValue: Collection.Selection) => {
     if (isDeepEqual(oldValue, newValue)) return
 
     const deselected = oldValue?.filter(t => newValue.indexOf(t) === -1) ?? []
@@ -298,7 +103,7 @@ export const Collection = /* #__PURE__ */ forwardRef(({
 
   useEffect(() => {
     const oldValue = selection
-    let newValue: CollectionSelection
+    let newValue: Collection.Selection
 
     switch (selectionMode) {
       case 'multiple':
@@ -316,7 +121,7 @@ export const Collection = /* #__PURE__ */ forwardRef(({
   }, [selectionMode])
 
   const components = asComponentDict(children, {
-    item: CollectionItem,
+    item: _Item,
   })
 
   return (
@@ -366,7 +171,7 @@ export const Collection = /* #__PURE__ */ forwardRef(({
               <Styled
                 aria-selected={isSelected}
                 className={clsx({ active: isSelected })}
-                element={components.item ?? <CollectionItem/>}
+                element={components.item ?? <_Item/>}
                 role={role}
                 selectionMode={selectionMode}
                 style={itemStyles}
@@ -381,12 +186,9 @@ export const Collection = /* #__PURE__ */ forwardRef(({
       </Each>
     </div>
   )
-}) as <T>(props: Readonly<CollectionProps<T> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
+}) as <T>(props: Readonly<Collection.Props<T> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
 
-/**
- * Component for each item in a {@link Collection}.
- */
-export const CollectionItem = ({ children, selectionMode, onActivateAt, ...props }: HTMLAttributes<HTMLDivElement | HTMLButtonElement> & Pick<CollectionProps<any>, 'selectionMode' | 'onActivateAt'>) => {
+const _Item = ({ children, selectionMode, onActivateAt, ...props }: HTMLAttributes<HTMLDivElement | HTMLButtonElement> & Pick<Collection.Props<any>, 'selectionMode' | 'onActivateAt'>) => {
   if (onActivateAt || selectionMode === 'single' || selectionMode === 'multiple') {
     return (<button {...props}>{children}</button>)
   }
@@ -403,7 +205,7 @@ function _isIndexOutOfRange<T>(index: number, items: T[]) {
   return false
 }
 
-function _sanitizeSelection<T>(indices: CollectionSelection, items: T[]) {
+function _sanitizeSelection<T>(indices: Collection.Selection, items: T[]) {
   return _sortIndices(indices).filter(t => !_isIndexOutOfRange(t, items))
 }
 
@@ -452,7 +254,211 @@ function _getFixedStyles({ itemLength = NaN, itemPadding = 0, layout = 'collecti
   })
 }
 
+export namespace Collection {
+  /**
+   * Type describing the layout orientation of items in {@link Collection}.
+   */
+  export type Orientation = 'horizontal' | 'vertical'
+
+  /**
+   * Type describing the layout appearance of {@link Collection}:
+   *   - `list`: Items will be laid out in a list.
+   *   - `grid`: Items will be laid out in a grid.
+   */
+  export type Layout = 'list' | 'grid'
+
+  /**
+   *  Type describing the item selection behavior of {@link Collection}:
+   *    - `none`: No selection permitted at all.
+   *    - `single`: Only one item can be selected at a time (the previously
+   *                selected item will be automatically deselected).
+   *    - `multiple`: Multiple items can be selected simultaneously.
+   */
+  export type SelectionMode = 'none' | 'single' | 'multiple'
+
+  /**
+   * Type describing the current item selection of {@link Collection}, composed of
+   * an array of indices of items that are selected. If the selection mode of the
+   * {@link Collection} is `single`, only one index is expected in this array.
+   */
+  export type Selection = number[]
+
+  /**
+   * Type describing the props of `ItemComponent` provided to {@link Collection}.
+   */
+  export type ItemProps<T> = HTMLAttributes<HTMLElement> & {
+    /**
+     * The index of the item.
+     */
+    index: number
+
+    /**
+     * Indicates whether the item is selected.
+     */
+    isSelected: boolean
+
+    /**
+     * Data provided to the item.
+     */
+    item: T
+
+    /**
+     * Orientation of the parent collection.
+     */
+    orientation: Orientation
+
+    /**
+     * Handler invoked to dispatch a custom event.
+     *
+     * @param name User-defined name of the custom event.
+     * @param info Optional user-defined info of the custom event.
+     */
+    onCustomEvent?: (name: string, info?: any) => void
+  }
+
+  /**
+   * Type describing the props of {@link Collection}.
+   */
+  export type Props<T> = HTMLAttributes<HTMLDivElement> & {
+    /**
+     * Indicates if item selection can be toggled, i.e. they can be deselected if
+     * selected again.
+     */
+    isSelectionTogglable?: boolean
+
+    /**
+     * Optional length (in pixels) of each item. Length refers to the height in
+     * vertical orientation and width in horizontal orientation.
+     */
+    itemLength?: number
+
+    /**
+     * Padding between every item (in pixels).
+     */
+    itemPadding?: number
+
+    /**
+     * Generically typed data of each item.
+     */
+    items?: T[]
+
+    /**
+     * Specifies the layout appearance of this component.
+     *
+     * @see {@link Layout}
+     */
+    layout?: Layout
+
+    /**
+     * Specifies the number of columns of this collection if the orientation is
+     * `vertical` or number of rows if the orientation is `horizontal`. This
+     * property is only used if the layout is set to `grid`.
+     */
+    numSegments?: number
+
+    /**
+     * Orientation of the component.
+     *
+     * @see {@link Orientation}
+     */
+    orientation?: Orientation
+
+    /**
+     * The selected indices. If `selectionMode` is `single`, only only the first
+     * value will be used.
+     *
+     * @see {@link Selection}
+     */
+    selection?: Selection
+
+    /**
+     * The item selection behavior.
+     *
+     * @see {@link SelectionMode}
+     */
+    selectionMode?: SelectionMode
+
+    /**
+     * Handler invoked when an item is activated (i.e. clicked). The order of
+     * handlers invoked when any selection changes take place is:
+     *   1. `onActivateAt`
+     *   2. `onDeselectAt`
+     *   3. `onSelectAt`
+     *   4. `onSelectionChange`
+     *
+     * @param index Item index.
+     */
+    onActivateAt?: (index: number) => void
+
+    /**
+     * Handler invoked when an item is deselected. The order of handlers invoked
+     * when any selection changes take place is:
+     *   1. `onActivateAt`
+     *   2. `onDeselectAt`
+     *   3. `onSelectAt`
+     *   4. `onSelectionChange`
+     *
+     * @param index Item index.
+     */
+    onDeselectAt?: (index: number) => void
+
+    /**
+     * Handler invoked when a custom event is dispatched from the item.
+     *
+     * @param index Index of the item.
+     * @param eventName User-defined name of the dispatched custom event.
+     * @param eventInfo Optional user-defined info of the dispatched custom event.
+     */
+    onCustomEvent?: (index: number, eventName: string, eventInfo?: any) => void
+
+    /**
+     * Handler invoked when an item is selected. The order of handlers invoked
+     * when any selection changes take place is:
+     *   1. `onActivateAt`
+     *   2. `onDeselectAt`
+     *   3. `onSelectAt`
+     *   4. `onSelectionChange`
+     *
+     * @param index Item index.
+     */
+    onSelectAt?: (index: number) => void
+
+    /**
+     * Handler invoked when the selected items changed. The order of handlers
+     * invoked when any selection changes take place is:
+     *   1. `onActivateAt`
+     *   2. `onDeselectAt`
+     *   3. `onSelectAt`
+     *   4. `onSelectionChange`
+     *
+     * @param selection Indices of selected items.
+     */
+    onSelectionChange?: (selection: Selection) => void
+
+    /**
+     * Custom component type for generating items in this collection. If this is
+     * provided, the {@link _Item} provided as part of the children will
+     * be ignored.
+     */
+    ItemComponent?: ComponentType<ItemProps<T>>
+  }
+}
+
+/**
+ * A collection of selectable items with generic data. Items are generated based
+ * on the provided `ItemComponent`. This component supports different layouts in
+ * both horizontal and vertical orientations.
+ *
+ * @exports Collection.Item Component for each item in the collection.
+ */
+export const Collection = Object.assign(_Collection, {
+  /**
+   * Component for each item in a {@link Collection}.
+   */
+  Item: _Item,
+})
+
 if (process.env.NODE_ENV === 'development') {
   (Collection as any).displayName = 'Collection'
-  CollectionItem.displayName = 'CollectionItem'
+  _Item.displayName = 'CollectionItem'
 }
