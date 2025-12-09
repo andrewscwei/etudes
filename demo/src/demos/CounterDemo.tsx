@@ -1,4 +1,4 @@
-import { Counter, CounterAddButton, CounterSubtractButton, CounterTextField } from 'etudes'
+import { Counter } from 'etudes'
 import { useState } from 'react'
 import $$MinusIcon from '../assets/minus-icon.svg?raw'
 import $$PlusIcon from '../assets/plus-icon.svg?raw'
@@ -29,9 +29,9 @@ export function CounterDemo() {
             toast(`Quantity: ${t}`)
           }}
         >
-          <CounterTextField className='ia border/black border bg-transparent px-2 text-center outline-none'/>
-          <CounterSubtractButton className='ia flex w-9 items-center border border-dark bg-transparent justify-center p-2' dangerouslySetInnerHTML={{ __html: $$MinusIcon }}/>
-          <CounterAddButton className='ia flex w-9 items-center justify-center border border-dark bg-transparent p-2' dangerouslySetInnerHTML={{ __html: $$PlusIcon }}/>
+          <Counter.TextField className='ia border/black border bg-transparent px-2 text-center outline-none'/>
+          <Counter.SubtractButton className='ia flex w-9 items-center border border-dark bg-transparent justify-center p-2' dangerouslySetInnerHTML={{ __html: $$MinusIcon }}/>
+          <Counter.AddButton className='ia flex w-9 items-center justify-center border border-dark bg-transparent p-2' dangerouslySetInnerHTML={{ __html: $$PlusIcon }}/>
         </Counter>
       )}
     </Frame>

@@ -7,56 +7,19 @@ import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 import { TextField, type TextFieldProps } from './TextField.js'
 
-/**
- * Type describing the props of {@link Counter}.
- */
-export type CounterProps = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & {
-  /**
-   * The minimum quantity that can be set.
-   */
-  min?: number
-
-  /**
-   * The maximum quantity that can be set.
-   */
-  max?: number
-
-  /**
-   * The quantity.
-   */
-  quantity?: number
-
-  /**
-   * Specifies if the quantity can be modified via user text input.
-   */
-  allowsInput?: boolean
-
-  /**
-   * Handler invoked when the quantity changes.
-   *
-   * @param quantity The new quantity.
-   */
-  onChange?: (quantity: number) => void
-}
-
-/**
- * A component that allows the user to increment or decrement a quantity
- * using buttons or by typing in a text field.
- *
- * @exports CounterTextField Component for the text field.
- * @exports CounterAddButton Component for the add button.
- * @exports CounterSubtractButton Component for the subtract button.
- */
-export const Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CounterProps>>(({
-  children,
-  style,
-  allowsInput = true,
-  max = NaN,
-  min = NaN,
-  quantity = 0,
-  onChange,
-  ...props
-}, ref) => {
+const _Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Counter.Props>>((
+  {
+    children,
+    style,
+    allowsInput = true,
+    max = NaN,
+    min = NaN,
+    quantity = 0,
+    onChange,
+    ...props
+  },
+  ref,
+) => {
   const handleSubtract = () => {
     onChange?.(clamp(quantity - 1))
   }
@@ -114,21 +77,21 @@ export const Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Count
   }, [quantity, min, max])
 
   const components = asComponentDict(children, {
-    textField: CounterTextField,
-    addButton: CounterAddButton,
-    subscribeButton: CounterSubtractButton,
+    textField: _TextField,
+    addButton: _AddButton,
+    subscribeButton: _SubtractButton,
   })
 
   return (
     <div {...props} ref={ref} style={styles(style, FIXED_STYLES.root)}>
       <Styled
         className={clsx({ disabled: isSubtractingDisabled })}
-        element={components.subscribeButton ?? <CounterSubtractButton/>}
+        element={components.subscribeButton ?? <_SubtractButton/>}
         style={styles(FIXED_STYLES.subtract)}
         onClick={() => handleSubtract()}
       />
       <Styled
-        element={components.textField ?? <CounterTextField/>}
+        element={components.textField ?? <_TextField/>}
         isDisabled={!allowsInput}
         style={styles(FIXED_STYLES.textField)}
         value={text}
@@ -137,7 +100,7 @@ export const Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Count
       />
       <Styled
         className={clsx({ disabled: isAddingDisabled })}
-        element={components.addButton ?? <CounterAddButton/>}
+        element={components.addButton ?? <_AddButton/>}
         style={styles(FIXED_STYLES.add)}
         onClick={() => handleAdd()}
       />
@@ -145,30 +108,80 @@ export const Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Count
   )
 })
 
-/**
- * Component for the text field in a {@link Counter}.
- */
-export const CounterTextField = ({ ...props }: TextFieldProps) => (
+const _TextField = ({ ...props }: TextFieldProps) => (
   <TextField {...props}/>
 )
 
-/**
- * Component for the add button in a {@link Counter}.
- */
-export const CounterAddButton = ({ children, ...props }: HTMLAttributes<HTMLButtonElement>) => (
+const _AddButton = ({ children, ...props }: HTMLAttributes<HTMLButtonElement>) => (
   <button {...props}>
     {children}
   </button>
 )
 
-/**
- * Component for the subtract button in a {@link Counter}.
- */
-export const CounterSubtractButton = ({ children, ...props }: HTMLAttributes<HTMLButtonElement>) => (
+const _SubtractButton = ({ children, ...props }: HTMLAttributes<HTMLButtonElement>) => (
   <button {...props}>
     {children}
   </button>
 )
+
+export namespace Counter {
+  /**
+   * Type describing the props of {@link Counter}.
+   */
+  export type Props = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & {
+    /**
+     * The minimum quantity that can be set.
+     */
+    min?: number
+
+    /**
+     * The maximum quantity that can be set.
+     */
+    max?: number
+
+    /**
+     * The quantity.
+     */
+    quantity?: number
+
+    /**
+     * Specifies if the quantity can be modified via user text input.
+     */
+    allowsInput?: boolean
+
+    /**
+     * Handler invoked when the quantity changes.
+     *
+     * @param quantity The new quantity.
+     */
+    onChange?: (quantity: number) => void
+  }
+}
+
+/**
+ * A component that allows the user to increment or decrement a quantity using
+ * buttons or by typing in a text field.
+ *
+ * @exports Counter.TextField Component for the text field.
+ * @exports Counter.AddButton Component for the add button.
+ * @exports Counter.SubtractButton Component for the subtract button.
+ */
+export const Counter = /* #__PURE__ */ Object.assign(_Counter, {
+  /**
+   * Component for the text field in a {@link Counter}.
+   */
+  TextField: _TextField,
+
+  /**
+   * Component for the add button in a {@link Counter}.
+   */
+  AddButton: _AddButton,
+
+  /**
+   * Component for the subtract button in a {@link Counter}.
+   */
+  SubtractButton: _SubtractButton,
+})
 
 const FIXED_STYLES = asStyleDict({
   root: {
@@ -189,8 +202,9 @@ const FIXED_STYLES = asStyleDict({
 })
 
 if (process.env.NODE_ENV === 'development') {
-  Counter.displayName = 'Counter'
-  CounterAddButton.displayName = 'CounterAddButton'
-  CounterSubtractButton.displayName = 'CounterSubtractButton'
-  CounterTextField.displayName = 'CounterTextField'
+  _Counter.displayName = 'Counter'
+
+  _AddButton.displayName = 'CounterAddButton'
+  _SubtractButton.displayName = 'CounterSubtractButton'
+  _TextField.displayName = 'CounterTextField'
 }

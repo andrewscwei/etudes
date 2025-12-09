@@ -208,7 +208,7 @@ export namespace CodeInput {
  *
  * @exports CodeInput.Field Component for the each field in a {@link CodeInput}.
  */
-export const CodeInput = Object.assign(_CodeInput, {
+export const CodeInput = /* #__PURE__ */ Object.assign(_CodeInput, {
   /**
    * Component for the each field in a {@link CodeInput}.
    */
