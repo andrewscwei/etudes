@@ -1,31 +1,13 @@
 import { forwardRef, useRef, useState, type HTMLAttributes, type RefObject } from 'react'
 import { Size } from 'spase'
 import { useRect } from '../hooks/useRect.js'
-import { Video, type VideoProps } from '../primitives/Video.js'
+import { Video } from '../primitives/Video.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
-/**
- * Type describing the props of {@link CoverVideo}.
- */
-export type CoverVideoProps = Omit<HTMLAttributes<HTMLDivElement>, 'onCanPlay' | 'onPause' | 'onPlay'> & Pick<VideoProps, 'autoLoop' | 'autoPlay' | 'hasControls' | 'isMuted' | 'playsInline' | 'posterSrc' | 'src' | 'onPause' | 'onPlay' | 'onCanPlay' | 'onEnd' | 'onFullscreenChange' | 'onLoadMetadata' | 'onLoadMetadataComplete' | 'onLoadMetadataError' | 'onSizeChange'> & {
-  /**
-   * The known aspect ratio of the video, expressed by width / height. If
-   * unprovided, it will be inferred after loading the video.
-   */
-  aspectRatio?: number
-}
-
-/**
- * A component that displays a video with a fixed aspect ratio. The video is
- * centered and cropped to fit the container (a.k.a. viewport).
- *
- * @exports CoverVideoContent Component for optional content inside the video.
- * @exports CoverVideoViewport Component for the viewport.
- */
-export const CoverVideo = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverVideoProps>>(({
+const _CoverVideo = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverVideo.Props>>(({
   className,
   children,
   style,
@@ -68,8 +50,8 @@ export const CoverVideo = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Co
   )
 
   const components = asComponentDict(children, {
-    content: CoverVideoContent,
-    viewport: CoverVideoViewport,
+    content: _Content,
+    viewport: _Viewport,
   })
 
   return (
@@ -120,7 +102,7 @@ export const CoverVideo = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Co
 /**
  * Component for optional content inside a {@link CoverVideo}.
  */
-export const CoverVideoContent = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+const _Content = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}>
     {children}
   </div>
@@ -129,11 +111,43 @@ export const CoverVideoContent = ({ children, ...props }: HTMLAttributes<HTMLDiv
 /**
  * Component for the viewport of a {@link CoverVideo}.
  */
-export const CoverVideoViewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+const _Viewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}>
     {children}
   </div>
 )
+
+export namespace CoverVideo {
+  /**
+   * Type describing the props of {@link CoverVideo}.
+   */
+  export type Props = Omit<HTMLAttributes<HTMLDivElement>, 'onCanPlay' | 'onPause' | 'onPlay'> & Pick<Video.Props, 'autoLoop' | 'autoPlay' | 'hasControls' | 'isMuted' | 'playsInline' | 'posterSrc' | 'src' | 'onPause' | 'onPlay' | 'onCanPlay' | 'onEnd' | 'onFullscreenChange' | 'onLoadMetadata' | 'onLoadMetadataComplete' | 'onLoadMetadataError' | 'onSizeChange'> & {
+    /**
+     * The known aspect ratio of the video, expressed by width / height. If
+     * unprovided, it will be inferred after loading the video.
+     */
+    aspectRatio?: number
+  }
+}
+
+/**
+ * A component that displays a video with a fixed aspect ratio. The video is
+ * centered and cropped to fit the container (a.k.a. viewport).
+ *
+ * @exports CoverVideo.Content Component for optional content inside the video.
+ * @exports CoverVideo.Viewport Component for the viewport.
+ */
+export const CoverVideo = /* #__PURE__ */ Object.assign(_CoverVideo, {
+  /**
+   * Component for optional content inside a {@link CoverVideo}.
+   */
+  Content: _Content,
+
+  /**
+   * Component for the viewport of a {@link CoverVideo}.
+   */
+  Viewport: _Viewport,
+})
 
 const FIXED_STYLES = asStyleDict({
   root: {
@@ -149,7 +163,8 @@ const FIXED_STYLES = asStyleDict({
 })
 
 if (process.env.NODE_ENV === 'development') {
-  CoverVideo.displayName = 'CoverVideo'
-  CoverVideoContent.displayName = 'CoverVideoContent'
-  CoverVideoViewport.displayName = 'CoverVideoViewport'
+  _CoverVideo.displayName = 'CoverVideo'
+
+  _Content.displayName = 'CoverVideo.Content'
+  _Viewport.displayName = 'CoverVideo.Viewport'
 }

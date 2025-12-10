@@ -1,4 +1,4 @@
-import { CoverVideo, CoverVideoContent, CoverVideoViewport } from 'etudes'
+import { CoverVideo } from 'etudes'
 import $$Video from '../assets/video.mov'
 import { Frame } from '../components/Frame.js'
 
@@ -15,10 +15,10 @@ export function CoverVideoDemo() {
           onPause={() => toast('Paused')}
           onPlay={() => toast('Playing')}
         >
-          <CoverVideoViewport className='z-10 flex items-center justify-center'>
+          <CoverVideo.Viewport className='z-10 flex items-center justify-center'>
             <div className='text-light bg-dark flex items-center justify-center px-2 py-1 text-sm'>Cover</div>
-          </CoverVideoViewport>
-          <CoverVideoContent className='bg-dark/40 pointer-events-none relative size-full'/>
+          </CoverVideo.Viewport>
+          <CoverVideo.Content className='bg-dark/40 pointer-events-none relative size-full'/>
         </CoverVideo>
       )}
     </Frame>

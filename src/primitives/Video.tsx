@@ -3,102 +3,104 @@ import { type Size } from 'spase'
 import { useVideoSize } from '../hooks/useVideoSize.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 
-/**
- * Type describing the props of {@link Video}.
- */
-export type VideoProps = Omit<VideoHTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'controls' | 'loop' | 'muted' | 'playsInline' | 'poster' | 'onCanPlay' | 'onEnded' | 'onPause' | 'onPlay' | 'onTimeUpdate'> & {
+export namespace Video {
   /**
-   * Specifies if the video should loop.
+   * Type describing the props of {@link Video}.
    */
-  autoLoop?: boolean
+  export type Props = Omit<VideoHTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'controls' | 'loop' | 'muted' | 'playsInline' | 'poster' | 'onCanPlay' | 'onEnded' | 'onPause' | 'onPlay' | 'onTimeUpdate'> & {
+    /**
+     * Specifies if the video should loop.
+     */
+    autoLoop?: boolean
 
-  /**
-   * Specifies if the video should play automatically when loaded.
-   */
-  autoPlay?: boolean
+    /**
+     * Specifies if the video should play automatically when loaded.
+     */
+    autoPlay?: boolean
 
-  /**
-   * Specifies if video controls are present.
-   */
-  hasControls?: boolean
+    /**
+     * Specifies if video controls are present.
+     */
+    hasControls?: boolean
 
-  /**
-   * Specifies if the video should be muted.
-   */
-  isMuted?: boolean
+    /**
+     * Specifies if the video should be muted.
+     */
+    isMuted?: boolean
 
-  /**
-   * Specifies if the video should be played inline.
-   */
-  playsInline?: boolean
+    /**
+     * Specifies if the video should be played inline.
+     */
+    playsInline?: boolean
 
-  /**
-   * The URL of the video poster when video is unavailable or loading.
-   */
-  posterSrc?: string
+    /**
+     * The URL of the video poster when video is unavailable or loading.
+     */
+    posterSrc?: string
 
-  /**
-   * The URL of the video to play.
-   */
-  src: string
+    /**
+     * The URL of the video to play.
+     */
+    src: string
 
-  /**
-   * Handler invoked when the video is ready to play.
-   */
-  onCanPlay?: () => void
+    /**
+     * Handler invoked when the video is ready to play.
+     */
+    onCanPlay?: () => void
 
-  /**
-   * Handler invoked when the video ends.
-   */
-  onEnd?: () => void
+    /**
+     * Handler invoked when the video ends.
+     */
+    onEnd?: () => void
 
-  /**
-   * Handler invoked when the video is in fullscreen mode.
-   *
-   * @param isFullscreen `true` if the video is in fullscreen mode, `false`
-   *                     otherwise.
-   */
-  onFullscreenChange?: (isFullscreen: boolean) => void
+    /**
+     * Handler invoked when the video is in fullscreen mode.
+     *
+     * @param isFullscreen `true` if the video is in fullscreen mode, `false`
+     *                     otherwise.
+     */
+    onFullscreenChange?: (isFullscreen: boolean) => void
 
-  /**
-   * Handler invoked when the video metadata begins to load.
-   */
-  onLoadMetadata?: () => void
+    /**
+     * Handler invoked when the video metadata begins to load.
+     */
+    onLoadMetadata?: () => void
 
-  /**
-   * Handler invoked when the video metadata is loaded.
-   */
-  onLoadMetadataComplete?: () => void
+    /**
+     * Handler invoked when the video metadata is loaded.
+     */
+    onLoadMetadataComplete?: () => void
 
-  /**
-   * Handler invoked when the video metadata fails to load.
-   */
-  onLoadMetadataError?: () => void
+    /**
+     * Handler invoked when the video metadata fails to load.
+     */
+    onLoadMetadataError?: () => void
 
-  /**
-   * Handler invoked when the video is paused.
-   */
-  onPause?: () => void
+    /**
+     * Handler invoked when the video is paused.
+     */
+    onPause?: () => void
 
-  /**
-   * Handler invoked when the video is played.
-   */
-  onPlay?: () => void
+    /**
+     * Handler invoked when the video is played.
+     */
+    onPlay?: () => void
 
-  /**
-   * Handler invoked when the video size changes.
-   *
-   * @param size The new size of the video.
-   */
-  onSizeChange?: (size?: Size) => void
+    /**
+     * Handler invoked when the video size changes.
+     *
+     * @param size The new size of the video.
+     */
+    onSizeChange?: (size?: Size) => void
 
-  /**
-   * Handler invoked when the video time updates.
-   *
-   * @param currentTime The current time of the video.
-   * @param duration The duration of the video.
-   */
-  onTimeUpdate?: (currentTime: number, duration: number) => void
+    /**
+     * Handler invoked when the video time updates.
+     *
+     * @param currentTime The current time of the video.
+     * @param duration The duration of the video.
+     */
+    onTimeUpdate?: (currentTime: number, duration: number) => void
+  }
 }
 
 /**
@@ -112,7 +114,7 @@ export type VideoProps = Omit<VideoHTMLAttributes<HTMLVideoElement>, 'autoPlay' 
  *
  * @see {@link https://www.npmjs.com/package/hls.js}
  */
-export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<VideoProps>>(({
+export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video.Props>>(({
   autoLoop = true,
   autoPlay = true,
   hasControls = false,
