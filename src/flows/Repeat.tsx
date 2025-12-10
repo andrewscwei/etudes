@@ -1,24 +1,26 @@
 import { Fragment, type ReactNode } from 'react'
 
-/**
- * Type describing the properties of {@link Repeat}.
- */
-export type RepeatProps = {
+export namespace Repeat {
   /**
-   * The children to repeat. This is omitted if `render` is provided.
+   * Type describing the properties of {@link Repeat}.
    */
-  children?: ReactNode | ((index: number) => ReactNode)
+  export type Props = {
+    /**
+     * The children to repeat. This is omitted if `render` is provided.
+     */
+    children?: ReactNode | ((index: number) => ReactNode)
 
-  /**
-   * The number of times to repeat the children.
-   */
-  count?: number
+    /**
+     * The number of times to repeat the children.
+     */
+    count?: number
 
-  /**
-   * Function that overrides the default rendering of the children, invoked on
-   * each index of `count`.
-   */
-  render?: (index: number) => ReactNode
+    /**
+     * Function that overrides the default rendering of the children, invoked on
+     * each index of `count`.
+     */
+    render?: (index: number) => ReactNode
+  }
 }
 
 /**
@@ -29,7 +31,7 @@ export function Repeat({
   count = 1,
   children,
   render,
-}: Readonly<RepeatProps>) {
+}: Readonly<Repeat.Props>) {
   return (
     <>
       {[...Array(count)].map((_, i) => (

@@ -1,24 +1,26 @@
 import { Fragment, type ReactNode } from 'react'
 
-/**
- * Type describing the properties of {@link Each}.
- */
-export type EachProps<T> = {
+export namespace Each {
   /**
-   * The children to repeat. This is omitted if `render` is provided.
+   * Type describing the properties of {@link Each}.
    */
-  children?: ReactNode | ((value: T, index: number) => ReactNode)
+  export type Props<T> = {
+    /**
+     * The children to repeat. This is omitted if `render` is provided.
+     */
+    children?: ReactNode | ((value: T, index: number) => ReactNode)
 
-  /**
-   * The array of items to iterate over.
-   */
-  in?: T[]
+    /**
+     * The array of items to iterate over.
+     */
+    in?: T[]
 
-  /**
-   * Function that overrides the default rendering of the children, invoked on
-   * each item in the array.
-   */
-  render?: (value: T, index: number) => ReactNode
+    /**
+     * Function that overrides the default rendering of the children, invoked on
+     * each item in the array.
+     */
+    render?: (value: T, index: number) => ReactNode
+  }
 }
 
 /**
@@ -28,7 +30,7 @@ export function Each<T>({
   in: array,
   children,
   render,
-}: Readonly<EachProps<T>>) {
+}: Readonly<Each.Props<T>>) {
   if (array === undefined || array === null) return <></>
   if (!(array instanceof Array)) throw TypeError(`Provided list <${array}> is not an array`)
 

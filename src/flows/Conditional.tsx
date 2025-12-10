@@ -1,20 +1,22 @@
 import { type PropsWithChildren } from 'react'
 
-/**
- * Type describing the properties of {@link Conditional}.
- */
-export type ConditionalProps = PropsWithChildren<{
+export namespace Conditional {
   /**
-   * An expression or function that returns a truthy value to determine if the
-   * children should be rendered.
+   * Type describing the properties of {@link Conditional}.
    */
-  if: any | (() => any)
-}>
+  export type Props = PropsWithChildren<{
+    /**
+     * An expression or function that returns a truthy value to determine if the
+     * children should be rendered.
+     */
+    if: any | (() => any)
+  }>
+}
 
 /**
  * Component for conditionally rendering children.
  */
-export function Conditional({ children, if: functionOrTruthyExpression }: Readonly<ConditionalProps>) {
+export function Conditional({ children, if: functionOrTruthyExpression }: Readonly<Conditional.Props>) {
   switch (typeof functionOrTruthyExpression) {
     case 'function':
       return functionOrTruthyExpression() ? <>{children}</> : <></>
