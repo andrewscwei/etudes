@@ -1,4 +1,4 @@
-import { BurgerButton, BurgerButtonBar } from 'etudes'
+import { BurgerButton } from 'etudes'
 import { useState } from 'react'
 import { Frame } from '../components/Frame.js'
 
@@ -27,7 +27,7 @@ export function BurgerButtonDemo() {
             toast(t ? 'Active' : 'Inactive')
           }}
         >
-          <BurgerButtonBar className='bg-dark h-[2px] transition-[left,top,right,bottom,transform]'/>
+          <BurgerButton.Bar className='bg-dark h-0.5 transition-[left,top,right,bottom,transform]'/>
         </BurgerButton>
       )}
     </Frame>

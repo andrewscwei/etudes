@@ -7,38 +7,35 @@ import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { styles } from '../utils/styles.js'
 
-/**
- * Type describing the props of {@link Burger}.
- */
-export type BurgerProps = HTMLAttributes<HTMLDivElement> & {
+export namespace Burger {
   /**
-   * Specifies if the burger is in its activated state.
+   * Type describing the props of {@link Burger}.
    */
-  isActive?: boolean
+  export type Props = HTMLAttributes<HTMLDivElement> & {
+    /**
+     * Specifies if the burger is in its activated state.
+     */
+    isActive?: boolean
 
-  /**
-   * Specifies if the bars are horizontally split to allow for an alternate
-   * transition.
-   */
-  isSplit?: boolean
+    /**
+     * Specifies if the bars are horizontally split to allow for an alternate
+     * transition.
+     */
+    isSplit?: boolean
 
-  /**
-   * Specifies if the tail of the bottom bar is hidden.
-   */
-  isTailHidden?: boolean
+    /**
+     * Specifies if the tail of the bottom bar is hidden.
+     */
+    isTailHidden?: boolean
 
-  /**
-   * Specifies the number of bars to display.
-   */
-  numberOfBars?: 2 | 3
+    /**
+     * Specifies the number of bars to display.
+     */
+    numberOfBars?: 2 | 3
+  }
 }
 
-/**
- * Three-striped burger component that transforms into an "X" when active.
- *
- * @exports BurgerBar Component for each bar in the burger.
- */
-export const Burger = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<BurgerProps>>(({
+const _Burger = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Burger.Props>>(({
   children,
   className,
   isActive = false,
@@ -48,7 +45,7 @@ export const Burger = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Burger
   ...props
 }, ref) => {
   const components = asComponentDict(children, {
-    bar: BurgerBar,
+    bar: _Bar,
   })
 
   const fixedClassNames = asClassNameDict({
@@ -76,7 +73,7 @@ export const Burger = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Burger
                 <Styled
                   aria-hidden={true}
                   className={clsx(fixedClassNames.bar)}
-                  element={components.bar ?? <BurgerBar/>}
+                  element={components.bar ?? <_Bar/>}
                   style={(() => {
                     switch (numberOfBars) {
                       case 2:
@@ -99,9 +96,21 @@ export const Burger = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Burger
 /**
  * Component for each bar in a {@link Burger}.
  */
-export const BurgerBar = ({ ...props }: HTMLAttributes<HTMLSpanElement>) => (
+const _Bar = ({ ...props }: HTMLAttributes<HTMLSpanElement>) => (
   <span {...props}/>
 )
+
+/**
+ * Three-striped burger component that transforms into an "X" when active.
+ *
+ * @exports Burger.Bar Component for each bar in the burger.
+ */
+export const Burger = /* #__PURE__ */ Object.assign(_Burger, {
+  /**
+   * Component for each bar in a {@link Burger}.
+   */
+  Bar: _Bar,
+})
 
 function _getFixedStyles({ isActive = false, isSplit = false, isTailHidden = false }) {
   return asStyleDict({
@@ -166,6 +175,7 @@ function _getFixedStyles({ isActive = false, isSplit = false, isTailHidden = fal
 }
 
 if (process.env.NODE_ENV === 'development') {
-  Burger.displayName = 'Burger'
-  BurgerBar.displayName = 'BurgerBar'
+  _Burger.displayName = 'Burger'
+
+  _Bar.displayName = 'Burger.Bar'
 }

@@ -1,38 +1,40 @@
 import { forwardRef, useCallback, type ButtonHTMLAttributes } from 'react'
 import { Button } from '../primitives/Button.js'
 
-/**
- * Type describing the props of {@link OptionButton}.
- */
-export type OptionButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-disabled' | 'aria-label' | 'disabled' | 'onChange'> & {
+export namespace OptionButton {
   /**
-   * The current index of the option.
+   * Type describing the props of {@link OptionButton}.
    */
-  index?: number
+  export type Props = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-disabled' | 'aria-label' | 'disabled' | 'onChange'> & {
+    /**
+     * The current index of the option.
+     */
+    index?: number
 
-  /**
-   * Specifies if the button is disabled.
-   */
-  isDisabled?: boolean
+    /**
+     * Specifies if the button is disabled.
+     */
+    isDisabled?: boolean
 
-  /**
-   * The list of options to cycle through.
-   */
-  options: string[] | { label: string; value: string }[]
+    /**
+     * The list of options to cycle through.
+     */
+    options: string[] | { label: string; value: string }[]
 
-  /**
-   * Handler invoked when the button is clicked.
-   *
-   * @param value The value of the next option.
-   * @param index The index of the next option.
-   */
-  onChange?: (value: string, index: number) => void
+    /**
+     * Handler invoked when the button is clicked.
+     *
+     * @param value The value of the next option.
+     * @param index The index of the next option.
+     */
+    onChange?: (value: string, index: number) => void
+  }
 }
 
 /**
  * A button component that cycles through a list of options when clicked.
  */
-export const OptionButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readonly<OptionButtonProps>>(({
+export const OptionButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readonly<OptionButton.Props>>(({
   index = 0,
   isDisabled = false,
   options,
