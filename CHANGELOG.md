@@ -1,3 +1,61 @@
+# [22.0.0](https://github.com/andrewscwei/etudes/compare/v21.5.0...v22.0.0) (2025-12-10)
+
+
+### Features
+
+* Group Accordion components and types in its own namespace ([04bc71b](https://github.com/andrewscwei/etudes/commit/04bc71b4f3c03ba97c2ed14fa08e8b8f6b18bae1))
+* Group Burger/BurgerButton/OptionButton/SelectableButton components and types in its own namespace ([aa217f1](https://github.com/andrewscwei/etudes/commit/aa217f1e93223152995eff138bf136c8dce105f6))
+* Group Button components and types in its own namespace ([ca598be](https://github.com/andrewscwei/etudes/commit/ca598bee87bb49bed8b7421ccd7f9ac33c7eed29))
+* Group Carousel components and types in its own namespace ([032e047](https://github.com/andrewscwei/etudes/commit/032e0477bbb7da4500ed82b19c0f3ee5a51c0ffe))
+* Group Collection components and types in Collection namespace ([a37e81a](https://github.com/andrewscwei/etudes/commit/a37e81a1dbfeb0263b4d111888fb25b35a823c58))
+* Group Counter components and types in its own namespace ([5fd9524](https://github.com/andrewscwei/etudes/commit/5fd9524590a2ada7c773b7ae4359d6c154ebd872))
+* Group Dial components and types in its own namespace ([cd7a425](https://github.com/andrewscwei/etudes/commit/cd7a425afefcc24c1e488ebe6ce0bffcf47f1be0))
+* Group Dropdown components and types in its own namespace ([2b51ad2](https://github.com/andrewscwei/etudes/commit/2b51ad2e3f995431c77e4160cbcbd1d47667135c))
+* Group FlatSVG components and types in its own namespace ([4d1f148](https://github.com/andrewscwei/etudes/commit/4d1f14875583db9ab5ce4b54a54ba436c026ff6e))
+* Group flow components and types in its own namespace ([d65392d](https://github.com/andrewscwei/etudes/commit/d65392d19f8f8239aabbfd81fea798b890c19fb8))
+* Group Form components and types in its own namespace ([058fd9c](https://github.com/andrewscwei/etudes/commit/058fd9c935436ef4b59a1e2ac410047555405adc))
+* Group Image/Picture/CoverImage components and types in its own namespace ([95fa0a3](https://github.com/andrewscwei/etudes/commit/95fa0a3554dad3623f20caad85285ee2ba9bd2ee))
+* Group MasonryGrid components and types in its own namespace ([03dfdac](https://github.com/andrewscwei/etudes/commit/03dfdac3140fb794dd8ef24a4e27efd766c342fb))
+* Group Panorama components and types in its own namespace ([c1ada0a](https://github.com/andrewscwei/etudes/commit/c1ada0a7a59c5b8ee3c18751e132ec72096a88b2))
+* Group RangeSlider components and types in its own namespace ([3e9465f](https://github.com/andrewscwei/etudes/commit/3e9465f078d242181ae64912756a31c051e584c8))
+* Group Select components and types in its own namespace ([a2fdff6](https://github.com/andrewscwei/etudes/commit/a2fdff6e645380cd703522a9e5c744dbdc83a8e9))
+* Group Slider components and types in its own namespace ([3524dfe](https://github.com/andrewscwei/etudes/commit/3524dfe3f73da50560951571dd9a451bdfee535a))
+* Group StepSlider components and types in its own namespace ([e73e798](https://github.com/andrewscwei/etudes/commit/e73e7980677d432ce19941f16763b455f9f8603e))
+* Group SwipeRegion components and types in its own namespace ([1e0dfdd](https://github.com/andrewscwei/etudes/commit/1e0dfddd63e19694e24398ea4be198d952f5d525))
+* Group TextArea components and types in its own namespace ([ff7629f](https://github.com/andrewscwei/etudes/commit/ff7629f6ca020dda5d3331dfd1492a7adba79bce))
+* Group TextField components and types in its own namespace ([4f9c5fa](https://github.com/andrewscwei/etudes/commit/4f9c5fa008dc18d271a798f69444b3cbc00e1785))
+* Group Toggle components and types in its own namespace ([b760788](https://github.com/andrewscwei/etudes/commit/b7607880af45fc94f40ebee6f8ab5651a7979aa9))
+* Group Video/CoverVideo components and types in its own namespace ([5167c7c](https://github.com/andrewscwei/etudes/commit/5167c7c173a24111894e11f6dcf14dd2b125c662))
+* Group WithToolTip components and types in its own namespace ([b5255b8](https://github.com/andrewscwei/etudes/commit/b5255b8530f9e3455bc8f3c0aa72c57f06671d26))
+
+
+### BREAKING CHANGES
+
+* WithToolTip components and types are now in its own namespace
+* Flow components and types are now in its own namespace
+* Burger/BurgerButton/OptionButton/SelectableButton components and types are now in its own namespace
+* Video/CoverVideo components and types are now in its own namespace
+* Toggle components and types are now in its own namespace
+* TextField components and types are now in its own namespace
+* TextArea components and types are now in its own namespace
+* SwipeRegion components and types are now in its own namespace
+* StepSlider components and types are now in its own namespace
+* Slider components and types are now in its own namespace
+* Select components and types are now in its own namespace
+* RangeSlider components and types are now in its own namespace
+* Panorama components and types are now in its own namespace
+* MasonryGrid components and types are now in its own namespace
+* Image/Picture/CoverImage components and types are now in its own namespace
+* Form components and types are now in its own namespace
+* FlatSVG components and types are now in its own namespace
+* Dropdown components and types are now in its own namespace
+* Dial components and types are now in its own namespace
+* Counter components and types are now in its own namespace
+* Carousel components and types are now in its own namespace
+* Button components and types are now in its own namespace
+* Accordion components and types are now in its own namespace
+* Collection components and types are now in its own namespace
+
 # [21.5.0](https://github.com/andrewscwei/etudes/compare/v21.4.0...v21.5.0) (2025-12-09)
 
 
