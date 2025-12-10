@@ -218,7 +218,8 @@ export namespace RangeSlider {
     knobHeight?: number
 
     /**
-     * Invisible padding around the knobs in pixels, helps expand their hit boxes.
+     * Invisible padding around the knobs in pixels, helps expand their hit
+     * boxes.
      */
     knobPadding?: number
 
@@ -248,8 +249,9 @@ export namespace RangeSlider {
     range?: Range
 
     /**
-     * Number of intervals between the minimum and maximum values to snap to when
-     * either knob releases. If set to `-1`, the knobs will not snap to any value.
+     * Number of intervals between the minimum and maximum values to snap to
+     * when either knob releases. If set to `-1`, the knobs will not snap to any
+     * value.
      */
     steps?: number
 

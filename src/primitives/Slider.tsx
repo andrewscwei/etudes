@@ -224,8 +224,9 @@ export namespace Slider {
     isTrackInteractive?: boolean
 
     /**
-     * Indicates if position change events are dispatched only when dragging ends.
-     * When disabled, aforementioned events are fired repeatedly while dragging.
+     * Indicates if position change events are dispatched only when dragging
+     * ends. When disabled, aforementioned events are fired repeatedly while
+     * dragging.
      */
     onlyDispatchesOnDragEnd?: boolean
 
@@ -270,11 +271,11 @@ export namespace Slider {
     labelProvider?: (position: number) => string
 
     /**
-     * Handler invoked when position changes. This can either be invoked from the
-     * `position` prop being changed or from the slider being dragged. Note that
-     * if the event is emitted at the end of dragging due to
-     * `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here is
-     * still `true`.
+     * Handler invoked when position changes. This can either be invoked from
+     * the `position` prop being changed or from the slider being dragged. Note
+     * that if the event is emitted at the end of dragging due to
+     * `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here
+     * is still `true`.
      *
      * @param position The current slider position.
      * @param isDragging Specifies if the position change is due to dragging.
@@ -306,7 +307,7 @@ export namespace Slider {
  * @exports Slider.KnobContainer Component for the container of the knob.
  * @exports Slider.Label Component for the label on the knob.
  * @exports Slider.Track Component for the slide track on either side of the
- *                      knob.
+ *                       knob.
  */
 export const Slider = /* #__PURE__ */ Object.assign(_Slider, {
   /**

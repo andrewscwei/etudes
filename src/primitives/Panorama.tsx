@@ -19,8 +19,8 @@ export namespace Panorama {
 
     /**
      * The panning speed. This is expressed a multiplier of the number of pixels
-     * dragged, i.e. when set to 1, the image will shift the same amount of pixels
-     * that were dragged.
+     * dragged, i.e. when set to 1, the image will shift the same amount of
+     * pixels that were dragged.
      */
     speed?: number
 
@@ -31,14 +31,14 @@ export namespace Panorama {
 
     /**
      * A decimal percentage of the image width indicating where 0° should be,
-     * i.e. if `zeroAnchor` is `0`, the `angle` would be 0° when the left edge of
-     * the image is at the left edge of the component.
+     * i.e. if `zeroAnchor` is `0`, the `angle` would be 0° when the left edge
+     * of the image is at the left edge of the component.
      */
     zeroAnchor?: number
 
     /**
-     * Handler invoked when the position changes. This can either be invoked from
-     * the `angle` prop being changed or from the image being dragged.
+     * Handler invoked when the position changes. This can either be invoked
+     * from the `angle` prop being changed or from the image being dragged.
      *
      * @param position The current position.
      * @param isDragging Specifies if the position change is due to dragging.
@@ -46,10 +46,11 @@ export namespace Panorama {
     onPositionChange?: (position: number, isDragging: boolean) => void
 
     /**
-     * Handler invoked when the angle changes. This can either be invoked from the
-     * `angle` prop being changed or from the image being dragged. When `angle` is
-     * being double-bound, ensure that the value is only being set by this
-     * handler when `isDragging` is `true` to avoid potential update overflow.
+     * Handler invoked when the angle changes. This can either be invoked from
+     * the `angle` prop being changed or from the image being dragged. When
+     * `angle` is being double-bound, ensure that the value is only being set by
+     * this handler when `isDragging` is `true` to avoid potential update
+     * overflow.
      *
      * @param angle The current angle.
      * @param isDragging Specifies if the angle change is due to dragging.
@@ -82,8 +83,8 @@ export namespace Panorama {
     onLoadImageError?: () => void
 
     /**
-     * Handler invoked when the image size changes. This is the actual size of the
-     * loaded image. When no images are loaded yet, the size is `undefined`.
+     * Handler invoked when the image size changes. This is the actual size of
+     * the loaded image. When no images are loaded yet, the size is `undefined`.
      *
      * @param size The actual size of the loaded image. If no images are loaded
      *               yet, the size is `undefined`.

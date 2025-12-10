@@ -82,8 +82,8 @@ export namespace Select {
     options: string[]
 
     /**
-     * Placeholder text to display when no option is selected (i.e. when the value
-     * is `''`).
+     * Placeholder text to display when no option is selected (i.e. when the
+     * value is `''`).
      */
     placeholder?: string
 

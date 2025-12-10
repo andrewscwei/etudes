@@ -24,8 +24,8 @@ export namespace Carousel {
     index?: number
 
     /**
-     * The interval in milliseconds to wait before automatically advancing to the
-     * next item (auto loops).
+     * The interval in milliseconds to wait before automatically advancing to
+     * the next item (auto loops).
      */
     autoAdvanceInterval?: number
 

@@ -10,164 +10,30 @@ import { createKey } from '../utils/createKey.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
-/**
- * Type describing the orientation of {@link StepSlider}.
- */
-export type StepSliderOrientation = 'horizontal' | 'vertical'
-
-/**
- * Type describing the props of {@link StepSlider}.
- */
-export type StepSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'role'> & {
-  /**
-   * Specifies if the knob is clipped to the track.
-   */
-  isClipped?: boolean
-
-  /**
-   * By default the position is a value from 0 - 1, 0 being the start of the
-   * slider and 1 being the end. Switching on this flag inverts this behavior,
-   * where 0 becomes the end of the slider and 1 being the start.
-   */
-  isInverted?: boolean
-
-  /**
-   * Specifies if the track is clickable to set the position of the knob.
-   */
-  isTrackInteractive?: boolean
-
-  /**
-   * Indicates if position/index change events are dispatched only when dragging
-   * ends. When disabled, aforementioned events are fired repeatedly while
-   * dragging.
-   */
-  onlyDispatchesOnDragEnd?: boolean
-
-  /**
-   * Padding between the track and the knob in pixels.
-   */
-  trackPadding?: number
-
-  /**
-   * Height of the knob in pixels.
-   */
-  knobHeight?: number
-
-  /**
-   * Invisible padding around the knob in pixels, helps expand its hit box.
-   */
-  knobPadding?: number
-
-  /**
-   * Width of the knob in pixels.
-   */
-  knobWidth?: number
-
-  /**
-   * StepSliderOrientation of the slider.
-   */
-  orientation?: StepSliderOrientation
-
-  /**
-   * An array of step descriptors. A step is a position (0 - 1 inclusive) on the
-   * track where the knob should snap to if dragging stops near it. Ensure that
-   * there are at least two steps: one for the start of the track and one for
-   * the end.
-   */
-  steps?: readonly number[]
-
-  /**
-   * The current index.
-   */
-  index?: number
-
-  /**
-   * A function that returns the label to be displayed at a given slider
-   * position and closest step index (if steps are provided).
-   *
-   * @param position The current slider position.
-   * @param index The nearest step index (if steps are provided), or -1 if no
-   *                steps are provided.
-   *
-   * @returns The label.
-   */
-  labelProvider?: (position: number, index: number) => string
-
-  /**
-   * Handler invoked when index changes. This can either be invoked from the
-   * `index` prop being changed or from the slider being dragged. Note that if
-   * the event is emitted at the end of dragging due to
-   * `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here is
-   * still `true`. This event is emitted right after `onPositionChange`.
-   *
-   * @param index The current slider index.
-   * @param isDragging Specifies if the index change is due to dragging.
-   */
-  onIndexChange?: (index: number, isDragging: boolean) => void
-
-  /**
-   * Handler invoked when position changes. This can either be invoked from the
-   * `index` prop being changed or from the slider being dragged. Note that if
-   * the event is emitted at the end of dragging due to
-   * `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here is
-   * still `true`. This event is emitted right before `onIndexChange`.
-   *
-   * @param position The current slider position.
-   * @param isDragging Specifies if the position change is due to dragging.
-   */
-  onPositionChange?: (position: number, isDragging: boolean) => void
-
-  /**
-   * Handler invoked when dragging ends.
-   */
-  onDragEnd?: () => void
-
-  /**
-   * Handler invoked when dragging begins.
-   */
-  onDragStart?: () => void
-}
-
-/**
- * A "step" slider component supporting both horizontal and vertical
- * orientations that automatically snaps to a set of predefined points on the
- * slider when dragged. These points are referred to as "steps", indexed by an
- * integer referred to as "index". This index can be two-way bound. The
- * component consists of four customizable elements: a draggable knob, a label
- * on the knob, a scroll track before the knob and a scroll track after the
- * knob. While the width and height of the slider is inferred from its CSS
- * rules, the width and height of the knob are set via props (`knobWidth` and
- * `knobHeight`, respectively). The size of the knob does not impact the size of
- * the slider. While dragging, the slider still emits a position change event,
- * where the position is a decimal ranging between 0.0 and 1.0, inclusive.
- *
- * @exports StepSliderKnob Component for the knob.
- * @exports StepSliderKnobContainer Component for the container of the knob.
- * @exports StepSliderLabel Component for the label on the knob.
- * @exports StepSliderTrack Component for the slide track on either side of the
- *                          knob.
- */
-export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSliderProps>>(({
-  children,
-  className,
-  index: externalIndex = 0,
-  isClipped = false,
-  isInverted = false,
-  isTrackInteractive = true,
-  knobHeight = 30,
-  knobPadding = 0,
-  knobWidth = 30,
-  labelProvider,
-  onlyDispatchesOnDragEnd = false,
-  orientation = 'vertical',
-  steps = generateSteps(10),
-  trackPadding = 0,
-  onDragEnd,
-  onDragStart,
-  onIndexChange,
-  onPositionChange,
-  ...props
-}, ref) => {
+const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlider.Props>>((
+  {
+    children,
+    className,
+    index: externalIndex = 0,
+    isClipped = false,
+    isInverted = false,
+    isTrackInteractive = true,
+    knobHeight = 30,
+    knobPadding = 0,
+    knobWidth = 30,
+    labelProvider,
+    onlyDispatchesOnDragEnd = false,
+    orientation = 'vertical',
+    steps = _generateSteps(10),
+    trackPadding = 0,
+    onDragEnd,
+    onDragStart,
+    onIndexChange,
+    onPositionChange,
+    ...props
+  },
+  ref,
+) => {
   const bodyRef = useRef<HTMLDivElement>(null)
   const knobContainerRef = useRef<HTMLButtonElement>(null)
   const rect = useRect(bodyRef)
@@ -260,10 +126,10 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
   const fixedClassNames = _getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
   const fixedStyles = _getFixedStyles({ orientation, naturalPosition, isClipped, knobPadding, knobHeight, knobWidth, isTrackInteractive })
   const components = asComponentDict(children, {
-    knob: StepSliderKnob,
-    knobContainer: StepSliderKnobContainer,
-    label: StepSliderLabel,
-    track: StepSliderTrack,
+    knob: _Knob,
+    knobContainer: _KnobContainer,
+    label: _Label,
+    track: _Track,
   })
 
   useEffect(() => {
@@ -307,7 +173,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
       <div ref={bodyRef} style={fixedStyles.body}>
         <Styled
           className={clsx(isInverted ? 'end' : 'start', fixedClassNames.track)}
-          element={components.track ?? <StepSliderTrack/>}
+          element={components.track ?? <_Track/>}
           style={styles(fixedStyles.track, orientation === 'vertical' ? {
             height: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
             top: '0',
@@ -321,7 +187,7 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
         </Styled>
         <Styled
           className={clsx(isInverted ? 'start' : 'end', fixedClassNames.track)}
-          element={components.track ?? <StepSliderTrack/>}
+          element={components.track ?? <_Track/>}
           style={styles(fixedStyles.track, orientation === 'vertical' ? {
             bottom: '0',
             height: `calc(${(_inverted(naturalPosition)) * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
@@ -336,13 +202,13 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
         <Styled
           ref={knobContainerRef}
           className={clsx(fixedClassNames.knobContainer)}
-          element={components.knobContainer ?? <StepSliderKnobContainer/>}
+          element={components.knobContainer ?? <_KnobContainer/>}
           style={styles(fixedStyles.knobContainer)}
         >
-          <Styled className={clsx(fixedClassNames.knob)} element={components.knob ?? <StepSliderKnob/>} style={styles(fixedStyles.knob)}>
+          <Styled className={clsx(fixedClassNames.knob)} element={components.knob ?? <_Knob/>} style={styles(fixedStyles.knob)}>
             <div style={fixedStyles.knobHitBox}/>
             {steps && labelProvider && (
-              <Styled className={clsx(fixedClassNames.label)} element={components.label ?? <StepSliderLabel/>} style={styles(fixedStyles.label)}>
+              <Styled className={clsx(fixedClassNames.label)} element={components.label ?? <_Label/>} style={styles(fixedStyles.label)}>
                 {labelProvider(position, _getNearestIndexByPosition(position, steps))}
               </Styled>
             )}
@@ -353,43 +219,23 @@ export const StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<St
   )
 })
 
-/**
- * Component for the knob of a {@link StepSlider}.
- */
-export const StepSliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+const _Knob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}/>
 )
 
-/**
- * Component for the container of the knob of a {@link StepSlider}.
- */
-export const StepSliderKnobContainer = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => (
+const _KnobContainer = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => (
   <button {...props}/>
 )
 
-/**
- * Component for the label on the knob of a {@link StepSlider}.
- */
-export const StepSliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+const _Label = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}/>
 )
 
-/**
- * Component for the track of a {@link StepSlider}.
- */
-export const StepSliderTrack = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+const _Track = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}/>
 )
 
-/**
- * Generates a set of steps compatible with this component.
- *
- * @param length The number of steps. This must be at least 2 because you must
- *                 include the starting and ending points.
- *
- * @returns An array of steps.
- */
-export function generateSteps(length: number): readonly number[] {
+function _generateSteps(length: number): readonly number[] {
   if (length <= 1) {
     console.error('[etudes::StepSlider] `length` value must be greater than or equal to 2')
 
@@ -410,6 +256,177 @@ export function generateSteps(length: number): readonly number[] {
     return position
   })
 }
+
+export namespace StepSlider {
+  /**
+   * Type describing the orientation of {@link StepSlider}.
+   */
+  export type Orientation = 'horizontal' | 'vertical'
+
+  /**
+   * Type describing the props of {@link StepSlider}.
+   */
+  export type Props = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'role'> & {
+    /**
+     * Specifies if the knob is clipped to the track.
+     */
+    isClipped?: boolean
+
+    /**
+     * By default the position is a value from 0 - 1, 0 being the start of the
+     * slider and 1 being the end. Switching on this flag inverts this behavior,
+     * where 0 becomes the end of the slider and 1 being the start.
+     */
+    isInverted?: boolean
+
+    /**
+     * Specifies if the track is clickable to set the position of the knob.
+     */
+    isTrackInteractive?: boolean
+
+    /**
+     * Indicates if position/index change events are dispatched only when dragging
+     * ends. When disabled, aforementioned events are fired repeatedly while
+     * dragging.
+     */
+    onlyDispatchesOnDragEnd?: boolean
+
+    /**
+     * Padding between the track and the knob in pixels.
+     */
+    trackPadding?: number
+
+    /**
+     * Height of the knob in pixels.
+     */
+    knobHeight?: number
+
+    /**
+     * Invisible padding around the knob in pixels, helps expand its hit box.
+     */
+    knobPadding?: number
+
+    /**
+     * Width of the knob in pixels.
+     */
+    knobWidth?: number
+
+    /**
+     * StepSliderOrientation of the slider.
+     */
+    orientation?: Orientation
+
+    /**
+     * An array of step descriptors. A step is a position (0 - 1 inclusive) on the
+     * track where the knob should snap to if dragging stops near it. Ensure that
+     * there are at least two steps: one for the start of the track and one for
+     * the end.
+     */
+    steps?: readonly number[]
+
+    /**
+     * The current index.
+     */
+    index?: number
+
+    /**
+     * A function that returns the label to be displayed at a given slider
+     * position and closest step index (if steps are provided).
+     *
+     * @param position The current slider position.
+     * @param index The nearest step index (if steps are provided), or -1 if no
+     *                steps are provided.
+     *
+     * @returns The label.
+     */
+    labelProvider?: (position: number, index: number) => string
+
+    /**
+     * Handler invoked when index changes. This can either be invoked from the
+     * `index` prop being changed or from the slider being dragged. Note that if
+     * the event is emitted at the end of dragging due to
+     * `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here is
+     * still `true`. This event is emitted right after `onPositionChange`.
+     *
+     * @param index The current slider index.
+     * @param isDragging Specifies if the index change is due to dragging.
+     */
+    onIndexChange?: (index: number, isDragging: boolean) => void
+
+    /**
+     * Handler invoked when position changes. This can either be invoked from the
+     * `index` prop being changed or from the slider being dragged. Note that if
+     * the event is emitted at the end of dragging due to
+     * `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here is
+     * still `true`. This event is emitted right before `onIndexChange`.
+     *
+     * @param position The current slider position.
+     * @param isDragging Specifies if the position change is due to dragging.
+     */
+    onPositionChange?: (position: number, isDragging: boolean) => void
+
+    /**
+     * Handler invoked when dragging ends.
+     */
+    onDragEnd?: () => void
+
+    /**
+     * Handler invoked when dragging begins.
+     */
+    onDragStart?: () => void
+  }
+}
+
+/**
+ * A "step" slider component supporting both horizontal and vertical
+ * orientations that automatically snaps to a set of predefined points on the
+ * slider when dragged. These points are referred to as "steps", indexed by an
+ * integer referred to as "index". This index can be two-way bound. The
+ * component consists of four customizable elements: a draggable knob, a label
+ * on the knob, a scroll track before the knob and a scroll track after the
+ * knob. While the width and height of the slider is inferred from its CSS
+ * rules, the width and height of the knob are set via props (`knobWidth` and
+ * `knobHeight`, respectively). The size of the knob does not impact the size of
+ * the slider. While dragging, the slider still emits a position change event,
+ * where the position is a decimal ranging between 0.0 and 1.0, inclusive.
+ *
+ * @exports StepSlider.Knob Component for the knob.
+ * @exports StepSlider.KnobContainer Component for the container of the knob.
+ * @exports StepSlider.Label Component for the label on the knob.
+ * @exports StepSlider.Track Component for the slide track on either side of the
+ *                           knob.
+ */
+export const StepSlider = /* #__PURE__ */ Object.assign(_StepSlider, {
+  /**
+   * Component for the knob of a {@link StepSlider}.
+   */
+  Knob: _Knob,
+
+  /**
+   * Component for the container of the knob of a {@link StepSlider}.
+   */
+  KnobContainer: _KnobContainer,
+
+  /**
+   * Component for the label on the knob of a {@link StepSlider}.
+   */
+  Label: _Label,
+
+  /**
+   * Component for the track of a {@link StepSlider}.
+   */
+  Track: _Track,
+
+  /**
+   * Generates a set of steps compatible with this component.
+   *
+   * @param length The number of steps. This must be at least 2 because you must
+   *               include the starting and ending points.
+   *
+   * @returns An array of steps.
+   */
+  generateSteps: _generateSteps,
+})
 
 function _getNearestIndexByPosition(position: number, steps: readonly number[]): number {
   let index = -1
@@ -547,9 +564,10 @@ function _clamped(value: number, max: number = 1, min: number = 0): number {
 }
 
 if (process.env.NODE_ENV === 'development') {
-  StepSlider.displayName = 'StepSlider'
-  StepSliderTrack.displayName = 'StepSliderTrack'
-  StepSliderKnob.displayName = 'StepSliderKnob'
-  StepSliderKnobContainer.displayName = 'StepSliderKnobContainer'
-  StepSliderLabel.displayName = 'StepSliderLabel'
+  _StepSlider.displayName = 'StepSlider'
+
+  _Track.displayName = 'StepSlider.Track'
+  _Knob.displayName = 'StepSlider.Knob'
+  _KnobContainer.displayName = 'StepSlider.KnobContainer'
+  _Label.displayName = 'StepSlider.Label'
 }
