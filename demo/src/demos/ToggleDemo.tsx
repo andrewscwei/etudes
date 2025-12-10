@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { Toggle, ToggleKnob, ToggleTrack } from 'etudes'
+import { Toggle } from 'etudes'
 import { useEffect, useState } from 'react'
 import { Frame } from '../components/Frame.js'
 
@@ -31,8 +31,8 @@ export function ToggleDemo() {
             orientation={orientation as 'horizontal' | 'vertical'}
             onChange={setIsOn}
           >
-            <ToggleTrack className='size-full cursor-pointer rounded-full bg-dark p-1'/>
-            <ToggleKnob
+            <Toggle.Track className='size-full cursor-pointer rounded-full bg-dark p-1'/>
+            <Toggle.Knob
               className={clsx('aspect-square rounded-full bg-white/60 transition-all group-hover:opacity-80 [.active]:bg-white', {
                 'h-full': orientation === 'horizontal',
                 'w-full': orientation === 'vertical',

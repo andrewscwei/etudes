@@ -8,40 +8,36 @@ import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
-/**
- * Type describing the props of {@link Toggle}.
- */
-export type ToggleProps = Omit<HTMLAttributes<HTMLLabelElement>, 'onChange' | 'onClick'> & {
+export namespace Toggle {
   /**
-   * Specifies if the toggle is inverted.
+   * Type describing the props of {@link Toggle}.
    */
-  isInverted?: boolean
+  export type Props = Omit<HTMLAttributes<HTMLLabelElement>, 'onChange' | 'onClick'> & {
+    /**
+     * Specifies if the toggle is inverted.
+     */
+    isInverted?: boolean
 
-  /**
-   * Specifies if the toggle is on or off.
-   */
-  isOn?: boolean
+    /**
+     * Specifies if the toggle is on or off.
+     */
+    isOn?: boolean
 
-  /**
-   * The orientation of the toggle.
-   */
-  orientation?: 'horizontal' | 'vertical'
+    /**
+     * The orientation of the toggle.
+     */
+    orientation?: 'horizontal' | 'vertical'
 
-  /**
-   * Handler invoked when the state of the toggle changes.
-   *
-   * @param isOn - The new state of the toggle.
-   */
-  onChange?: (isOn: boolean) => void
+    /**
+     * Handler invoked when the state of the toggle changes.
+     *
+     * @param isOn - The new state of the toggle.
+     */
+    onChange?: (isOn: boolean) => void
+  }
 }
 
-/**
- * A toggle switch component that allows users to switch between on or off.
- *
- * @exports ToggleKnob The knob of the toggle switch.
- * @exports ToggleTrack The track of the toggle switch.
- */
-export const Toggle = /* #__PURE__ */ forwardRef<HTMLLabelElement, ToggleProps>(({
+const _Toggle = /* #__PURE__ */ forwardRef<HTMLLabelElement, Toggle.Props>(({
   className,
   children,
   isInverted = false,
@@ -55,8 +51,8 @@ export const Toggle = /* #__PURE__ */ forwardRef<HTMLLabelElement, ToggleProps>(
   const knobSize = useSize(knobRef)
 
   const components = asComponentDict(children, {
-    knob: ToggleKnob,
-    track: ToggleTrack,
+    knob: _Knob,
+    track: _Track,
   })
 
   const fixedClassNames = _getFixedClassNames({ isOn })
@@ -65,28 +61,40 @@ export const Toggle = /* #__PURE__ */ forwardRef<HTMLLabelElement, ToggleProps>(
   return (
     <label {...props} ref={ref} className={clsx(className, fixedClassNames.root)} style={styles(style, fixedStyles.root)}>
       <input checked={isOn} style={fixedStyles.input} type='checkbox' onChange={event => onChange?.(event.target.checked)}/>
-      <Styled className={fixedClassNames.track} element={components.track ?? <ToggleTrack/>} style={fixedStyles.track}>
+      <Styled className={fixedClassNames.track} element={components.track ?? <_Track/>} style={fixedStyles.track}>
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-          <Styled ref={knobRef} className={fixedClassNames.knob} element={components.knob ?? <ToggleKnob/>} style={fixedStyles.knob}/>
+          <Styled ref={knobRef} className={fixedClassNames.knob} element={components.knob ?? <_Knob/>} style={fixedStyles.knob}/>
         </div>
       </Styled>
     </label>
   )
 })
 
-/**
- * Component for the knob of a {@link Toggle}.
- */
-export const ToggleTrack = ({ children, ...props }: HTMLAttributes<HTMLSpanElement>) => (
+const _Track = ({ children, ...props }: HTMLAttributes<HTMLSpanElement>) => (
+  <div {...props}>{children}</div>
+)
+
+const _Knob = ({ children, ...props }: HTMLAttributes<HTMLSpanElement>) => (
   <div {...props}>{children}</div>
 )
 
 /**
- * Component for the track of a {@link Toggle}.
+ * A toggle switch component that allows users to switch between on or off.
+ *
+ * @exports Toggle.Knob The knob of the toggle switch.
+ * @exports Toggle.Track The track of the toggle switch.
  */
-export const ToggleKnob = ({ children, ...props }: HTMLAttributes<HTMLSpanElement>) => (
-  <div {...props}>{children}</div>
-)
+export const Toggle = /* #__PURE__ */ Object.assign(_Toggle, {
+  /**
+   * Component for the knob of a {@link Toggle}.
+   */
+  Knob: _Knob,
+
+  /**
+   * Component for the track of a {@link Toggle}.
+   */
+  Track: _Track,
+})
 
 function _getFixedClassNames({ isOn = false }) {
   return asClassNameDict({
@@ -158,7 +166,8 @@ function _getFixedStyles({ isOn = false, isInverted = false, knobSize = Size.zer
 }
 
 if (process.env.NODE_ENV === 'development') {
-  Toggle.displayName = 'Toggle'
-  ToggleKnob.displayName = 'ToggleKnob'
-  ToggleTrack.displayName = 'ToggleTrack'
+  _Toggle.displayName = 'Toggle'
+
+  _Knob.displayName = 'Toggle.Knob'
+  _Track.displayName = 'Toggle.Track'
 }
