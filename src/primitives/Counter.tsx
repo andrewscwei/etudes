@@ -5,7 +5,7 @@ import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
-import { TextField, type TextFieldProps } from './TextField.js'
+import { TextField } from './TextField.js'
 
 const _Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Counter.Props>>((
   {
@@ -108,7 +108,7 @@ const _Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Counter.Pro
   )
 })
 
-const _TextField = ({ ...props }: TextFieldProps) => (
+const _TextField = ({ ...props }: TextField.Props) => (
   <TextField {...props}/>
 )
 
