@@ -24,47 +24,49 @@ type StyleOptions = {
   targetWidth: number
 }
 
-/**
- * Type describing the props of {@link WithTooltip}.
- */
-export type WithTooltipProps = Pick<HTMLAttributes<HTMLElement>, 'className' | 'children' | 'style'> & {
+export namespace WithTooltip {
   /**
-   * Target alignment with respect to the wrapped element, automatically
-   * computed if not provided.
+   * Type describing the props of {@link WithTooltip}.
    */
-  alignment?: Alignment
+  export type Props = Pick<HTMLAttributes<HTMLElement>, 'className' | 'children' | 'style'> & {
+    /**
+     * Target alignment with respect to the wrapped element, automatically
+     * computed if not provided.
+     */
+    alignment?: Alignment
 
-  /**
-   * The height of the arrow.
-   */
-  arrowHeight?: number
+    /**
+     * The height of the arrow.
+     */
+    arrowHeight?: number
 
-  /**
-   * The width of the arrow.
-   */
-  arrowWidth?: number
+    /**
+     * The width of the arrow.
+     */
+    arrowWidth?: number
 
-  /**
-   * The hint string to display in the tooltip.
-   */
-  hint: string
+    /**
+     * The hint string to display in the tooltip.
+     */
+    hint: string
 
-  /**
-   * The gap (in pixels) between the target element and the tooltip, defaults to
-   * `0`.
-   */
-  gap?: number
+    /**
+     * The gap (in pixels) between the target element and the tooltip, defaults
+     * to `0`.
+     */
+    gap?: number
 
-  /**
-   * The maximum width (in pixels) of the tooltip.
-   */
-  maxWidth?: number
+    /**
+     * The maximum width (in pixels) of the tooltip.
+     */
+    maxWidth?: number
 
-  /**
-   * The minimum space (in pixels) between the target element and the edge of
-   * the window required to trigger an alignment change, defaults to `100px`.
-   */
-  threshold?: number
+    /**
+     * The minimum space (in pixels) between the target element and the edge of
+     * the window required to trigger an alignment change, defaults to `100px`.
+     */
+    threshold?: number
+  }
 }
 
 /**
@@ -82,7 +84,7 @@ export function WithTooltip({
   hint,
   maxWidth = 200,
   threshold = 100,
-}: Readonly<WithTooltipProps>) {
+}: Readonly<WithTooltip.Props>) {
   const targetRef = useRef<HTMLElement>(null)
   const dialogRef = useRef<HTMLSpanElement>(undefined)
   const targetRect = useRect(targetRef)
