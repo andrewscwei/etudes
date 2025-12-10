@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { Slider, SliderKnob, SliderKnobContainer, SliderLabel, SliderTrack } from 'etudes'
+import { Slider } from 'etudes'
 import { useState } from 'react'
 import { Frame } from '../components/Frame.js'
 
@@ -42,15 +42,15 @@ export function SliderDemo() {
             toast(`Position: ${Math.round(pos * (max - min) + min)}`)
           }}
         >
-          <SliderKnob className='ia flex items-center justify-center border border-dark bg-dark'/>
-          <SliderKnobContainer
+          <Slider.Knob className='ia flex items-center justify-center border border-dark bg-dark'/>
+          <Slider.KnobContainer
             className={clsx({
               '[:not(.dragging)]:transition-[left]': orientation === 'horizontal',
               '[:not(.dragging)]:transition-[top]': orientation === 'vertical',
             })}
           />
-          <SliderLabel className='text-base text-light'/>
-          <SliderTrack className='ia bg-dark/40 [.start]:bg-dark'/>
+          <Slider.Label className='text-base text-light'/>
+          <Slider.Track className='ia bg-dark/40 [.start]:bg-dark'/>
         </Slider>
       )}
     </Frame>

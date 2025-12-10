@@ -20,7 +20,7 @@ export function PanoramaSliderDemo() {
         zeroAnchor={zeroAnchor}
         onAngleChange={setAngle}
       >
-        <PanoramaSlider.Indicator className='absolute inset-x-0 -bottom-2 mx-auto h-[2px] bg-light/40 [.dragging]:bg-light'/>
+        <PanoramaSlider.Indicator className='absolute inset-x-0 -bottom-2 mx-auto h-0.5 bg-light/40 [.dragging]:bg-light'/>
         <PanoramaSlider.Reticle className='h-full bg-dark/20 transition-colors [.dragging]:bg-dark/0'/>
         <PanoramaSlider.Track className='h-full bg-dark/40 transition-colors'/>
       </PanoramaSlider>
