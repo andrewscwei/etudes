@@ -1,55 +1,60 @@
 import { forwardRef, useState, type HTMLAttributes } from 'react'
 import { Point } from 'spase'
 
-/**
- * Type describing the props of {@link SwipeRegion}.
- */
-export type SwipeRegionProps = Omit<HTMLAttributes<HTMLDivElement>, 'onMouseDown' | 'onMouseLeave' | 'onMouseMove' | 'onMouseUp' | 'onTouchEnd' | 'onTouchMove' | 'onTouchStart'> & {
+export namespace SwipeRegion {
   /**
-   * Specifies if swipe detection is enabled.
+   * Type describing the props of {@link SwipeRegion}.
    */
-  isEnabled?: boolean
+  export type Props = Omit<HTMLAttributes<HTMLDivElement>, 'onMouseDown' | 'onMouseLeave' | 'onMouseMove' | 'onMouseUp' | 'onTouchEnd' | 'onTouchMove' | 'onTouchStart'> & {
+    /**
+     * Specifies if swipe detection is enabled.
+     */
+    isEnabled?: boolean
 
-  /**
-   * The minimum velocity (in pixels per millisecond) required to trigger a
-   * swipe event.
-   */
-  threshold?: number
+    /**
+     * The minimum velocity (in pixels per millisecond) required to trigger a
+     * swipe event.
+     */
+    threshold?: number
 
-  /**
-   * Handler invoked when a swipe down gesture is detected.
-   */
-  onSwipeDown?: () => void
+    /**
+     * Handler invoked when a swipe down gesture is detected.
+     */
+    onSwipeDown?: () => void
 
-  /**
-   * Handler invoked when a swipe left gesture is detected.
-   */
-  onSwipeLeft?: () => void
+    /**
+     * Handler invoked when a swipe left gesture is detected.
+     */
+    onSwipeLeft?: () => void
 
-  /**
-   * Handler invoked when a swipe right gesture is detected.
-   */
-  onSwipeRight?: () => void
+    /**
+     * Handler invoked when a swipe right gesture is detected.
+     */
+    onSwipeRight?: () => void
 
-  /**
-   * Handler invoked when a swipe up gesture is detected.
-   */
-  onSwipeUp?: () => void
+    /**
+     * Handler invoked when a swipe up gesture is detected.
+     */
+    onSwipeUp?: () => void
+  }
 }
 
 /**
  * An {@link HTMLDivElement} container that detects swipe gestures.
  */
-export const SwipeRegion = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<SwipeRegionProps>>(({
-  children,
-  isEnabled = true,
-  threshold = 0.5,
-  onSwipeDown,
-  onSwipeLeft,
-  onSwipeRight,
-  onSwipeUp,
-  ...props
-}, ref) => {
+export const SwipeRegion = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<SwipeRegion.Props>>((
+  {
+    children,
+    isEnabled = true,
+    threshold = 0.5,
+    onSwipeDown,
+    onSwipeLeft,
+    onSwipeRight,
+    onSwipeUp,
+    ...props
+  },
+  ref,
+) => {
   const [dragStartPosition, setDragStartPosition] = useState<Point | undefined>(undefined)
   const [dragEndPosition, setDragEndPosition] = useState<Point | undefined>(undefined)
   const [dragStartTime, setDragStartTime] = useState(NaN)
