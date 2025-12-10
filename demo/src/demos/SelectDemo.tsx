@@ -1,4 +1,4 @@
-import { Select, SelectExpandIcon, SelectToggle } from 'etudes'
+import { Select } from 'etudes'
 import { useEffect, useState } from 'react'
 import $$ExpandIcon from '../assets/expand-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
@@ -22,8 +22,8 @@ export function SelectDemo() {
             value={value}
             onChange={setValue}
           >
-            <SelectToggle className='cursor-pointer px-3'/>
-            <SelectExpandIcon className='mr-3 flex size-5 items-center justify-center' dangerouslySetInnerHTML={{ __html: $$ExpandIcon }}/>
+            <Select.Toggle className='cursor-pointer px-3'/>
+            <Select.ExpandIcon className='mr-3 flex size-5 items-center justify-center' dangerouslySetInnerHTML={{ __html: $$ExpandIcon }}/>
           </Select>
         )
       }}
