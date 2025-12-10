@@ -5,19 +5,22 @@ import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
-const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>(({
-  children,
-  autoFocus = false,
-  inputMode = 'numeric',
-  isDisabled = false,
-  isRequired = true,
-  placeholder,
-  size,
-  style,
-  value,
-  onChange,
-  ...props
-}, ref) => {
+const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
+  {
+    children,
+    autoFocus = false,
+    inputMode = 'numeric',
+    isDisabled = false,
+    isRequired = true,
+    placeholder,
+    size,
+    style,
+    value,
+    onChange,
+    ...props
+  },
+  ref,
+) => {
   const fields = _normalizeFields(value, size)
   const fieldRefs = useRef<HTMLInputElement[]>([])
   const fixedStyles = _getFixedStyles()

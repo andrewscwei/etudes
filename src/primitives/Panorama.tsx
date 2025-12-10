@@ -96,21 +96,24 @@ export namespace Panorama {
  * A component containing a pannable 360° panorama image. The angle supports
  * two-way binding.
  */
-export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Panorama.Props>>(({
-  angle: externalAngle = 0,
-  speed = 1,
-  src,
-  zeroAnchor = 0,
-  onAngleChange,
-  onPositionChange,
-  onDragStart,
-  onDragEnd,
-  onLoadImageStart,
-  onLoadImageComplete,
-  onLoadImageError,
-  onImageSizeChange,
-  ...props
-}, ref) => {
+export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Panorama.Props>>((
+  {
+    angle: externalAngle = 0,
+    speed = 1,
+    src,
+    zeroAnchor = 0,
+    onAngleChange,
+    onPositionChange,
+    onDragStart,
+    onDragEnd,
+    onLoadImageStart,
+    onLoadImageComplete,
+    onLoadImageError,
+    onImageSizeChange,
+    ...props
+  },
+  ref,
+) => {
   const mapDragPositionToDisplacement = useCallback((currentPosition: number, dx: number, _: number): number => {
     const newDisplacement = currentPosition - dx * speed
 

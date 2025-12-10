@@ -15,10 +15,13 @@ export namespace Form {
 /**
  * A form component overrides the default submission behavior.
  */
-export const Form = /* #__PURE__ */ forwardRef<HTMLFormElement, Form.Props>(({
-  onSubmit,
-  ...props
-}, ref) => {
+export const Form = /* #__PURE__ */ forwardRef<HTMLFormElement, Form.Props>((
+  {
+    onSubmit,
+    ...props
+  },
+  ref,
+) => {
   return (
     <form
       {...props}

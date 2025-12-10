@@ -11,118 +11,39 @@ import { createKey } from '../utils/createKey.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
-/**
- * Type describing the orientation of {@link RangeSlider}.
- */
-export type RangeSliderOrientation = 'horizontal' | 'vertical'
-
-/**
- * Type describing the range of values of {@link RangeSlider}.
- */
-export type RangeSliderRange = [number, number]
-
-/**
- * Type describing the props of {@link RangeSlider}.
- */
-export type RangeSliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuemax' | 'aria-valuemin' | 'role' | 'onChange'> & {
-  /**
-   * Number of decimal places to display.
-   */
-  decimalPlaces?: number
-
-  /**
-   * Specifies if the knobs are clipped to the track.
-   */
-  isClipped?: boolean
-
-  /**
-   * Height of the knobs in pixels.
-   */
-  knobHeight?: number
-
-  /**
-   * Invisible padding around the knobs in pixels, helps expand their hit boxes.
-   */
-  knobPadding?: number
-
-  /**
-   * Width of the knobs in pixels.
-   */
-  knobWidth?: number
-
-  /**
-   * Maximum value to clamp to.
-   */
-  max: number
-
-  /**
-   * Minimum value to clamp to.
-   */
-  min: number
-
-  /**
-   * Orientation of the slider.
-   */
-  orientation?: RangeSliderOrientation
-
-  /**
-   * Range of values.
-   */
-  range?: RangeSliderRange
-
-  /**
-   * Number of intervals between the minimum and maximum values to snap to when
-   * either knob releases. If set to `-1`, the knobs will not snap to any value.
-   */
-  steps?: number
-
-  /**
-   * Handler invoked when the range of values changes.
-   *
-   * @param range The current range of values.
-   */
-  onChange?: (range: RangeSliderRange) => void
-}
-
-/**
- * A slider component that allows the user to select a range of values.
- *
- * @exports RangeSliderGutter Component for the gutter.
- * @exports RangeSliderHighlight Component for the highlight.
- * @exports RangeSliderKnob Component for the knob.
- * @exports RangeSliderKnobContainer Component for the container of the knob.
- * @exports RangeSliderLabel Component for the label.
- */
-export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<RangeSliderProps>>(({
-  children,
-  className,
-  decimalPlaces = 2,
-  isClipped = false,
-  knobHeight = 28,
-  knobPadding = 0,
-  knobWidth = 40,
-  max: maxValue,
-  min: minValue,
-  orientation = 'vertical',
-  range: externalRange,
-  steps = -1,
-  onChange,
-  ...props
-}, ref) => {
+const _RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<RangeSlider.Props>>((
+  {
+    children,
+    className,
+    decimalPlaces = 2,
+    isClipped = false,
+    knobHeight = 28,
+    knobPadding = 0,
+    knobWidth = 40,
+    max: maxValue,
+    min: minValue,
+    orientation = 'vertical',
+    range: externalRange,
+    steps = -1,
+    onChange,
+    ...props
+  },
+  ref,
+) => {
   const bodyRef = useRef<HTMLDivElement>(null)
   const bodyRect = useRect(bodyRef)
   const startKnobContainerRef = useRef<HTMLDivElement>(null)
   const endKnobContainerRef = useRef<HTMLDivElement>(null)
-  const [range, setRange] = useState<RangeSliderRange>(externalRange ?? [minValue, maxValue])
+  const [range, setRange] = useState<RangeSlider.Range>(externalRange ?? [minValue, maxValue])
   const breakpoints = _createBreakpoints(minValue, maxValue, steps)
   const [start, end] = range.map(t => _getDisplacementByValue(t, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped))
   const highlightLength = end - start
   const components = asComponentDict(children, {
-    gutter: RangeSliderGutter,
-    highlight: RangeSliderHighlight,
-    knob: RangeSliderKnob,
-    knobContainer: RangeSliderKnobContainer,
-    label: RangeSliderLabel,
+    gutter: _Gutter,
+    highlight: _Highlight,
+    knob: _Knob,
+    knobContainer: _KnobContainer,
+    label: _Label,
   })
 
   const mapStartDragValueToValue = useCallback((value: number, dx: number, dy: number) => {
@@ -191,13 +112,13 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
       role='slider'
     >
       <div ref={bodyRef} style={fixedStyles.body}>
-        <Styled element={components.gutter ?? <RangeSliderGutter/>} style={styles(fixedStyles.gutter)}/>
-        <Styled element={components.highlight ?? <RangeSliderHighlight/>} style={styles(fixedStyles.highlight)}/>
+        <Styled element={components.gutter ?? <_Gutter/>} style={styles(fixedStyles.gutter)}/>
+        <Styled element={components.highlight ?? <_Highlight/>} style={styles(fixedStyles.highlight)}/>
         <Styled
           ref={startKnobContainerRef}
           className={fixedClassNames.startKnobContainer}
           disabled={isDeepEqual([startValue, endValue], [minValue, minValue])}
-          element={components.knobContainer ?? <RangeSliderKnobContainer/>}
+          element={components.knobContainer ?? <_KnobContainer/>}
           style={styles(fixedStyles.knobContainer, {
             pointerEvents: isDeepEqual([startValue, endValue], [minValue, minValue]) ? 'none' : 'auto',
           }, orientation === 'horizontal' ? {
@@ -208,10 +129,10 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
             top: `${start}px`,
           })}
         >
-          <Styled className={fixedClassNames.startKnob} element={components.knob ?? <RangeSliderKnob/>} style={styles(fixedStyles.knob)}>
+          <Styled className={fixedClassNames.startKnob} element={components.knob ?? <_Knob/>} style={styles(fixedStyles.knob)}>
             <div style={fixedStyles.knobHitBox}/>
             {components.label && (
-              <Styled className={fixedClassNames.startLabel} element={components.label ?? <RangeSliderLabel/>} style={styles(fixedStyles.label)}>
+              <Styled className={fixedClassNames.startLabel} element={components.label ?? <_Label/>} style={styles(fixedStyles.label)}>
                 {Number(startValue.toFixed(decimalPlaces)).toLocaleString()}
               </Styled>
             )}
@@ -221,7 +142,7 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
           ref={endKnobContainerRef}
           className={fixedClassNames.endKnobContainer}
           disabled={isDeepEqual([startValue, endValue], [maxValue, maxValue])}
-          element={components.knobContainer ?? <RangeSliderKnobContainer/>}
+          element={components.knobContainer ?? <_KnobContainer/>}
           style={styles(fixedStyles.knobContainer, {
             pointerEvents: isDeepEqual([startValue, endValue], [maxValue, maxValue]) ? 'none' : 'auto',
           }, orientation === 'horizontal' ? {
@@ -232,10 +153,10 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
             top: `${end}px`,
           })}
         >
-          <Styled className={fixedClassNames.endKnob} element={components.knob ?? <RangeSliderKnob/>} style={styles(fixedStyles.knob)}>
+          <Styled className={fixedClassNames.endKnob} element={components.knob ?? <_Knob/>} style={styles(fixedStyles.knob)}>
             <div style={fixedStyles.knobHitBox}/>
             {components.label && (
-              <Styled className={fixedClassNames.endLabel} element={components.label ?? <RangeSliderLabel/>} style={styles(fixedStyles.label)}>
+              <Styled className={fixedClassNames.endLabel} element={components.label ?? <_Label/>} style={styles(fixedStyles.label)}>
                 {Number(endValue.toFixed(decimalPlaces)).toLocaleString()}
               </Styled>
             )}
@@ -246,40 +167,136 @@ export const RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<R
   )
 })
 
-/**
- * Component for the gutter of a {@link RangeSlider}.
- */
-export const RangeSliderGutter = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+const _Gutter = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}/>
 )
 
-/**
- * Component for the label of a {@link RangeSlider}.
- */
-export const RangeSliderLabel = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+const _Label = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}/>
 )
 
-/**
- * Component for the highlight of a {@link RangeSlider}.
- */
-export const RangeSliderHighlight = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+const _Highlight = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}/>
 )
 
-/**
- * Component for the knob of a {@link RangeSlider}.
- */
-export const RangeSliderKnob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+const _Knob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div {...props}/>
 )
 
-/**
- * Component for the container of the knob of a {@link RangeSlider}.
- */
-export const RangeSliderKnobContainer = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => (
+const _KnobContainer = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => (
   <button {...props}/>
 )
+
+export namespace RangeSlider {
+  /**
+   * Type describing the orientation of {@link RangeSlider}.
+   */
+  export type Orientation = 'horizontal' | 'vertical'
+
+  /**
+   * Type describing the range of values of {@link RangeSlider}.
+   */
+  export type Range = [number, number]
+
+  /**
+   * Type describing the props of {@link RangeSlider}.
+   */
+  export type Props = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuemax' | 'aria-valuemin' | 'role' | 'onChange'> & {
+    /**
+     * Number of decimal places to display.
+     */
+    decimalPlaces?: number
+
+    /**
+     * Specifies if the knobs are clipped to the track.
+     */
+    isClipped?: boolean
+
+    /**
+     * Height of the knobs in pixels.
+     */
+    knobHeight?: number
+
+    /**
+     * Invisible padding around the knobs in pixels, helps expand their hit boxes.
+     */
+    knobPadding?: number
+
+    /**
+     * Width of the knobs in pixels.
+     */
+    knobWidth?: number
+
+    /**
+     * Maximum value to clamp to.
+     */
+    max: number
+
+    /**
+     * Minimum value to clamp to.
+     */
+    min: number
+
+    /**
+     * Orientation of the slider.
+     */
+    orientation?: Orientation
+
+    /**
+     * Range of values.
+     */
+    range?: Range
+
+    /**
+     * Number of intervals between the minimum and maximum values to snap to when
+     * either knob releases. If set to `-1`, the knobs will not snap to any value.
+     */
+    steps?: number
+
+    /**
+     * Handler invoked when the range of values changes.
+     *
+     * @param range The current range of values.
+     */
+    onChange?: (range: Range) => void
+  }
+}
+
+/**
+ * A slider component that allows the user to select a range of values.
+ *
+ * @exports RangeSlider.Gutter Component for the gutter.
+ * @exports RangeSlider.Highlight Component for the highlight.
+ * @exports RangeSlider.Knob Component for the knob.
+ * @exports RangeSlider.KnobContainer Component for the container of the knob.
+ * @exports RangeSlider.Label Component for the label.
+ */
+export const RangeSlider = /* #__PURE__ */ Object.assign(_RangeSlider, {
+  /**
+   * Component for the gutter of a {@link RangeSlider}.
+   */
+  Gutter: _Gutter,
+
+  /**
+   * Component for the highlight of a {@link RangeSlider}.
+   */
+  Highlight: _Highlight,
+
+  /**
+   * Component for the knob of a {@link RangeSlider}.
+   */
+  Knob: _Knob,
+
+  /**
+   * Component for the container of the knob of a {@link RangeSlider}.
+   */
+  KnobContainer: _KnobContainer,
+
+  /**
+   * Component for the label of a {@link RangeSlider}.
+   */
+  Label: _Label,
+})
 
 function _getFixedClassNames({ isDraggingStartKnob = false, isReleasingStartKnob = false, isDraggingEndKnob = false, isReleasingEndKnob = false }) {
   return asClassNameDict({
@@ -372,7 +389,7 @@ function _getPositionByValue(value: number, min: number, max: number) {
   return (value - min) / (max - min)
 }
 
-function _getPositionByDisplacement(displacement: number, orientation: RangeSliderOrientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
+function _getPositionByDisplacement(displacement: number, orientation: RangeSlider.Orientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
   switch (orientation) {
     case 'horizontal': {
       const maxWidth = isClipped ? rect.width - knobWidth : rect.width
@@ -393,13 +410,13 @@ function _getValueByPosition(position: number, min: number, max: number) {
   return position * (max - min) + min
 }
 
-function _getValueByDisplacement(displacement: number, min: number, max: number, orientation: RangeSliderOrientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
+function _getValueByDisplacement(displacement: number, min: number, max: number, orientation: RangeSlider.Orientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
   const position = _getPositionByDisplacement(displacement, orientation, rect, knobWidth, knobHeight, isClipped)
 
   return _getValueByPosition(position, min, max)
 }
 
-function _getDisplacementByPosition(position: number, orientation: RangeSliderOrientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
+function _getDisplacementByPosition(position: number, orientation: RangeSlider.Orientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
   switch (orientation) {
     case 'horizontal': {
       const maxWidth = isClipped ? rect.width - knobWidth : rect.width
@@ -416,7 +433,7 @@ function _getDisplacementByPosition(position: number, orientation: RangeSliderOr
   }
 }
 
-function _getDisplacementByValue(value: number, min: number, max: number, orientation: RangeSliderOrientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
+function _getDisplacementByValue(value: number, min: number, max: number, orientation: RangeSlider.Orientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
   const position = _getPositionByValue(value, min, max)
 
   return _getDisplacementByPosition(position, orientation, rect, knobWidth, knobHeight, isClipped)
@@ -451,9 +468,10 @@ function _createBreakpoints(min: number, max: number, steps: number): number[] |
 }
 
 if (process.env.NODE_ENV === 'development') {
-  RangeSlider.displayName = 'RangeSlider'
-  RangeSliderGutter.displayName = 'RangeSliderGutter'
-  RangeSliderLabel.displayName = 'RangeSliderLabel'
-  RangeSliderHighlight.displayName = 'RangeSliderHighlight'
-  RangeSliderKnob.displayName = 'RangeSliderKnob'
+  _RangeSlider.displayName = 'RangeSlider'
+
+  _Gutter.displayName = 'RangeSlider.Gutter'
+  _Label.displayName = 'RangeSlider.Label'
+  _Highlight.displayName = 'RangeSlider.Highlight'
+  _Knob.displayName = 'RangeSlider.Knob'
 }

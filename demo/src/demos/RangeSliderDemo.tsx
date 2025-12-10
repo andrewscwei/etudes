@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { RangeSlider, RangeSliderGutter, RangeSliderHighlight, RangeSliderKnob, RangeSliderKnobContainer, RangeSliderLabel } from 'etudes'
+import { RangeSlider } from 'etudes'
 import { useState } from 'react'
 import { Frame } from '../components/Frame.js'
 
@@ -41,16 +41,16 @@ export function RangeSliderDemo() {
             toast(`Min: ${Math.round(range[0])}, Max: ${Math.round(range[1])}`)
           }}
         >
-          <RangeSliderGutter className='bg-dark/40'/>
-          <RangeSliderHighlight className='bg-dark'/>
-          <RangeSliderKnob className='ia flex items-center justify-center border border-dark bg-dark'/>
-          <RangeSliderKnobContainer
+          <RangeSlider.Gutter className='bg-dark/40'/>
+          <RangeSlider.Highlight className='bg-dark'/>
+          <RangeSlider.Knob className='ia flex items-center justify-center border border-dark bg-dark'/>
+          <RangeSlider.KnobContainer
             className={clsx({
               '[.releasing]:transition-[left]': orientation === 'horizontal',
               '[.releasing]:transition-[top]': orientation === 'vertical',
             })}
           />
-          <RangeSliderLabel className='text-base text-light'/>
+          <RangeSlider.Label className='text-base text-light'/>
         </RangeSlider>
       )}
     </Frame>
