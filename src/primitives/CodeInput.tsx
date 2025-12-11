@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useRef, type ChangeEvent, type ClipboardEvent, type HTMLAttributes, type KeyboardEvent } from 'react'
+import { forwardRef, useEffect, useRef, type ChangeEvent, type ClipboardEvent, type HTMLAttributes, type HTMLInputAutoCompleteAttribute, type KeyboardEvent } from 'react'
 import { Repeat } from '../flows/Repeat.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
@@ -8,6 +8,7 @@ import { styles } from '../utils/styles.js'
 const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
   {
     children,
+    autoComplete = 'one-time-code',
     autoFocus = false,
     inputMode = 'numeric',
     isDisabled = false,
@@ -43,21 +44,15 @@ const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
 
   const changeHandler = (index: number) => {
     return (e: ChangeEvent<HTMLInputElement>) => {
-      const prev = fields[index]
-      const curr = e.target.value
-      const char = _replaceFirst(curr, prev).slice(-1)
-
-      const newValue = fields.slice()
-      newValue[index] = char
+      const curr = fields[index]
+      const input = _trimEdgeChar(e.target.value, curr)
+      const newValue = _insertFields(fields.slice(), input.split('').slice(0, size), index)
 
       onChange(newValue)
 
-      if (char) {
-        focusOn(index + 1)
-      }
-      else {
-        focusOn(index - 1)
-      }
+      const nextIndex = Math.min(index + input.length, size - 1)
+
+      focusOn(nextIndex)
     }
   }
 
@@ -100,12 +95,12 @@ const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
     return (e: ClipboardEvent<HTMLInputElement>) => {
       e.preventDefault()
 
-      const text = e.clipboardData.getData('text').trim()
-      const newValue = _insertFields(fields.slice(), text.split('').slice(0, size), index)
+      const input = e.clipboardData.getData('text').trim()
+      const newValue = _insertFields(fields.slice(), input.split('').slice(0, size), index)
 
       onChange(newValue)
 
-      const nextIndex = Math.min(index + text.length, size - 1)
+      const nextIndex = Math.min(index + input.length, size - 1)
 
       focusOn(nextIndex)
     }
@@ -129,6 +124,7 @@ const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
             ref={(el: HTMLInputElement) => (fieldRefs.current[i] = el)}
             aria-disabled={isDisabled}
             aria-required={isRequired}
+            autoComplete={autoComplete}
             disabled={isDisabled}
             element={components.field ?? <_Field/>}
             inputMode={inputMode}
@@ -150,7 +146,6 @@ const _Field = ({ ...props }: HTMLAttributes<HTMLInputElement>) => (
   <input
     {...props}
     autoCapitalize='off'
-    autoComplete='off'
     autoCorrect='off'
     type='text'
   />
@@ -161,6 +156,11 @@ export namespace CodeInput {
    * Type describing the properties of {@link CodeInput}.
    */
   export type Props = Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> & {
+    /**
+     * Specifies the autocomplete behavior for the code input.
+     */
+    autoComplete?: HTMLInputAutoCompleteAttribute
+
     /**
      * Specifies if the first empty field should be focused on mount.
      */
@@ -262,12 +262,20 @@ function _insertFields(source: string[], target: string[], start: number = 0) {
   return source
 }
 
-function _replaceFirst(str: string, search: string, replacement: string = '') {
-  const index = str.indexOf(search)
+function _trimEdgeChar(str: string, char: string) {
+  if (char === '') {
+    return str
+  }
 
-  if (index === -1) return str
+  if (str.startsWith(char)) {
+    return str.slice(char.length)
+  }
 
-  return (str.slice(0, index) + replacement + str.slice(index + search.length))
+  if (str.endsWith(char)) {
+    return str.slice(0, -char.length)
+  }
+
+  return str
 }
 
 if (process.env.NODE_ENV === 'development') {
