@@ -1,3 +1,10 @@
+# [22.1.0](https://github.com/andrewscwei/etudes/compare/v22.0.0...v22.1.0) (2025-12-11)
+
+
+### Features
+
+* Handle auto-fill for CodeInput ([22c20e2](https://github.com/andrewscwei/etudes/commit/22c20e2d85a1df40bf5234cd4b86befe3992cf99))
+
 # [22.0.0](https://github.com/andrewscwei/etudes/compare/v21.5.0...v22.0.0) (2025-12-10)
 
 
