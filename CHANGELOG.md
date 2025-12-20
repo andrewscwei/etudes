@@ -1,3 +1,10 @@
+# [22.2.0](https://github.com/andrewscwei/etudes/compare/v22.1.0...v22.2.0) (2025-12-20)
+
+
+### Features
+
+* Create useSystemColorScheme hook ([974dc8d](https://github.com/andrewscwei/etudes/commit/974dc8da2d8b83a2bda17682364f8b423e263bf4))
+
 # [22.1.0](https://github.com/andrewscwei/etudes/compare/v22.0.0...v22.1.0) (2025-12-11)
 
 
