@@ -1,3 +1,15 @@
+# [23.0.0](https://github.com/andrewscwei/etudes/compare/v22.3.0...v23.0.0) (2025-12-22)
+
+
+### Features
+
+* Rename useAgent to useOS ([22699fa](https://github.com/andrewscwei/etudes/commit/22699fadb5ce51e1f0c9ccbc21d5e81563cc6140))
+
+
+### BREAKING CHANGES
+
+* `useAgent` is renamed to `useOS`
+
 # [22.3.0](https://github.com/andrewscwei/etudes/compare/v22.2.0...v22.3.0) (2025-12-20)
 
 
