@@ -15,7 +15,7 @@ export function useClickOutside(targetRef: TargetRef | TargetRef[], onClickOutsi
   const handlerRef = useLatest(onClickOutside)
 
   useLayoutEffect(() => {
-    const handler = (event: MouseEvent) => {
+    const listener = (event: MouseEvent) => {
       if (!(event.target instanceof Node)) return
 
       let isOutside = true
@@ -40,10 +40,10 @@ export function useClickOutside(targetRef: TargetRef | TargetRef[], onClickOutsi
       handlerRef.current()
     }
 
-    window.addEventListener('click', handler, true)
+    window.addEventListener('click', listener, true)
 
     return () => {
-      window.removeEventListener('click', handler, true)
+      window.removeEventListener('click', listener, true)
     }
   }, [])
 }

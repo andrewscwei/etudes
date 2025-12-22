@@ -1,8 +1,16 @@
 import { useMemo } from 'react'
 
-type OS = 'windows' | 'macos' | 'linux' | 'ios' | 'android' | 'unknown'
+/**
+ * Type describing the operating system.
+ */
+export type OS = 'windows' | 'macos' | 'linux' | 'ios' | 'android' | 'unknown'
 
-export function useAgent(): OS {
+/**
+ * Hook for detecting the operating system of the user.
+ *
+ * @returns The detected operating system.
+ */
+export function useOS(): OS {
   const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera
 
   return useMemo(() => {

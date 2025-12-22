@@ -65,14 +65,14 @@ export function useImageLoader(
   useLayoutEffect(() => {
     let cancelled = false
 
-    const loadHandler = (event: Event) => {
+    const loadListener = (event: Event) => {
       if (cancelled) return
 
       const element = event.currentTarget as HTMLImageElement
       loadCompleteHandlerRef.current?.(element)
     }
 
-    const errorHandler = (event: Event) => {
+    const errorListener = (event: Event) => {
       if (cancelled) return
 
       const element = event.currentTarget as HTMLImageElement
@@ -80,8 +80,8 @@ export function useImageLoader(
     }
 
     const image = new Image()
-    image.addEventListener('load', loadHandler)
-    image.addEventListener('error', errorHandler)
+    image.addEventListener('load', loadListener)
+    image.addEventListener('error', errorListener)
 
     loadStartHandlerRef.current?.(image)
 
@@ -94,8 +94,8 @@ export function useImageLoader(
     return () => {
       cancelled = true
 
-      image.removeEventListener('load', loadHandler)
-      image.removeEventListener('error', errorHandler)
+      image.removeEventListener('load', loadListener)
+      image.removeEventListener('error', errorListener)
       imageRef.current = undefined
     }
   }, [src, srcSet, sizes])

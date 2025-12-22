@@ -11,7 +11,7 @@ type InteractDraggableOptions = Parameters<Interact.Interactable['draggable']>[0
 /**
  * Type describing the options of {@link useInertiaDrag}.
  */
-type UseInertiaDragOptions = Omit<InteractDraggableOptions, 'onstart' | 'onmove' | 'onend'> & {
+export type UseInertiaDragOptions = Omit<InteractDraggableOptions, 'onstart' | 'onmove' | 'onend'> & {
   /**
    * Specifies whether this effect is enabled.
    */

@@ -47,18 +47,18 @@ export function useVideoMetadataLoader(src?: string, {
 
     const video = window.document.createElement('video')
 
-    const loadCompleteHandler = () => loadCompleteHandlerRef.current?.(video)
-    const loadErrorHandler = () => loadErrorHandlerRef.current?.(video)
+    const loadCompleteListener = () => loadCompleteHandlerRef.current?.(video)
+    const loadErrorListener = () => loadErrorHandlerRef.current?.(video)
 
-    video.addEventListener('loadedmetadata', loadCompleteHandler)
-    video.addEventListener('error', loadErrorHandler)
+    video.addEventListener('loadedmetadata', loadCompleteListener)
+    video.addEventListener('error', loadErrorListener)
     video.src = src
 
     loadStartHandlerRef.current?.(video)
 
     return () => {
-      video.removeEventListener('loadedmetadata', loadCompleteHandler)
-      video.removeEventListener('error', loadErrorHandler)
+      video.removeEventListener('loadedmetadata', loadCompleteListener)
+      video.removeEventListener('error', loadErrorListener)
       video.src = ''
     }
   }, [src])

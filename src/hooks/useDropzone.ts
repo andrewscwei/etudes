@@ -44,21 +44,21 @@ export type UseDropzoneOutput<T = HTMLElement> = {
 export function useDropzone<T = HTMLElement>(action: (file: File) => void): UseDropzoneOutput<T> {
   const [isDropping, setIsDropping] = useState(false)
 
-  const dragOverHandler = useCallback((e: DragEvent<T>) => {
+  const dragOverListener = useCallback((e: DragEvent<T>) => {
     e.preventDefault()
     e.stopPropagation()
 
     setIsDropping(true)
   }, [])
 
-  const dragLeaveHandler = useCallback((e: DragEvent<T>) => {
+  const dragLeaveListener = useCallback((e: DragEvent<T>) => {
     e.preventDefault()
     e.stopPropagation()
 
     setIsDropping(false)
   }, [])
 
-  const dropHandler = useCallback((e: DragEvent<T>) => {
+  const dropListener = useCallback((e: DragEvent<T>) => {
     e.preventDefault()
     e.stopPropagation()
 
@@ -77,8 +77,8 @@ export function useDropzone<T = HTMLElement>(action: (file: File) => void): UseD
 
   return {
     isDropping,
-    onDragOver: dragOverHandler,
-    onDragLeave: dragLeaveHandler,
-    onDrop: dropHandler,
+    onDragOver: dragOverListener,
+    onDragLeave: dragLeaveListener,
+    onDrop: dropListener,
   }
 }

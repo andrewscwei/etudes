@@ -9,7 +9,7 @@ type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | R
 /**
  * Type describing the output of {@link useInertiaDragValue}.
  */
-type UseDragValueOutput<T = [number, number]> = {
+export type UseDragValueOutput<T = [number, number]> = {
   /**
    * Indicates whether the drag is currently happening.
    */

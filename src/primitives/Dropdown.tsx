@@ -98,7 +98,7 @@ const _Dropdown = /* #__PURE__ */ forwardRef((
   }, [externalIsCollapsed])
 
   useEffect(() => {
-    const clickOutsideHandler = (event: MouseEvent) => {
+    const clickOutsideListener = (event: MouseEvent) => {
       if (isCollapsed) return
       if (!(event.target instanceof Node)) return
 
@@ -121,10 +121,10 @@ const _Dropdown = /* #__PURE__ */ forwardRef((
       collapse()
     }
 
-    window.addEventListener('click', clickOutsideHandler)
+    window.addEventListener('click', clickOutsideListener)
 
     return () => {
-      window.removeEventListener('click', clickOutsideHandler)
+      window.removeEventListener('click', clickOutsideListener)
     }
   }, [isCollapsed])
 

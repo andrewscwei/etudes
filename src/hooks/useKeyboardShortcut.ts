@@ -141,7 +141,7 @@ export function useKeyboardShortcut(
 
     if (!eventTarget) return
 
-    const handler = (event: KeyboardEvent) => {
+    const listener = (event: KeyboardEvent) => {
       const pressed = new Set([
         event.key.toLowerCase(),
         event.ctrlKey && 'control',
@@ -161,10 +161,10 @@ export function useKeyboardShortcut(
       actionRef.current?.()
     }
 
-    eventTarget.addEventListener('keydown', handler as any, { capture })
+    eventTarget.addEventListener('keydown', listener as any, { capture })
 
     return () => {
-      eventTarget.removeEventListener('keydown', handler as any, { capture })
+      eventTarget.removeEventListener('keydown', listener as any, { capture })
     }
   }, [isEnabled, preventDefault, capture, normalizedKeys.join(',')])
 }

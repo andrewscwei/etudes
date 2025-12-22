@@ -216,7 +216,7 @@ export const Carousel = /* #__PURE__ */ forwardRef((
     })
   }, [orientation])
 
-  const scrollHandler = useCallback(() => {
+  const scrollListener = useCallback(() => {
     const viewport = viewportRef.current
     if (!viewport || isScrollTickingRef.current) return
 
@@ -276,7 +276,7 @@ export const Carousel = /* #__PURE__ */ forwardRef((
     const isInitialRender = prevIndexRef.current === undefined
     const isIndexModifiedFromManualScrolling = prevIndexRef.current === index
 
-    viewport.addEventListener('scroll', scrollHandler)
+    viewport.addEventListener('scroll', scrollListener)
 
     if (tracksItemExposure) {
       updateExposures()
@@ -292,9 +292,9 @@ export const Carousel = /* #__PURE__ */ forwardRef((
     }
 
     return () => {
-      viewport.removeEventListener('scroll', scrollHandler)
+      viewport.removeEventListener('scroll', scrollListener)
     }
-  }, [index, tracksItemExposure, normalizeScrollPosition, scrollHandler, updateExposures])
+  }, [index, tracksItemExposure, normalizeScrollPosition, scrollListener, updateExposures])
 
   return (
     <div

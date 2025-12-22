@@ -159,7 +159,7 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video
       }
     }
 
-    const handler = (_: Event) => {
+    const listener = (_: Event) => {
       const isFullscreen: boolean | undefined = (window.document as any).fullScreen || (window.document as any).mozFullScreen || (window.document as any).webkitIsFullScreen
       if (isFullscreen === undefined) return
 
@@ -168,16 +168,16 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video
 
     videoRef.current.muted = isMuted
     videoRef.current.load()
-    videoRef.current.addEventListener('webkitfullscreenchange', handler)
-    videoRef.current.addEventListener('mozfullscreenchange', handler)
-    videoRef.current.addEventListener('fullscreenchange', handler)
+    videoRef.current.addEventListener('webkitfullscreenchange', listener)
+    videoRef.current.addEventListener('mozfullscreenchange', listener)
+    videoRef.current.addEventListener('fullscreenchange', listener)
 
     return () => {
       pause()
 
-      videoRef.current?.removeEventListener('webkitfullscreenchange', handler)
-      videoRef.current?.removeEventListener('mozfullscreenchange', handler)
-      videoRef.current?.removeEventListener('fullscreenchange', handler)
+      videoRef.current?.removeEventListener('webkitfullscreenchange', listener)
+      videoRef.current?.removeEventListener('mozfullscreenchange', listener)
+      videoRef.current?.removeEventListener('fullscreenchange', listener)
     }
   }, [src])
 
