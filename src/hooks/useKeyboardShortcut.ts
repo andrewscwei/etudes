@@ -91,6 +91,11 @@ export type KeyboardKey =
  */
 type Options = {
   /**
+   * Specifies whether to use event capturing.
+   */
+  capture?: boolean
+
+  /**
    * Specifies whether the keyboard shortcut is enabled.
    */
   isEnabled?: boolean
@@ -98,12 +103,12 @@ type Options = {
   /**
    * Specifies whether to prevent the default action for the keyboard event.
    */
-  preventDefault?: boolean
+  preventsDefault?: boolean
 
   /**
-   * Specifies whether to use event capturing.
+   * Specifies whether to stop propagation of the keyboard event.
    */
-  capture?: boolean
+  stopsPropagation?: boolean
 
   /**
    * The target element to attach the event listener to. Defaults to `window`.
@@ -122,9 +127,10 @@ export function useKeyboardShortcut(
   keyOrKeys: KeyboardKey | KeyboardKey[],
   action: () => void,
   {
+    capture = false,
     isEnabled = true,
-    preventDefault = true,
-    capture = true,
+    preventsDefault = true,
+    stopsPropagation = true,
     target,
   }: Options = {},
 ) {
@@ -154,8 +160,12 @@ export function useKeyboardShortcut(
 
       if (!match) return
 
-      if (preventDefault) {
+      if (preventsDefault) {
         event.preventDefault()
+      }
+
+      if (stopsPropagation) {
+        event.stopPropagation()
       }
 
       actionRef.current?.()
@@ -166,5 +176,5 @@ export function useKeyboardShortcut(
     return () => {
       eventTarget.removeEventListener('keydown', listener as any, { capture })
     }
-  }, [isEnabled, preventDefault, capture, normalizedKeys.join(',')])
+  }, [isEnabled, preventsDefault, capture, normalizedKeys.join(',')])
 }
