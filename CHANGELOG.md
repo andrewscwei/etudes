@@ -1,3 +1,10 @@
+# [23.1.0](https://github.com/andrewscwei/etudes/compare/v23.0.0...v23.1.0) (2025-12-22)
+
+
+### Features
+
+* Support stopPropagation in useKeyboardShortcut ([e753d02](https://github.com/andrewscwei/etudes/commit/e753d02cf3e9fd23df9e488fdfc83f1ef8636120))
+
 # [23.0.0](https://github.com/andrewscwei/etudes/compare/v22.3.0...v23.0.0) (2025-12-22)
 
 
