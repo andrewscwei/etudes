@@ -39,8 +39,8 @@ const _Accordion = /* #__PURE__ */ forwardRef((
   const selection = _sanitizeSelection(externalSelection ?? {}, sections)
   const expandedSectionIndices = _sanitizeExpandedSectionIndices(externalExpandedSectionIndices ?? [], sections)
   const fixedStyles = _getFixedStyles({ orientation })
-  const sectionHeaderRefs: RefObject<HTMLDivElement | null>[] = sections.map(() => useRef<HTMLDivElement>(null))
-  const sectionHeaderSizes = sectionHeaderRefs.map(t => useSize(t))
+  const headerRefs: RefObject<HTMLDivElement | null>[] = sections.map(() => useRef<HTMLDivElement>(null))
+  const headerSizes = headerRefs.map(useSize)
 
   const isSelectedAt = (itemIndex: number, sectionIndex: number) => (selection[sectionIndex]?.indexOf(itemIndex) ?? -1) >= 0
 
@@ -146,7 +146,11 @@ const _Accordion = /* #__PURE__ */ forwardRef((
   })
 
   return (
-    <div {...props} ref={ref} style={styles(style, fixedStyles.root)}>
+    <div
+      ref={ref}
+      style={styles(style, fixedStyles.root)}
+      {...props}
+    >
       <Each in={sections}>
         {(section, sectionIndex) => {
           const { collectionPadding = 0, items = [], itemLength = 50, itemPadding = 0, isSelectionTogglable, layout = 'list', maxVisible = -1, numSegments = 1 } = section
@@ -154,7 +158,9 @@ const _Accordion = /* #__PURE__ */ forwardRef((
           const numVisible = maxVisible < 0 ? allVisible : Math.min(allVisible, maxVisible)
           const maxLength = itemLength * numVisible + itemPadding * (numVisible - 1)
           const isCollapsed = !isSectionExpandedAt(sectionIndex)
-          const headerSize = sectionHeaderSizes[sectionIndex]
+          const headerSize = headerSizes[sectionIndex]
+          const sectionWidth = isCollapsed ? headerSize.width : maxLength + headerSize.width + collectionPadding
+          const sectionHeight = isCollapsed ? headerSize.height : maxLength + headerSize.height + collectionPadding
 
           return (
             <Styled
@@ -162,21 +168,21 @@ const _Accordion = /* #__PURE__ */ forwardRef((
               style={styles(fixedStyles.section, orientation === 'vertical' ? {
                 marginTop: sectionIndex === 0 ? '0px' : `${sectionPadding}px`,
                 ...headerSize.height > 0 ? {
-                  height: isCollapsed ? `${headerSize.height}px` : `${maxLength + headerSize.height + collectionPadding}px`,
+                  height: `${sectionHeight}px`,
                 } : {
                   visibility: 'hidden',
                 },
               } : {
                 marginLeft: sectionIndex === 0 ? '0px' : `${sectionPadding}px`,
                 ...headerSize.width > 0 ? {
-                  width: isCollapsed ? `${headerSize.width}px` : `${maxLength + headerSize.width + collectionPadding}px`,
+                  width: `${sectionWidth}px`,
                 } : {
                   visibility: 'hidden',
                 },
               })}
             >
               <div
-                ref={sectionHeaderRefs[sectionIndex]}
+                ref={headerRefs[sectionIndex]}
                 style={styles(fixedStyles.headerContainer)}
               >
                 {HeaderComponent ? (
