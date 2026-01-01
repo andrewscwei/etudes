@@ -97,8 +97,8 @@ export const TextField = /* #__PURE__ */ forwardRef<HTMLInputElement, Readonly<T
   return (
     <input
       {...props}
+      {...isDisabled ? { 'aria-disabled': true } : {}}
       ref={ref}
-      aria-disabled={isDisabled}
       aria-placeholder={placeholder}
       aria-required={isRequired}
       className={clsx(className, { disabled: isDisabled })}

@@ -22,6 +22,10 @@ button {
   cursor: pointer;
 }
 
+img, video {
+  font-size: 0;
+}
+
 .os {
   -webkit-overflow-scrolling: touch;
 }

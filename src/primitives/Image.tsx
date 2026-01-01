@@ -2,7 +2,6 @@ import { forwardRef, useEffect, type HTMLAttributes } from 'react'
 import { type Size } from 'spase'
 import { useImageSize } from '../hooks/useImageSize.js'
 import { ImageSource } from '../types/ImageSource.js'
-import { asStyleDict } from '../utils/asStyleDict.js'
 
 export namespace Image {
   /**
@@ -65,7 +64,6 @@ export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<Image
     source,
     loadingMode,
     src: fallbackSrc,
-    style,
     onLoadStart,
     onLoadComplete,
     onLoadError,
@@ -86,8 +84,6 @@ export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<Image
     onLoadError,
   })
 
-  const fixedStyles = _getFixedStyles()
-
   useEffect(() => {
     onSizeChange?.(size)
   }, [size?.width, size?.height])
@@ -100,18 +96,9 @@ export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<Image
       alt={alt}
       loading={loadingMode}
       src={fallbackSrc}
-      style={{ ...fixedStyles.root, ...style }}
     />
   )
 })
-
-function _getFixedStyles() {
-  return asStyleDict({
-    root: {
-      fontSize: '0',
-    },
-  })
-}
 
 if (process.env.NODE_ENV === 'development') {
   Image.displayName = 'Image'

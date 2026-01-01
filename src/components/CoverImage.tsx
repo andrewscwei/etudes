@@ -131,7 +131,6 @@ const FIXED_STYLES = asStyleDict({
     overflow: 'hidden',
   },
   viewport: {
-    fontSize: '0',
     left: '50%',
     position: 'absolute',
     top: '50%',

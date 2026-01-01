@@ -121,8 +121,8 @@ const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
       <Repeat count={size}>
         {i => (
           <Styled
+            {...isDisabled ? { 'aria-disabled': true } : {}}
             ref={(el: HTMLInputElement) => (fieldRefs.current[i] = el)}
-            aria-disabled={isDisabled}
             aria-required={isRequired}
             autoComplete={autoComplete}
             disabled={isDisabled}

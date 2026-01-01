@@ -34,8 +34,8 @@ export const Button = /* #__PURE__ */ forwardRef<HTMLAnchorElement | HTMLButtonE
       return (
         <a
           {...uniqProps}
+          {...isDisabled ? { 'aria-disabled': true } : {}}
           ref={ref as React.Ref<HTMLAnchorElement>}
-          aria-disabled={isDisabled}
           aria-label={label}
           className={clsx(className, { disabled: isDisabled })}
           href={action}
@@ -52,8 +52,8 @@ export const Button = /* #__PURE__ */ forwardRef<HTMLAnchorElement | HTMLButtonE
       return (
         <button
           {...uniqProps}
+          {...isDisabled ? { 'aria-disabled': true } : {}}
           ref={ref as React.Ref<HTMLButtonElement>}
-          aria-disabled={isDisabled}
           aria-label={label}
           className={className}
           disabled={isDisabled}
