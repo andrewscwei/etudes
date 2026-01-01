@@ -139,7 +139,6 @@ export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<FlatS
       {...props}
       ref={ref}
       dangerouslySetInnerHTML={{ __html: sanitizedMarkup() }}
-      role='img'
     />
   )
 })
