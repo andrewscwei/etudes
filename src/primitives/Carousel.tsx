@@ -356,7 +356,6 @@ function _getItemExposureAt(idx: number, ref: RefObject<HTMLDivElement | null>, 
   if (!child) return 0
 
   const intersection = Rect.intersecting(child, viewport)
-  if (!intersection) return 0
 
   switch (orientation) {
     case 'horizontal':

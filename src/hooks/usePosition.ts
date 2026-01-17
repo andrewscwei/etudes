@@ -63,8 +63,6 @@ function _getScrollPositionInfo(): ScrollPositionInfo | undefined {
   const refRectMin = Rect.clone(refRect, { x: 0, y: 0 })
   const refRectFull = Rect.from(window, { overflow: true })
 
-  if (!refRectFull) return undefined
-
   const refRectMax = Rect.clone(refRectMin, { x: refRectFull.width - refRect.width, y: refRectFull.height - refRect.height })
   const step = Point.make(refRect.left / refRectMax.left, refRect.top / refRectMax.top)
 

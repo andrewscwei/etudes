@@ -165,20 +165,18 @@ function _computeAlignment(element: HTMLElement, threshold: number) {
   const vrect = Rect.fromViewport()
   const irect = Rect.intersecting(element)
 
-  if (irect) {
-    const leftBound = irect.left - vrect.left < threshold
-    const rightBound = vrect.right - irect.right < threshold
-    const topBound = irect.top - vrect.top < threshold
-    const bottomBound = vrect.bottom - irect.bottom < threshold
+  const leftBound = irect.left - vrect.left < threshold
+  const rightBound = vrect.right - irect.right < threshold
+  const topBound = irect.top - vrect.top < threshold
+  const bottomBound = vrect.bottom - irect.bottom < threshold
 
-    if (leftBound && topBound) return 'br'
-    if (leftBound && bottomBound) return 'tr'
-    if (rightBound && topBound) return 'bl'
-    if (rightBound && bottomBound) return 'tl'
-    if (leftBound) return 'cr'
-    if (rightBound) return 'cl'
-    if (bottomBound) return 'tc'
-  }
+  if (leftBound && topBound) return 'br'
+  if (leftBound && bottomBound) return 'tr'
+  if (rightBound && topBound) return 'bl'
+  if (rightBound && bottomBound) return 'tl'
+  if (leftBound) return 'cr'
+  if (rightBound) return 'cl'
+  if (bottomBound) return 'tc'
 
   return 'tc'
 }

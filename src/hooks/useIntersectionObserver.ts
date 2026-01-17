@@ -23,11 +23,11 @@ export type UseIntersectionObserverOptions = {
  * @param targetRef Reference to the target element.
  * @param options See {@link UseIntersectionObserverOptions}.
  */
-export function useIntersectionObserver(targetRef: TargetRef, { onChange }: UseIntersectionObserverOptions) {
+export function useIntersectionObserver(targetRef: TargetRef | undefined, { onChange }: UseIntersectionObserverOptions) {
   const handlerRef = useLatest(onChange)
 
   useLayoutEffect(() => {
-    const element = targetRef.current
+    const element = targetRef?.current
     if (!element) return
 
     const observer = new IntersectionObserver(entries => {
@@ -44,5 +44,5 @@ export function useIntersectionObserver(targetRef: TargetRef, { onChange }: UseI
     return () => {
       observer.disconnect()
     }
-  }, [targetRef.current])
+  }, [targetRef?.current])
 }

@@ -63,9 +63,9 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
   const [maxWidth, setMaxWidth] = useState(NaN)
   const [maxHeight, setMaxHeight] = useState(NaN)
 
-  const getCurrentWidth = () => Rect.from(bodyRef.current)?.width ?? 0
+  const getCurrentWidth = () => Rect.from(bodyRef.current).width
 
-  const getCurrentHeight = () => Rect.from(bodyRef.current)?.height ?? 0
+  const getCurrentHeight = () => Rect.from(bodyRef.current).height
 
   const repositionChildren = () => {
     const rootNode = bodyRef.current
@@ -98,7 +98,7 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
         child.style.top = `${y + (y === 0 ? 0 : verticalSpacing)}px`
 
         for (let j = 0; j < base; j++) {
-          sectionHeights[colIdx + j] = y + (y === 0 ? 0 : verticalSpacing) + (Rect.from(child)?.height ?? 0)
+          sectionHeights[colIdx + j] = y + (y === 0 ? 0 : verticalSpacing) + Rect.from(child).height
         }
 
         if (alignSections && colIdx + base === numSections) {
@@ -142,7 +142,7 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
         child.style.left = `${x + (x === 0 ? 0 : horizontalSpacing)}px`
 
         for (let j = 0; j < base; j++) {
-          sectionWidths[rowIdx + j] = x + (x === 0 ? 0 : horizontalSpacing) + (Rect.from(child)?.width ?? 0)
+          sectionWidths[rowIdx + j] = x + (x === 0 ? 0 : horizontalSpacing) + Rect.from(child).width
         }
 
         if (alignSections && rowIdx + base === numSections) {
@@ -173,7 +173,7 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
   }
 
   const resizeHandler = useCallback((element: HTMLElement) => {
-    const maxSize = Rect.size(Rect.from(element) ?? Rect.zero)
+    const maxSize = Rect.size(Rect.from(element))
     const currWidth = getCurrentWidth()
     const currHeight = getCurrentHeight()
 

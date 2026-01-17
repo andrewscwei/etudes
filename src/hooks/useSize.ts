@@ -11,7 +11,7 @@ type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | R
  *
  * @returns The most current {@link Size} of the target element.
  */
-export function useSize(targetRef: TargetRef): Size {
+export function useSize(targetRef?: TargetRef): Size {
   const [size, setSize] = useState<Size>(Size.zero)
 
   useSizeObserver(targetRef, {

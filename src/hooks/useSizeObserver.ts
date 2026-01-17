@@ -21,11 +21,11 @@ export type UseSizeObserverOptions = {
  * @param targetRef Reference to the target element.
  * @param options See {@link UseSizeObserverOptions}.
  */
-export function useSizeObserver(targetRef: TargetRef, { onResize }: UseSizeObserverOptions) {
+export function useSizeObserver(targetRef: TargetRef | undefined, { onResize }: UseSizeObserverOptions) {
   const handlerRef = useLatest(onResize)
 
   useLayoutEffect(() => {
-    const element = targetRef.current
+    const element = targetRef?.current
     if (!element) return
 
     const observer = new ResizeObserver(() => {
@@ -37,5 +37,5 @@ export function useSizeObserver(targetRef: TargetRef, { onResize }: UseSizeObser
     return () => {
       observer.disconnect()
     }
-  }, [targetRef.current])
+  }, [targetRef?.current])
 }
