@@ -29,11 +29,14 @@ export function useClassName(className: string, { element, isEnabled = true }: O
 
     const target = element ?? window.document.documentElement
     const oldValue = target.classList
+    const hasClassName = oldValue.contains(className)
 
-    target.classList.add(className)
+    if (!hasClassName) {
+      target.classList.add(className)
+    }
 
     return () => {
-      if (!oldValue.contains(className)) {
+      if (!hasClassName) {
         target.classList.remove(className)
       }
     }
