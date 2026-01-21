@@ -28,8 +28,7 @@ export function useClassName(className: string, { element, isEnabled = true }: O
     if (!isEnabled) return
 
     const target = element ?? window.document.documentElement
-    const oldValue = target.classList
-    const hasClassName = oldValue.contains(className)
+    const hasClassName = target.classList.contains(className)
 
     if (!hasClassName) {
       target.classList.add(className)
