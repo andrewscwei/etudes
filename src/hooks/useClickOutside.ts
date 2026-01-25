@@ -8,11 +8,11 @@ type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | R
  *
  * @param targetRef The reference to the target element to add click outside
  *                  interaction to.
- * @param onClickOutside The handler to call when a click outside the target
- *                       element is detected.
+ * @param handler The handler to call when a click outside the target element is
+ *                detected.
  */
-export function useClickOutside(targetRef: TargetRef | TargetRef[], onClickOutside: () => void) {
-  const handlerRef = useLatest(onClickOutside)
+export function useClickOutside(targetRef: TargetRef | TargetRef[], handler: () => void) {
+  const handlerRef = useLatest(handler)
 
   useLayoutEffect(() => {
     const listener = (event: MouseEvent) => {
