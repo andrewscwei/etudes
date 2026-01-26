@@ -4,42 +4,38 @@ import { useIntersectionObserver } from './useIntersectionObserver.js'
 import { useSizeObserver } from './useSizeObserver.js'
 import { useViewportSize } from './useViewportSize.js'
 
-type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
-
 /**
  * Hook for monitoring changes in and returning the size and position of the
  * target element.
  *
- * @param targetRef Reference to the target element.
+ * @param target The target element or the reference to it.
  *
  * @returns The most current {@link Rect} of the target element.
  */
-export function useRect(targetRef?: TargetRef): Rect {
+export function useRect(target: HTMLElement | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | null | undefined): Rect {
   const [rect, setRect] = useState<Rect>(Rect.zero)
   const viewportSize = useViewportSize()
 
-  useSizeObserver(targetRef, {
-    onResize: element => {
-      const newRect = Rect.from(element)
+  useSizeObserver(target, el => {
+    const newRect = Rect.from(el)
 
-      setRect(newRect)
-    },
+    setRect(newRect)
   })
 
-  useIntersectionObserver(targetRef, {
-    onChange: element => {
-      const newRect = Rect.from(element)
+  useIntersectionObserver(target, el => {
+    const newRect = Rect.from(el)
 
-      setRect(newRect)
-    },
+    setRect(newRect)
   })
 
   useLayoutEffect(() => {
-    const element = targetRef?.current
+    const element = target && 'current' in target ? target.current : target
+    if (!element) return
+
     const newRect = Rect.from(element)
 
     setRect(newRect)
-  }, [Size.toString(viewportSize)])
+  }, [target, Size.toString(viewportSize)])
 
   return rect
 }

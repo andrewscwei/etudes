@@ -1,31 +1,20 @@
 import { useLayoutEffect, type RefObject } from 'react'
 import { useLatest } from './useLatest.js'
 
-type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
-
-/**
- * Type describing the options for {@link useSizeObserver}.
- */
-export type UseSizeObserverOptions = {
-  /**
-   * Handler invoked when the target element resizes.
-   *
-   * @param element The target element.
-   */
-  onResize: (element: HTMLElement) => void
-}
-
 /**
  * Hook for monitoring the resizing event of the target element.
  *
- * @param targetRef Reference to the target element.
+ * @param target The target element or the reference to it.
  * @param options See {@link UseSizeObserverOptions}.
  */
-export function useSizeObserver(targetRef: TargetRef | undefined, { onResize }: UseSizeObserverOptions) {
-  const handlerRef = useLatest(onResize)
+export function useSizeObserver(
+  target: HTMLElement | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | null | undefined,
+  handler: (element: HTMLElement) => void,
+) {
+  const handlerRef = useLatest(handler)
 
   useLayoutEffect(() => {
-    const element = targetRef?.current
+    const element = target && 'current' in target ? target.current : target
     if (!element) return
 
     const observer = new ResizeObserver(() => {
@@ -37,5 +26,5 @@ export function useSizeObserver(targetRef: TargetRef | undefined, { onResize }: 
     return () => {
       observer.disconnect()
     }
-  }, [targetRef?.current])
+  }, [target])
 }

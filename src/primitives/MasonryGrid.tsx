@@ -184,9 +184,7 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
     }
   }, [alignSections, horizontalSpacing, isReversed, sections, verticalSpacing, orientation])
 
-  useSizeObserver(bodyRef, {
-    onResize: resizeHandler,
-  })
+  useSizeObserver(bodyRef, resizeHandler)
 
   useEffect(() => {
     const imageSources = _getAllImageSources(bodyRef.current?.innerHTML)

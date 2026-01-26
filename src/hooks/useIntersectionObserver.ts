@@ -1,33 +1,21 @@
-import { useLayoutEffect, type RefObject } from 'react'
+import { type RefObject, useLayoutEffect } from 'react'
 import { useLatest } from './useLatest.js'
-
-type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
-
-/**
- * Type describing the options for {@link useIntersectionObserver}.
- */
-export type UseIntersectionObserverOptions = {
-  /**
-   * Handler invoked when the target element's intersection with the viewport
-   * changes.
-   *
-   * @param element The target element.
-   */
-  onChange: (element: HTMLElement) => void
-}
 
 /**
  * Hook for monitoring the change in intersection between the target element and
  * the viewport.
  *
- * @param targetRef Reference to the target element.
- * @param options See {@link UseIntersectionObserverOptions}.
+ * @param target The target element or the reference to it.
+ * @param handler Handler invoked when the intersection changes.
  */
-export function useIntersectionObserver(targetRef: TargetRef | undefined, { onChange }: UseIntersectionObserverOptions) {
-  const handlerRef = useLatest(onChange)
+export function useIntersectionObserver(
+  target: HTMLElement | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | null | undefined,
+  handler: (element: HTMLElement) => void,
+) {
+  const handlerRef = useLatest(handler)
 
   useLayoutEffect(() => {
-    const element = targetRef?.current
+    const element = target && 'current' in target ? target.current : target
     if (!element) return
 
     const observer = new IntersectionObserver(entries => {
@@ -44,5 +32,5 @@ export function useIntersectionObserver(targetRef: TargetRef | undefined, { onCh
     return () => {
       observer.disconnect()
     }
-  }, [targetRef?.current])
+  }, [target])
 }
