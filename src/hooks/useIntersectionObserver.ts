@@ -5,7 +5,7 @@ import { useLatest } from './useLatest.js'
  * Hook for monitoring the change in intersection between the target element and
  * the viewport.
  *
- * @param target The target element or the reference to it.
+ * @param target The target element or reference.
  * @param handler Handler invoked when the intersection changes.
  */
 export function useIntersectionObserver(

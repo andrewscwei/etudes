@@ -1,38 +1,50 @@
 import { useLayoutEffect, type RefObject } from 'react'
 import { useLatest } from './useLatest.js'
 
-type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
+type Target = HTMLElement | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | null | undefined
+
+type Options = {
+  isEnabled?: boolean
+}
 
 /**
  * Hook for adding click outside interaction to an element.
  *
- * @param targetRef The reference to the target element to add click outside
- *                  interaction to.
+ * @param target The target element(s) or reference(s).
  * @param handler The handler to call when a click outside the target element is
  *                detected.
+ * @param options See {@link Options}.
  */
-export function useClickOutside(targetRef: TargetRef | TargetRef[], handler: () => void) {
+
+export function useClickOutside(
+  target: Target | Target[],
+  handler: () => void,
+  {
+    isEnabled = true,
+  }: Options = {},
+) {
   const handlerRef = useLatest(handler)
 
   useLayoutEffect(() => {
+    if (!isEnabled) return
+
     const listener = (event: MouseEvent) => {
       if (!(event.target instanceof Node)) return
 
       let isOutside = true
-      let node = event.target
+      let el = event.target
 
-      const targetRefs = ([] as TargetRef[]).concat(targetRef)
-      const targetNodes = targetRefs.map(ref => ref.current)
+      const els = ([] as Target[]).concat(target).map(v => v && 'current' in v ? v.current : v).filter(Boolean)
 
-      while (node) {
-        if (targetNodes.find(t => t === node)) {
+      while (el) {
+        if (els.find(t => t === el)) {
           isOutside = false
           break
         }
 
-        if (!node.parentNode) break
+        if (!el.parentNode) break
 
-        node = node.parentNode
+        el = el.parentNode
       }
 
       if (!isOutside) return
@@ -45,5 +57,5 @@ export function useClickOutside(targetRef: TargetRef | TargetRef[], handler: () 
     return () => {
       window.removeEventListener('click', listener, true)
     }
-  }, [])
+  }, [isEnabled, target])
 }

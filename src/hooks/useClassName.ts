@@ -8,7 +8,7 @@ type Options = {
    * The target element to which the class name will be added, defaults to the
    * document's root element.
    */
-  element?: HTMLElement
+  target?: HTMLElement
 
   /**
    * Specifies whether the hook is enabled, defaults to `true`.
@@ -23,21 +23,21 @@ type Options = {
  * @param className The class name to add to the document's root element.
  * @param options See {@link Options}.
  */
-export function useClassName(className: string, { element, isEnabled = true }: Options = {}) {
+export function useClassName(className: string, { target, isEnabled = true }: Options = {}) {
   useLayoutEffect(() => {
     if (!isEnabled) return
 
-    const target = element ?? window.document.documentElement
-    const hasClassName = target.classList.contains(className)
+    const el = target ?? window.document.documentElement
+    const hasClassName = el.classList.contains(className)
 
     if (!hasClassName) {
-      target.classList.add(className)
+      el.classList.add(className)
     }
 
     return () => {
       if (!hasClassName) {
-        target.classList.remove(className)
+        el.classList.remove(className)
       }
     }
-  }, [className, element, isEnabled])
+  }, [className, target, isEnabled])
 }

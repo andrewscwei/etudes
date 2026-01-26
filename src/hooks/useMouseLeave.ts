@@ -1,7 +1,6 @@
-import { useCallback, useEffect, type RefObject } from 'react'
+import { useLayoutEffect, type RefObject } from 'react'
 import { Point, Rect, hitTest } from 'spase'
-
-type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
+import { useLatest } from './useLatest.js'
 
 type Options = {
   isEnabled?: boolean
@@ -10,30 +9,38 @@ type Options = {
 /**
  * Hook for adding mouse leave interaction to an element.
  *
- * @param targetRef The reference to the target element to add mouse leave
- *                  interaction to.
+ * @param target The target element or reference to add mouse leave interaction
+ *               to.
  * @param handler The handler to call when a mouse leave from the target element
  *                is detected.
  * @param options See {@link Options}.
  */
-export function useMouseLeave(targetRef: TargetRef, handler: () => void, {
-  isEnabled = true,
-}: Options = {}) {
-  const listener = useCallback((event: MouseEvent) => {
-    const viewport = Rect.fromViewport()
-    const point = Point.make([event.x + viewport.left, event.y + viewport.top])
-    const target = targetRef.current
+export function useMouseLeave(
+  target: HTMLElement | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | null | undefined,
+  handler: () => void,
+  {
+    isEnabled = true,
+  }: Options = {},
+) {
+  const handlerRef = useLatest(handler)
 
-    if (isEnabled && target && !hitTest(point, target)) {
-      handler()
+  useLayoutEffect(() => {
+    if (!isEnabled) return
+
+    const listener = (event: MouseEvent) => {
+      const viewport = Rect.fromViewport()
+      const point = Point.make([event.x + viewport.left, event.y + viewport.top])
+      const element = target && 'current' in target ? target.current : target
+
+      if (element && !hitTest(point, element)) {
+        handlerRef.current()
+      }
     }
-  }, [isEnabled])
 
-  useEffect(() => {
     window.addEventListener('mousemove', listener)
 
     return () => {
       window.removeEventListener('mousemove', listener)
     }
-  }, [listener])
+  }, [isEnabled, target])
 }

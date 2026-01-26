@@ -4,7 +4,7 @@ import { useLatest } from './useLatest.js'
 /**
  * Hook for monitoring the resizing event of the target element.
  *
- * @param target The target element or the reference to it.
+ * @param target The target element or reference.
  * @param options See {@link UseSizeObserverOptions}.
  */
 export function useSizeObserver(

@@ -8,7 +8,7 @@ import { useViewportSize } from './useViewportSize.js'
  * Hook for monitoring changes in and returning the size and position of the
  * target element.
  *
- * @param target The target element or the reference to it.
+ * @param target The target element or reference.
  *
  * @returns The most current {@link Rect} of the target element.
  */

@@ -1,10 +1,8 @@
 import interact from 'interactjs'
-import { useLayoutEffect, type RefObject } from 'react'
+import { type RefObject, useLayoutEffect } from 'react'
 import { Point } from 'spase'
 import { createKey } from '../utils/createKey.js'
 import { useLatest } from './useLatest.js'
-
-type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
 
 type InteractDraggableOptions = Parameters<Interact.Interactable['draggable']>[0]
 
@@ -45,20 +43,23 @@ export type UseInertiaDragOptions = Omit<InteractDraggableOptions, 'onstart' | '
 /**
  * Hook for adding dragging interaction to an element.
  *
- * @param targetRef The reference to the target element to add drag interaction
+ * @param target The reference to the target element to add drag interaction
  *                  to.
  * @param options Additional options which include options for
  *                `module:interactjs.draggable`.
  *
  * @returns The states created for this effect.
  */
-export function useInertiaDrag(targetRef: TargetRef, {
-  isEnabled = true,
-  onDragStart,
-  onDragMove,
-  onDragEnd,
-  ...options
-}: UseInertiaDragOptions) {
+export function useInertiaDrag(
+  target: HTMLElement | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | null | undefined,
+  {
+    isEnabled = true,
+    onDragStart,
+    onDragMove,
+    onDragEnd,
+    ...options
+  }: UseInertiaDragOptions,
+) {
   const dragStartHandlerRef = useLatest(onDragStart)
   const dragMoveHandlerRef = useLatest(onDragMove)
   const dragEndHandlerRef = useLatest(onDragEnd)
@@ -66,10 +67,10 @@ export function useInertiaDrag(targetRef: TargetRef, {
   useLayoutEffect(() => {
     if (!isEnabled) return
 
-    const el = targetRef.current
-    if (!el) return
+    const element = target && 'current' in target ? target.current : target
+    if (!element) return
 
-    const interactable = interact(el).draggable({
+    const interactable = interact(element).draggable({
       inertia: true,
       ...options,
       onstart: ({ client }) => {
@@ -97,5 +98,5 @@ export function useInertiaDrag(targetRef: TargetRef, {
 
       dragEndHandlerRef.current?.(Point.zero, Point.zero)
     }
-  }, [isEnabled, createKey(options)])
+  }, [target, isEnabled, createKey(options)])
 }

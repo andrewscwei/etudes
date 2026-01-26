@@ -4,8 +4,6 @@ import type { Point } from 'spase'
 import { useInertiaDrag } from './useInertiaDrag.js'
 import { useLatest } from './useLatest.js'
 
-type TargetRef = RefObject<HTMLElement> | RefObject<HTMLElement | undefined> | RefObject<HTMLElement | null>
-
 /**
  * Type describing the output of {@link useInertiaDragValue}.
  */
@@ -60,20 +58,22 @@ export type UseDragValueOptions<T = [number, number]> = Parameters<typeof useIne
 /**
  * Hook for adding dragging interaction to an element.
  *
- * @param targetRef The reference to the target element to add drag interaction
- *                  to.
+ * @param target The target element or reference to add drag interaction to.
  * @param options Additional options.
  *
  * @returns The states created for this effect.
  */
-export function useInertiaDragValue<T = [number, number]>(targetRef: TargetRef, {
-  initialValue,
-  transform,
-  onDragStart,
-  onDragMove,
-  onDragEnd,
-  ...options
-}: UseDragValueOptions<T>): UseDragValueOutput<T> {
+export function useInertiaDragValue<T = [number, number]>(
+  target: HTMLElement | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | null | undefined,
+  {
+    initialValue,
+    transform,
+    onDragStart,
+    onDragMove,
+    onDragEnd,
+    ...options
+  }: UseDragValueOptions<T>,
+): UseDragValueOutput<T> {
   const valueRef = useRef<T>(initialValue)
   const [isDragging, setIsDragging] = useState(false)
   const [isReleasing, setIsReleasing] = useState(false)
@@ -111,7 +111,7 @@ export function useInertiaDragValue<T = [number, number]>(targetRef: TargetRef, 
     dragEndHandlerRef.current?.(endPosition, startPosition)
   }
 
-  useInertiaDrag(targetRef, {
+  useInertiaDrag(target, {
     onDragStart: dragStartHandler,
     onDragMove: dragMoveHandler,
     onDragEnd: dragEndHandler,

@@ -6,7 +6,7 @@ type Options = {
    * Element from which to retrieve the computed style. If not provided, the
    * document's root element will be used.
    */
-  element?: HTMLElement
+  target?: HTMLElement
 
   /**
    * Whether to retrieve the computed style. Defaults to `true`.
@@ -26,15 +26,15 @@ type Options = {
  * @returns The value of the CSS property, or `undefined` if the property does
  *          not exist.
  */
-export function getStyle(name: string, { element, computed }: Options): string | undefined {
+export function getStyle(name: string, { target, computed }: Options): string | undefined {
   if (typeof window === 'undefined') return undefined
 
-  const target = element ?? window.document.documentElement
+  const el = target ?? window.document.documentElement
 
   if (computed) {
-    return window.getComputedStyle(target).getPropertyValue(name) || undefined
+    return window.getComputedStyle(el).getPropertyValue(name) || undefined
   }
   else {
-    return target.style.getPropertyValue(name) || undefined
+    return el.style.getPropertyValue(name) || undefined
   }
 }

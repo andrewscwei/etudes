@@ -6,7 +6,7 @@ type Options = {
    * Element on which to set the style. If not provided, the document's root
    * element will be used.
    */
-  element?: HTMLElement
+  target?: HTMLElement
 }
 
 /**
@@ -20,15 +20,15 @@ type Options = {
  *              will be removed.
  * @param options See {@link Options}.
  */
-export function setStyle(name: string, value?: string, { element }: Options = {}) {
+export function setStyle(name: string, value?: string, { target }: Options = {}) {
   if (typeof window === 'undefined') return
 
-  const target = element ?? window.document.documentElement
+  const el = target ?? window.document.documentElement
 
   if (value === undefined) {
-    target.style.removeProperty(name)
+    el.style.removeProperty(name)
   }
   else {
-    target.style.setProperty(name, value)
+    el.style.setProperty(name, value)
   }
 }

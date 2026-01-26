@@ -10,7 +10,7 @@ type Options = {
    * The target element to which the style will be applied, defaults to the
    * document's root element.
    */
-  element?: HTMLElement
+  target?: HTMLElement
 
   /**
    * Specifies whether the hook is enabled, defaults to `true`.
@@ -28,17 +28,17 @@ type Options = {
  *              will be removed.
  * @param options See {@link Options}.
  */
-export function useStyle(name: string, value?: string, { element, isEnabled = true }: Options = {}) {
+export function useStyle(name: string, value?: string, { target, isEnabled = true }: Options = {}) {
   useLayoutEffect(() => {
     if (!isEnabled) return
 
-    const target = element ?? window.document.documentElement
-    const oldValue = getStyle(name, { element: target, computed: false })
+    const el = target ?? window.document.documentElement
+    const oldValue = getStyle(name, { target: el, computed: false })
 
-    setStyle(name, value, { element: target })
+    setStyle(name, value, { target: el })
 
     return () => {
-      setStyle(name, oldValue, { element: target })
+      setStyle(name, oldValue, { target: el })
     }
-  }, [name, value, element, isEnabled])
+  }, [name, value, target, isEnabled])
 }
