@@ -163,7 +163,6 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video
     }
 
     videoRef.current.muted = isMuted
-    videoRef.current.load()
     videoRef.current.addEventListener('webkitfullscreenchange', listener)
     videoRef.current.addEventListener('mozfullscreenchange', listener)
     videoRef.current.addEventListener('fullscreenchange', listener)
