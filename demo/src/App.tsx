@@ -35,42 +35,44 @@ import { WithTooltipDemo } from './demos/WithTooltipDemo.js'
 export function App() {
   return (
     <StrictMode>
-      <Header className='px-safe-or-4 tab:px-safe-or-10 note:px-safe-or-20'/>
-      <main
-        className='px-safe-or-4 tab:px-safe-or-10 note:px-safe-or-20 grid-cols text-dark grid w-full gap-6 py-6'
-        style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr)' }}
-      >
-        <AccordionDemo/>
-        <BurgerButtonDemo/>
-        <ButtonDemo/>
-        <CarouselDemo/>
-        <CodeInputDemo/>
-        <CollectionDemo/>
-        <CounterDemo/>
-        <CoverImageDemo/>
-        <CoverVideoDemo/>
-        <DialDemo/>
-        <DropdownDemo/>
-        <FlatSVGDemo/>
-        <ImageDemo/>
-        <MasonryGridDemo/>
-        <OptionButtonDemo/>
-        <PanoramaDemo/>
-        <PanoramaSliderDemo/>
-        <PictureDemo/>
-        <RangeSliderDemo/>
-        <SelectableButtonDemo/>
-        <SelectDemo/>
-        <SliderDemo/>
-        <StepSliderDemo/>
-        <SwipeContainerDemo/>
-        <TextAreaDemo/>
-        <TextFieldDemo/>
-        <ToggleDemo/>
-        <VideoDemo/>
-        <WithTooltipDemo/>
+      <Header/>
+      <main className='w-full px-safe'>
+        <div
+          className='grid-cols grid w-full gap-6 px-4 py-6 text-dark tab:px-10 note:px-20'
+          style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr)' }}
+        >
+          <AccordionDemo/>
+          <BurgerButtonDemo/>
+          <ButtonDemo/>
+          <CarouselDemo/>
+          <CodeInputDemo/>
+          <CollectionDemo/>
+          <CounterDemo/>
+          <CoverImageDemo/>
+          <CoverVideoDemo/>
+          <DialDemo/>
+          <DropdownDemo/>
+          <FlatSVGDemo/>
+          <ImageDemo/>
+          <MasonryGridDemo/>
+          <OptionButtonDemo/>
+          <PanoramaDemo/>
+          <PanoramaSliderDemo/>
+          <PictureDemo/>
+          <RangeSliderDemo/>
+          <SelectableButtonDemo/>
+          <SelectDemo/>
+          <SliderDemo/>
+          <StepSliderDemo/>
+          <SwipeContainerDemo/>
+          <TextAreaDemo/>
+          <TextFieldDemo/>
+          <ToggleDemo/>
+          <VideoDemo/>
+          <WithTooltipDemo/>
+        </div>
       </main>
-      <Footer className='px-safe-or-4 tab:px-safe-or-10 note:px-safe-or-20'/>
+      <Footer/>
     </StrictMode>
   )
 }

@@ -1,13 +1,9 @@
-import clsx from 'clsx'
-
-type Props = {
-  className?: string
-}
-
-export function Footer({ className }: Props) {
+export function Footer() {
   return (
-    <footer className={clsx(className, 'vb px-safe-or-4 pb-safe-or-8 border-dark/20 text-dark sticky top-0 z-50 flex items-center justify-center border-t pt-8 text-base')}>
-      <span className='text-sm'>a study of headless React components</span>
+    <footer className='px-safe pb-safe text-base text-dark'>
+      <div className='flex items-center justify-center px-4 py-8 tab:px-10 note:px-20'>
+        <span className='text-sm'>a study of headless React components</span>
+      </div>
     </footer>
   )
 }
