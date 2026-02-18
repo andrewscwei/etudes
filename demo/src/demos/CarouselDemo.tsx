@@ -1,9 +1,10 @@
 import clsx from 'clsx'
 import { Carousel, Conditional, Each } from 'etudes'
 import { useState } from 'react'
+
 import { Frame } from '../components/Frame.js'
 
-function Item({ className, label, exposure, ...props }: { className?: string; exposure?: number; label: string }) {
+function Item({ className, exposure, label, ...props }: { className?: string; exposure?: number; label: string }) {
   return (
     <div {...props} className={clsx(className, 'relative flex items-center justify-center border border-dark text-base')}>
       <span>{label}</span>
@@ -41,7 +42,7 @@ export function CarouselDemo() {
       usesMaxHeight={true}
       onReset={() => setIndex(0)}
     >
-      {({ autoAdvanceInterval, isDragEnabled, orientation, tracksItemExposure }, toast) => (
+      {({ autoAdvanceInterval, orientation, tracksItemExposure, isDragEnabled }, toast) => (
         <div className='flex size-full flex-col items-center justify-center gap-1'>
           <div className='flex w-full justify-stretch gap-1'>
             <Each
@@ -58,14 +59,14 @@ export function CarouselDemo() {
             />
           </div>
           <Carousel
-            autoAdvanceInterval={Number(autoAdvanceInterval)}
             className='w-full grow'
+            autoAdvanceInterval={Number(autoAdvanceInterval)}
             index={index}
-            isDragEnabled={isDragEnabled === 'true'}
             ItemComponent={Item}
             items={items}
             orientation={orientation as any}
             tracksItemExposure={tracksItemExposure === 'true'}
+            isDragEnabled={isDragEnabled === 'true'}
             onIndexChange={t => {
               setIndex(t)
               toast(`Slide ${t + 1}`)

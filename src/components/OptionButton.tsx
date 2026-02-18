@@ -1,11 +1,12 @@
-import { forwardRef, useCallback, type ButtonHTMLAttributes } from 'react'
+import { type ButtonHTMLAttributes, forwardRef, useCallback } from 'react'
+
 import { Button } from '../primitives/Button.js'
 
 export namespace OptionButton {
   /**
    * Type describing the props of {@link OptionButton}.
    */
-  export type Props = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-disabled' | 'aria-label' | 'disabled' | 'onChange'> & {
+  export type Props = {
     /**
      * The current index of the option.
      */
@@ -19,7 +20,7 @@ export namespace OptionButton {
     /**
      * The list of options to cycle through.
      */
-    options: string[] | { label: string; value: string }[]
+    options: { label: string; value: string }[] | string[]
 
     /**
      * Handler invoked when the button is clicked.
@@ -28,7 +29,7 @@ export namespace OptionButton {
      * @param index The index of the next option.
      */
     onChange?: (value: string, index: number) => void
-  }
+  } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-disabled' | 'aria-label' | 'disabled' | 'onChange'>
 }
 
 /**
@@ -36,8 +37,8 @@ export namespace OptionButton {
  */
 export const OptionButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readonly<OptionButton.Props>>(({
   index = 0,
-  isDisabled = false,
   options,
+  isDisabled = false,
   onChange,
   ...props
 }, ref) => {
@@ -60,8 +61,8 @@ export const OptionButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readon
       {...props}
       ref={ref}
       action={action}
-      isDisabled={isDisabled}
       label={label}
+      isDisabled={isDisabled}
     />
   )
 })

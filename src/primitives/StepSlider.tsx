@@ -1,6 +1,7 @@
 import clsx from 'clsx'
-import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttributes, type MouseEvent } from 'react'
+import { forwardRef, type HTMLAttributes, type MouseEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { Rect } from 'spase'
+
 import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
 import { useRect } from '../hooks/useRect.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
@@ -12,23 +13,23 @@ import { styles } from '../utils/styles.js'
 
 const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlider.Props>>((
   {
-    children,
     className,
+    children,
     index: externalIndex = 0,
-    isClipped = false,
-    isInverted = false,
-    isTrackInteractive = true,
     knobHeight = 30,
     knobPadding = 0,
     knobWidth = 30,
     labelProvider,
-    onlyDispatchesOnDragEnd = false,
     orientation = 'vertical',
     steps = _generateSteps(10),
     trackPadding = 0,
+    isClipped = false,
+    isInverted = false,
+    isTrackInteractive = true,
     onDragEnd,
     onDragStart,
     onIndexChange,
+    onlyDispatchesOnDragEnd = false,
     onPositionChange,
     ...props
   },
@@ -66,11 +67,11 @@ const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlid
     }
   }, [rect.width, rect.height, isClipped, isInverted, knobWidth, knobHeight, orientation])
 
-  const { isDragging, isReleasing, value: position, setValue: setPosition } = useInertiaDragValue(knobContainerRef, {
+  const { setValue: setPosition, value: position, isDragging, isReleasing } = useInertiaDragValue(knobContainerRef, {
     initialValue: _getPositionAt(externalIndex, steps),
     transform: mapDragValueToPosition,
-    onDragStart,
     onDragEnd,
+    onDragStart,
   })
 
   const trackClickHandler = useCallback((event: MouseEvent) => {
@@ -87,8 +88,7 @@ const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlid
         if (nearestIndex === index) {
           const newIndex = normalizedPosition > position ? nearestIndex + 1 : nearestIndex - 1
           setIndex(_clamped(newIndex, steps.length - 1))
-        }
-        else {
+        } else {
           setIndex(nearestIndex)
         }
 
@@ -104,8 +104,7 @@ const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlid
           const newPosition = _getPositionAt(newIndex, steps)
           setPosition(newPosition)
           setIndex(_clamped(newIndex, steps.length - 1))
-        }
-        else {
+        } else {
           const newPosition = _getPositionAt(nearestIndex, steps)
           setPosition(newPosition)
           setIndex(nearestIndex)
@@ -124,7 +123,7 @@ const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlid
   const isAtEnd = isInverted ? position === 0 : position === 1
   const isAtStart = isInverted ? position === 1 : position === 0
   const fixedClassNames = _getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
-  const fixedStyles = _getFixedStyles({ orientation, naturalPosition, isClipped, knobPadding, knobHeight, knobWidth, isTrackInteractive })
+  const fixedStyles = _getFixedStyles({ knobHeight, knobPadding, knobWidth, naturalPosition, orientation, isClipped, isTrackInteractive })
   const components = asComponentDict(children, {
     knob: _Knob,
     knobContainer: _KnobContainer,
@@ -144,8 +143,7 @@ const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlid
       if (onlyDispatchesOnDragEnd) return
 
       setIndex(_getNearestIndexByPosition(position, steps))
-    }
-    else {
+    } else {
       const nearestIndex = _getNearestIndexByPosition(position, steps)
       const nearestPosition = _getPositionAt(nearestIndex, steps)
 
@@ -165,15 +163,14 @@ const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlid
   return (
     <div
       {...props}
+      className={clsx(className, fixedClassNames.root)}
       ref={ref}
       aria-valuenow={index}
-      className={clsx(className, fixedClassNames.root)}
       role='slider'
     >
       <div ref={bodyRef} style={fixedStyles.body}>
         <Styled
           className={clsx(isInverted ? 'end' : 'start', fixedClassNames.track)}
-          element={components.track ?? <_Track/>}
           style={styles(fixedStyles.track, orientation === 'vertical' ? {
             height: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
             top: '0',
@@ -181,13 +178,13 @@ const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlid
             left: '0',
             width: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
           })}
+          element={components.track ?? <_Track/>}
           onClick={trackClickHandler}
         >
           <div style={fixedStyles.trackHitBox}/>
         </Styled>
         <Styled
           className={clsx(isInverted ? 'start' : 'end', fixedClassNames.track)}
-          element={components.track ?? <_Track/>}
           style={styles(fixedStyles.track, orientation === 'vertical' ? {
             bottom: '0',
             height: `calc(${(_inverted(naturalPosition)) * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
@@ -195,20 +192,21 @@ const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlid
             right: '0',
             width: `calc(${(_inverted(naturalPosition)) * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
           })}
+          element={components.track ?? <_Track/>}
           onClick={trackClickHandler}
         >
           <div style={fixedStyles.trackHitBox}/>
         </Styled>
         <Styled
-          ref={knobContainerRef}
           className={clsx(fixedClassNames.knobContainer)}
-          element={components.knobContainer ?? <_KnobContainer/>}
+          ref={knobContainerRef}
           style={styles(fixedStyles.knobContainer)}
+          element={components.knobContainer ?? <_KnobContainer/>}
         >
-          <Styled className={clsx(fixedClassNames.knob)} element={components.knob ?? <_Knob/>} style={styles(fixedStyles.knob)}>
+          <Styled className={clsx(fixedClassNames.knob)} style={styles(fixedStyles.knob)} element={components.knob ?? <_Knob/>}>
             <div style={fixedStyles.knobHitBox}/>
             {steps && labelProvider && (
-              <Styled className={clsx(fixedClassNames.label)} element={components.label ?? <_Label/>} style={styles(fixedStyles.label)}>
+              <Styled className={clsx(fixedClassNames.label)} style={styles(fixedStyles.label)} element={components.label ?? <_Label/>}>
                 {labelProvider(position, _getNearestIndexByPosition(position, steps))}
               </Styled>
             )}
@@ -266,7 +264,7 @@ export namespace StepSlider {
   /**
    * Type describing the props of {@link StepSlider}.
    */
-  export type Props = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'role'> & {
+  export type Props = {
     /**
      * Specifies if the knob is clipped to the track.
      */
@@ -374,7 +372,7 @@ export namespace StepSlider {
      * Handler invoked when dragging begins.
      */
     onDragStart?: () => void
-  }
+  } & Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'role'>
 }
 
 /**
@@ -456,18 +454,6 @@ function _getPositionAt(index: number, steps: readonly number[]): number {
 
 function _getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtStart = false, isDragging = false, isReleasing = false }) {
   return asClassNameDict({
-    root: clsx(orientation, {
-      'at-end': isAtEnd,
-      'at-start': isAtStart,
-      'dragging': isDragging,
-      'releasing': isReleasing,
-    }),
-    track: clsx(orientation, {
-      'at-end': isAtEnd,
-      'at-start': isAtStart,
-      'dragging': isDragging,
-      'releasing': isReleasing,
-    }),
     knob: clsx(orientation, {
       'at-end': isAtEnd,
       'at-start': isAtStart,
@@ -486,14 +472,31 @@ function _getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtSt
       'dragging': isDragging,
       'releasing': isReleasing,
     }),
+    root: clsx(orientation, {
+      'at-end': isAtEnd,
+      'at-start': isAtStart,
+      'dragging': isDragging,
+      'releasing': isReleasing,
+    }),
+    track: clsx(orientation, {
+      'at-end': isAtEnd,
+      'at-start': isAtStart,
+      'dragging': isDragging,
+      'releasing': isReleasing,
+    }),
   })
 }
 
-function _getFixedStyles({ orientation = 'vertical', naturalPosition = 0, isClipped = false, knobPadding = 0, knobHeight = 0, knobWidth = 0, isTrackInteractive = false }) {
+function _getFixedStyles({ knobHeight = 0, knobPadding = 0, knobWidth = 0, naturalPosition = 0, orientation = 'vertical', isClipped = false, isTrackInteractive = false }) {
   return asStyleDict({
     body: {
       height: '100%',
       width: '100%',
+    },
+    knob: {
+      height: `${knobHeight}px`,
+      touchAction: 'none',
+      width: `${knobWidth}px`,
     },
     knobContainer: {
       background: 'none',
@@ -509,11 +512,6 @@ function _getFixedStyles({ orientation = 'vertical', naturalPosition = 0, isClip
         left: isClipped ? `calc(${naturalPosition * 100}% + ${knobWidth * 0.5 - naturalPosition * knobWidth}px)` : `${naturalPosition * 100}%`,
         top: '50%',
       },
-    },
-    knob: {
-      height: `${knobHeight}px`,
-      touchAction: 'none',
-      width: `${knobWidth}px`,
     },
     knobHitBox: {
       background: 'none',

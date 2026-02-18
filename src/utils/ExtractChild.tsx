@@ -1,4 +1,5 @@
-import { Children, forwardRef, isValidElement, type HTMLAttributes } from 'react'
+import { Children, forwardRef, type HTMLAttributes, isValidElement } from 'react'
+
 import { cloneStyledElement } from './cloneStyledElement.js'
 
 /**
@@ -22,11 +23,9 @@ export const ExtractChild = /* #__PURE__ */ forwardRef<HTMLElement, Readonly<Ext
   return Children.map(children, (child, idx) => {
     if (idx > 0) {
       return undefined
-    }
-    else if (isValidElement(child)) {
+    } else if (isValidElement(child)) {
       return cloneStyledElement(child, { ...props, ref } as any)
-    }
-    else {
+    } else {
       return child
     }
   })

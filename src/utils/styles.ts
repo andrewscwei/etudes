@@ -8,7 +8,7 @@ import { type CSSProperties } from 'react'
  *
  * @returns A single object containing all the provided CSS properties.
  */
-export function styles(...args: (CSSProperties | undefined | false)[]): CSSProperties {
+export function styles(...args: (CSSProperties | false | undefined)[]): CSSProperties {
   return args.reduce<CSSProperties>((out, curr) => ({
     ...out,
     ...curr || {},

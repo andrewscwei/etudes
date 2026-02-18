@@ -1,4 +1,5 @@
 import { useLayoutEffect } from 'react'
+
 import { useLatest } from './useLatest.js'
 
 /**
@@ -34,9 +35,9 @@ export type UseVideoMetadataLoaderOptions = {
  * @param options See {@link UseVideoMetadataLoaderOptions}.
  */
 export function useVideoMetadataLoader(src?: string, {
-  onLoadStart,
   onLoadComplete,
   onLoadError,
+  onLoadStart,
 }: UseVideoMetadataLoaderOptions = {}) {
   const loadStartHandlerRef = useLatest(onLoadStart)
   const loadCompleteHandlerRef = useLatest(onLoadComplete)

@@ -1,5 +1,6 @@
-import { useLayoutEffect, useState, type RefObject } from 'react'
+import { type RefObject, useLayoutEffect, useState } from 'react'
 import { Rect, Size } from 'spase'
+
 import { useIntersectionObserver } from './useIntersectionObserver.js'
 import { useSizeObserver } from './useSizeObserver.js'
 import { useViewportSize } from './useViewportSize.js'
@@ -12,7 +13,7 @@ import { useViewportSize } from './useViewportSize.js'
  *
  * @returns The most current {@link Rect} of the target element.
  */
-export function useRect(target: HTMLElement | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | null | undefined): Rect {
+export function useRect(target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined): Rect {
   const [rect, setRect] = useState<Rect>(Rect.zero)
   const viewportSize = useViewportSize()
 

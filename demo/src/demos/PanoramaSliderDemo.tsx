@@ -1,6 +1,7 @@
 import { PanoramaSlider } from 'etudes'
 import { useState } from 'react'
 import { Size } from 'spase'
+
 import $$PanoramaImage from '../assets/panorama.png'
 import { Frame } from '../components/Frame.js'
 
@@ -13,8 +14,8 @@ export function PanoramaSliderDemo() {
       title='PanoramaSlider'
     >
       <PanoramaSlider
-        angle={angle}
         className='relative h-24'
+        angle={angle}
         src={$$PanoramaImage}
         viewportSize={Size.make(500, 400)}
         zeroAnchor={zeroAnchor}

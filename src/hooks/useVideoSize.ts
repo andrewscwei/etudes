@@ -1,18 +1,19 @@
 import { useCallback, useState } from 'react'
 import { Size } from 'spase'
+
 import { useLatest } from './useLatest.js'
 import { useVideoMetadataLoader, type UseVideoMetadataLoaderOptions } from './useVideoMetadataLoader.js'
 
 /**
  * Type describing the options of {@link useVideoSize}.
  */
-type UseVideoSizeOptions = UseVideoMetadataLoaderOptions & {
+type UseVideoSizeOptions = {
   /**
    * If `false`, the size will be reset to `undefined` when the video begins
    * loading or when an error occurs. Defaults to `true`.
    */
   preservesSizeBetweenLoads?: boolean
-}
+} & UseVideoMetadataLoaderOptions
 
 /**
  * Hook for retrieving the size of a video.
@@ -25,9 +26,9 @@ type UseVideoSizeOptions = UseVideoMetadataLoaderOptions & {
  */
 export function useVideoSize(src?: string, {
   preservesSizeBetweenLoads = true,
-  onLoadStart,
   onLoadComplete,
   onLoadError,
+  onLoadStart,
 }: UseVideoSizeOptions = {}): Size | undefined {
   const [size, setSize] = useState<Size>()
   const loadStartHandlerRef = useLatest(onLoadStart)
@@ -53,9 +54,9 @@ export function useVideoSize(src?: string, {
   }, [preservesSizeBetweenLoads])
 
   useVideoMetadataLoader(src, {
-    onLoadStart: loadStartHandler,
     onLoadComplete: loadCompleteHandler,
     onLoadError: loadErrorHandler,
+    onLoadStart: loadStartHandler,
   })
 
   return size

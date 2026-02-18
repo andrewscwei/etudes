@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import { forwardRef, useRef, type ComponentType, type HTMLAttributes, type ReactElement, type Ref, type RefObject } from 'react'
+import { type ComponentType, forwardRef, type HTMLAttributes, type ReactElement, type Ref, type RefObject, useRef } from 'react'
+
 import { Each } from '../flows/Each.js'
 import { useSize } from '../hooks/useSize.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
@@ -12,10 +13,12 @@ import { type Dropdown } from './Dropdown.js'
 
 const _Accordion = /* #__PURE__ */ forwardRef((
   {
-    children,
     style,
     autoCollapseSections = false,
+    children,
     expandedSectionIndices: externalExpandedSectionIndices,
+    HeaderComponent,
+    ItemComponent,
     orientation = 'vertical',
     sectionPadding = 0,
     sections,
@@ -30,8 +33,6 @@ const _Accordion = /* #__PURE__ */ forwardRef((
     onItemCustomEvent,
     onSelectAt,
     onSelectionChange,
-    HeaderComponent,
-    ItemComponent,
     ...props
   },
   ref,
@@ -51,11 +52,9 @@ const _Accordion = /* #__PURE__ */ forwardRef((
 
     if (isSectionExpandedAt(sectionIndex)) {
       transform = val => val.filter(t => t !== sectionIndex)
-    }
-    else if (autoCollapseSections) {
+    } else if (autoCollapseSections) {
       transform = _ => [sectionIndex]
-    }
-    else {
+    } else {
       transform = val => [...val.filter(t => t !== sectionIndex), sectionIndex]
     }
 
@@ -153,7 +152,7 @@ const _Accordion = /* #__PURE__ */ forwardRef((
     >
       <Each in={sections}>
         {(section, sectionIndex) => {
-          const { collectionPadding = 0, items = [], itemLength = 50, itemPadding = 0, isSelectionTogglable, layout = 'list', maxVisible = -1, numSegments = 1 } = section
+          const { collectionPadding = 0, itemLength = 50, itemPadding = 0, items = [], layout = 'list', maxVisible = -1, numSegments = 1, isSelectionTogglable } = section
           const allVisible = layout === 'list' ? items.length : Math.ceil(items.length / numSegments)
           const numVisible = maxVisible < 0 ? allVisible : Math.min(allVisible, maxVisible)
           const maxLength = itemLength * numVisible + itemPadding * (numVisible - 1)
@@ -164,7 +163,6 @@ const _Accordion = /* #__PURE__ */ forwardRef((
 
           return (
             <Styled
-              element={components.section ?? <_Section/>}
               style={styles(fixedStyles.section, orientation === 'vertical' ? {
                 marginTop: sectionIndex === 0 ? '0px' : `${sectionPadding}px`,
                 ...headerSize.height > 0 ? {
@@ -180,6 +178,7 @@ const _Accordion = /* #__PURE__ */ forwardRef((
                   visibility: 'hidden',
                 },
               })}
+              element={components.section ?? <_Section/>}
             >
               <div
                 ref={headerRefs[sectionIndex]}
@@ -187,55 +186,55 @@ const _Accordion = /* #__PURE__ */ forwardRef((
               >
                 {HeaderComponent ? (
                   <HeaderComponent
-                    aria-expanded={!isCollapsed}
                     className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
+                    style={styles(fixedStyles.header)}
+                    aria-expanded={!isCollapsed}
                     index={sectionIndex}
-                    isCollapsed={isCollapsed}
                     role='button'
                     section={section}
-                    style={styles(fixedStyles.header)}
+                    isCollapsed={isCollapsed}
                     onClick={() => toggleSectionAt(sectionIndex)}
                     onCustomEvent={(name, info) => onHeaderCustomEvent?.(sectionIndex, name, info)}
                   />
                 ) : (
                   <Styled
-                    aria-expanded={!isCollapsed}
                     className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
+                    style={styles(fixedStyles.header)}
+                    aria-expanded={!isCollapsed}
                     element={components.header ?? <_Header/>}
                     role='button'
-                    style={styles(fixedStyles.header)}
                     onClick={() => toggleSectionAt(sectionIndex)}
                   >
                     <span dangerouslySetInnerHTML={{ __html: section.label }}/>
                     {components.expandIcon && (
                       <Styled
                         className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
-                        element={isCollapsed ? (components.collapseIcon ?? components.expandIcon) : components.expandIcon}
                         style={styles(isCollapsed ? fixedStyles.collapseIcon : fixedStyles.expandIcon)}
+                        element={isCollapsed ? (components.collapseIcon ?? components.expandIcon) : components.expandIcon}
                       />
                     )}
                   </Styled>
                 )}
               </div>
               <div
-                role='region'
                 style={styles({
                   pointerEvents: isCollapsed ? 'none' : 'auto',
                 }, orientation === 'vertical' ? {
-                  width: '100%',
                   height: `${maxLength}px`,
                   marginTop: `${collectionPadding}px`,
                   overflowY: maxVisible < 0 || maxVisible >= allVisible ? 'hidden' : 'scroll',
+                  width: '100%',
                 } : {
+                  height: '100%',
                   marginLeft: `${collectionPadding}px`,
                   overflowX: maxVisible < 0 || maxVisible >= allVisible ? 'hidden' : 'scroll',
                   width: `${maxLength}px`,
-                  height: '100%',
                 })}
+                role='region'
               >
                 <Collection
                   className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
-                  isSelectionTogglable={isSelectionTogglable}
+                  style={styles(orientation === 'vertical' ? { width: '100%' } : { height: '100%' })}
                   ItemComponent={ItemComponent}
                   itemLength={itemLength}
                   itemPadding={itemPadding}
@@ -245,7 +244,7 @@ const _Accordion = /* #__PURE__ */ forwardRef((
                   orientation={orientation}
                   selection={selection[sectionIndex] ?? []}
                   selectionMode={selectionMode}
-                  style={styles(orientation === 'vertical' ? { width: '100%' } : { height: '100%' })}
+                  isSelectionTogglable={isSelectionTogglable}
                   onActivateAt={itemIndex => onActivateAt?.(itemIndex, sectionIndex)}
                   onCustomEvent={(itemIndex, name, info) => onItemCustomEvent?.(itemIndex, sectionIndex, name, info)}
                   onDeselectAt={itemIndex => handleDeselectAt(itemIndex, sectionIndex)}
@@ -260,9 +259,9 @@ const _Accordion = /* #__PURE__ */ forwardRef((
       </Each>
     </div>
   )
-}) as <I, S extends Accordion.SectionProps<I> = Accordion.SectionProps<I>>(props: Readonly<Accordion.Props<I, S> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
+}) as <I, S extends Accordion.SectionProps<I> = Accordion.SectionProps<I>>(props: Readonly<{ ref?: Ref<HTMLDivElement> } & Accordion.Props<I, S>>) => ReactElement
 
-const _Header = ({ children, ...props }: HTMLAttributes<HTMLButtonElement> & Dropdown.ToggleProps) => (
+const _Header = ({ children, ...props }: Dropdown.ToggleProps & HTMLAttributes<HTMLButtonElement>) => (
   <button {...props}>{children}</button>
 )
 
@@ -293,7 +292,7 @@ export namespace Accordion {
   /**
    * Type describing the data of each section in {@link Accordion}.
    */
-  export type SectionProps<T> = Pick<Collection.Props<T>, 'isSelectionTogglable' | 'itemLength' | 'itemPadding' | 'items' | 'layout' | 'numSegments'> & {
+  export type SectionProps<T> = {
     /**
      * Padding (in pixels) between the section header and the internal
      * collection.
@@ -311,7 +310,7 @@ export namespace Accordion {
      * exceeds the number of visible, a scrollbar will be put in place.
      */
     maxVisible?: number
-  }
+  } & Pick<Collection.Props<T>, 'isSelectionTogglable' | 'itemLength' | 'itemPadding' | 'items' | 'layout' | 'numSegments'>
 
   /**
    * Type describing the props of each `ItemComponent` provided to
@@ -323,7 +322,7 @@ export namespace Accordion {
    * Type describing the props of each `HeaderComponent` provided to
    * {@link Accordion}.
    */
-  export type HeaderProps<I, S extends SectionProps<I> = SectionProps<I>> = HTMLAttributes<HTMLElement> & {
+  export type HeaderProps<I, S extends SectionProps<I> = SectionProps<I>> = {
     /**
      * The index of the corresponding section.
      */
@@ -346,12 +345,12 @@ export namespace Accordion {
      * @param info Optional user-defined info of the custom event.
      */
     onCustomEvent?: (name: string, info?: any) => void
-  }
+  } & HTMLAttributes<HTMLElement>
 
   /**
    * Type describing the props of {@link Accordion}.
    */
-  export type Props<I, S extends SectionProps<I> = SectionProps<I>> = HTMLAttributes<HTMLDivElement> & {
+  export type Props<I, S extends SectionProps<I> = SectionProps<I>> = {
     /**
      * Specifies if expanded sections should automatically collapse upon
      * expanding another section.
@@ -503,7 +502,7 @@ export namespace Accordion {
      * Component type for generating items for each section.
      */
     ItemComponent?: ComponentType<ItemProps<I>>
-  }
+  } & HTMLAttributes<HTMLDivElement>
 }
 
 /**
@@ -586,6 +585,31 @@ function _sortIndices(indices: number[]): number[] {
 
 function _getFixedStyles({ orientation = 'vertical' }) {
   return asStyleDict({
+    collapseIcon: {
+      pointerEvents: 'none',
+      zIndex: 1,
+    },
+    expandIcon: {
+      pointerEvents: 'none',
+      zIndex: 1,
+    },
+    header: {
+      cursor: 'pointer',
+      margin: '0',
+      ...orientation === 'vertical' ? {
+        width: '100%',
+      } : {
+        height: '100%',
+      },
+    },
+    headerContainer: {
+      flexShrink: '0',
+      ...orientation === 'vertical' ? {
+        width: '100%',
+      } : {
+        height: '100%',
+      },
+    },
     root: {
       alignItems: 'center',
       boxSizing: 'border-box',
@@ -601,14 +625,6 @@ function _getFixedStyles({ orientation = 'vertical' }) {
         width: 'auto',
       },
     },
-    collapseIcon: {
-      pointerEvents: 'none',
-      zIndex: 1,
-    },
-    expandIcon: {
-      pointerEvents: 'none',
-      zIndex: 1,
-    },
     section: {
       alignItems: 'flex-start',
       display: 'flex',
@@ -622,23 +638,6 @@ function _getFixedStyles({ orientation = 'vertical' }) {
         width: '100%',
       } : {
         flexDirection: 'row',
-        height: '100%',
-      },
-    },
-    headerContainer: {
-      flexShrink: '0',
-      ...orientation === 'vertical' ? {
-        width: '100%',
-      } : {
-        height: '100%',
-      },
-    },
-    header: {
-      cursor: 'pointer',
-      margin: '0',
-      ...orientation === 'vertical' ? {
-        width: '100%',
-      } : {
         height: '100%',
       },
     },

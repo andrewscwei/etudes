@@ -1,4 +1,5 @@
 import { CoverVideo } from 'etudes'
+
 import $$Video from '../assets/video.mov'
 import { Frame } from '../components/Frame.js'
 
@@ -7,9 +8,9 @@ export function CoverVideoDemo() {
     <Frame title='CoverVideo' usesMaxHeight={true}>
       {(_, toast) => (
         <CoverVideo
+          className='relative size-full grayscale'
           autoLoop={true}
           autoPlay={true}
-          className='relative size-full grayscale'
           src={$$Video}
           onEnd={() => toast('Stopped')}
           onPause={() => toast('Paused')}

@@ -1,4 +1,5 @@
 import { Dial } from 'etudes'
+
 import { Frame } from '../components/Frame.js'
 
 export function DialDemo() {
@@ -15,8 +16,8 @@ export function DialDemo() {
     >
       {({ angle, knobLength, knobThickness, trackGap, trackThickness }, _) => (
         <Dial
-          angle={Number(angle)}
           className='relative'
+          angle={Number(angle)}
           knobLength={Number(knobLength)}
           knobThickness={Number(knobThickness)}
           radius={56}

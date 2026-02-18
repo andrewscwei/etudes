@@ -1,6 +1,7 @@
 import clsx from 'clsx'
-import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttributes } from 'react'
+import { forwardRef, type HTMLAttributes, useCallback, useEffect, useRef, useState } from 'react'
 import { Rect } from 'spase'
+
 import { useSizeObserver } from '../hooks/useSizeObserver.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
@@ -16,14 +17,14 @@ export namespace MasonryGrid {
   /**
    * Type describing the props of {@link MasonryGrid}.
    */
-  export type Props = Omit<HTMLAttributes<HTMLDivElement>, 'role'> & {
+  export type Props = {
     alignSections?: boolean
     horizontalSpacing?: number
-    isReversed?: boolean
     orientation?: Orientation
     sections?: number
     verticalSpacing?: number
-  }
+    isReversed?: boolean
+  } & Omit<HTMLAttributes<HTMLDivElement>, 'role'>
 }
 
 /**
@@ -44,14 +45,14 @@ export namespace MasonryGrid {
  */
 export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<MasonryGrid.Props>>((
   {
+    className,
     alignSections = false,
     children,
-    className,
     horizontalSpacing = 0,
-    isReversed = false,
     orientation = 'vertical',
     sections = 3,
     verticalSpacing = 0,
+    isReversed = false,
     ...props
   },
   ref,
@@ -125,8 +126,7 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
           child.style.left = `calc(${w}px - ${child.style.left} - ${child.getBoundingClientRect().width}px)`
         }
       }
-    }
-    else {
+    } else {
       const sectionWidths: number[] = [...new Array(numSections)].map(() => 0)
 
       for (const child of Array.from(nodes)) {
@@ -202,13 +202,13 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
   }, [children])
 
   const fixedClassNames = _getFixedClassNames({ orientation })
-  const fixedStyles = _getFixedStyles({ orientation, minHeight, minWidth })
+  const fixedStyles = _getFixedStyles({ minHeight, minWidth, orientation })
 
   return (
     <div
       {...props}
-      ref={ref}
       className={clsx(className, fixedClassNames.root)}
+      ref={ref}
       role='grid'
     >
       <div ref={bodyRef} style={fixedStyles.body}>
@@ -224,7 +224,7 @@ function _getFixedClassNames({ orientation = 'horizontal' }) {
   })
 }
 
-function _getFixedStyles({ orientation = 'horizontal', minHeight = NaN, minWidth = NaN }) {
+function _getFixedStyles({ minHeight = NaN, minWidth = NaN, orientation = 'horizontal' }) {
   return asStyleDict({
     body: {
       height: orientation === 'horizontal' ? '100%' : 'auto',
@@ -273,8 +273,7 @@ function _computeNextAvailableSectionAndLengthByBase(currentSectionLengths: numb
 
   if (isNaN(sectionIdx)) {
     return [0, _computeMaxLength(currentSectionLengths, base)]
-  }
-  else {
+  } else {
     return [sectionIdx, minLength]
   }
 }

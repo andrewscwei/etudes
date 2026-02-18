@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import { Dropdown } from 'etudes'
 import { useState } from 'react'
+
 import $$ExpandIcon from '../assets/expand-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
 
@@ -26,18 +27,15 @@ export function DropdownDemo() {
         setIsCollapsed(true)
       }}
     >
-      {({ collapsesOnSelect, isInverted, isSelectionTogglable, layout, maxVisibleItems, orientation, selectionMode }, toast) => (
+      {({ collapsesOnSelect, layout, maxVisibleItems, orientation, selectionMode, isInverted, isSelectionTogglable }, toast) => (
         <Dropdown
           className={clsx('relative text-base', {
-            'mb-24': orientation === 'vertical' && isInverted === 'false',
-            'mt-24': orientation === 'vertical' && isInverted === 'true',
             'h-24 w-32': orientation === 'horizontal',
             'h-9 w-44': orientation === 'vertical',
+            'mb-24': orientation === 'vertical' && isInverted === 'false',
+            'mt-24': orientation === 'vertical' && isInverted === 'true',
           })}
           collapsesOnSelect={collapsesOnSelect === 'true'}
-          isCollapsed={isCollapsed}
-          isInverted={isInverted === 'true'}
-          isSelectionTogglable={isSelectionTogglable === 'true'}
           itemLength={36}
           items={items}
           label={t => {
@@ -56,6 +54,9 @@ export function DropdownDemo() {
           orientation={orientation as any}
           selection={selection}
           selectionMode={selectionMode as any}
+          isCollapsed={isCollapsed}
+          isInverted={isInverted === 'true'}
+          isSelectionTogglable={isSelectionTogglable === 'true'}
           onCollapse={() => setIsCollapsed(true)}
           onExpand={() => setIsCollapsed(false)}
           onSelectAt={t => toast(`Selected Item ${t + 1}`)}
@@ -64,17 +65,17 @@ export function DropdownDemo() {
           <Dropdown.Toggle className='ia flex items-center justify-between border border-dark px-3'/>
           <Dropdown.ExpandIcon
             className={clsx('flex size-5 items-center justify-center transition-transform', {
-              'rotate-90 [.expanded]:-rotate-90': orientation === 'horizontal' && isInverted === 'true',
               '-rotate-90 [.expanded]:rotate-90': orientation === 'horizontal' && isInverted === 'false',
               '[.expanded]:rotate-180': orientation === 'vertical' && isInverted === 'false',
               'rotate-180 [.expanded]:rotate-0': orientation === 'vertical' && isInverted === 'true',
+              'rotate-90 [.expanded]:-rotate-90': orientation === 'horizontal' && isInverted === 'true',
             })}
             dangerouslySetInnerHTML={{ __html: $$ExpandIcon }}
           />
           <Dropdown.Collection
             className={clsx({
-              'transition-[width]': orientation === 'horizontal',
               'transition-[height]': orientation === 'vertical',
+              'transition-[width]': orientation === 'horizontal',
             })}
           />
           <Dropdown.Item className='ia flex items-center justify-start border border-dark px-3 [.active]:bg-dark [.active]:text-light'/>

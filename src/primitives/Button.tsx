@@ -1,18 +1,18 @@
 import clsx from 'clsx'
-import { forwardRef, type AnchorHTMLAttributes, type ButtonHTMLAttributes } from 'react'
+import { type AnchorHTMLAttributes, type ButtonHTMLAttributes, forwardRef } from 'react'
 
-type ButtonVariantProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-disabled' | 'aria-label' | 'disabled' | 'rel' | 'onClick'> & {
-  isDisabled?: boolean
-  label?: string
+type ButtonVariantProps = {
   action?: () => void
-}
-
-type AnchorVariantProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'aria-disabled' | 'aria-label' | 'href' | 'rel' | 'target' | 'type' | 'onClick'> & {
-  action: string
+  label?: string
   isDisabled?: boolean
+} & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-disabled' | 'aria-label' | 'disabled' | 'onClick' | 'rel'>
+
+type AnchorVariantProps = {
+  action: string
   label?: string
   opensInNewTab?: boolean
-}
+  isDisabled?: boolean
+} & Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'aria-disabled' | 'aria-label' | 'href' | 'onClick' | 'rel' | 'target' | 'type'>
 
 export namespace Button {
   /**
@@ -29,15 +29,15 @@ export namespace Button {
 export const Button = /* #__PURE__ */ forwardRef<HTMLAnchorElement | HTMLButtonElement, Button.Props>((props: Readonly<Button.Props>, ref) => {
   switch (true) {
     case _isAnchor(props): {
-      const { action, children, className, isDisabled, label, opensInNewTab, ...uniqProps } = props
+      const { className, action, children, label, opensInNewTab, isDisabled, ...uniqProps } = props
 
       return (
         <a
           {...uniqProps}
           {...isDisabled ? { 'aria-disabled': true } : {}}
+          className={clsx(className, { disabled: isDisabled })}
           ref={ref as React.Ref<HTMLAnchorElement>}
           aria-label={label}
-          className={clsx(className, { disabled: isDisabled })}
           href={action}
           rel={opensInNewTab ? 'noopener,noreferrer' : undefined}
           target={opensInNewTab ? '_blank' : undefined}
@@ -47,15 +47,15 @@ export const Button = /* #__PURE__ */ forwardRef<HTMLAnchorElement | HTMLButtonE
       )
     }
     case _isButton(props): {
-      const { action, children, className, isDisabled, label, type = 'button', ...uniqProps } = props
+      const { className, action, children, label, type = 'button', isDisabled, ...uniqProps } = props
 
       return (
         <button
           {...uniqProps}
           {...isDisabled ? { 'aria-disabled': true } : {}}
+          className={className}
           ref={ref as React.Ref<HTMLButtonElement>}
           aria-label={label}
-          className={className}
           disabled={isDisabled}
           type={type}
           onClick={action}

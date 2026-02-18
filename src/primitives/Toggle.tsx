@@ -1,6 +1,7 @@
 import clsx from 'clsx'
-import { forwardRef, useRef, type HTMLAttributes } from 'react'
+import { forwardRef, type HTMLAttributes, useRef } from 'react'
 import { Size } from 'spase'
+
 import { useSize } from '../hooks/useSize.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
@@ -12,7 +13,7 @@ export namespace Toggle {
   /**
    * Type describing the props of {@link Toggle}.
    */
-  export type Props = Omit<HTMLAttributes<HTMLLabelElement>, 'onChange' | 'onClick'> & {
+  export type Props = {
     /**
      * Specifies if the toggle is inverted.
      */
@@ -34,16 +35,16 @@ export namespace Toggle {
      * @param isOn - The new state of the toggle.
      */
     onChange?: (isOn: boolean) => void
-  }
+  } & Omit<HTMLAttributes<HTMLLabelElement>, 'onChange' | 'onClick'>
 }
 
 const _Toggle = /* #__PURE__ */ forwardRef<HTMLLabelElement, Toggle.Props>(({
   className,
+  style,
   children,
+  orientation = 'horizontal',
   isInverted = false,
   isOn = false,
-  orientation = 'horizontal',
-  style,
   onChange,
   ...props
 }, ref) => {
@@ -56,14 +57,14 @@ const _Toggle = /* #__PURE__ */ forwardRef<HTMLLabelElement, Toggle.Props>(({
   })
 
   const fixedClassNames = _getFixedClassNames({ isOn })
-  const fixedStyles = _getFixedStyles({ isOn, isInverted, orientation, knobSize })
+  const fixedStyles = _getFixedStyles({ knobSize, orientation, isInverted, isOn })
 
   return (
-    <label {...props} ref={ref} className={clsx(className, fixedClassNames.root)} style={styles(style, fixedStyles.root)}>
-      <input checked={isOn} style={fixedStyles.input} type='checkbox' onChange={event => onChange?.(event.target.checked)}/>
-      <Styled className={fixedClassNames.track} element={components.track ?? <_Track/>} style={fixedStyles.track}>
-        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-          <Styled ref={knobRef} className={fixedClassNames.knob} element={components.knob ?? <_Knob/>} style={fixedStyles.knob}/>
+    <label {...props} className={clsx(className, fixedClassNames.root)} ref={ref} style={styles(style, fixedStyles.root)}>
+      <input style={fixedStyles.input} checked={isOn} type='checkbox' onChange={event => onChange?.(event.target.checked)}/>
+      <Styled className={fixedClassNames.track} style={fixedStyles.track} element={components.track ?? <_Track/>}>
+        <div style={{ height: '100%', position: 'relative', width: '100%' }}>
+          <Styled className={fixedClassNames.knob} ref={knobRef} style={fixedStyles.knob} element={components.knob ?? <_Knob/>}/>
         </div>
       </Styled>
     </label>
@@ -98,32 +99,21 @@ export const Toggle = /* #__PURE__ */ Object.assign(_Toggle, {
 
 function _getFixedClassNames({ isOn = false }) {
   return asClassNameDict({
-    root: clsx({ active: isOn }),
     knob: clsx({ active: isOn }),
+    root: clsx({ active: isOn }),
     track: clsx({ active: isOn }),
   })
 }
 
-function _getFixedStyles({ isOn = false, isInverted = false, knobSize = Size.zero, orientation = 'horizontal' }) {
+function _getFixedStyles({ knobSize = Size.zero, orientation = 'horizontal', isInverted = false, isOn = false }) {
   return asStyleDict({
-    root: {
-      alignItems: 'center',
-      display: 'flex',
-      justifyContent: 'start',
-      position: 'relative',
-      ...orientation === 'horizontal' ? {
-        flexDirection: 'row',
-      } : {
-        flexDirection: 'column',
-      },
-    },
     input: {
-      position: 'absolute',
-      top: 0,
+      height: 0,
       left: 0,
       opacity: 0,
+      position: 'absolute',
+      top: 0,
       width: 0,
-      height: 0,
     },
     knob: {
       position: 'absolute',
@@ -157,6 +147,17 @@ function _getFixedStyles({ isOn = false, isInverted = false, knobSize = Size.zer
         } : {
           visibility: 'hidden',
         },
+      },
+    },
+    root: {
+      alignItems: 'center',
+      display: 'flex',
+      justifyContent: 'start',
+      position: 'relative',
+      ...orientation === 'horizontal' ? {
+        flexDirection: 'row',
+      } : {
+        flexDirection: 'column',
       },
     },
     track: {

@@ -8,7 +8,7 @@ export namespace Repeat {
     /**
      * The children to repeat. This is omitted if `render` is provided.
      */
-    children?: ReactNode | ((index: number) => ReactNode)
+    children?: ((index: number) => ReactNode) | ReactNode
 
     /**
      * The number of times to repeat the children.
@@ -28,8 +28,8 @@ export namespace Repeat {
  * key.
  */
 export function Repeat({
-  count = 1,
   children,
+  count = 1,
   render,
 }: Readonly<Repeat.Props>) {
   return (

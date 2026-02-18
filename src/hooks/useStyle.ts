@@ -1,4 +1,5 @@
 import { useLayoutEffect } from 'react'
+
 import { getStyle } from '../utils/getStyle.js'
 import { setStyle } from '../utils/setStyle.js'
 
@@ -33,7 +34,7 @@ export function useStyle(name: string, value?: string, { target, isEnabled = tru
     if (!isEnabled) return
 
     const el = target ?? window.document.documentElement
-    const oldValue = getStyle(name, { target: el, computed: false })
+    const oldValue = getStyle(name, { computed: false, target: el })
 
     setStyle(name, value, { target: el })
 

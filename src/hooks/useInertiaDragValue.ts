@@ -1,6 +1,8 @@
-import isDeepEqual from 'fast-deep-equal/react'
-import { useEffect, useRef, useState, type Dispatch, type RefObject, type SetStateAction } from 'react'
 import type { Point } from 'spase'
+
+import isDeepEqual from 'fast-deep-equal/react'
+import { type Dispatch, type RefObject, type SetStateAction, useEffect, useRef, useState } from 'react'
+
 import { useInertiaDrag } from './useInertiaDrag.js'
 import { useLatest } from './useLatest.js'
 
@@ -34,7 +36,7 @@ export type UseDragValueOutput<T = [number, number]> = {
 /**
  * Type describing the options of {@link useInertiaDragValue}.
  */
-export type UseDragValueOptions<T = [number, number]> = Parameters<typeof useInertiaDrag>[1] & {
+export type UseDragValueOptions<T = [number, number]> = {
   /**
    * The initial associated value of this hook.
    */
@@ -53,7 +55,7 @@ export type UseDragValueOptions<T = [number, number]> = Parameters<typeof useIne
    * @returns The transformed value.
    */
   transform: (currentValue: T, dx: number, dy: number) => T
-}
+} & Parameters<typeof useInertiaDrag>[1]
 
 /**
  * Hook for adding dragging interaction to an element.
@@ -64,13 +66,13 @@ export type UseDragValueOptions<T = [number, number]> = Parameters<typeof useIne
  * @returns The states created for this effect.
  */
 export function useInertiaDragValue<T = [number, number]>(
-  target: HTMLElement | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | null | undefined,
+  target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined,
   {
     initialValue,
     transform,
-    onDragStart,
-    onDragMove,
     onDragEnd,
+    onDragMove,
+    onDragStart,
     ...options
   }: UseDragValueOptions<T>,
 ): UseDragValueOutput<T> {
@@ -112,9 +114,9 @@ export function useInertiaDragValue<T = [number, number]>(
   }
 
   useInertiaDrag(target, {
-    onDragStart: dragStartHandler,
-    onDragMove: dragMoveHandler,
     onDragEnd: dragEndHandler,
+    onDragMove: dragMoveHandler,
+    onDragStart: dragStartHandler,
     ...options,
   })
 
@@ -123,10 +125,10 @@ export function useInertiaDragValue<T = [number, number]>(
   }, [value])
 
   return {
+    setValue,
+    value,
     isDragging,
     isReleasing,
-    value,
-    setValue,
   }
 }
 

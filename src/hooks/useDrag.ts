@@ -1,5 +1,6 @@
-import { useCallback, useLayoutEffect, useRef, type RefObject } from 'react'
+import { type RefObject, useCallback, useLayoutEffect, useRef } from 'react'
 import { Point } from 'spase'
+
 import { useLatest } from './useLatest.js'
 
 /**
@@ -55,13 +56,13 @@ export type UseDragOptions = {
  * @returns The states created for this effect.
  */
 export function useDrag(
-  target: HTMLElement | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | null | undefined,
+  target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined,
   {
-    isEnabled = true,
     updatesCursor = true,
-    onDragStart,
-    onDragMove,
+    isEnabled = true,
     onDragEnd,
+    onDragMove,
+    onDragStart,
   }: UseDragOptions,
 ) {
   const startPositionRef = useRef<Point>(undefined)

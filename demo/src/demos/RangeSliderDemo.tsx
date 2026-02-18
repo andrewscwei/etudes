@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import { RangeSlider } from 'etudes'
 import { useState } from 'react'
+
 import { Frame } from '../components/Frame.js'
 
 export function RangeSliderDemo() {
@@ -20,14 +21,13 @@ export function RangeSliderDemo() {
         setMax(100)
       }}
     >
-      {({ isClipped, orientation }, toast) => (
+      {({ orientation, isClipped }, toast) => (
         <RangeSlider
           className={clsx('relative', {
             'h-1 w-44': orientation === 'horizontal',
             'h-32 w-1': orientation === 'vertical',
           })}
           decimalPlaces={0}
-          isClipped={isClipped === 'true'}
           knobHeight={28}
           knobWidth={40}
           max={100}
@@ -35,6 +35,7 @@ export function RangeSliderDemo() {
           orientation={orientation as any}
           range={[min, max]}
           steps={99}
+          isClipped={isClipped === 'true'}
           onChange={range => {
             setMin(range[0])
             setMax(range[1])

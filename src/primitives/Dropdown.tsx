@@ -1,5 +1,6 @@
 import clsx from 'clsx'
-import { forwardRef, useEffect, useRef, useState, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
+import { type ComponentType, forwardRef, type HTMLAttributes, type ReactElement, type Ref, useEffect, useRef, useState } from 'react'
+
 import { useRect } from '../hooks/useRect.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
@@ -9,24 +10,26 @@ import { Collection } from './Collection.js'
 
 const _Dropdown = /* #__PURE__ */ forwardRef((
   {
-    children,
     className,
     style,
+    children,
     collapsesOnSelect = true,
     collectionPadding = 0,
-    isCollapsed: externalIsCollapsed,
-    isInverted = false,
-    label,
-    layout = 'list',
-    isSelectionTogglable = false,
+    ItemComponent,
     itemLength: externalItemLength,
     itemPadding = 0,
     items = [],
+    label,
+    layout = 'list',
     maxVisibleItems = -1,
     numSegments = 1,
     orientation = 'vertical',
     selection: externalSelection = [],
     selectionMode = 'single',
+    ToggleComponent,
+    isCollapsed: externalIsCollapsed,
+    isInverted = false,
+    isSelectionTogglable = false,
     onActivateAt,
     onCollapse,
     onDeselectAt,
@@ -34,8 +37,6 @@ const _Dropdown = /* #__PURE__ */ forwardRef((
     onSelectAt,
     onSelectionChange,
     onToggleCustomEvent,
-    ItemComponent,
-    ToggleComponent,
     ...props
   },
   ref,
@@ -50,7 +51,7 @@ const _Dropdown = /* #__PURE__ */ forwardRef((
   const selection = _sanitizeSelection(externalSelection, items)
   const [isCollapsed, setIsCollapsed] = useState(externalIsCollapsed ?? true)
 
-  const fixedStyles = _getFixedStyles({ isCollapsed, collectionPadding, isInverted, maxVisibleItems, menuLength, numItems, orientation })
+  const fixedStyles = _getFixedStyles({ collectionPadding, maxVisibleItems, menuLength, numItems, orientation, isCollapsed, isInverted })
 
   const components = asComponentDict(children, {
     collapseIcon: _CollapseIcon,
@@ -77,8 +78,7 @@ const _Dropdown = /* #__PURE__ */ forwardRef((
   const toggleClickHandler = () => {
     if (isCollapsed) {
       expand()
-    }
-    else {
+    } else {
       collapse()
     }
   }
@@ -131,42 +131,42 @@ const _Dropdown = /* #__PURE__ */ forwardRef((
   return (
     <div
       {...props}
-      ref={ref}
       className={clsx(className, { collapsed: isCollapsed, expanded: !isCollapsed })}
+      ref={ref}
       style={styles(style, fixedStyles.root)}
     >
       <div ref={bodyRef} style={styles(fixedStyles.body)}>
         {ToggleComponent ? (
           <ToggleComponent
-            aria-expanded={!isCollapsed}
-            aria-haspopup='listbox'
             className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
             style={styles(fixedStyles.toggle)}
+            aria-expanded={!isCollapsed}
+            aria-haspopup='listbox'
             onClick={toggleClickHandler}
             onCustomEvent={(name, info) => onToggleCustomEvent?.(name, info)}
           />
         ) : (
           <Styled
+            className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
+            style={styles(fixedStyles.toggle)}
             aria-expanded={!isCollapsed}
             aria-haspopup='listbox'
-            className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
             element={components.toggle ?? <_Toggle/>}
-            style={styles(fixedStyles.toggle)}
             onClick={toggleClickHandler}
           >
             <span dangerouslySetInnerHTML={{ __html: label?.(selection) ?? (selection.length > 0 ? selection.map(t => items[t]).join(', ') : '') }}/>
             {components.expandIcon && (
               <Styled
                 className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
-                element={isCollapsed ? (components.collapseIcon ?? components.expandIcon) : components.expandIcon}
                 style={styles(isCollapsed ? fixedStyles.collapseIcon : fixedStyles.expandIcon)}
+                element={isCollapsed ? (components.collapseIcon ?? components.expandIcon) : components.expandIcon}
               />
             )}
           </Styled>
         )}
         <Styled
+          style={styles(fixedStyles.collection)}
           element={components.collection ?? <_Collection/>}
-          isSelectionTogglable={isSelectionTogglable}
           ItemComponent={ItemComponent}
           itemLength={itemLength}
           itemPadding={itemPadding}
@@ -176,7 +176,7 @@ const _Dropdown = /* #__PURE__ */ forwardRef((
           orientation={orientation}
           selection={selection}
           selectionMode={selectionMode}
-          style={styles(fixedStyles.collection)}
+          isSelectionTogglable={isSelectionTogglable}
           onActivateAt={onActivateAt}
           onDeselectAt={onDeselectAt}
           onSelectAt={selectAtHandler}
@@ -187,7 +187,7 @@ const _Dropdown = /* #__PURE__ */ forwardRef((
       </div>
     </div>
   )
-}) as <T>(props: Readonly<Dropdown.Props<T> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
+}) as <T>(props: Readonly<{ ref?: Ref<HTMLDivElement> } & Dropdown.Props<T>>) => ReactElement
 
 const _Collection = Collection
 
@@ -222,7 +222,7 @@ export namespace Dropdown {
    * Type describing the props of `ToggleComponent` provided to
    * {@link Dropdown}.
    */
-  export type ToggleProps = HTMLAttributes<HTMLButtonElement> & {
+  export type ToggleProps = {
     /**
      * Handler invoked to dispatch a custom event.
      *
@@ -230,7 +230,7 @@ export namespace Dropdown {
      * @param info User-defined info of the custom event.
      */
     onCustomEvent?: (name: string, info?: any) => void
-  }
+  } & HTMLAttributes<HTMLButtonElement>
 
   /**
    * Type describing the props of `ItemComponent` provided to {@link Dropdown}.
@@ -240,7 +240,7 @@ export namespace Dropdown {
   /**
    * Type describing the props of {@link Dropdown}.
    */
-  export type Props<T> = HTMLAttributes<HTMLDivElement> & Collection.Props<T> & {
+  export type Props<T> = {
     /**
      * Specifies if the internal collection collapses when an item is selected.
      * This only works if `selectionMode` is `single`.
@@ -303,7 +303,7 @@ export namespace Dropdown {
      * the component. When absent, one will be generated automatically.
      */
     ToggleComponent?: ComponentType<ToggleProps>
-  }
+  } & Collection.Props<T> & HTMLAttributes<HTMLDivElement>
 }
 
 /**
@@ -373,50 +373,34 @@ function _getNumVisibleItems<T>(items: T[], maxVisible: number, numSegments: num
   }
 }
 
-function _getFixedStyles({ isCollapsed = true, isInverted = false, collectionPadding = 0, maxVisibleItems = 0, menuLength = NaN, numItems = 0, orientation = 'vertical' }) {
+function _getFixedStyles({ collectionPadding = 0, maxVisibleItems = 0, menuLength = NaN, numItems = 0, orientation = 'vertical', isCollapsed = true, isInverted = false }) {
   return asStyleDict({
-    root: {
-      alignItems: 'center',
-      display: 'flex',
-      justifyContent: 'flex-start',
-      overflow: 'visible',
-      ...orientation === 'vertical' ? {
-        flexDirection: isInverted ? 'column-reverse' : 'column',
-      } : {
-        flexDirection: isInverted ? 'row-reverse' : 'row',
-      },
-    },
     body: {
       height: '100%',
       position: 'relative',
       width: '100%',
     },
-    toggle: {
-      height: '100%',
-      left: '0',
-      margin: '0',
-      position: 'absolute',
-      top: '0',
-      width: '100%',
-      zIndex: '1',
+    collapseIcon: {
+      pointerEvents: 'none',
+      zIndex: 1,
     },
     collection: {
       position: 'absolute',
       ...orientation === 'vertical' ? {
-        width: '100%',
         height: isCollapsed ? '0px' : `${menuLength}px`,
         overflowY: maxVisibleItems !== -1 && maxVisibleItems < numItems ? 'scroll' : 'hidden',
+        width: '100%',
         ...isInverted ? {
-          marginBottom: `${collectionPadding}px`,
           bottom: '100%',
+          marginBottom: `${collectionPadding}px`,
         } : {
-          top: '100%',
           marginTop: `${collectionPadding}px`,
+          top: '100%',
         },
       } : {
-        width: isCollapsed ? '0px' : `${menuLength}px`,
         height: '100%',
         overflowX: maxVisibleItems !== -1 && maxVisibleItems < numItems ? 'scroll' : 'hidden',
+        width: isCollapsed ? '0px' : `${menuLength}px`,
         ...isInverted ? {
           marginRight: `${collectionPadding}px`,
           right: '100%',
@@ -430,9 +414,25 @@ function _getFixedStyles({ isCollapsed = true, isInverted = false, collectionPad
       pointerEvents: 'none',
       zIndex: 1,
     },
-    collapseIcon: {
-      pointerEvents: 'none',
-      zIndex: 1,
+    root: {
+      alignItems: 'center',
+      display: 'flex',
+      justifyContent: 'flex-start',
+      overflow: 'visible',
+      ...orientation === 'vertical' ? {
+        flexDirection: isInverted ? 'column-reverse' : 'column',
+      } : {
+        flexDirection: isInverted ? 'row-reverse' : 'row',
+      },
+    },
+    toggle: {
+      height: '100%',
+      left: '0',
+      margin: '0',
+      position: 'absolute',
+      top: '0',
+      width: '100%',
+      zIndex: '1',
     },
   })
 }

@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 /**
  * Type describing the operating system.
  */
-export type OS = 'windows' | 'macos' | 'linux' | 'ios' | 'android' | 'unknown'
+export type OS = 'android' | 'ios' | 'linux' | 'macos' | 'unknown' | 'windows'
 
 /**
  * Hook for detecting the operating system of the user.

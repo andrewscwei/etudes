@@ -4,12 +4,12 @@ export namespace Form {
   /**
    * Type describing the props of {@link Form}.
    */
-  export type Props = HTMLAttributes<HTMLFormElement> & {
+  export type Props = {
     /**
      * Handler invoked when the form is submitted.
      */
     onSubmit: () => void
-  }
+  } & HTMLAttributes<HTMLFormElement>
 }
 
 /**

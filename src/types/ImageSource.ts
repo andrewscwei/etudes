@@ -70,8 +70,7 @@ export namespace ImageSource {
         srcSet: resolveSourceSet(imageSource),
         type: imageSource.type,
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.error(`[etudes:ImageSource] ${error}`)
 
       return undefined
@@ -91,7 +90,7 @@ export namespace ImageSource {
       throw Error('At least one entry in `sourceSet` must be specified')
     }
 
-    sourceSet.forEach(({ src, width, pixelDensity }) => {
+    sourceSet.forEach(({ pixelDensity, src, width }) => {
       if (src === undefined || src === '') {
         throw Error('Each entry in `sourceSet` must have a non-empty `src`')
       }
@@ -116,8 +115,7 @@ export namespace ImageSource {
 
       if (width !== undefined) {
         res += ` ${width}w`
-      }
-      else if (pixelDensity !== undefined) {
+      } else if (pixelDensity !== undefined) {
         res += ` ${pixelDensity}x`
       }
 

@@ -1,17 +1,18 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import { forwardRef, useEffect, type ComponentType, type HTMLAttributes, type ReactElement, type Ref } from 'react'
+import { type ComponentType, forwardRef, type HTMLAttributes, type ReactElement, type Ref, useEffect } from 'react'
+
 import { Each } from '../flows/Each.js'
-import { Styled } from '../utils/Styled.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
+import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
 const _Collection = /* #__PURE__ */ forwardRef(({
   className,
-  children,
   style,
-  isSelectionTogglable = false,
+  children,
+  ItemComponent,
   itemLength,
   itemPadding = 0,
   items = [],
@@ -20,12 +21,12 @@ const _Collection = /* #__PURE__ */ forwardRef(({
   orientation = 'vertical',
   selection: externalSelection,
   selectionMode = 'none',
+  isSelectionTogglable = false,
   onActivateAt,
-  onDeselectAt,
   onCustomEvent,
+  onDeselectAt,
   onSelectAt,
   onSelectionChange,
-  ItemComponent,
   ...props
 }, ref) => {
   const selection = _sanitizeSelection(externalSelection ?? [], items)
@@ -36,8 +37,7 @@ const _Collection = /* #__PURE__ */ forwardRef(({
   const toggleAt = (index: number) => {
     if (isSelectedAt(index)) {
       deselectAt(index)
-    }
-    else {
+    } else {
       selectAt(index)
     }
   }
@@ -83,8 +83,7 @@ const _Collection = /* #__PURE__ */ forwardRef(({
 
     if (isSelectionTogglable) {
       toggleAt(index)
-    }
-    else {
+    } else {
       selectAt(index)
     }
   }
@@ -127,11 +126,11 @@ const _Collection = /* #__PURE__ */ forwardRef(({
   return (
     <div
       {...props}
-      ref={ref}
-      aria-multiselectable={selectionMode === 'multiple'}
       className={clsx(className)}
-      role={layout === 'grid' ? 'grid' : (selectionMode === 'none' ? 'list' : 'listbox')}
+      ref={ref}
       style={styles(style, fixedStyles.root)}
+      aria-multiselectable={selectionMode === 'multiple'}
+      role={layout === 'grid' ? 'grid' : (selectionMode === 'none' ? 'list' : 'listbox')}
     >
       <Each in={items}>
         {(val, idx) => {
@@ -153,28 +152,27 @@ const _Collection = /* #__PURE__ */ forwardRef(({
           if (ItemComponent) {
             return (
               <ItemComponent
-                aria-selected={isSelected}
                 className={clsx({ active: isSelected })}
+                style={itemStyles}
+                aria-selected={isSelected}
                 index={idx}
-                isSelected={isSelectedAt(idx)}
                 item={val}
                 orientation={orientation}
                 role={role}
-                style={itemStyles}
+                isSelected={isSelectedAt(idx)}
                 onClick={() => activateAt(idx)}
                 onCustomEvent={(name, info) => onCustomEvent?.(idx, name, info)}
               />
             )
-          }
-          else {
+          } else {
             return (
               <Styled
-                aria-selected={isSelected}
                 className={clsx({ active: isSelected })}
+                style={itemStyles}
+                aria-selected={isSelected}
                 element={components.item ?? <_Item/>}
                 role={role}
                 selectionMode={selectionMode}
-                style={itemStyles}
                 onActivateAt={onActivateAt}
                 onClick={() => activateAt(idx)}
               >
@@ -186,13 +184,12 @@ const _Collection = /* #__PURE__ */ forwardRef(({
       </Each>
     </div>
   )
-}) as <T>(props: Readonly<Collection.Props<T> & { ref?: Ref<HTMLDivElement> }>) => ReactElement
+}) as <T>(props: Readonly<{ ref?: Ref<HTMLDivElement> } & Collection.Props<T>>) => ReactElement
 
-const _Item = ({ children, selectionMode, onActivateAt, ...props }: HTMLAttributes<HTMLDivElement | HTMLButtonElement> & Pick<Collection.Props<any>, 'selectionMode' | 'onActivateAt'>) => {
+const _Item = ({ children, selectionMode, onActivateAt, ...props }: HTMLAttributes<HTMLButtonElement | HTMLDivElement> & Pick<Collection.Props<any>, 'onActivateAt' | 'selectionMode'>) => {
   if (onActivateAt || selectionMode === 'single' || selectionMode === 'multiple') {
     return (<button {...props}>{children}</button>)
-  }
-  else {
+  } else {
     return (<div {...props}>{children}</div>)
   }
 }
@@ -208,7 +205,7 @@ export namespace Collection {
    *   - `list`: Items will be laid out in a list.
    *   - `grid`: Items will be laid out in a grid.
    */
-  export type Layout = 'list' | 'grid'
+  export type Layout = 'grid' | 'list'
 
   /**
    *  Type describing the item selection behavior of {@link Collection}:
@@ -217,7 +214,7 @@ export namespace Collection {
    *                selected item will be automatically deselected).
    *    - `multiple`: Multiple items can be selected simultaneously.
    */
-  export type SelectionMode = 'none' | 'single' | 'multiple'
+  export type SelectionMode = 'multiple' | 'none' | 'single'
 
   /**
    * Type describing the current item selection of {@link Collection}, composed
@@ -231,7 +228,7 @@ export namespace Collection {
    * Type describing the props of `ItemComponent` provided to
    * {@link Collection}.
    */
-  export type ItemProps<T> = HTMLAttributes<HTMLElement> & {
+  export type ItemProps<T> = {
     /**
      * The index of the item.
      */
@@ -259,12 +256,12 @@ export namespace Collection {
      * @param info Optional user-defined info of the custom event.
      */
     onCustomEvent?: (name: string, info?: any) => void
-  }
+  } & HTMLAttributes<HTMLElement>
 
   /**
    * Type describing the props of {@link Collection}.
    */
-  export type Props<T> = HTMLAttributes<HTMLDivElement> & {
+  export type Props<T> = {
     /**
      * Indicates if item selection can be toggled, i.e. they can be deselected
      * if selected again.
@@ -387,7 +384,7 @@ export namespace Collection {
      * be ignored.
      */
     ItemComponent?: ComponentType<ItemProps<T>>
-  }
+  } & HTMLAttributes<HTMLDivElement>
 }
 
 /**
@@ -422,6 +419,19 @@ function _sortIndices(indices: number[]): number[] {
 
 function _getFixedStyles({ itemLength = NaN, itemPadding = 0, layout = 'collection', numSegments = 1, orientation = 'vertical' }) {
   return asStyleDict({
+    item: {
+      counterIncrement: 'item-counter',
+      flex: '0 0 auto',
+      ...layout === 'list' ? {
+        ...orientation === 'vertical' ? {
+          height: isNaN(itemLength) ? undefined : `${itemLength}px`,
+          width: '100%',
+        } : {
+          height: '100%',
+          width: isNaN(itemLength) ? undefined : `${itemLength}px`,
+        },
+      } : {},
+    },
     root: {
       counterReset: 'item-counter',
       listStyle: 'none',
@@ -435,28 +445,15 @@ function _getFixedStyles({ itemLength = NaN, itemPadding = 0, layout = 'collecti
         display: 'grid',
         gap: `${itemPadding}px`,
         ...orientation === 'vertical' ? {
+          gridAutoFlow: 'row',
           gridAutoRows: isNaN(itemLength) ? undefined : `${itemLength}px`,
           gridTemplateColumns: `repeat(${numSegments}, 1fr)`,
-          gridAutoFlow: 'row',
         } : {
           gridAutoColumns: isNaN(itemLength) ? undefined : `${itemLength}px`,
-          gridTemplateRows: `repeat(${numSegments}, 1fr)`,
           gridAutoFlow: 'column',
+          gridTemplateRows: `repeat(${numSegments}, 1fr)`,
         },
       },
-    },
-    item: {
-      counterIncrement: 'item-counter',
-      flex: '0 0 auto',
-      ...layout === 'list' ? {
-        ...orientation === 'vertical' ? {
-          width: '100%',
-          height: isNaN(itemLength) ? undefined : `${itemLength}px`,
-        } : {
-          width: isNaN(itemLength) ? undefined : `${itemLength}px`,
-          height: '100%',
-        },
-      } : {},
     },
   })
 }

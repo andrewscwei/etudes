@@ -1,12 +1,13 @@
-import { forwardRef, useEffect, useRef, type ReactEventHandler, type RefObject, type VideoHTMLAttributes } from 'react'
+import { forwardRef, type ReactEventHandler, type RefObject, useEffect, useRef, type VideoHTMLAttributes } from 'react'
 import { type Size } from 'spase'
+
 import { useVideoSize } from '../hooks/useVideoSize.js'
 
 export namespace Video {
   /**
    * Type describing the props of {@link Video}.
    */
-  export type Props = Omit<VideoHTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'controls' | 'loop' | 'muted' | 'playsInline' | 'poster' | 'onCanPlay' | 'onEnded' | 'onPause' | 'onPlay' | 'onTimeUpdate'> & {
+  export type Props = {
     /**
      * Specifies if the video should loop.
      */
@@ -99,7 +100,7 @@ export namespace Video {
      * @param duration The duration of the video.
      */
     onTimeUpdate?: (currentTime: number, duration: number) => void
-  }
+  } & Omit<VideoHTMLAttributes<HTMLVideoElement>, 'autoPlay' | 'controls' | 'loop' | 'muted' | 'onCanPlay' | 'onEnded' | 'onPause' | 'onPlay' | 'onTimeUpdate' | 'playsInline' | 'poster'>
 }
 
 /**
@@ -116,11 +117,11 @@ export namespace Video {
 export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video.Props>>(({
   autoLoop = true,
   autoPlay = true,
-  hasControls = false,
-  isMuted = true,
   playsInline = true,
   posterSrc,
   src,
+  hasControls = false,
+  isMuted = true,
   onCanPlay,
   onEnd,
   onFullscreenChange,
@@ -136,9 +137,9 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video
   const localRef = useRef<HTMLVideoElement>(null)
   const videoRef = ref as RefObject<HTMLVideoElement> ?? localRef
   const size = useVideoSize(src, {
-    onLoadStart: onLoadMetadata,
     onLoadComplete: onLoadMetadataComplete,
     onLoadError: onLoadMetadataError,
+    onLoadStart: onLoadMetadata,
   })
 
   useEffect(() => {

@@ -1,14 +1,15 @@
 import { forwardRef, type HTMLAttributes, type SVGAttributes } from 'react'
-import { Styled } from '../utils/Styled.js'
+
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
+import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
 const _Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Dial.Props>>((
   {
-    children,
     style,
     angle = 0,
+    children,
     knobLength = 30,
     knobThickness = 10,
     radius = 50,
@@ -22,8 +23,8 @@ const _Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Dial.Props>>((
   const clampedKnobAngle = Math.max(0, Math.min(360, knobLength))
 
   const components = asComponentDict(children, {
-    track: _Track,
     knob: _Knob,
+    track: _Track,
   })
 
   const fixedStyles = _getFixedStyles({ angle, diameter })
@@ -31,7 +32,7 @@ const _Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Dial.Props>>((
   return (
     <div {...props} ref={ref} style={styles(style, fixedStyles.root)}>
       <div style={fixedStyles.trackContainer}>
-        <svg height={diameter} style={fixedStyles.svgContainer} viewBox={`0 0 ${diameter} ${diameter}`} width={diameter}>
+        <svg style={fixedStyles.svgContainer} height={diameter} viewBox={`0 0 ${diameter} ${diameter}`} width={diameter}>
           <Styled
             cx={radius}
             cy={radius}
@@ -69,7 +70,7 @@ export namespace Dial {
   /**
    * Type describing the props of {@link Dial}.
    */
-  export type Props = HTMLAttributes<HTMLDivElement> & {
+  export type Props = {
     /**
      * Current angle reading of the compass, between 0.0 - 360.0 degrees,
      * inclusive.
@@ -107,7 +108,7 @@ export namespace Dial {
      * `stroke-width` of the `<circle>` element.
      */
     trackThickness?: number
-  }
+  } & HTMLAttributes<HTMLDivElement>
 }
 
 /**
@@ -158,12 +159,8 @@ function _arcPath(x: number, y: number, radius: number, startAngle: number, endA
   return d.join(' ')
 }
 
-function _getFixedStyles({ diameter = 0, angle = 0 }) {
+function _getFixedStyles({ angle = 0, diameter = 0 }) {
   return asStyleDict({
-    root: {
-      height: `${diameter}px`,
-      width: `${diameter}px`,
-    },
     knobContainer: {
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
@@ -172,9 +169,19 @@ function _getFixedStyles({ diameter = 0, angle = 0 }) {
       left: '0',
       position: 'absolute',
       top: '0',
+      transform: `rotate(${(angle + 360) % 360}deg)`,
       transformOrigin: 'center',
       width: '100%',
-      transform: `rotate(${(angle + 360) % 360}deg)`,
+    },
+    root: {
+      height: `${diameter}px`,
+      width: `${diameter}px`,
+    },
+    svgContainer: {
+      overflow: 'visible',
+      position: 'absolute',
+      right: '0',
+      top: '0',
     },
     trackContainer: {
       height: '100%',
@@ -183,12 +190,6 @@ function _getFixedStyles({ diameter = 0, angle = 0 }) {
       top: '0',
       transformOrigin: 'center',
       width: '100%',
-    },
-    svgContainer: {
-      overflow: 'visible',
-      position: 'absolute',
-      right: '0',
-      top: '0',
     },
   })
 }

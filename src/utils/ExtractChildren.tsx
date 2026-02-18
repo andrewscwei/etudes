@@ -1,4 +1,5 @@
-import { Children, isValidElement, type HTMLAttributes } from 'react'
+import { Children, type HTMLAttributes, isValidElement } from 'react'
+
 import { cloneStyledElement } from './cloneStyledElement.js'
 
 /**
@@ -18,8 +19,7 @@ export function ExtractChildren({
       {Children.map(children, child => {
         if (isValidElement(child)) {
           return cloneStyledElement(child, { ...props })
-        }
-        else {
+        } else {
           return child
         }
       })}

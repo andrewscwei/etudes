@@ -1,5 +1,6 @@
-import { forwardRef, useRef, useState, type HTMLAttributes, type RefObject } from 'react'
+import { forwardRef, type HTMLAttributes, type RefObject, useRef, useState } from 'react'
 import { Size } from 'spase'
+
 import { useRect } from '../hooks/useRect.js'
 import { Picture } from '../primitives/Picture.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
@@ -9,16 +10,16 @@ import { styles } from '../utils/styles.js'
 
 const _CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverImage.Props>>((
   {
-    children,
+    style,
     alt,
     aspectRatio: externalAspectRatio = NaN,
-    sources,
+    children,
     loadingMode,
+    sources,
     src,
-    style,
-    onLoadStart,
     onLoadComplete,
     onLoadError,
+    onLoadStart,
     ...props
   },
   ref,
@@ -54,14 +55,14 @@ const _CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverIma
       style={styles(style, FIXED_STYLES.root)}
     >
       <Picture
-        alt={alt}
-        sources={sources}
-        src={src}
         style={styles(FIXED_STYLES.viewport, {
           height: `${imageSize.height}px`,
           maxWidth: 'unset',
           width: `${imageSize.width}px`,
         })}
+        alt={alt}
+        sources={sources}
+        src={src}
         onLoadComplete={onLoadComplete}
         onLoadError={onLoadError}
         onLoadStart={onLoadStart}
@@ -69,12 +70,12 @@ const _CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverIma
       />
       {components.viewport && (
         <Styled
-          element={components.viewport}
           style={styles(FIXED_STYLES.viewport, {
             height: `${imageSize.height}px`,
             pointerEvents: 'none',
             width: `${imageSize.width}px`,
           })}
+          element={components.viewport}
         />
       )}
       {components.content}
@@ -98,13 +99,13 @@ export namespace CoverImage {
   /**
    * Type describing the props of {@link CoverImage}.
    */
-  export type Props = Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<Picture.Props, 'alt' | 'loadingMode' | 'sources' | 'src' | 'onLoadStart' | 'onLoadComplete' | 'onLoadError'> & {
+  export type Props = {
     /**
      * The known aspect ratio of the image, expressed by width / height. If
      * unprovided, it will be inferred after loading the image.
      */
     aspectRatio?: number
-  }
+  } & Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<Picture.Props, 'alt' | 'loadingMode' | 'onLoadComplete' | 'onLoadError' | 'onLoadStart' | 'sources' | 'src'>
 }
 
 /**

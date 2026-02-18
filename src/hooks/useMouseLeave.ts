@@ -1,5 +1,6 @@
-import { useLayoutEffect, type RefObject } from 'react'
-import { Point, Rect, hitTest } from 'spase'
+import { type RefObject, useLayoutEffect } from 'react'
+import { hitTest, Point, Rect } from 'spase'
+
 import { useLatest } from './useLatest.js'
 
 type Options = {
@@ -16,7 +17,7 @@ type Options = {
  * @param options See {@link Options}.
  */
 export function useMouseLeave(
-  target: HTMLElement | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | null | undefined,
+  target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined,
   handler: () => void,
   {
     isEnabled = true,

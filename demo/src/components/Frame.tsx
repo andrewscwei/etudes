@@ -1,10 +1,10 @@
 import clsx from 'clsx'
 import { Button, Conditional, OptionButton, Repeat } from 'etudes'
-import { useState, type ReactNode } from 'react'
+import { type ReactNode, useState } from 'react'
 
 type Props = {
-  children: ReactNode | ((selectedOptions: Record<string, string>, toast: (feedback: string) => void) => ReactNode)
-  alignment?: 'start' | 'center' | 'end'
+  alignment?: 'center' | 'end' | 'start'
+  children: ((selectedOptions: Record<string, string>, toast: (feedback: string) => void) => ReactNode) | ReactNode
   options?: string[][]
   title: string
   usesMaxHeight?: boolean
@@ -23,8 +23,8 @@ function mapSelectedOptions(selectedOptions: string[]) {
 }
 
 export function Frame({
-  children,
   alignment = 'center',
+  children,
   options = [],
   title,
   usesMaxHeight = false,
@@ -46,11 +46,11 @@ export function Frame({
         <h2 className='text-sm'>{title}</h2>
         <Conditional if={options.length > 0 || !!onReset}>
           <Button
+            className='ia text-sm'
             action={() => {
               setSelectedOptions(options.map(o => o[0]))
               onReset?.()
             }}
-            className='ia text-sm'
           >
             Reset
           </Button>
@@ -73,9 +73,9 @@ export function Frame({
         </Conditional>
         <div
           className={clsx('os flex flex-1 items-center overflow-scroll p-3', {
-            'justify-start': alignment === 'start',
             'justify-center': alignment === 'center',
             'justify-end': alignment === 'end',
+            'justify-start': alignment === 'start',
           })}
         >
           {typeof children === 'function' ? children(mapSelectedOptions(selectedOptions), toast) : children}
@@ -83,8 +83,8 @@ export function Frame({
         <div className='absolute bottom-0 h-6 w-full'>
           <Conditional if={!!feedback}>
             <div
-              key={feedback}
               className='animate-fade bg-light/20 vb border-dark/40 flex h-full items-center justify-center truncate border-t px-3 text-center text-sm'
+              key={feedback}
             >
               {feedback.replace(/^<[0-9]+>/, '')}
             </div>

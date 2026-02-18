@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import { FlatSVG } from 'etudes'
+
 import $$GitHubIcon from '../assets/github-icon.svg?raw'
 
 type Props = {

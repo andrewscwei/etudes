@@ -4,9 +4,9 @@ export namespace TextArea {
   /**
    * Type describing the props of {@link TextArea}.
    */
-  export type Props = Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> & {
+  export type Props = {
     onChange: (value: string) => void
-  }
+  } & Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'>
 }
 
 /**

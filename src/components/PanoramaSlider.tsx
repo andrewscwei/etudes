@@ -1,6 +1,7 @@
 import clsx from 'clsx'
-import { forwardRef, useCallback, useRef, useState, type HTMLAttributes } from 'react'
+import { forwardRef, type HTMLAttributes, useCallback, useRef, useState } from 'react'
 import { Rect, type Size } from 'spase'
+
 import { useRect } from '../hooks/useRect.js'
 import { Panorama } from '../primitives/Panorama.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
@@ -23,10 +24,10 @@ const _PanoramaSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
     onAngleChange,
     onDragEnd,
     onDragStart,
+    onImageSizeChange,
     onLoadImageComplete,
     onLoadImageError,
     onLoadImageStart,
-    onImageSizeChange,
     onPositionChange,
     ...props
   },
@@ -40,7 +41,7 @@ const _PanoramaSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
 
   const getAspectRatio = useCallback(() => {
     if (!imageSize) return 0
-    const { width, height } = imageSize
+    const { height, width } = imageSize
     if (height === 0) return 0
 
     return width / height
@@ -75,26 +76,26 @@ const _PanoramaSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
   }, [onDragEnd])
 
   const components = asComponentDict(children, {
-    track: _Track,
-    reticle: _Reticle,
     indicator: _Indicator,
+    reticle: _Reticle,
+    track: _Track,
   })
 
-  const fixedStyles = _getFixedStyles({ autoDimension, panoramaRect, aspectRatio, reticleWidth })
+  const fixedStyles = _getFixedStyles({ aspectRatio, autoDimension, panoramaRect, reticleWidth })
 
   return (
     <div
       {...props}
-      ref={ref}
       className={clsx(className, { dragging: isDragging })}
+      ref={ref}
       style={styles(style, fixedStyles.root)}
     >
       <Panorama
         ref={panoramaRef}
+        style={fixedStyles.panorama}
         angle={angle}
         speed={speed}
         src={src}
-        style={fixedStyles.panorama}
         zeroAnchor={adjustedZeroAnchor}
         onAngleChange={onAngleChange}
         onDragEnd={dragEndHandler}
@@ -107,12 +108,12 @@ const _PanoramaSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
       />
       <div style={fixedStyles.body}>
         <div style={fixedStyles.controls}>
-          <Styled className={clsx({ dragging: isDragging })} element={components.track ?? <_Track/>} style={fixedStyles.track}/>
-          <Styled className={clsx({ dragging: isDragging })} element={components.reticle ?? <_Reticle/>} style={fixedStyles.reticle}/>
-          <Styled className={clsx({ dragging: isDragging })} element={components.track ?? <_Track/>} style={fixedStyles.track}/>
+          <Styled className={clsx({ dragging: isDragging })} style={fixedStyles.track} element={components.track ?? <_Track/>}/>
+          <Styled className={clsx({ dragging: isDragging })} style={fixedStyles.reticle} element={components.reticle ?? <_Reticle/>}/>
+          <Styled className={clsx({ dragging: isDragging })} style={fixedStyles.track} element={components.track ?? <_Track/>}/>
         </div>
       </div>
-      <Styled className={clsx({ dragging: isDragging })} element={components.indicator ?? <_Indicator/>} style={fixedStyles.indicator}/>
+      <Styled className={clsx({ dragging: isDragging })} style={fixedStyles.indicator} element={components.indicator ?? <_Indicator/>}/>
     </div>
   )
 })
@@ -133,7 +134,7 @@ export namespace PanoramaSlider {
   /**
    * Type describing the props of {@link PanoramaSlider}.
    */
-  export type Props = Panorama.Props & {
+  export type Props = {
     /**
      * Field-of-view (0.0 - 360.0 degrees, inclusive) that represents the size
      * of the reticle. 360 indicates the reticle covers the entire image. If
@@ -148,7 +149,7 @@ export namespace PanoramaSlider {
      * the component's height must be known, i.e. it is specified in the CSS).
      * Defaults to `width`.
      */
-    autoDimension?: 'width' | 'height'
+    autoDimension?: 'height' | 'width'
 
     /**
      * Size of the viewport that this component is controlling. A viewport can
@@ -157,7 +158,7 @@ export namespace PanoramaSlider {
      * If it is, this prop is ignored.
      */
     viewportSize?: Size
-  }
+  } & Panorama.Props
 }
 
 /**
@@ -186,15 +187,8 @@ export const PanoramaSlider = /* #__PURE__ */ Object.assign(_PanoramaSlider, {
   Track: _Track,
 })
 
-function _getFixedStyles({ autoDimension = 'width', panoramaRect = Rect.zero, aspectRatio = 0, reticleWidth = 0 }) {
+function _getFixedStyles({ aspectRatio = 0, autoDimension = 'width', panoramaRect = Rect.zero, reticleWidth = 0 }) {
   return asStyleDict({
-    root: {
-      ...autoDimension === 'width' ? {
-        width: `${panoramaRect.height * aspectRatio}px`,
-      } : {
-        height: `${panoramaRect.width / aspectRatio}px`,
-      },
-    },
     body: {
       height: '100%',
       left: '0',
@@ -202,10 +196,6 @@ function _getFixedStyles({ autoDimension = 'width', panoramaRect = Rect.zero, as
       pointerEvents: 'none',
       position: 'absolute',
       top: '0',
-      width: '100%',
-    },
-    panorama: {
-      height: '100%',
       width: '100%',
     },
     controls: {
@@ -219,14 +209,25 @@ function _getFixedStyles({ autoDimension = 'width', panoramaRect = Rect.zero, as
       top: '0',
       width: '100%',
     },
-    track: {
-      flex: '1 0 auto',
+    indicator: {
+      width: `${reticleWidth}px`,
+    },
+    panorama: {
+      height: '100%',
+      width: '100%',
     },
     reticle: {
       width: `${reticleWidth}px`,
     },
-    indicator: {
-      width: `${reticleWidth}px`,
+    root: {
+      ...autoDimension === 'width' ? {
+        width: `${panoramaRect.height * aspectRatio}px`,
+      } : {
+        height: `${panoramaRect.width / aspectRatio}px`,
+      },
+    },
+    track: {
+      flex: '1 0 auto',
     },
   })
 }

@@ -27,8 +27,7 @@ export function setStyle(name: string, value?: string, { target }: Options = {})
 
   if (value === undefined) {
     el.style.removeProperty(name)
-  }
-  else {
+  } else {
     el.style.setProperty(name, value)
   }
 }

@@ -1,4 +1,5 @@
 import { StrictMode } from 'react'
+
 import { Footer } from './components/Footer.js'
 import { Header } from './components/Header.js'
 import { AccordionDemo } from './demos/AccordionDemo.js'

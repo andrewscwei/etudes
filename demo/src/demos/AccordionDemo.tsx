@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import { Accordion } from 'etudes'
 import { useState } from 'react'
+
 import $$ExpandIcon from '../assets/expand-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
 
@@ -11,11 +12,11 @@ export function AccordionDemo() {
   const [selection, setSelection] = useState<Accordion.Selection>([])
 
   const sections: Section[] = [{
+    itemLength: 36,
     items: ['1', '2', '3'],
     label: 'A',
     layout: 'grid',
     numSegments: 3,
-    itemLength: 36,
     isSelectionTogglable: true,
   }, {
     itemLength: 36,
@@ -23,8 +24,8 @@ export function AccordionDemo() {
     label: 'B',
     maxVisible: 2,
   }, {
-    items: ['1', '2', '3'],
     itemLength: 36,
+    items: ['1', '2', '3'],
     label: 'C',
   }]
 
@@ -45,12 +46,12 @@ export function AccordionDemo() {
     >
       {({ autoCollapseSections, orientation, selectionMode }, toast) => (
         <Accordion
+          className={clsx({
+            'h-44': orientation === 'horizontal',
+            'self-start mx-auto w-44': orientation === 'vertical',
+          })}
           key={orientation}
           autoCollapseSections={autoCollapseSections === 'true'}
-          className={clsx({
-            'self-start mx-auto w-44': orientation === 'vertical',
-            'h-44': orientation === 'horizontal',
-          })}
           expandedSectionIndices={expandedSectionIndices}
           orientation={orientation as any}
           sections={sections}

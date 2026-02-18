@@ -1,5 +1,6 @@
 import clsx from 'clsx'
-import { forwardRef, useEffect, useState, type HTMLAttributes } from 'react'
+import { forwardRef, type HTMLAttributes, useEffect, useState } from 'react'
+
 import { usePrevious } from '../hooks/usePrevious.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
@@ -9,9 +10,9 @@ import { TextField } from './TextField.js'
 
 const _Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Counter.Props>>((
   {
-    children,
     style,
     allowsInput = true,
+    children,
     max = NaN,
     min = NaN,
     quantity = 0,
@@ -37,8 +38,7 @@ const _Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Counter.Pro
 
     if (newQuantity !== quantity) {
       onChange?.(newQuantity)
-    }
-    else {
+    } else {
       setText(toString(newQuantity))
     }
   }
@@ -77,31 +77,31 @@ const _Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Counter.Pro
   }, [quantity, min, max])
 
   const components = asComponentDict(children, {
-    textField: _TextField,
     addButton: _AddButton,
     subscribeButton: _SubtractButton,
+    textField: _TextField,
   })
 
   return (
     <div {...props} ref={ref} style={styles(style, FIXED_STYLES.root)}>
       <Styled
         className={clsx({ disabled: isSubtractingDisabled })}
-        element={components.subscribeButton ?? <_SubtractButton/>}
         style={styles(FIXED_STYLES.subtract)}
+        element={components.subscribeButton ?? <_SubtractButton/>}
         onClick={() => handleSubtract()}
       />
       <Styled
-        element={components.textField ?? <_TextField/>}
-        isDisabled={!allowsInput}
         style={styles(FIXED_STYLES.textField)}
+        element={components.textField ?? <_TextField/>}
         value={text}
+        isDisabled={!allowsInput}
         onChange={handleInputProgress}
         onUnfocus={handleInputComplete}
       />
       <Styled
         className={clsx({ disabled: isAddingDisabled })}
-        element={components.addButton ?? <_AddButton/>}
         style={styles(FIXED_STYLES.add)}
+        element={components.addButton ?? <_AddButton/>}
         onClick={() => handleAdd()}
       />
     </div>
@@ -128,7 +128,7 @@ export namespace Counter {
   /**
    * Type describing the props of {@link Counter}.
    */
-  export type Props = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & {
+  export type Props = {
     /**
      * The minimum quantity that can be set.
      */
@@ -155,7 +155,7 @@ export namespace Counter {
      * @param quantity The new quantity.
      */
     onChange?: (quantity: number) => void
-  }
+  } & Omit<HTMLAttributes<HTMLElement>, 'onChange'>
 }
 
 /**
@@ -184,6 +184,9 @@ export const Counter = /* #__PURE__ */ Object.assign(_Counter, {
 })
 
 const FIXED_STYLES = asStyleDict({
+  add: {
+    flex: '0 0 auto',
+  },
   root: {
     alignItems: 'stretch',
     display: 'flex',
@@ -191,9 +194,6 @@ const FIXED_STYLES = asStyleDict({
     justifyContent: 'stretch',
   },
   subtract: {
-    flex: '0 0 auto',
-  },
-  add: {
     flex: '0 0 auto',
   },
   textField: {

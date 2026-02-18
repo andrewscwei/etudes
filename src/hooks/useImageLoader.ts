@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef } from 'react'
+
 import { useLatest } from './useLatest.js'
 
 /**
@@ -54,8 +55,8 @@ export type UseImageLoaderOptions = {
  * @param options See {@link UseImageLoaderOptions}.
  */
 export function useImageLoader(
-  { src, srcSet, sizes }: UseImageLoaderParams,
-  { onLoadStart, onLoadComplete, onLoadError }: UseImageLoaderOptions = {},
+  { sizes, src, srcSet }: UseImageLoaderParams,
+  { onLoadComplete, onLoadError, onLoadStart }: UseImageLoaderOptions = {},
 ) {
   const imageRef = useRef<HTMLImageElement>(undefined)
   const loadStartHandlerRef = useLatest(onLoadStart)

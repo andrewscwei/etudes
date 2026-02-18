@@ -5,7 +5,7 @@ export namespace FlatSVG {
   /**
    * Type describing the props of {@link FlatSVG}.
    */
-  export type Props = Omit<HTMLAttributes<HTMLElement>, 'role'> & {
+  export type Props = {
     /**
      * Specifies how the SVG should be resized:
      * - `preserve`: Default: the SVG size attributes are unchanged.
@@ -17,7 +17,7 @@ export namespace FlatSVG {
      * - `width`: The SVG will maintain its aspect ratio and fill the width of
      *   the container, i.e. `width="100%"` and `height="auto"`.
      */
-    fillMode?: 'preserve' | 'none' | 'fill' | 'height' | 'width'
+    fillMode?: 'fill' | 'height' | 'none' | 'preserve' | 'width'
 
     /**
      * The SVG string markup, i.e. "<svg>...</svg>".
@@ -47,7 +47,7 @@ export namespace FlatSVG {
      * removed in the SVG root node and all of its child nodes.
      */
     shouldStripStyles?: boolean
-  }
+  } & Omit<HTMLAttributes<HTMLElement>, 'role'>
 }
 
 /**
@@ -108,11 +108,11 @@ export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<FlatS
               attrs[`${attributeNamePrefix}width`] = '100%'
               attrs[`${attributeNamePrefix}height`] = '100%'
               break
-            case 'width':
-              attrs[`${attributeNamePrefix}width`] = '100%'
-              break
             case 'height':
               attrs[`${attributeNamePrefix}height`] = '100%'
+              break
+            case 'width':
+              attrs[`${attributeNamePrefix}width`] = '100%'
               break
             default:
               break

@@ -1,11 +1,11 @@
-import { forwardRef, useState, type HTMLAttributes } from 'react'
+import { forwardRef, type HTMLAttributes, useState } from 'react'
 import { Point } from 'spase'
 
 export namespace SwipeRegion {
   /**
    * Type describing the props of {@link SwipeRegion}.
    */
-  export type Props = Omit<HTMLAttributes<HTMLDivElement>, 'onMouseDown' | 'onMouseLeave' | 'onMouseMove' | 'onMouseUp' | 'onTouchEnd' | 'onTouchMove' | 'onTouchStart'> & {
+  export type Props = {
     /**
      * Specifies if swipe detection is enabled.
      */
@@ -36,7 +36,7 @@ export namespace SwipeRegion {
      * Handler invoked when a swipe up gesture is detected.
      */
     onSwipeUp?: () => void
-  }
+  } & Omit<HTMLAttributes<HTMLDivElement>, 'onMouseDown' | 'onMouseLeave' | 'onMouseMove' | 'onMouseUp' | 'onTouchEnd' | 'onTouchMove' | 'onTouchStart'>
 }
 
 /**
@@ -45,8 +45,8 @@ export namespace SwipeRegion {
 export const SwipeRegion = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<SwipeRegion.Props>>((
   {
     children,
-    isEnabled = true,
     threshold = 0.5,
+    isEnabled = true,
     onSwipeDown,
     onSwipeLeft,
     onSwipeRight,
@@ -96,16 +96,13 @@ export const SwipeRegion = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<S
       if (Math.abs(vx) >= threshold && Math.abs(vx) > Math.abs(vy)) {
         if (vx > 0) {
           onSwipeRight?.()
-        }
-        else {
+        } else {
           onSwipeLeft?.()
         }
-      }
-      else if (Math.abs(vy) >= threshold && Math.abs(vy) > Math.abs(vx)) {
+      } else if (Math.abs(vy) >= threshold && Math.abs(vy) > Math.abs(vx)) {
         if (vy > 0) {
           onSwipeDown?.()
-        }
-        else {
+        } else {
           onSwipeUp?.()
         }
       }

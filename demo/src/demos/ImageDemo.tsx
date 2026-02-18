@@ -1,4 +1,5 @@
 import { Image } from 'etudes'
+
 import $$Image from '../assets/image.png'
 import { Frame } from '../components/Frame.js'
 

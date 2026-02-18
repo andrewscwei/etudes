@@ -1,6 +1,7 @@
 import clsx from 'clsx'
-import { useCallback, useEffect, useRef, type CSSProperties, type HTMLAttributes } from 'react'
+import { type CSSProperties, type HTMLAttributes, useCallback, useEffect, useRef } from 'react'
 import { Rect, Size } from 'spase'
+
 import { useRect } from '../hooks/useRect.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { createKey } from '../utils/createKey.js'
@@ -10,7 +11,7 @@ import { styles } from '../utils/styles.js'
 /**
  * Type describing the alignment of the tooltip relative to the wrapped element.
  */
-type Alignment = 'tl' | 'tc' | 'tr' | 'cl' | 'cr' | 'bl' | 'bc' | 'br'
+type Alignment = 'bc' | 'bl' | 'br' | 'cl' | 'cr' | 'tc' | 'tl' | 'tr'
 
 /**
  * Type describing the styling options of the tooltip.
@@ -28,7 +29,7 @@ export namespace WithTooltip {
   /**
    * Type describing the props of {@link WithTooltip}.
    */
-  export type Props = Pick<HTMLAttributes<HTMLElement>, 'className' | 'children' | 'style'> & {
+  export type Props = {
     /**
      * Target alignment with respect to the wrapped element, automatically
      * computed if not provided.
@@ -66,7 +67,7 @@ export namespace WithTooltip {
      * the window required to trigger an alignment change, defaults to `100px`.
      */
     threshold?: number
-  }
+  } & Pick<HTMLAttributes<HTMLElement>, 'children' | 'className' | 'style'>
 }
 
 /**
@@ -74,12 +75,12 @@ export namespace WithTooltip {
  * string when the target element is hovered.
  */
 export function WithTooltip({
-  children,
   className,
   style,
   alignment: externalAlignment,
   arrowHeight = 6,
   arrowWidth = 12,
+  children,
   gap = 4,
   hint,
   maxWidth = 200,
@@ -97,7 +98,7 @@ export function WithTooltip({
 
     const alignment = externalAlignment ?? (targetRef.current ? _computeAlignment(targetRef.current, threshold) : 'tl')
     const fullDialogSize = _computeMaxSize(dialog)
-    const fixedStyles = _getFixedStyles({ alignment, arrowSize: Size.make(arrowWidth, arrowHeight), gap, maxDialogWidth: maxWidth, fullDialogWidth: fullDialogSize.width, targetWidth: targetRect.width })
+    const fixedStyles = _getFixedStyles({ alignment, arrowSize: Size.make(arrowWidth, arrowHeight), fullDialogWidth: fullDialogSize.width, gap, maxDialogWidth: maxWidth, targetWidth: targetRect.width })
 
     const dialogStyle = styles(style, fixedStyles.dialog)
     Object.keys(dialogStyle).forEach(rule => (dialog.style as any)[rule] = (dialogStyle as any)[rule])
@@ -186,31 +187,10 @@ function _makeDialogStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialo
   const shouldRealign = targetWidth > dialogWidth
 
   switch (alignment) {
-    case 'tl': return {
-      bottom: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
-      right: shouldRealign ? '' : '0',
-      left: shouldRealign ? '50%' : '',
-      transform: `translate(${dialogWidth > targetWidth ? '0' : '-50%'}, 0)`,
-    }
-    case 'tc': return {
-      bottom: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
+    case 'bc': return {
       left: '50%',
+      top: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
       transform: 'translateX(-50%)',
-    }
-    case 'tr': return {
-      bottom: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
-      left: shouldRealign ? '50%' : '0',
-      transform: `translate(${dialogWidth > targetWidth ? '0' : '-50%'}, 0)`,
-    }
-    case 'cl': return {
-      top: '50%',
-      right: `calc(100% + ${arrowSize.height + gap}px)`,
-      transform: 'translate(0, -50%)',
-    }
-    case 'cr': return {
-      top: '50%',
-      left: `calc(100% + ${arrowSize.height + gap}px)`,
-      transform: 'translate(0, -50%)',
     }
     case 'bl': return {
       left: shouldRealign ? '50%' : '',
@@ -218,14 +198,35 @@ function _makeDialogStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialo
       top: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
       transform: `translate(${dialogWidth > targetWidth ? '0' : '-50%'}, 0)`,
     }
-    case 'bc': return {
-      left: '50%',
-      top: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
-      transform: 'translateX(-50%)',
-    }
     case 'br': return {
       left: shouldRealign ? '50%' : '0',
       top: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
+      transform: `translate(${dialogWidth > targetWidth ? '0' : '-50%'}, 0)`,
+    }
+    case 'cl': return {
+      right: `calc(100% + ${arrowSize.height + gap}px)`,
+      top: '50%',
+      transform: 'translate(0, -50%)',
+    }
+    case 'cr': return {
+      left: `calc(100% + ${arrowSize.height + gap}px)`,
+      top: '50%',
+      transform: 'translate(0, -50%)',
+    }
+    case 'tc': return {
+      bottom: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
+      left: '50%',
+      transform: 'translateX(-50%)',
+    }
+    case 'tl': return {
+      bottom: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
+      left: shouldRealign ? '50%' : '',
+      right: shouldRealign ? '' : '0',
+      transform: `translate(${dialogWidth > targetWidth ? '0' : '-50%'}, 0)`,
+    }
+    case 'tr': return {
+      bottom: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
+      left: shouldRealign ? '50%' : '0',
       transform: `translate(${dialogWidth > targetWidth ? '0' : '-50%'}, 0)`,
     }
     default:
@@ -240,29 +241,29 @@ function _makeArrowStyle({ alignment, arrowSize, fullDialogWidth, maxDialogWidth
   const shouldRealign = targetWidth > dialogWidth
 
   switch (alignment) {
-    case 'tl': return {
-      bottom: 0,
-      clipPath: 'polygon(50% 100%,100% 0,0 0)',
+    case 'bc': return {
+      clipPath: 'polygon(50% 0,100% 100%,0 100%)',
+      height: `${arrowSize.height}px`,
+      left: '50%',
+      top: '0',
+      transform: 'translate(-50%, -100%)',
+      width: `${arrowSize.width}px`,
+    }
+    case 'bl': return {
+      clipPath: 'polygon(50% 0,100% 100%,0 100%)',
       height: `${arrowSize.height}px`,
       left: shouldRealign ? '50%' : '',
       right: shouldRealign ? '' : `${targetWidth - arrowSize.width / 2 - targetWidth / 2}px`,
-      transform: `translate(${shouldRealign ? '-50%' : '0'}, 100%)`,
+      top: '0',
+      transform: `translate(${shouldRealign ? '-50%' : '0'}, -100%)`,
       width: `${arrowSize.width}px`,
     }
-    case 'tc': return {
-      bottom: 0,
-      clipPath: 'polygon(50% 100%,100% 0,0 0)',
-      height: `${arrowSize.height}px`,
-      left: '50%',
-      transform: 'translate(-50%, 100%)',
-      width: `${arrowSize.width}px`,
-    }
-    case 'tr': return {
-      bottom: 0,
-      clipPath: 'polygon(50% 100%,100% 0,0 0)',
+    case 'br': return {
+      clipPath: 'polygon(50% 0,100% 100%,0 100%)',
       height: `${arrowSize.height}px`,
       left: shouldRealign ? '50%' : `${targetWidth - arrowSize.width / 2 - targetWidth / 2}px`,
-      transform: `translate(${shouldRealign ? '-50%' : '0'}, 100%)`,
+      top: '0',
+      transform: `translate(${shouldRealign ? '-50%' : '0'}, -100%)`,
       width: `${arrowSize.width}px`,
     }
     case 'cl': return {
@@ -281,29 +282,29 @@ function _makeArrowStyle({ alignment, arrowSize, fullDialogWidth, maxDialogWidth
       transform: 'translate(-100%, -50%)',
       width: `${arrowSize.height}px`,
     }
-    case 'bl': return {
-      clipPath: 'polygon(50% 0,100% 100%,0 100%)',
+    case 'tc': return {
+      bottom: 0,
+      clipPath: 'polygon(50% 100%,100% 0,0 0)',
+      height: `${arrowSize.height}px`,
+      left: '50%',
+      transform: 'translate(-50%, 100%)',
+      width: `${arrowSize.width}px`,
+    }
+    case 'tl': return {
+      bottom: 0,
+      clipPath: 'polygon(50% 100%,100% 0,0 0)',
       height: `${arrowSize.height}px`,
       left: shouldRealign ? '50%' : '',
       right: shouldRealign ? '' : `${targetWidth - arrowSize.width / 2 - targetWidth / 2}px`,
-      top: '0',
-      transform: `translate(${shouldRealign ? '-50%' : '0'}, -100%)`,
+      transform: `translate(${shouldRealign ? '-50%' : '0'}, 100%)`,
       width: `${arrowSize.width}px`,
     }
-    case 'bc': return {
-      clipPath: 'polygon(50% 0,100% 100%,0 100%)',
-      height: `${arrowSize.height}px`,
-      left: '50%',
-      top: '0',
-      transform: 'translate(-50%, -100%)',
-      width: `${arrowSize.width}px`,
-    }
-    case 'br': return {
-      clipPath: 'polygon(50% 0,100% 100%,0 100%)',
+    case 'tr': return {
+      bottom: 0,
+      clipPath: 'polygon(50% 100%,100% 0,0 0)',
       height: `${arrowSize.height}px`,
       left: shouldRealign ? '50%' : `${targetWidth - arrowSize.width / 2 - targetWidth / 2}px`,
-      top: '0',
-      transform: `translate(${shouldRealign ? '-50%' : '0'}, -100%)`,
+      transform: `translate(${shouldRealign ? '-50%' : '0'}, 100%)`,
       width: `${arrowSize.width}px`,
     }
     default:
@@ -315,6 +316,11 @@ function _makeArrowStyle({ alignment, arrowSize, fullDialogWidth, maxDialogWidth
 
 function _getFixedStyles({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }: StyleOptions) {
   return asStyleDict({
+    arrow: {
+      background: 'inherit',
+      position: 'absolute',
+      ..._makeArrowStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }),
+    },
     dialog: {
       boxSizing: 'border-box',
       height: 'auto',
@@ -326,11 +332,6 @@ function _getFixedStyles({ alignment, arrowSize, fullDialogWidth, gap, maxDialog
       whiteSpace: fullDialogWidth > maxDialogWidth ? 'normal' : 'pre',
       width: fullDialogWidth > maxDialogWidth ? `${maxDialogWidth}px` : '',
       ..._makeDialogStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }),
-    },
-    arrow: {
-      background: 'inherit',
-      position: 'absolute',
-      ..._makeArrowStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }),
     },
   })
 }

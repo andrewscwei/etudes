@@ -1,5 +1,6 @@
 import { TextArea } from 'etudes'
 import { useState } from 'react'
+
 import { Frame } from '../components/Frame.js'
 
 export function TextAreaDemo() {

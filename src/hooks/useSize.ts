@@ -1,5 +1,6 @@
 import { type RefObject, useState } from 'react'
 import { Rect, Size } from 'spase'
+
 import { useSizeObserver } from './useSizeObserver.js'
 
 /**
@@ -9,7 +10,7 @@ import { useSizeObserver } from './useSizeObserver.js'
  *
  * @returns The most current {@link Size} of the target element.
  */
-export function useSize(target: HTMLElement | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | null | undefined): Size {
+export function useSize(target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined): Size {
   const [size, setSize] = useState<Size>(Size.zero)
 
   useSizeObserver(target, el => {

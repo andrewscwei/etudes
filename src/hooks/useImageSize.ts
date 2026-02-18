@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { Size } from 'spase'
+
 import { useImageLoader, type UseImageLoaderOptions, type UseImageLoaderParams } from './useImageLoader.js'
 import { useLatest } from './useLatest.js'
 
@@ -11,13 +12,13 @@ export type UseImageSizeParams = UseImageLoaderParams
 /**
  * Type describing the options of {@link useImageSize}.
  */
-export type UseImageSizeOptions = UseImageLoaderOptions & {
+export type UseImageSizeOptions = {
   /**
    * If `false`, the size will be reset to `undefined` when the image begins
    * loading or when an error occurs. Defaults to `true`.
    */
   preservesSizeBetweenLoads?: boolean
-}
+} & UseImageLoaderOptions
 
 /**
  * Hook for retrieving the size of an image.
@@ -29,14 +30,14 @@ export type UseImageSizeOptions = UseImageLoaderOptions & {
  *          otherwise.
  */
 export function useImageSize({
+  sizes,
   src,
   srcSet,
-  sizes,
 }: UseImageSizeParams, {
   preservesSizeBetweenLoads = true,
-  onLoadStart,
   onLoadComplete,
   onLoadError,
+  onLoadStart,
 }: UseImageSizeOptions = {}): Size | undefined {
   const [size, setSize] = useState<Size | undefined>()
   const loadStartHandlerRef = useLatest(onLoadStart)
@@ -61,10 +62,10 @@ export function useImageSize({
     loadErrorHandlerRef.current?.(element)
   }, [preservesSizeBetweenLoads])
 
-  useImageLoader({ src, srcSet, sizes }, {
-    onLoadStart: loadStartHandler,
+  useImageLoader({ sizes, src, srcSet }, {
     onLoadComplete: loadCompleteHandler,
     onLoadError: loadErrorHandler,
+    onLoadStart: loadStartHandler,
   })
 
   return size

@@ -3,7 +3,7 @@
  *
  * @returns The system color scheme, either 'light' or 'dark'.
  */
-export function getSystemColorScheme(): 'light' | 'dark' {
+export function getSystemColorScheme(): 'dark' | 'light' {
   if (typeof window !== 'undefined' && window.matchMedia) {
     const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
 

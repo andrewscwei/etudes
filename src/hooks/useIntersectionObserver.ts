@@ -1,4 +1,5 @@
 import { type RefObject, useLayoutEffect } from 'react'
+
 import { useLatest } from './useLatest.js'
 
 /**
@@ -9,7 +10,7 @@ import { useLatest } from './useLatest.js'
  * @param handler Handler invoked when the intersection changes.
  */
 export function useIntersectionObserver(
-  target: HTMLElement | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | null | undefined,
+  target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined,
   handler: (element: HTMLElement) => void,
 ) {
   const handlerRef = useLatest(handler)

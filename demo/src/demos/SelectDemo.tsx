@@ -1,5 +1,6 @@
 import { Select } from 'etudes'
 import { useEffect, useState } from 'react'
+
 import $$ExpandIcon from '../assets/expand-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
 

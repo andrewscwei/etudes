@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import { CodeInput } from 'etudes'
 import { useEffect, useState } from 'react'
+
 import { Frame } from '../components/Frame.js'
 
 export function CodeInputDemo() {

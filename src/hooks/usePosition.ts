@@ -1,10 +1,11 @@
-import { useLayoutEffect, useRef, type DependencyList } from 'react'
+import { type DependencyList, useLayoutEffect, useRef } from 'react'
 import { Point, Rect } from 'spase'
+
 import { useLatest } from './useLatest.js'
 
 export type ScrollPositionInfo = {
-  minPos: Point
   maxPos: Point
+  minPos: Point
   pos: Point
   step: Point
 }
@@ -67,8 +68,8 @@ function _getScrollPositionInfo(): ScrollPositionInfo | undefined {
   const step = Point.make(refRect.left / refRectMax.left, refRect.top / refRectMax.top)
 
   return {
-    minPos: Point.make(refRectMin.left, refRectMin.top),
     maxPos: Point.make(refRectMax.left, refRectMax.top),
+    minPos: Point.make(refRectMin.left, refRectMin.top),
     pos: Point.make(refRect.left, refRect.top),
     step,
   }

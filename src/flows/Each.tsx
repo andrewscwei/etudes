@@ -8,7 +8,7 @@ export namespace Each {
     /**
      * The children to repeat. This is omitted if `render` is provided.
      */
-    children?: ReactNode | ((value: T, index: number) => ReactNode)
+    children?: ((value: T, index: number) => ReactNode) | ReactNode
 
     /**
      * The array of items to iterate over.
@@ -27,8 +27,8 @@ export namespace Each {
  * Component for rendering a list of items.
  */
 export function Each<T>({
-  in: array,
   children,
+  in: array,
   render,
 }: Readonly<Each.Props<T>>) {
   if (array === undefined || array === null) return <></>

@@ -27,13 +27,13 @@ export default defineConfig({
   ],
   test: {
     coverage: {
-      reporter: ['text-summary'],
       provider: 'v8',
+      reporter: ['text-summary'],
     },
-    passWithNoTests: true,
     include: [
       '**/*.spec.ts',
       '**/*.spec.tsx',
     ],
+    passWithNoTests: true,
   },
 })

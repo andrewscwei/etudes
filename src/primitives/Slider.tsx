@@ -1,6 +1,7 @@
 import clsx from 'clsx'
-import { forwardRef, useCallback, useEffect, useRef, type HTMLAttributes, type MouseEvent } from 'react'
+import { forwardRef, type HTMLAttributes, type MouseEvent, useCallback, useEffect, useRef } from 'react'
 import { Rect } from 'spase'
+
 import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
@@ -10,22 +11,22 @@ import { styles } from '../utils/styles.js'
 
 const _Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider.Props>>((
   {
-    children,
     className,
-    isClipped = false,
-    isInverted = false,
-    isTrackInteractive = true,
+    children,
     knobHeight = 30,
     knobPadding = 0,
     knobWidth = 30,
-    onlyDispatchesOnDragEnd = false,
+    labelProvider,
     orientation = 'vertical',
     position: externalPosition = 0,
     trackPadding = 0,
-    labelProvider,
+    isClipped = false,
+    isInverted = false,
+    isTrackInteractive = true,
+    onChange,
     onDragEnd,
     onDragStart,
-    onChange,
+    onlyDispatchesOnDragEnd = false,
     ...props
   },
   ref,
@@ -85,11 +86,11 @@ const _Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider.Props
     }
   }, [bodyRef.current, isInverted, isTrackInteractive, orientation])
 
-  const { isDragging, isReleasing, value: position, setValue: setPosition } = useInertiaDragValue(knobContainerRef, {
+  const { setValue: setPosition, value: position, isDragging, isReleasing } = useInertiaDragValue(knobContainerRef, {
     initialValue: externalPosition,
     transform: mapDragValueToPosition,
-    onDragStart,
     onDragEnd,
+    onDragStart,
   })
 
   // Natural position is the position affecting internal components accounting
@@ -98,7 +99,7 @@ const _Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider.Props
   const isAtEnd = isInverted ? position === 0 : position === 1
   const isAtStart = isInverted ? position === 1 : position === 0
   const fixedClassNames = _getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
-  const fixedStyles = _getFixedStyles({ orientation, isClipped, naturalPosition, knobPadding, knobHeight, knobWidth, isTrackInteractive })
+  const fixedStyles = _getFixedStyles({ knobHeight, knobPadding, knobWidth, naturalPosition, orientation, isClipped, isTrackInteractive })
 
   useEffect(() => {
     if (isDragging || externalPosition === position) return
@@ -125,16 +126,15 @@ const _Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider.Props
   return (
     <div
       {...props}
+      className={clsx(className, fixedClassNames.root)}
       ref={ref}
       aria-orientation={orientation}
       aria-valuenow={position}
-      className={clsx(className, fixedClassNames.root)}
       role='slider'
     >
       <div ref={bodyRef} style={fixedStyles.body}>
         <Styled
           className={clsx(isInverted ? 'end' : 'start', fixedClassNames.track)}
-          element={components.track ?? <_Track/>}
           style={styles(fixedStyles.track, orientation === 'vertical' ? {
             height: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
             top: '0',
@@ -142,13 +142,13 @@ const _Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider.Props
             left: '0',
             width: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
           })}
+          element={components.track ?? <_Track/>}
           onClick={trackClickHandler}
         >
           <div style={fixedStyles.trackHitBox}/>
         </Styled>
         <Styled
           className={clsx(isInverted ? 'start' : 'end', fixedClassNames.track)}
-          element={components.track ?? <_Track/>}
           style={styles(fixedStyles.track, orientation === 'vertical' ? {
             bottom: '0',
             height: `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
@@ -156,20 +156,21 @@ const _Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider.Props
             right: '0',
             width: `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
           })}
+          element={components.track ?? <_Track/>}
           onClick={trackClickHandler}
         >
           <div style={fixedStyles.trackHitBox}/>
         </Styled>
         <Styled
-          ref={knobContainerRef}
           className={clsx(fixedClassNames.knobContainer)}
-          element={components.knobContainer ?? <_KnobContainer/>}
+          ref={knobContainerRef}
           style={fixedStyles.knobContainer}
+          element={components.knobContainer ?? <_KnobContainer/>}
         >
-          <Styled className={clsx(fixedClassNames.knob)} element={components.knob ?? <_Knob/>} style={styles(fixedStyles.knob)}>
+          <Styled className={clsx(fixedClassNames.knob)} style={styles(fixedStyles.knob)} element={components.knob ?? <_Knob/>}>
             <div style={fixedStyles.knobHitBox}/>
             {labelProvider && (
-              <Styled className={clsx(fixedClassNames.label)} element={components.label ?? <_Label/>} style={styles(fixedStyles.label)}>
+              <Styled className={clsx(fixedClassNames.label)} style={styles(fixedStyles.label)} element={components.label ?? <_Label/>}>
                 {labelProvider(position)}
               </Styled>
             )}
@@ -205,7 +206,7 @@ export namespace Slider {
   /**
    * Type describing the props of {@link Slider}.
    */
-  export type Props = Omit<HTMLAttributes<HTMLDivElement>, 'aria-orientation' | 'aria-valuenow' | 'role' | 'onChange'> & {
+  export type Props = {
     /**
      * Specifies if the knob is clipped to the track.
      */
@@ -291,7 +292,7 @@ export namespace Slider {
      * Handler invoked when dragging begins.
      */
     onDragStart?: () => void
-  }
+  } & Omit<HTMLAttributes<HTMLDivElement>, 'aria-orientation' | 'aria-valuenow' | 'onChange' | 'role'>
 }
 
 /**
@@ -334,18 +335,6 @@ export const Slider = /* #__PURE__ */ Object.assign(_Slider, {
 
 function _getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtStart = false, isDragging = false, isReleasing = false }) {
   return asClassNameDict({
-    root: clsx(orientation, {
-      'at-end': isAtEnd,
-      'at-start': isAtStart,
-      'dragging': isDragging,
-      'releasing': isReleasing,
-    }),
-    track: clsx(orientation, {
-      'at-end': isAtEnd,
-      'at-start': isAtStart,
-      'dragging': isDragging,
-      'releasing': isReleasing,
-    }),
     knob: clsx(orientation, {
       'at-end': isAtEnd,
       'at-start': isAtStart,
@@ -364,14 +353,31 @@ function _getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtSt
       'dragging': isDragging,
       'releasing': isReleasing,
     }),
+    root: clsx(orientation, {
+      'at-end': isAtEnd,
+      'at-start': isAtStart,
+      'dragging': isDragging,
+      'releasing': isReleasing,
+    }),
+    track: clsx(orientation, {
+      'at-end': isAtEnd,
+      'at-start': isAtStart,
+      'dragging': isDragging,
+      'releasing': isReleasing,
+    }),
   })
 }
 
-function _getFixedStyles({ orientation = 'vertical', isClipped = false, naturalPosition = 0, knobPadding = 0, knobHeight = 0, knobWidth = 0, isTrackInteractive = true }) {
+function _getFixedStyles({ knobHeight = 0, knobPadding = 0, knobWidth = 0, naturalPosition = 0, orientation = 'vertical', isClipped = false, isTrackInteractive = true }) {
   return asStyleDict({
     body: {
       height: '100%',
       width: '100%',
+    },
+    knob: {
+      height: `${knobHeight}px`,
+      touchAction: 'none',
+      width: `${knobWidth}px`,
     },
     knobContainer: {
       background: 'none',
@@ -387,11 +393,6 @@ function _getFixedStyles({ orientation = 'vertical', isClipped = false, naturalP
         left: isClipped ? `calc(${naturalPosition * 100}% + ${knobWidth * 0.5 - naturalPosition * knobWidth}px)` : `${naturalPosition * 100}%`,
         top: '50%',
       },
-    },
-    knob: {
-      height: `${knobHeight}px`,
-      touchAction: 'none',
-      width: `${knobWidth}px`,
     },
     knobHitBox: {
       background: 'none',

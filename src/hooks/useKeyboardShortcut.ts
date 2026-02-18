@@ -1,31 +1,11 @@
 import { type KeyboardEvent, type RefObject, useEffect, useMemo } from 'react'
+
 import { useLatest } from './useLatest.js'
 
 /**
  * A type representing the keys that can be used in a keyboard shortcut.
  */
 export type KeyboardKey =
-  | 'backspace'
-  | 'tab'
-  | 'enter'
-  | 'shift'
-  | 'control'
-  | 'alt'
-  | 'pause'
-  | 'capslock'
-  | 'escape'
-  | 'space'
-  | 'pageup'
-  | 'pagedown'
-  | 'end'
-  | 'home'
-  | 'arrowleft'
-  | 'arrowup'
-  | 'arrowright'
-  | 'arrowdown'
-  | 'printscreen'
-  | 'insert'
-  | 'delete'
   | '0'
   | '1'
   | '2'
@@ -37,34 +17,31 @@ export type KeyboardKey =
   | '8'
   | '9'
   | 'a'
+  | 'alt'
+  | 'arrowdown'
+  | 'arrowleft'
+  | 'arrowright'
+  | 'arrowup'
+  | 'audiovolumedown'
+  | 'audiovolumemute'
+  | 'audiovolumeup'
   | 'b'
+  | 'backspace'
   | 'c'
-  | 'd'
-  | 'e'
-  | 'f'
-  | 'g'
-  | 'h'
-  | 'i'
-  | 'j'
-  | 'k'
-  | 'l'
-  | 'm'
-  | 'n'
-  | 'o'
-  | 'p'
-  | 'q'
-  | 'r'
-  | 's'
-  | 't'
-  | 'u'
-  | 'v'
-  | 'w'
-  | 'x'
-  | 'y'
-  | 'z'
-  | 'meta'
+  | 'capslock'
   | 'contextmenu'
+  | 'control'
+  | 'd'
+  | 'delete'
+  | 'e'
+  | 'end'
+  | 'enter'
+  | 'escape'
+  | 'f'
   | 'f1'
+  | 'f10'
+  | 'f11'
+  | 'f12'
   | 'f2'
   | 'f3'
   | 'f4'
@@ -73,18 +50,42 @@ export type KeyboardKey =
   | 'f7'
   | 'f8'
   | 'f9'
-  | 'f10'
-  | 'f11'
-  | 'f12'
-  | 'numlock'
-  | 'scrolllock'
-  | 'audiovolumemute'
-  | 'audiovolumedown'
-  | 'audiovolumeup'
+  | 'g'
+  | 'h'
+  | 'home'
+  | 'i'
+  | 'insert'
+  | 'j'
+  | 'k'
+  | 'l'
+  | 'm'
+  | 'mediaplaypause'
+  | 'mediastop'
   | 'mediatracknext'
   | 'mediatrackprevious'
-  | 'mediastop'
-  | 'mediaplaypause'
+  | 'meta'
+  | 'n'
+  | 'numlock'
+  | 'o'
+  | 'p'
+  | 'pagedown'
+  | 'pageup'
+  | 'pause'
+  | 'printscreen'
+  | 'q'
+  | 'r'
+  | 's'
+  | 'scrolllock'
+  | 'shift'
+  | 'space'
+  | 't'
+  | 'tab'
+  | 'u'
+  | 'v'
+  | 'w'
+  | 'x'
+  | 'y'
+  | 'z'
 
 /**
  * Options for the {@link useKeyboardShortcut} hook.
@@ -113,7 +114,7 @@ type Options = {
   /**
    * The target element to attach the event listener to. Defaults to `window`.
    */
-  target?: Window | HTMLElement | RefObject<Window | HTMLElement> | RefObject<Window | HTMLElement | null> | RefObject<Window | HTMLElement | undefined>
+  target?: HTMLElement | RefObject<HTMLElement | null | Window> | RefObject<HTMLElement | undefined | Window> | RefObject<HTMLElement | Window> | Window
 }
 
 /**
@@ -128,10 +129,10 @@ export function useKeyboardShortcut(
   action: () => void,
   {
     capture = false,
-    isEnabled = true,
     preventsDefault = true,
     stopsPropagation = true,
     target,
+    isEnabled = true,
   }: Options = {},
 ) {
   const actionRef = useLatest(action)

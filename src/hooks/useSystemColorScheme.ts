@@ -1,6 +1,6 @@
 import { useLayoutEffect, useState } from 'react'
 
-type ColorScheme = 'light' | 'dark'
+type ColorScheme = 'dark' | 'light'
 
 /**
  * Hook for getting the current system color scheme. The color scheme is updated

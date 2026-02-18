@@ -33,8 +33,7 @@ function _Switch<T>({
       if ((condition as (value: T) => boolean)((child.props as Switch.CaseProps<T>).value)) {
         return child
       }
-    }
-    else if (condition === (child.props as Switch.CaseProps<T>).value) {
+    } else if (condition === (child.props as Switch.CaseProps<T>).value) {
       return child
     }
   }
@@ -62,7 +61,7 @@ export namespace Switch {
      * value of each `Case` child. If it's a value, it will be compared with the
      * `value` prop of each `Case` child.
      */
-    condition: T | ((value: T) => boolean)
+    condition: ((value: T) => boolean) | T
   }>
 
   /**

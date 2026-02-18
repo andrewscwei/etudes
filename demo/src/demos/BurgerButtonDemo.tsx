@@ -1,5 +1,6 @@
 import { BurgerButton } from 'etudes'
 import { useState } from 'react'
+
 import { Frame } from '../components/Frame.js'
 
 export function BurgerButtonDemo() {
@@ -15,13 +16,13 @@ export function BurgerButtonDemo() {
       title='BurgerButton'
       onReset={() => setIsNavActive(false)}
     >
-      {({ isSplit, isTailHidden, numberOfBars }, toast) => (
+      {({ numberOfBars, isSplit, isTailHidden }, toast) => (
         <BurgerButton
           className='ia relative size-4'
+          numberOfBars={numberOfBars === '2' ? 2 : 3}
           isActive={isNavActive}
           isSplit={isSplit === 'true'}
           isTailHidden={isTailHidden === 'true'}
-          numberOfBars={numberOfBars === '2' ? 2 : 3}
           onToggle={t => {
             setIsNavActive(t)
             toast(t ? 'Active' : 'Inactive')

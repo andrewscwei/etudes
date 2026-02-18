@@ -1,7 +1,8 @@
-import { useLayoutEffect, type RefObject } from 'react'
+import { type RefObject, useLayoutEffect } from 'react'
+
 import { useLatest } from './useLatest.js'
 
-type Target = HTMLElement | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | null | undefined
+type Target = HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined
 
 type Options = {
   isEnabled?: boolean

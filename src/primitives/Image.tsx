@@ -1,5 +1,6 @@
-import { forwardRef, useEffect, type HTMLAttributes } from 'react'
+import { forwardRef, type HTMLAttributes, useEffect } from 'react'
 import { type Size } from 'spase'
+
 import { useImageSize } from '../hooks/useImageSize.js'
 import { ImageSource } from '../types/ImageSource.js'
 
@@ -7,7 +8,7 @@ export namespace Image {
   /**
    * Type describing the props of {@link Image}.
    */
-  export type Props = Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'loading' | 'sizes' | 'src' | 'srcSet' | 'onLoadStart'> & {
+  export type Props = {
     /**
      * Optional alt text.
      */
@@ -51,7 +52,7 @@ export namespace Image {
      * @param size Size of the loaded image.
      */
     onSizeChange?: (size?: Size) => void
-  }
+  } & Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'loading' | 'onLoadStart' | 'sizes' | 'src' | 'srcSet'>
 }
 
 /**
@@ -61,12 +62,12 @@ export namespace Image {
 export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<Image.Props>>((
   {
     alt,
-    source,
     loadingMode,
+    source,
     src: fallbackSrc,
-    onLoadStart,
     onLoadComplete,
     onLoadError,
+    onLoadStart,
     onSizeChange,
     ...props
   },
@@ -75,13 +76,13 @@ export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<Image
   const resolvedImageSource = source ? ImageSource.asProps(source) : undefined
 
   const size = useImageSize({
+    sizes: resolvedImageSource?.sizes,
     src: fallbackSrc,
     srcSet: resolvedImageSource?.srcSet,
-    sizes: resolvedImageSource?.sizes,
   }, {
-    onLoadStart,
     onLoadComplete,
     onLoadError,
+    onLoadStart,
   })
 
   useEffect(() => {

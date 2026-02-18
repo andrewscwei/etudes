@@ -1,18 +1,19 @@
 import clsx from 'clsx'
-import { forwardRef, type ButtonHTMLAttributes } from 'react'
+import { type ButtonHTMLAttributes, forwardRef } from 'react'
+
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { styles } from '../utils/styles.js'
 import { Burger } from './Burger.js'
 
 const _BurgerButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readonly<BurgerButton.Props>>(({
-  children,
   className,
   style,
-  isActive = false,
-  isTailHidden = false,
-  isSplit = false,
+  children,
   numberOfBars = 3,
+  isActive = false,
+  isSplit = false,
+  isTailHidden = false,
   onActivate,
   onDeactivate,
   onToggle,
@@ -25,8 +26,7 @@ const _BurgerButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readonly<Bur
 
     if (newIsActive) {
       onActivate?.()
-    }
-    else {
+    } else {
       onDeactivate?.()
     }
   }
@@ -42,17 +42,17 @@ const _BurgerButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readonly<Bur
   return (
     <button
       {...props}
-      ref={ref}
-      aria-expanded={isActive}
       className={clsx(className, fixedClassNames.root)}
+      ref={ref}
       style={styles(style, fixedStyles.root)}
+      aria-expanded={isActive}
       onClick={onClick}
     >
       <Burger
+        numberOfBars={numberOfBars}
         isActive={isActive}
         isSplit={isSplit}
         isTailHidden={isTailHidden}
-        numberOfBars={numberOfBars}
       >
         {children}
       </Burger>
@@ -69,7 +69,7 @@ export namespace BurgerButton {
   /**
    * Type describing the props of {@link BurgerButton}.
    */
-  export type Props = Omit<ButtonHTMLAttributes<HTMLButtonElement> & Burger.Props, 'onToggle'> & {
+  export type Props = {
     /**
      * Handler invoked when the button is activated.
      */
@@ -86,7 +86,7 @@ export namespace BurgerButton {
      * @param isActive The new active state of the button.
      */
     onToggle?: (isActive: boolean) => void
-  }
+  } & Omit<Burger.Props & ButtonHTMLAttributes<HTMLButtonElement>, 'onToggle'>
 }
 
 /**

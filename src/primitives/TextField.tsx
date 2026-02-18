@@ -1,11 +1,11 @@
 import clsx from 'clsx'
-import { forwardRef, useCallback, type ChangeEvent, type FocusEvent, type HTMLInputTypeAttribute, type InputHTMLAttributes } from 'react'
+import { type ChangeEvent, type FocusEvent, forwardRef, type HTMLInputTypeAttribute, type InputHTMLAttributes, useCallback } from 'react'
 
 export namespace TextField {
   /**
    * Type describing the props of {@link TextField}.
    */
-  export type Props = Omit<InputHTMLAttributes<HTMLInputElement>, 'aria-disabled' | 'aria-placeholder' | 'aria-required' | 'disabled' | 'placeholder' | 'required' | 'type' | 'value' | 'onBlur' | 'onChange' | 'onFocus'> & {
+  export type Props = {
     /**
      * The value to set to when the text field is empty.
      */
@@ -29,7 +29,7 @@ export namespace TextField {
     /**
      * The type of the text field.
      */
-    type?: Extract<HTMLInputTypeAttribute, 'text' | 'password' | 'search' | 'email' | 'tel' | 'url'>
+    type?: Extract<HTMLInputTypeAttribute, 'email' | 'password' | 'search' | 'tel' | 'text' | 'url'>
 
     /**
      * The value of the text field.
@@ -65,7 +65,7 @@ export namespace TextField {
      * @param value The new value of the text field.
      */
     onChange?: (value: string) => void
-  }
+  } & Omit<InputHTMLAttributes<HTMLInputElement>, 'aria-disabled' | 'aria-placeholder' | 'aria-required' | 'disabled' | 'onBlur' | 'onChange' | 'onFocus' | 'placeholder' | 'required' | 'type' | 'value'>
 }
 
 /**
@@ -75,15 +75,15 @@ export const TextField = /* #__PURE__ */ forwardRef<HTMLInputElement, Readonly<T
   {
     className,
     emptyValue = '',
-    isDisabled = false,
-    isRequired = false,
+    formatter,
     placeholder,
     type = 'text',
     value,
-    formatter,
+    isDisabled = false,
+    isRequired = false,
+    onChange,
     onFocus,
     onUnfocus,
-    onChange,
     ...props
   },
   ref,
@@ -98,10 +98,10 @@ export const TextField = /* #__PURE__ */ forwardRef<HTMLInputElement, Readonly<T
     <input
       {...props}
       {...isDisabled ? { 'aria-disabled': true } : {}}
+      className={clsx(className, { disabled: isDisabled })}
       ref={ref}
       aria-placeholder={placeholder}
       aria-required={isRequired}
-      className={clsx(className, { disabled: isDisabled })}
       disabled={isDisabled}
       placeholder={placeholder}
       required={isRequired}

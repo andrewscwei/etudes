@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+
 import { getDPR } from '../utils/getDPR.js'
 
 /**

@@ -1,7 +1,8 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttributes } from 'react'
+import { forwardRef, type HTMLAttributes, useCallback, useEffect, useRef, useState } from 'react'
 import { Rect } from 'spase'
+
 import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
 import { useRect } from '../hooks/useRect.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
@@ -13,10 +14,9 @@ import { styles } from '../utils/styles.js'
 
 const _RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<RangeSlider.Props>>((
   {
-    children,
     className,
+    children,
     decimalPlaces = 2,
-    isClipped = false,
     knobHeight = 28,
     knobPadding = 0,
     knobWidth = 40,
@@ -25,6 +25,7 @@ const _RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<RangeSl
     orientation = 'vertical',
     range: externalRange,
     steps = -1,
+    isClipped = false,
     onChange,
     ...props
   },
@@ -64,18 +65,18 @@ const _RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<RangeSl
     return _getValueByDisplacement(Math.max(dMin, Math.min(dMax, dCurr)), minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
   }, [knobWidth, knobHeight, isClipped, minValue, maxValue, orientation, range[0], Rect.toString(bodyRect)])
 
-  const { isDragging: isDraggingStartKnob, isReleasing: isReleasingStartKnob, value: startValue, setValue: setStartValue } = useInertiaDragValue(startKnobContainerRef, {
+  const { setValue: setStartValue, value: startValue, isDragging: isDraggingStartKnob, isReleasing: isReleasingStartKnob } = useInertiaDragValue(startKnobContainerRef, {
     initialValue: externalRange?.[0] ?? minValue,
     transform: mapStartDragValueToValue,
   })
 
-  const { isDragging: isDraggingEndKnob, isReleasing: isReleasingEndKnob, value: endValue, setValue: setEndValue } = useInertiaDragValue(endKnobContainerRef, {
+  const { setValue: setEndValue, value: endValue, isDragging: isDraggingEndKnob, isReleasing: isReleasingEndKnob } = useInertiaDragValue(endKnobContainerRef, {
     initialValue: externalRange?.[1] ?? maxValue,
     transform: mapEndDragValueToValue,
   })
 
   const fixedClassNames = _getFixedClassNames({ isDraggingEndKnob, isDraggingStartKnob, isReleasingEndKnob, isReleasingStartKnob })
-  const fixedStyles = _getFixedStyles({ orientation, highlightLength, start, knobPadding, knobWidth, knobHeight })
+  const fixedStyles = _getFixedStyles({ highlightLength, knobHeight, knobPadding, knobWidth, orientation, start })
 
   useEffect(() => {
     setRange([startValue, endValue])
@@ -105,20 +106,18 @@ const _RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<RangeSl
   return (
     <div
       {...props}
+      className={clsx(className, orientation)}
       ref={ref}
       aria-valuemax={maxValue}
       aria-valuemin={minValue}
-      className={clsx(className, orientation)}
       role='slider'
     >
       <div ref={bodyRef} style={fixedStyles.body}>
-        <Styled element={components.gutter ?? <_Gutter/>} style={styles(fixedStyles.gutter)}/>
-        <Styled element={components.highlight ?? <_Highlight/>} style={styles(fixedStyles.highlight)}/>
+        <Styled style={styles(fixedStyles.gutter)} element={components.gutter ?? <_Gutter/>}/>
+        <Styled style={styles(fixedStyles.highlight)} element={components.highlight ?? <_Highlight/>}/>
         <Styled
-          ref={startKnobContainerRef}
           className={fixedClassNames.startKnobContainer}
-          disabled={isDeepEqual([startValue, endValue], [minValue, minValue])}
-          element={components.knobContainer ?? <_KnobContainer/>}
+          ref={startKnobContainerRef}
           style={styles(fixedStyles.knobContainer, {
             pointerEvents: isDeepEqual([startValue, endValue], [minValue, minValue]) ? 'none' : 'auto',
           }, orientation === 'horizontal' ? {
@@ -128,21 +127,21 @@ const _RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<RangeSl
             left: `${bodyRect.width * 0.5}px`,
             top: `${start}px`,
           })}
+          disabled={isDeepEqual([startValue, endValue], [minValue, minValue])}
+          element={components.knobContainer ?? <_KnobContainer/>}
         >
-          <Styled className={fixedClassNames.startKnob} element={components.knob ?? <_Knob/>} style={styles(fixedStyles.knob)}>
+          <Styled className={fixedClassNames.startKnob} style={styles(fixedStyles.knob)} element={components.knob ?? <_Knob/>}>
             <div style={fixedStyles.knobHitBox}/>
             {components.label && (
-              <Styled className={fixedClassNames.startLabel} element={components.label ?? <_Label/>} style={styles(fixedStyles.label)}>
+              <Styled className={fixedClassNames.startLabel} style={styles(fixedStyles.label)} element={components.label ?? <_Label/>}>
                 {Number(startValue.toFixed(decimalPlaces)).toLocaleString()}
               </Styled>
             )}
           </Styled>
         </Styled>
         <Styled
-          ref={endKnobContainerRef}
           className={fixedClassNames.endKnobContainer}
-          disabled={isDeepEqual([startValue, endValue], [maxValue, maxValue])}
-          element={components.knobContainer ?? <_KnobContainer/>}
+          ref={endKnobContainerRef}
           style={styles(fixedStyles.knobContainer, {
             pointerEvents: isDeepEqual([startValue, endValue], [maxValue, maxValue]) ? 'none' : 'auto',
           }, orientation === 'horizontal' ? {
@@ -152,11 +151,13 @@ const _RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<RangeSl
             left: `${bodyRect.width * 0.5}px`,
             top: `${end}px`,
           })}
+          disabled={isDeepEqual([startValue, endValue], [maxValue, maxValue])}
+          element={components.knobContainer ?? <_KnobContainer/>}
         >
-          <Styled className={fixedClassNames.endKnob} element={components.knob ?? <_Knob/>} style={styles(fixedStyles.knob)}>
+          <Styled className={fixedClassNames.endKnob} style={styles(fixedStyles.knob)} element={components.knob ?? <_Knob/>}>
             <div style={fixedStyles.knobHitBox}/>
             {components.label && (
-              <Styled className={fixedClassNames.endLabel} element={components.label ?? <_Label/>} style={styles(fixedStyles.label)}>
+              <Styled className={fixedClassNames.endLabel} style={styles(fixedStyles.label)} element={components.label ?? <_Label/>}>
                 {Number(endValue.toFixed(decimalPlaces)).toLocaleString()}
               </Styled>
             )}
@@ -201,7 +202,7 @@ export namespace RangeSlider {
   /**
    * Type describing the props of {@link RangeSlider}.
    */
-  export type Props = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuemax' | 'aria-valuemin' | 'role' | 'onChange'> & {
+  export type Props = {
     /**
      * Number of decimal places to display.
      */
@@ -261,7 +262,7 @@ export namespace RangeSlider {
      * @param range The current range of values.
      */
     onChange?: (range: Range) => void
-  }
+  } & Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuemax' | 'aria-valuemin' | 'onChange' | 'role'>
 }
 
 /**
@@ -300,25 +301,13 @@ export const RangeSlider = /* #__PURE__ */ Object.assign(_RangeSlider, {
   Label: _Label,
 })
 
-function _getFixedClassNames({ isDraggingStartKnob = false, isReleasingStartKnob = false, isDraggingEndKnob = false, isReleasingEndKnob = false }) {
+function _getFixedClassNames({ isDraggingEndKnob = false, isDraggingStartKnob = false, isReleasingEndKnob = false, isReleasingStartKnob = false }) {
   return asClassNameDict({
-    startKnobContainer: clsx({
-      dragging: isDraggingStartKnob,
-      releasing: isReleasingStartKnob,
-    }),
-    startKnob: clsx({
-      dragging: isDraggingStartKnob,
-      releasing: isReleasingStartKnob,
-    }),
-    startLabel: clsx({
-      dragging: isDraggingStartKnob,
-      releasing: isReleasingStartKnob,
-    }),
-    endKnobContainer: clsx({
+    endKnob: clsx({
       dragging: isDraggingEndKnob,
       releasing: isReleasingEndKnob,
     }),
-    endKnob: clsx({
+    endKnobContainer: clsx({
       dragging: isDraggingEndKnob,
       releasing: isReleasingEndKnob,
     }),
@@ -326,10 +315,22 @@ function _getFixedClassNames({ isDraggingStartKnob = false, isReleasingStartKnob
       dragging: isDraggingEndKnob,
       releasing: isReleasingEndKnob,
     }),
+    startKnob: clsx({
+      dragging: isDraggingStartKnob,
+      releasing: isReleasingStartKnob,
+    }),
+    startKnobContainer: clsx({
+      dragging: isDraggingStartKnob,
+      releasing: isReleasingStartKnob,
+    }),
+    startLabel: clsx({
+      dragging: isDraggingStartKnob,
+      releasing: isReleasingStartKnob,
+    }),
   })
 }
 
-function _getFixedStyles({ orientation = 'horizontal', knobWidth = 0, knobHeight = 0, highlightLength = 0, start = 0, knobPadding = 0 }) {
+function _getFixedStyles({ highlightLength = 0, knobHeight = 0, knobPadding = 0, knobWidth = 0, orientation = 'horizontal', start = 0 }) {
   return asStyleDict({
     body: {
       height: '100%',
@@ -337,11 +338,11 @@ function _getFixedStyles({ orientation = 'horizontal', knobWidth = 0, knobHeight
     },
     gutter: {
       display: 'block',
-      top: '0',
+      height: '100%',
       left: '0',
       position: 'absolute',
+      top: '0',
       width: '100%',
-      height: '100%',
     },
     highlight: {
       left: '0',
@@ -349,13 +350,18 @@ function _getFixedStyles({ orientation = 'horizontal', knobWidth = 0, knobHeight
       top: '0',
       ...orientation === 'horizontal' ? {
         height: '100%',
-        width: `${highlightLength}px`,
         transform: `translate(${start}px, 0)`,
+        width: `${highlightLength}px`,
       } : {
         height: `${highlightLength}px`,
-        width: '100%',
         transform: `translate(0, ${start}px)`,
+        width: '100%',
       },
+    },
+    knob: {
+      height: `${knobHeight}px`,
+      touchAction: 'none',
+      width: `${knobWidth}px`,
     },
     knobContainer: {
       background: 'none',
@@ -364,11 +370,6 @@ function _getFixedStyles({ orientation = 'horizontal', knobWidth = 0, knobHeight
       position: 'absolute',
       transform: 'translate(-50%, -50%)',
       zIndex: '1',
-    },
-    knob: {
-      height: `${knobHeight}px`,
-      touchAction: 'none',
-      width: `${knobWidth}px`,
     },
     knobHitBox: {
       background: 'none',

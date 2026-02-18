@@ -100,17 +100,16 @@ function _get<T>(key: string): T | undefined {
     _invalidate(key)
 
     return undefined
-  }
-  else {
+  } else {
     return item.value
   }
 }
 
 function _set<T>(value: T, key: string, ttl: number): T {
   const item = {
-    value,
     timestamp: Date.now(),
     ttl,
+    value,
   }
 
   STORAGE?.setItem(key, JSON.stringify(item))

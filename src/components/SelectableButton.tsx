@@ -1,11 +1,11 @@
 import clsx from 'clsx'
-import { forwardRef, type ButtonHTMLAttributes } from 'react'
+import { type ButtonHTMLAttributes, forwardRef } from 'react'
 
 export namespace SelectableButton {
   /**
    * Type describing the props of {@link SelectableButton}.
    */
-  export type Props = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-disabled' | 'aria-label' | 'aria-selected' | 'disabled' | 'onClick' | 'onSelect' | 'onToggle'> & {
+  export type Props = {
     /**
      * Specifies if the button can be deselected.
      */
@@ -42,19 +42,19 @@ export namespace SelectableButton {
      * @param isSelected The new selected state of the button.
      */
     onToggle?: (isSelected: boolean) => void
-  }
+  } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-disabled' | 'aria-label' | 'aria-selected' | 'disabled' | 'onClick' | 'onSelect' | 'onToggle'>
 }
 
 /**
  * A button component that can be selected or deselected.
  */
 export const SelectableButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readonly<SelectableButton.Props>>(({
-  children,
   className,
+  children,
+  label,
   isDeselectable = false,
   isDisabled = false,
   isSelected = false,
-  label,
   onDeselect,
   onSelect,
   onToggle,
@@ -67,8 +67,7 @@ export const SelectableButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Re
       if (!isDeselectable) return
       onToggle?.(isSelected)
       onDeselect?.()
-    }
-    else {
+    } else {
       onToggle?.(isSelected)
       onSelect?.()
     }
@@ -78,10 +77,10 @@ export const SelectableButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Re
     <button
       {...props}
       {...isDisabled ? { 'aria-disabled': true } : {}}
+      className={clsx(className, { active: isSelected, disabled: isDisabled || (isSelected && !isDeselectable) })}
       ref={ref}
       aria-label={label}
       aria-selected={isSelected}
-      className={clsx(className, { active: isSelected, disabled: isDisabled || (isSelected && !isDeselectable) })}
       disabled={isDisabled || (isSelected && !isDeselectable)}
       onClick={onClick}
     >

@@ -1,5 +1,6 @@
-import { forwardRef, useCallback, useEffect, useRef, useState, type HTMLAttributes } from 'react'
+import { forwardRef, type HTMLAttributes, useCallback, useEffect, useRef, useState } from 'react'
 import { Rect, Size } from 'spase'
+
 import { useImageSize } from '../hooks/useImageSize.js'
 import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
 import { useRect } from '../hooks/useRect.js'
@@ -9,7 +10,7 @@ export namespace Panorama {
   /**
    * Type describing the props of {@link Panorama}.
    */
-  export type Props = Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'role'> & {
+  export type Props = {
     /**
      * The current angle in degrees, 0.0 - 360.0, inclusive. When angle is 0 or
      * 360, the `zeroAnchor` position of the image is at the left bound of the
@@ -90,7 +91,7 @@ export namespace Panorama {
      *               yet, the size is `undefined`.
      */
     onImageSizeChange?: (size?: Size) => void
-  }
+  } & Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'role'>
 }
 
 /**
@@ -104,13 +105,13 @@ export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
     src,
     zeroAnchor = 0,
     onAngleChange,
-    onPositionChange,
-    onDragStart,
     onDragEnd,
-    onLoadImageStart,
+    onDragStart,
+    onImageSizeChange,
     onLoadImageComplete,
     onLoadImageError,
-    onImageSizeChange,
+    onLoadImageStart,
+    onPositionChange,
     ...props
   },
   ref,
@@ -124,17 +125,17 @@ export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
   const bodyRef = useRef<HTMLDivElement>(null)
   const bodyRect = useRect(bodyRef)
   const imageSize = useImageSize({ src }, {
-    onLoadStart: onLoadImageStart,
     onLoadComplete: onLoadImageComplete,
     onLoadError: onLoadImageError,
+    onLoadStart: onLoadImageStart,
   })
   const [angle, setAngle] = useState(externalAngle)
 
-  const { isDragging, value: displacement, setValue: setDisplacement } = useInertiaDragValue(bodyRef, {
+  const { setValue: setDisplacement, value: displacement, isDragging } = useInertiaDragValue(bodyRef, {
     initialValue: 0,
     transform: mapDragPositionToDisplacement,
-    onDragStart,
     onDragEnd,
+    onDragStart,
   })
 
   useEffect(() => {
@@ -170,7 +171,7 @@ export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
     onImageSizeChange?.(imageSize)
   }, [imageSize?.width, imageSize?.height])
 
-  const fixedStyles = _getFixedStyles({ src, displacement })
+  const fixedStyles = _getFixedStyles({ displacement, src })
 
   return (
     <div
@@ -184,7 +185,7 @@ export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
   )
 })
 
-function _getFixedStyles({ src = '', displacement = NaN }) {
+function _getFixedStyles({ displacement = NaN, src = '' }) {
   return asStyleDict({
     body: {
       backgroundImage: `url(${src})`,
@@ -199,7 +200,7 @@ function _getFixedStyles({ src = '', displacement = NaN }) {
 }
 
 function _getFilledImageSize(originalSize: Size, sizeToFill: Size): Size {
-  const { width: originalWidth, height: originalHeight } = originalSize
+  const { height: originalHeight, width: originalWidth } = originalSize
   const { height: filledHeight } = sizeToFill
 
   if (originalHeight <= 0) return Size.zero

@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState, type PropsWithChildren, type ReactNode } from 'react'
+import { type PropsWithChildren, type ReactNode, Suspense, useEffect, useState } from 'react'
 
 type Props = PropsWithChildren<{
   fallback?: ReactNode

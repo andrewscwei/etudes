@@ -1,6 +1,7 @@
 import interact from 'interactjs'
 import { type RefObject, useLayoutEffect } from 'react'
 import { Point } from 'spase'
+
 import { createKey } from '../utils/createKey.js'
 import { useLatest } from './useLatest.js'
 
@@ -9,7 +10,7 @@ type InteractDraggableOptions = Parameters<Interact.Interactable['draggable']>[0
 /**
  * Type describing the options of {@link useInertiaDrag}.
  */
-export type UseInertiaDragOptions = Omit<InteractDraggableOptions, 'onstart' | 'onmove' | 'onend'> & {
+export type UseInertiaDragOptions = {
   /**
    * Specifies whether this effect is enabled.
    */
@@ -38,7 +39,7 @@ export type UseInertiaDragOptions = Omit<InteractDraggableOptions, 'onstart' | '
    * @param startPosition The position (in pixels) where the drag started.
    */
   onDragEnd?: (endPosition: Point, startPosition: Point) => void
-}
+} & Omit<InteractDraggableOptions, 'onend' | 'onmove' | 'onstart'>
 
 /**
  * Hook for adding dragging interaction to an element.
@@ -51,12 +52,12 @@ export type UseInertiaDragOptions = Omit<InteractDraggableOptions, 'onstart' | '
  * @returns The states created for this effect.
  */
 export function useInertiaDrag(
-  target: HTMLElement | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | null | undefined,
+  target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined,
   {
     isEnabled = true,
-    onDragStart,
-    onDragMove,
     onDragEnd,
+    onDragMove,
+    onDragStart,
     ...options
   }: UseInertiaDragOptions,
 ) {
@@ -73,10 +74,11 @@ export function useInertiaDrag(
     const interactable = interact(element).draggable({
       inertia: true,
       ...options,
-      onstart: ({ client }) => {
-        const startPosition = Point.make(client)
+      onend: ({ client, clientX0, clientY0 }) => {
+        const startPosition = Point.make(clientX0, clientY0)
+        const endPosition = Point.make(client)
 
-        dragStartHandlerRef.current?.(startPosition)
+        dragEndHandlerRef.current?.(endPosition, startPosition)
       },
       onmove: ({ client, clientX0, clientY0, dx, dy }) => {
         const startPosition = Point.make(clientX0, clientY0)
@@ -85,11 +87,10 @@ export function useInertiaDrag(
 
         dragMoveHandlerRef.current?.(displacement, currentPosition, startPosition)
       },
-      onend: ({ client, clientX0, clientY0 }) => {
-        const startPosition = Point.make(clientX0, clientY0)
-        const endPosition = Point.make(client)
+      onstart: ({ client }) => {
+        const startPosition = Point.make(client)
 
-        dragEndHandlerRef.current?.(endPosition, startPosition)
+        dragStartHandlerRef.current?.(startPosition)
       },
     })
 

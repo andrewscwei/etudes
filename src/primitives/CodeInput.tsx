@@ -1,4 +1,5 @@
-import { forwardRef, useEffect, useRef, type ChangeEvent, type ClipboardEvent, type HTMLAttributes, type HTMLInputAutoCompleteAttribute, type KeyboardEvent } from 'react'
+import { type ChangeEvent, type ClipboardEvent, forwardRef, type HTMLAttributes, type HTMLInputAutoCompleteAttribute, type KeyboardEvent, useEffect, useRef } from 'react'
+
 import { Repeat } from '../flows/Repeat.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
@@ -7,16 +8,16 @@ import { styles } from '../utils/styles.js'
 
 const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
   {
-    children,
+    style,
     autoComplete = 'one-time-code',
     autoFocus = false,
+    children,
     inputMode = 'numeric',
-    isDisabled = false,
-    isRequired = true,
     placeholder,
     size,
-    style,
     value,
+    isDisabled = false,
+    isRequired = true,
     onChange,
     ...props
   },
@@ -33,11 +34,9 @@ const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
   const focusOn = (index: number) => {
     if (index < 0) {
       fieldRefs.current[0]?.focus()
-    }
-    else if (index >= size) {
+    } else if (index >= size) {
       fieldRefs.current[size - 1]?.focus()
-    }
-    else {
+    } else {
       fieldRefs.current[index]?.focus()
     }
   }
@@ -59,6 +58,16 @@ const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
   const keyDownHandler = (index: number) => {
     return (e: KeyboardEvent<HTMLInputElement>) => {
       switch (e.key) {
+        case 'ArrowLeft': {
+          e.preventDefault()
+          focusOn(index - 1)
+          break
+        }
+        case 'ArrowRight': {
+          e.preventDefault()
+          focusOn(index + 1)
+          break
+        }
         case 'Backspace': {
           e.preventDefault()
 
@@ -68,21 +77,10 @@ const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
 
             onChange(newValue)
             focusOn(index - 1)
-          }
-          else {
+          } else {
             focusOn(index - 1)
           }
 
-          break
-        }
-        case 'ArrowLeft': {
-          e.preventDefault()
-          focusOn(index - 1)
-          break
-        }
-        case 'ArrowRight': {
-          e.preventDefault()
-          focusOn(index + 1)
           break
         }
         default:
@@ -123,6 +121,7 @@ const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
           <Styled
             {...isDisabled ? { 'aria-disabled': true } : {}}
             ref={(el: HTMLInputElement) => (fieldRefs.current[i] = el)}
+            style={styles(fixedStyles.field)}
             aria-required={isRequired}
             autoComplete={autoComplete}
             disabled={isDisabled}
@@ -130,7 +129,6 @@ const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
             inputMode={inputMode}
             placeholder={placeholder}
             required={isRequired}
-            style={styles(fixedStyles.field)}
             value={fields[i]}
             onChange={changeHandler(i)}
             onKeyDown={keyDownHandler(i)}
@@ -155,7 +153,7 @@ export namespace CodeInput {
   /**
    * Type describing the properties of {@link CodeInput}.
    */
-  export type Props = Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> & {
+  export type Props = {
     /**
      * Specifies the autocomplete behavior for the code input.
      */
@@ -169,7 +167,7 @@ export namespace CodeInput {
     /**
      * Specifies the input mode for each field.
      */
-    inputMode?: 'text' | 'numeric'
+    inputMode?: 'numeric' | 'text'
 
     /**
      * Specifies if each field in the code input is disabled.
@@ -202,7 +200,7 @@ export namespace CodeInput {
      * @param newValue The new value.
      */
     onChange: (newValue: string[]) => void
-  }
+  } & Omit<HTMLAttributes<HTMLDivElement>, 'onChange'>
 }
 
 /**
@@ -220,15 +218,15 @@ export const CodeInput = /* #__PURE__ */ Object.assign(_CodeInput, {
 
 function _getFixedStyles() {
   return asStyleDict({
-    root: {
-      alignItems: 'stretch',
-      display: 'flex',
-      justifyContent: 'stretch',
-    },
     field: {
       caretColor: 'transparent',
       flex: '1',
       minWidth: '0',
+    },
+    root: {
+      alignItems: 'stretch',
+      display: 'flex',
+      justifyContent: 'stretch',
     },
   })
 }

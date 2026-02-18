@@ -1,5 +1,6 @@
-import { forwardRef, useRef, useState, type HTMLAttributes, type RefObject } from 'react'
+import { forwardRef, type HTMLAttributes, type RefObject, useRef, useState } from 'react'
 import { Size } from 'spase'
+
 import { useRect } from '../hooks/useRect.js'
 import { Video } from '../primitives/Video.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
@@ -9,16 +10,16 @@ import { styles } from '../utils/styles.js'
 
 const _CoverVideo = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverVideo.Props>>(({
   className,
-  children,
   style,
   aspectRatio: externalAspectRatio = NaN,
   autoLoop,
   autoPlay,
-  hasControls,
-  isMuted,
+  children,
   playsInline,
   posterSrc,
   src,
+  hasControls,
+  isMuted,
   onCanPlay,
   onEnd,
   onFullscreenChange,
@@ -57,23 +58,23 @@ const _CoverVideo = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverVid
   return (
     <div
       {...props}
-      ref={rootRef}
       className={className}
+      ref={rootRef}
       style={styles(style, FIXED_STYLES.root)}
     >
       <Video
+        style={styles(FIXED_STYLES.viewport, {
+          height: `${videoSize.height}px`,
+          maxWidth: 'unset',
+          width: `${videoSize.width}px`,
+        })}
         autoLoop={autoLoop}
         autoPlay={autoPlay}
-        hasControls={hasControls}
-        isMuted={isMuted}
         playsInline={playsInline}
         posterSrc={posterSrc}
         src={src}
-        style={styles(FIXED_STYLES.viewport, {
-          width: `${videoSize.width}px`,
-          height: `${videoSize.height}px`,
-          maxWidth: 'unset',
-        })}
+        hasControls={hasControls}
+        isMuted={isMuted}
         onCanPlay={onCanPlay}
         onEnd={onEnd}
         onFullscreenChange={onFullscreenChange}
@@ -86,12 +87,12 @@ const _CoverVideo = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverVid
       />
       {components.viewport && (
         <Styled
-          element={components.viewport}
           style={styles(FIXED_STYLES.viewport, {
             height: `${videoSize.height}px`,
             pointerEvents: 'none',
             width: `${videoSize.width}px`,
           })}
+          element={components.viewport}
         />
       )}
       {components.content}
@@ -121,13 +122,13 @@ export namespace CoverVideo {
   /**
    * Type describing the props of {@link CoverVideo}.
    */
-  export type Props = Omit<HTMLAttributes<HTMLDivElement>, 'onCanPlay' | 'onPause' | 'onPlay'> & Pick<Video.Props, 'autoLoop' | 'autoPlay' | 'hasControls' | 'isMuted' | 'playsInline' | 'posterSrc' | 'src' | 'onPause' | 'onPlay' | 'onCanPlay' | 'onEnd' | 'onFullscreenChange' | 'onLoadMetadata' | 'onLoadMetadataComplete' | 'onLoadMetadataError' | 'onSizeChange'> & {
+  export type Props = {
     /**
      * The known aspect ratio of the video, expressed by width / height. If
      * unprovided, it will be inferred after loading the video.
      */
     aspectRatio?: number
-  }
+  } & Omit<HTMLAttributes<HTMLDivElement>, 'onCanPlay' | 'onPause' | 'onPlay'> & Pick<Video.Props, 'autoLoop' | 'autoPlay' | 'hasControls' | 'isMuted' | 'onCanPlay' | 'onEnd' | 'onFullscreenChange' | 'onLoadMetadata' | 'onLoadMetadataComplete' | 'onLoadMetadataError' | 'onPause' | 'onPlay' | 'onSizeChange' | 'playsInline' | 'posterSrc' | 'src'>
 }
 
 /**

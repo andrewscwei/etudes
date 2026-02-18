@@ -1,4 +1,5 @@
 import { Video } from 'etudes'
+
 import $$Video from '../assets/video.mov'
 import { Frame } from '../components/Frame.js'
 
@@ -13,11 +14,11 @@ export function VideoDemo() {
     >
       {({ autoLoop, hasControls }, toast) => (
         <Video
+          className='grayscale'
           autoLoop={autoLoop === 'true'}
           autoPlay={true}
-          className='grayscale'
-          hasControls={hasControls === 'true'}
           src={$$Video}
+          hasControls={hasControls === 'true'}
           onEnd={() => toast('Stopped')}
           onPause={() => toast('Paused')}
           onPlay={() => toast('Playing')}

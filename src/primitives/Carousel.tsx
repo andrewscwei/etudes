@@ -1,5 +1,6 @@
-import { forwardRef, useCallback, useLayoutEffect, useRef, useState, type ComponentType, type ForwardedRef, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactElement, type RefObject } from 'react'
+import { type ComponentType, type ForwardedRef, forwardRef, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactElement, type RefObject, useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { Point, Rect } from 'spase'
+
 import { Each } from '../flows/Each.js'
 import { useDrag } from '../hooks/useDrag.js'
 import { useInterval } from '../hooks/useInterval.js'
@@ -17,7 +18,7 @@ export namespace Carousel {
   /**
    * Type describing the props of {@link Carousel}.
    */
-  export type Props<I> = Omit<HTMLAttributes<HTMLDivElement>, 'role' | 'onClick' | 'onPointerCancel' | 'onPointerDown' | 'onPointerLeave' | 'onPointerUp'> & {
+  export type Props<I> = {
     /**
      * Current item index.
      */
@@ -73,7 +74,7 @@ export namespace Carousel {
      * The component to render for each item.
      */
     ItemComponent: ComponentType<I>
-  }
+  } & Omit<HTMLAttributes<HTMLDivElement>, 'onClick' | 'onPointerCancel' | 'onPointerDown' | 'onPointerLeave' | 'onPointerUp' | 'role'>
 }
 
 /**
@@ -90,14 +91,14 @@ export const Carousel = /* #__PURE__ */ forwardRef((
   {
     autoAdvanceInterval = 0,
     index = 0,
-    isDragEnabled = true,
+    ItemComponent,
     items = [],
     orientation = 'horizontal',
     tracksItemExposure = false,
+    isDragEnabled = true,
     onAutoAdvancePause,
     onAutoAdvanceResume,
     onIndexChange,
-    ItemComponent,
     ...props
   },
   ref,
@@ -118,7 +119,7 @@ export const Carousel = /* #__PURE__ */ forwardRef((
   const [exposures, setExposures] = useState<number[] | undefined>(_getItemExposures(viewportRef, orientation))
   const [isPointerDown, setIsPointerDown] = useState(false)
 
-  const fixedStyles = _getFixedStyles({ scrollSnapEnabled: isTouchDevice || !isPointerDown, orientation })
+  const fixedStyles = _getFixedStyles({ orientation, scrollSnapEnabled: isTouchDevice || !isPointerDown })
   const shouldAutoAdvance = autoAdvanceInterval > 0
 
   const unlockScrollEffect = useCallback(() => {
@@ -263,8 +264,7 @@ export const Carousel = /* #__PURE__ */ forwardRef((
 
     if (isPointerDown) {
       autoAdvancePauseHandlerRef.current?.()
-    }
-    else {
+    } else {
       autoAdvanceResumeHandlerRef.current?.()
     }
   }, [isTouchDevice, isPointerDown, shouldAutoAdvance])
@@ -312,9 +312,9 @@ export const Carousel = /* #__PURE__ */ forwardRef((
           {({ style: itemStyle, ...itemProps }, idx) => (
             <div style={styles(fixedStyles.itemContainer)}>
               <ItemComponent
+                style={styles(itemStyle, fixedStyles.item)}
                 aria-hidden={idx !== index}
                 exposure={tracksItemExposure ? exposures?.[idx] : undefined}
-                style={styles(itemStyle, fixedStyles.item)}
                 {...itemProps as any}
               />
             </div>
@@ -323,7 +323,7 @@ export const Carousel = /* #__PURE__ */ forwardRef((
       </div>
     </div>
   )
-}) as <I extends HTMLAttributes<HTMLElement>>(props: Readonly<Carousel.Props<I> & { ref?: ForwardedRef<HTMLDivElement> }>) => ReactElement
+}) as <I extends HTMLAttributes<HTMLElement>>(props: Readonly<{ ref?: ForwardedRef<HTMLDivElement> } & Carousel.Props<I>>) => ReactElement
 
 function _scrollToIndex(ref: RefObject<HTMLDivElement | null>, index: number, orientation: Carousel.Orientation) {
   const viewport = ref?.current
@@ -334,7 +334,7 @@ function _scrollToIndex(ref: RefObject<HTMLDivElement | null>, index: number, or
 
   if (viewport.scrollTop === top && viewport.scrollLeft === left) return
 
-  viewport.scrollTo({ top, left, behavior: 'smooth' })
+  viewport.scrollTo({ behavior: 'smooth', left, top })
 }
 
 function _getItemExposures(ref: RefObject<HTMLDivElement | null>, orientation: Carousel.Orientation) {
@@ -368,15 +368,26 @@ function _getItemExposureAt(idx: number, ref: RefObject<HTMLDivElement | null>, 
   }
 }
 
-function _getFixedStyles({ scrollSnapEnabled = false, orientation = 'horizontal' }) {
+function _getFixedStyles({ orientation = 'horizontal', scrollSnapEnabled = false }) {
   return asStyleDict({
+    item: {
+      height: '100%',
+      width: '100%',
+    },
+    itemContainer: {
+      flex: '0 0 auto',
+      height: '100%',
+      overflow: 'hidden',
+      scrollSnapAlign: 'center',
+      width: '100%',
+    },
     viewport: {
       alignItems: 'center',
       display: 'flex',
       height: '100%',
-      userSelect: scrollSnapEnabled ? 'auto' : 'none',
       justifyContent: 'flex-start',
       scrollSnapStop: 'always',
+      userSelect: scrollSnapEnabled ? 'auto' : 'none',
       WebkitOverflowScrolling: 'touch',
       width: '100%',
       ...orientation === 'horizontal' ? {
@@ -390,17 +401,6 @@ function _getFixedStyles({ scrollSnapEnabled = false, orientation = 'horizontal'
         overflowY: 'scroll',
         scrollSnapType: scrollSnapEnabled ? 'y mandatory' : 'none',
       },
-    },
-    itemContainer: {
-      height: '100%',
-      overflow: 'hidden',
-      scrollSnapAlign: 'center',
-      width: '100%',
-      flex: '0 0 auto',
-    },
-    item: {
-      height: '100%',
-      width: '100%',
     },
   })
 }

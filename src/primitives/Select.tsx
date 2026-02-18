@@ -1,18 +1,19 @@
-import { forwardRef, type ChangeEvent, type HTMLAttributes } from 'react'
-import { Styled } from '../utils/Styled.js'
+import { type ChangeEvent, forwardRef, type HTMLAttributes } from 'react'
+
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
+import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
 const _Select = /* #__PURE__ */ forwardRef<HTMLDivElement, Select.Props>((
   {
-    children,
     id,
-    isRequired = false,
+    children,
     name,
     options,
     placeholder,
     value = '',
+    isRequired = false,
     onChange,
     ...props
   },
@@ -27,30 +28,30 @@ const _Select = /* #__PURE__ */ forwardRef<HTMLDivElement, Select.Props>((
   return (
     <div {...props} ref={ref} style={FIXED_STYLES.root}>
       <Styled
+        style={FIXED_STYLES.select}
         aria-required={isRequired ? 'true' : undefined}
         element={components.toggle ?? <_Toggle/>}
         name={name}
         required={isRequired}
-        style={FIXED_STYLES.select}
         value={value}
         onChange={(event: ChangeEvent<HTMLSelectElement>) => onChange?.(event.target.value)}
       >
         {placeholder !== undefined && (
-          <Styled disabled hidden element={components.option ?? <_Option/>} value=''>{placeholder}</Styled>
+          <Styled disabled element={components.option ?? <_Option/>} hidden value=''>{placeholder}</Styled>
         )}
         {options.map((val, idx) => (
           <Styled key={`${idx}-${val}`} element={components.option ?? <_Option/>} value={val}>{val}</Styled>
         ))}
       </Styled>
       {components.expandIcon && (
-        <Styled element={components.expandIcon} style={FIXED_STYLES.expandIcon}/>
+        <Styled style={FIXED_STYLES.expandIcon} element={components.expandIcon}/>
       )}
     </div>
   )
 })
 
-const _ExpandIcon = ({ children, style, ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <figure {...props} aria-hidden={true} style={styles(style, { pointerEvents: 'none' })}>{children}</figure>
+const _ExpandIcon = ({ style, children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+  <figure {...props} style={styles(style, { pointerEvents: 'none' })} aria-hidden={true}>{children}</figure>
 )
 
 const _Toggle = ({ children, ...props }: HTMLAttributes<HTMLSelectElement>) => (
@@ -65,7 +66,7 @@ export namespace Select {
   /**
    * Type describing the props of {@link Select}.
    */
-  export type Props = Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> & {
+  export type Props = {
     /**
      * Specifies if a selection is required.
      */
@@ -98,7 +99,7 @@ export namespace Select {
      * @param value The new value of the `select` element.
      */
     onChange?: (value: string) => void
-  }
+  } & Omit<HTMLAttributes<HTMLDivElement>, 'onChange'>
 }
 
 /**
@@ -127,6 +128,10 @@ export const Select = /* #__PURE__ */ Object.assign(_Select, {
 })
 
 const FIXED_STYLES = asStyleDict({
+  expandIcon: {
+    pointerEvents: 'none',
+    zIndex: 1,
+  },
   root: {
     alignItems: 'center',
     display: 'flex',
@@ -142,10 +147,6 @@ const FIXED_STYLES = asStyleDict({
     position: 'absolute',
     top: 0,
     width: '100%',
-  },
-  expandIcon: {
-    pointerEvents: 'none',
-    zIndex: 1,
   },
 })
 

@@ -1,17 +1,18 @@
 import clsx from 'clsx'
 import { forwardRef, type HTMLAttributes } from 'react'
+
 import { Repeat } from '../flows/Repeat.js'
-import { Styled } from '../utils/Styled.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
+import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
 export namespace Burger {
   /**
    * Type describing the props of {@link Burger}.
    */
-  export type Props = HTMLAttributes<HTMLDivElement> & {
+  export type Props = {
     /**
      * Specifies if the burger is in its activated state.
      */
@@ -32,16 +33,16 @@ export namespace Burger {
      * Specifies the number of bars to display.
      */
     numberOfBars?: 2 | 3
-  }
+  } & HTMLAttributes<HTMLDivElement>
 }
 
 const _Burger = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Burger.Props>>(({
-  children,
   className,
-  isActive = false,
-  isTailHidden = false,
-  isSplit = false,
+  children,
   numberOfBars = 3,
+  isActive = false,
+  isSplit = false,
+  isTailHidden = false,
   ...props
 }, ref) => {
   const components = asComponentDict(children, {
@@ -49,31 +50,29 @@ const _Burger = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Burger.Props
   })
 
   const fixedClassNames = asClassNameDict({
-    root: clsx({
+    bar: clsx({
       active: isActive,
     }),
-    bar: clsx({
+    root: clsx({
       active: isActive,
     }),
   })
 
-  const fixedStyles = _getFixedStyles({ isSplit, isActive, isTailHidden })
+  const fixedStyles = _getFixedStyles({ isActive, isSplit, isTailHidden })
 
   return (
     <div
       {...props}
-      ref={ref}
       className={clsx(className, fixedClassNames.root)}
+      ref={ref}
     >
       <Repeat count={isSplit ? 2 : 1}>
         {j => (
-          <div aria-hidden={true} style={styles(fixedStyles.section, (fixedStyles as any)[`section${j}`])}>
+          <div style={styles(fixedStyles.section, (fixedStyles as any)[`section${j}`])} aria-hidden={true}>
             <Repeat count={numberOfBars}>
               {i => (
                 <Styled
-                  aria-hidden={true}
                   className={clsx(fixedClassNames.bar)}
-                  element={components.bar ?? <_Bar/>}
                   style={(() => {
                     switch (numberOfBars) {
                       case 2:
@@ -83,6 +82,8 @@ const _Burger = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Burger.Props
                         return styles(fixedStyles.bar, (fixedStyles as any)[`bar${j}${i}`])
                     }
                   })()}
+                  aria-hidden={true}
+                  element={components.bar ?? <_Bar/>}
                 />
               )}
             </Repeat>
@@ -114,19 +115,6 @@ export const Burger = /* #__PURE__ */ Object.assign(_Burger, {
 
 function _getFixedStyles({ isActive = false, isSplit = false, isTailHidden = false }) {
   return asStyleDict({
-    section: {
-      height: '100%',
-      position: 'absolute',
-      width: isSplit ? '50%' : '100%',
-    },
-    section0: {
-      left: '0',
-      top: '0',
-    },
-    section1: {
-      right: '0',
-      top: '0',
-    },
     bar: {
       margin: '0',
       padding: '0',
@@ -170,6 +158,19 @@ function _getFixedStyles({ isActive = false, isSplit = false, isTailHidden = fal
       transform: isActive ? 'translate(0, -50%) rotate(45deg)' : 'translate(0, -100%) rotate(0deg)',
       transformOrigin: 'left center',
       width: isTailHidden && !isActive ? '0' : '100%',
+    },
+    section: {
+      height: '100%',
+      position: 'absolute',
+      width: isSplit ? '50%' : '100%',
+    },
+    section0: {
+      left: '0',
+      top: '0',
+    },
+    section1: {
+      right: '0',
+      top: '0',
     },
   })
 }

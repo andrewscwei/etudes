@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import { Collection } from 'etudes'
 import { useState } from 'react'
+
 import { Frame } from '../components/Frame.js'
 
 export function CollectionDemo() {
@@ -20,13 +21,12 @@ export function CollectionDemo() {
       usesMaxHeight={true}
       onReset={() => setCollectionSelection([])}
     >
-      {({ isSelectionTogglable, layout, orientation, selectionMode }, toast) => (
+      {({ layout, orientation, selectionMode, isSelectionTogglable }, toast) => (
         <Collection
           className={clsx('self-start', {
-            'w-full': orientation === 'vertical',
             'h-full': orientation === 'horizontal',
+            'w-full': orientation === 'vertical',
           })}
-          isSelectionTogglable={isSelectionTogglable === 'true'}
           itemLength={orientation === 'vertical' ? 40 : 64}
           itemPadding={12}
           items={items}
@@ -35,6 +35,7 @@ export function CollectionDemo() {
           orientation={orientation as Collection.Orientation}
           selection={collectionSelection}
           selectionMode={selectionMode as Collection.SelectionMode}
+          isSelectionTogglable={isSelectionTogglable === 'true'}
           onActivateAt={index => { if (selectionMode === 'none') toast(`<${Date.now()}>Activated Item ${index + 1}`) }}
           onDeselectAt={index => toast(`<${Date.now()}>Deselected Item ${index + 1}`)}
           onSelectAt={index => toast(`<${Date.now()}>Selected Item ${index + 1}`)}

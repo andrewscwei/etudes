@@ -1,4 +1,4 @@
-import { cloneElement, type Attributes, type ClassAttributes, type Component, type ComponentClass, type ComponentState, type FunctionComponent, type ReactElement, type ReactNode } from 'react'
+import { type Attributes, type ClassAttributes, cloneElement, type Component, type ComponentClass, type ComponentState, type FunctionComponent, type ReactElement, type ReactNode } from 'react'
 
 /**
  * Wrapper for {@link cloneElement} but instead of overwriting `className` and
@@ -13,12 +13,12 @@ import { cloneElement, type Attributes, type ClassAttributes, type Component, ty
  *
  * @returns The cloned element.
  */
-export function cloneStyledElement<P>(element: ReactElement<P, FunctionComponent<P>>, props?: Partial<P> & Attributes, ...children: ReactNode[]): ReactElement<P, FunctionComponent<P>>
-export function cloneStyledElement<P, T extends Component<P, ComponentState>>(element: ReactElement<P, ComponentClass<T>>, props?: Partial<P> & ClassAttributes<T>, ...children: ReactNode[]): ReactElement<P, ComponentClass<T>>
-export function cloneStyledElement<P>(element: ReactElement<P>, props?: Partial<P> & Attributes, ...children: ReactNode[]): ReactElement<P>
+export function cloneStyledElement<P>(element: ReactElement<P, FunctionComponent<P>>, props?: Attributes & Partial<P>, ...children: ReactNode[]): ReactElement<P, FunctionComponent<P>>
+export function cloneStyledElement<P, T extends Component<P, ComponentState>>(element: ReactElement<P, ComponentClass<T>>, props?: ClassAttributes<T> & Partial<P>, ...children: ReactNode[]): ReactElement<P, ComponentClass<T>>
+export function cloneStyledElement<P>(element: ReactElement<P>, props?: Attributes & Partial<P>, ...children: ReactNode[]): ReactElement<P>
 export function cloneStyledElement<P, T extends Component<P, ComponentState> = never>(
-  element: ReactElement<P, FunctionComponent<P>> | ReactElement<P, ComponentClass<T>> | ReactElement<P>,
-  props: Partial<P> & Attributes | Partial<P> & ClassAttributes<T> = {},
+  element: ReactElement<P, ComponentClass<T>> | ReactElement<P, FunctionComponent<P>> | ReactElement<P>,
+  props: Attributes & Partial<P> | ClassAttributes<T> & Partial<P> = {},
   ...children: ReactNode[]
 ) {
   const { className, style, ...otherProps } = props as any

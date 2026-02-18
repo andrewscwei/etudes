@@ -1,4 +1,4 @@
-import { useCallback, useState, type DragEvent } from 'react'
+import { type DragEvent, useCallback, useState } from 'react'
 
 /**
  * Type describing the output of {@link useDropzone}.
@@ -77,8 +77,8 @@ export function useDropzone<T = HTMLElement>(action: (file: File) => void): UseD
 
   return {
     isDropping,
-    onDragOver: dragOverListener,
     onDragLeave: dragLeaveListener,
+    onDragOver: dragOverListener,
     onDrop: dropListener,
   }
 }

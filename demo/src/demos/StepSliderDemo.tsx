@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import { StepSlider } from 'etudes'
 import { useState } from 'react'
+
 import { Frame } from '../components/Frame.js'
 
 export function StepSliderDemo() {
@@ -19,26 +20,26 @@ export function StepSliderDemo() {
       usesMaxHeight={true}
       onReset={() => setIndex(0)}
     >
-      {({ isClipped, isInverted, isTrackInteractive, onlyDispatchesOnDragEnd, orientation }, toast) => (
+      {({ orientation, isClipped, isInverted, isTrackInteractive, onlyDispatchesOnDragEnd }, toast) => (
         <StepSlider
           className={clsx('relative', {
             'h-1 w-44': orientation === 'horizontal',
             'h-32 w-1': orientation === 'vertical',
           })}
           index={index}
-          isClipped={isClipped === 'true'}
-          isInverted={isInverted === 'true'}
-          isTrackInteractive={isTrackInteractive === 'true'}
           knobHeight={28}
           knobWidth={40}
           labelProvider={(_, idx) => `${idx}`}
-          onlyDispatchesOnDragEnd={onlyDispatchesOnDragEnd === 'true'}
           orientation={orientation as any}
           trackPadding={0}
+          isClipped={isClipped === 'true'}
+          isInverted={isInverted === 'true'}
+          isTrackInteractive={isTrackInteractive === 'true'}
           onIndexChange={idx => {
             setIndex(idx)
             toast(`Index: ${idx}`)
           }}
+          onlyDispatchesOnDragEnd={onlyDispatchesOnDragEnd === 'true'}
         >
           <StepSlider.Knob className='ia flex items-center justify-center border border-dark bg-dark'/>
           <StepSlider.KnobContainer

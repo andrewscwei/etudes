@@ -12,8 +12,7 @@ export function useCopyBlobToClipboard() {
 
     try {
       await navigator.clipboard.write([item])
-    }
-    catch (err) {
+    } catch (err) {
       console.error('[etudes::useCopyBlobToClipboard] Failed to copy blob to clipboard:', err)
     }
   }, [])

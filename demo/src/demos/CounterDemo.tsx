@@ -1,5 +1,6 @@
 import { Counter } from 'etudes'
 import { useState } from 'react'
+
 import $$MinusIcon from '../assets/minus-icon.svg?raw'
 import $$PlusIcon from '../assets/plus-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
@@ -17,10 +18,10 @@ export function CounterDemo() {
       title='Counter'
       onReset={() => setQuantity(0)}
     >
-      {({ allowsInput, min, max }, toast) => (
+      {({ allowsInput, max, min }, toast) => (
         <Counter
-          allowsInput={allowsInput === 'true'}
           className='relative h-9 w-48 gap-1 text-base text-dark'
+          allowsInput={allowsInput === 'true'}
           max={Number(max)}
           min={Number(min)}
           quantity={quantity}

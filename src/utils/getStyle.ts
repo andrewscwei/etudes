@@ -26,15 +26,14 @@ type Options = {
  * @returns The value of the CSS property, or `undefined` if the property does
  *          not exist.
  */
-export function getStyle(name: string, { target, computed }: Options): string | undefined {
+export function getStyle(name: string, { computed, target }: Options): string | undefined {
   if (typeof window === 'undefined') return undefined
 
   const el = target ?? window.document.documentElement
 
   if (computed) {
     return window.getComputedStyle(el).getPropertyValue(name) || undefined
-  }
-  else {
+  } else {
     return el.style.getPropertyValue(name) || undefined
   }
 }

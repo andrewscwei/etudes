@@ -1,4 +1,5 @@
 import { FlatSVG } from 'etudes'
+
 import $$GitHubIcon from '../assets/github-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
 
@@ -14,15 +15,15 @@ export function FlatSVGDemo() {
       ]}
       title='FlatSVG'
     >
-      {({ fillMode, shouldStripClasses, shouldStripPositions, shouldStripIds, shouldStripStyles }, _) => (
+      {({ fillMode, shouldStripClasses, shouldStripIds, shouldStripPositions, shouldStripStyles }, _) => (
         <FlatSVG
           className='[&_svg]:fill-dark size-10'
           fillMode={fillMode as any}
+          svg={$$GitHubIcon}
           shouldStripClasses={shouldStripClasses === 'true'}
           shouldStripIds={shouldStripIds === 'true'}
           shouldStripPositions={shouldStripPositions === 'true'}
           shouldStripStyles={shouldStripStyles === 'true'}
-          svg={$$GitHubIcon}
         />
       )}
     </Frame>

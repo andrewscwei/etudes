@@ -9,7 +9,7 @@ export namespace Conditional {
      * An expression or function that returns a truthy value to determine if the
      * children should be rendered.
      */
-    if: any | (() => any)
+    if: (() => any) | any
   }>
 }
 

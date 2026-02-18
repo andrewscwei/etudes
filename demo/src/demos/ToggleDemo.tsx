@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import { Toggle } from 'etudes'
 import { useEffect, useState } from 'react'
+
 import { Frame } from '../components/Frame.js'
 
 export function ToggleDemo() {
@@ -15,7 +16,7 @@ export function ToggleDemo() {
       title='Toggle'
       onReset={() => setIsOn(false)}
     >
-      {({ isInverted, orientation }, toast) => {
+      {({ orientation, isInverted }, toast) => {
         useEffect(() => {
           toast(isOn ? 'On' : 'Off')
         }, [isOn])
@@ -26,9 +27,9 @@ export function ToggleDemo() {
               'w-12 h-7': orientation === 'horizontal',
               'w-7 h-12': orientation === 'vertical',
             })}
+            orientation={orientation as 'horizontal' | 'vertical'}
             isInverted={isInverted === 'true'}
             isOn={isOn}
-            orientation={orientation as 'horizontal' | 'vertical'}
             onChange={setIsOn}
           >
             <Toggle.Track className='size-full cursor-pointer rounded-full bg-dark p-1'/>
