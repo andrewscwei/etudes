@@ -38,14 +38,14 @@ export type UseImageLoaderOptions = {
    *
    * @param element The target image element.
    */
-  onLoadComplete?: (element: HTMLImageElement) => void
+  onLoad?: (element: HTMLImageElement) => void
 
   /**
    * Handler invoked when there is an error loading the image.
    *
    * @param element The target image element.
    */
-  onLoadError?: (element: HTMLImageElement) => void
+  onError?: (element: HTMLImageElement) => void
 }
 
 /**
@@ -56,12 +56,12 @@ export type UseImageLoaderOptions = {
  */
 export function useImageLoader(
   { sizes, src, srcSet }: UseImageLoaderParams,
-  { onLoadComplete, onLoadError, onLoadStart }: UseImageLoaderOptions = {},
+  { onError, onLoad, onLoadStart }: UseImageLoaderOptions = {},
 ) {
   const imageRef = useRef<HTMLImageElement>(undefined)
   const loadStartHandlerRef = useLatest(onLoadStart)
-  const loadCompleteHandlerRef = useLatest(onLoadComplete)
-  const loadErrorHandlerRef = useLatest(onLoadError)
+  const loadCompleteHandlerRef = useLatest(onLoad)
+  const loadErrorHandlerRef = useLatest(onError)
 
   useLayoutEffect(() => {
     let cancelled = false

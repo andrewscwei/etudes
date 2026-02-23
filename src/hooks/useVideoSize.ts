@@ -26,14 +26,14 @@ type UseVideoSizeOptions = {
  */
 export function useVideoSize(src?: string, {
   preservesSizeBetweenLoads = true,
-  onLoadComplete,
-  onLoadError,
+  onError,
+  onLoad,
   onLoadStart,
 }: UseVideoSizeOptions = {}): Size | undefined {
   const [size, setSize] = useState<Size>()
   const loadStartHandlerRef = useLatest(onLoadStart)
-  const loadCompleteHandlerRef = useLatest(onLoadComplete)
-  const loadErrorHandlerRef = useLatest(onLoadError)
+  const loadCompleteHandlerRef = useLatest(onLoad)
+  const loadErrorHandlerRef = useLatest(onError)
 
   const loadStartHandler = useCallback((element: HTMLVideoElement) => {
     if (!preservesSizeBetweenLoads) setSize(undefined)
@@ -54,8 +54,8 @@ export function useVideoSize(src?: string, {
   }, [preservesSizeBetweenLoads])
 
   useVideoMetadataLoader(src, {
-    onLoadComplete: loadCompleteHandler,
-    onLoadError: loadErrorHandler,
+    onError: loadErrorHandler,
+    onLoad: loadCompleteHandler,
     onLoadStart: loadStartHandler,
   })
 

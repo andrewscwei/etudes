@@ -18,14 +18,14 @@ export type UseVideoMetadataLoaderOptions = {
    *
    * @param element The target video element.
    */
-  onLoadComplete?: (element: HTMLVideoElement) => void
+  onLoad?: (element: HTMLVideoElement) => void
 
   /**
    * Handler invoked when there is an error loading the video metadata.
    *
    * @param element The target video element.
    */
-  onLoadError?: (element: HTMLVideoElement) => void
+  onError?: (element: HTMLVideoElement) => void
 }
 
 /**
@@ -35,13 +35,13 @@ export type UseVideoMetadataLoaderOptions = {
  * @param options See {@link UseVideoMetadataLoaderOptions}.
  */
 export function useVideoMetadataLoader(src?: string, {
-  onLoadComplete,
-  onLoadError,
+  onError,
+  onLoad,
   onLoadStart,
 }: UseVideoMetadataLoaderOptions = {}) {
   const loadStartHandlerRef = useLatest(onLoadStart)
-  const loadCompleteHandlerRef = useLatest(onLoadComplete)
-  const loadErrorHandlerRef = useLatest(onLoadError)
+  const loadCompleteHandlerRef = useLatest(onLoad)
+  const loadErrorHandlerRef = useLatest(onError)
 
   useLayoutEffect(() => {
     if (!src) return

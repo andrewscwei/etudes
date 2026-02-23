@@ -35,14 +35,14 @@ export function useImageSize({
   srcSet,
 }: UseImageSizeParams, {
   preservesSizeBetweenLoads = true,
-  onLoadComplete,
-  onLoadError,
+  onError,
+  onLoad,
   onLoadStart,
 }: UseImageSizeOptions = {}): Size | undefined {
   const [size, setSize] = useState<Size | undefined>()
   const loadStartHandlerRef = useLatest(onLoadStart)
-  const loadCompleteHandlerRef = useLatest(onLoadComplete)
-  const loadErrorHandlerRef = useLatest(onLoadError)
+  const loadCompleteHandlerRef = useLatest(onLoad)
+  const loadErrorHandlerRef = useLatest(onError)
 
   const loadStartHandler = useCallback((element: HTMLImageElement) => {
     if (!preservesSizeBetweenLoads) setSize(undefined)
@@ -63,8 +63,8 @@ export function useImageSize({
   }, [preservesSizeBetweenLoads])
 
   useImageLoader({ sizes, src, srcSet }, {
-    onLoadComplete: loadCompleteHandler,
-    onLoadError: loadErrorHandler,
+    onError: loadErrorHandler,
+    onLoad: loadCompleteHandler,
     onLoadStart: loadStartHandler,
   })
 

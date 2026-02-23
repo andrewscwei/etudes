@@ -39,12 +39,12 @@ export namespace Image {
     /**
      * Handler invoked when image load completes.
      */
-    onLoadComplete?: () => void
+    onLoad?: () => void
 
     /**
      * Handler invoked when image load encounters an error.
      */
-    onLoadError?: () => void
+    onError?: () => void
 
     /**
      * Handler invoked when the size of the loaded image changes.
@@ -52,7 +52,7 @@ export namespace Image {
      * @param size Size of the loaded image.
      */
     onSizeChange?: (size?: Size) => void
-  } & Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'loading' | 'onLoadStart' | 'sizes' | 'src' | 'srcSet'>
+  } & Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'loading' | 'onError' | 'onLoad' | 'onLoadStart' | 'sizes' | 'src' | 'srcSet'>
 }
 
 /**
@@ -65,8 +65,8 @@ export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<Image
     loadingMode,
     source,
     src: fallbackSrc,
-    onLoadComplete,
-    onLoadError,
+    onError,
+    onLoad,
     onLoadStart,
     onSizeChange,
     ...props
@@ -80,8 +80,8 @@ export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<Image
     src: fallbackSrc,
     srcSet: resolvedImageSource?.srcSet,
   }, {
-    onLoadComplete,
-    onLoadError,
+    onError,
+    onLoad,
     onLoadStart,
   })
 

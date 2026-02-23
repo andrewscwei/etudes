@@ -125,8 +125,8 @@ export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
   const bodyRef = useRef<HTMLDivElement>(null)
   const bodyRect = useRect(bodyRef)
   const imageSize = useImageSize({ src }, {
-    onLoadComplete: onLoadImageComplete,
-    onLoadError: onLoadImageError,
+    onError: onLoadImageError,
+    onLoad: onLoadImageComplete,
     onLoadStart: onLoadImageStart,
   })
   const [angle, setAngle] = useState(externalAngle)

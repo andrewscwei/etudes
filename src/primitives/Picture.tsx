@@ -9,7 +9,7 @@ export namespace Picture {
    */
   export type Props = {
     sources?: ImageSource[]
-  } & HTMLAttributes<HTMLPictureElement> & Pick<Image.Props, 'alt' | 'loadingMode' | 'onLoadComplete' | 'onLoadError' | 'onLoadStart' | 'onSizeChange' | 'src'>
+  } & HTMLAttributes<HTMLPictureElement> & Pick<Image.Props, 'alt' | 'loadingMode' | 'onError' | 'onLoad' | 'onLoadStart' | 'onSizeChange' | 'src'>
 }
 
 export const Picture = /* #__PURE__ */ forwardRef<HTMLPictureElement, Picture.Props>((
@@ -18,8 +18,8 @@ export const Picture = /* #__PURE__ */ forwardRef<HTMLPictureElement, Picture.Pr
     loadingMode,
     sources = [],
     src,
-    onLoadComplete,
-    onLoadError,
+    onError,
+    onLoad,
     onLoadStart,
     onSizeChange,
     ...props
@@ -36,8 +36,8 @@ export const Picture = /* #__PURE__ */ forwardRef<HTMLPictureElement, Picture.Pr
         alt={alt}
         loadingMode={loadingMode}
         src={src}
-        onLoadComplete={onLoadComplete}
-        onLoadError={onLoadError}
+        onError={onError}
+        onLoad={onLoad}
         onLoadStart={onLoadStart}
         onSizeChange={onSizeChange}
       />

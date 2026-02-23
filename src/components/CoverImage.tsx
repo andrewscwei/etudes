@@ -17,8 +17,8 @@ const _CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverIma
     loadingMode,
     sources,
     src,
-    onLoadComplete,
-    onLoadError,
+    onError,
+    onLoad,
     onLoadStart,
     ...props
   },
@@ -63,8 +63,8 @@ const _CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverIma
         alt={alt}
         sources={sources}
         src={src}
-        onLoadComplete={onLoadComplete}
-        onLoadError={onLoadError}
+        onError={onError}
+        onLoad={onLoad}
         onLoadStart={onLoadStart}
         onSizeChange={size => handleSizeChange(size)}
       />
@@ -105,7 +105,7 @@ export namespace CoverImage {
      * unprovided, it will be inferred after loading the image.
      */
     aspectRatio?: number
-  } & Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<Picture.Props, 'alt' | 'loadingMode' | 'onLoadComplete' | 'onLoadError' | 'onLoadStart' | 'sources' | 'src'>
+  } & Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<Picture.Props, 'alt' | 'loadingMode' | 'onError' | 'onLoad' | 'onLoadStart' | 'sources' | 'src'>
 }
 
 /**
