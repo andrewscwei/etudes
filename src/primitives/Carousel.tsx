@@ -209,6 +209,7 @@ export const Carousel = /* #__PURE__ */ forwardRef((
           break
         case 'vertical':
           viewport.scrollTop -= y * 1.5
+          break
         default:
           console.error(`[etudes::Carousel] Unsupported orientation: ${orientation}`)
       }

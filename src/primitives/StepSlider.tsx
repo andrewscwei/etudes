@@ -26,10 +26,10 @@ const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlid
     isClipped = false,
     isInverted = false,
     isTrackInteractive = true,
+    shouldOnlyDispatchOnDragEnd = false,
     onChange,
     onDragEnd,
     onDragStart,
-    shouldOnlyDispatchOnDragEnd = false,
     ...props
   },
   ref,

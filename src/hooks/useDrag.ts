@@ -38,12 +38,12 @@ export type UseDragOptions = {
   /**
    * Handler invoked when dragging ends.
    *
-   * @param endPosition The position (in pixels) where the drag ended.
    * @param displacement The displacement (in pixels) since the last emitted
    *                     drag move event.
+   * @param endPosition The position (in pixels) where the drag ended.
    * @param startPosition The position (in pixels) where the drag started.
    */
-  onDragEnd?: (displacement: Point, startPosition: Point, endPosition: Point) => void
+  onDragEnd?: (displacement: Point, endPosition: Point, startPosition: Point) => void
 }
 
 /**
@@ -89,7 +89,7 @@ export function useDrag(
     const position = Point.make(event.clientX, event.clientY)
     const displacement = Point.subtract(dragPositionRef.current ?? startPositionRef.current, position)
 
-    dragEndHandlerRef.current?.(position, displacement, startPositionRef.current)
+    dragEndHandlerRef.current?.(displacement, position, startPositionRef.current)
 
     startPositionRef.current = undefined
     dragPositionRef.current = undefined
