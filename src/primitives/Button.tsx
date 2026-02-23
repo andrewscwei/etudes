@@ -78,7 +78,8 @@ function _isAnchor(props: Button.Props): props is AnchorVariantProps {
 }
 
 function _isButton(props: Button.Props): props is ButtonVariantProps {
-  if (typeof props.action === 'function' || typeof (props as any).type === 'string') return true
+  if (typeof props.action === 'function') return true
+  if (!_isAnchor(props) && typeof props.type === 'string') return true
 
   return false
 }

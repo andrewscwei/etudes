@@ -87,7 +87,7 @@ export function WithTooltip({
   threshold = 100,
 }: Readonly<WithTooltip.Props>) {
   const targetRef = useRef<HTMLElement>(null)
-  const dialogRef = useRef<HTMLSpanElement>(undefined)
+  const dialogRef = useRef<HTMLSpanElement>(null)
   const targetRect = useRect(targetRef)
 
   const createDialog = useCallback(() => {
@@ -132,7 +132,7 @@ export function WithTooltip({
 
     return () => {
       targetRef.current?.removeChild(dialogNode)
-      dialogRef.current = undefined
+      dialogRef.current = null
     }
   }, [createDialog])
 
