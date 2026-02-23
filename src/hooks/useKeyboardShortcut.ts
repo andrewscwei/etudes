@@ -137,7 +137,7 @@ export function useKeyboardShortcut(
 ) {
   const actionRef = useLatest(action)
   const keys = Array.isArray(keyOrKeys) ? keyOrKeys : [keyOrKeys]
-  const normalizedKeys = useMemo(() => keys.map(k => k.toLowerCase()).sort(), [keys])
+  const normalizedKeys = useMemo(() => keys.map(k => k.toLowerCase()).sort(), [keys.join(',')])
 
   useEffect(() => {
     if (!isEnabled || normalizedKeys.length === 0) return
@@ -177,5 +177,5 @@ export function useKeyboardShortcut(
     return () => {
       eventTarget.removeEventListener('keydown', listener as any, { capture })
     }
-  }, [isEnabled, preventsDefault, capture, normalizedKeys.join(',')])
+  }, [isEnabled, preventsDefault, stopsPropagation, capture, normalizedKeys.join(',')])
 }

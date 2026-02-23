@@ -1,5 +1,7 @@
 import { type DragEvent, useCallback, useState } from 'react'
 
+import { useLatest } from './useLatest.js'
+
 /**
  * Type describing the output of {@link useDropzone}.
  */
@@ -42,6 +44,7 @@ export type UseDropzoneOutput<T = HTMLElement> = {
  * @returns See {@link UseDropzoneOutput}.
  */
 export function useDropzone<T = HTMLElement>(action: (file: File) => void): UseDropzoneOutput<T> {
+  const actionRef = useLatest(action)
   const [isDropping, setIsDropping] = useState(false)
 
   const dragOverListener = useCallback((e: DragEvent<T>) => {
@@ -67,9 +70,7 @@ export function useDropzone<T = HTMLElement>(action: (file: File) => void): UseD
     const files = e.dataTransfer.files
 
     if (files && files.length > 0) {
-      const file = files[0]
-
-      action(file)
+      actionRef.current(files[0])
     }
   }, [])
 
