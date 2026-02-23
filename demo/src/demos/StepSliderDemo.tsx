@@ -35,7 +35,7 @@ export function StepSliderDemo() {
           isClipped={isClipped === 'true'}
           isInverted={isInverted === 'true'}
           isTrackInteractive={isTrackInteractive === 'true'}
-          onIndexChange={idx => {
+          onChange={idx => {
             setIndex(idx)
             toast(`Index: ${idx}`)
           }}

@@ -26,11 +26,10 @@ const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlid
     isClipped = false,
     isInverted = false,
     isTrackInteractive = true,
+    onChange,
     onDragEnd,
     onDragStart,
-    onIndexChange,
     onlyDispatchesOnDragEnd = false,
-    onPositionChange,
     ...props
   },
   ref,
@@ -153,12 +152,8 @@ const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlid
   }, [position, isDragging, onlyDispatchesOnDragEnd, createKey(steps)])
 
   useEffect(() => {
-    onPositionChange?.(position, isDragging)
-  }, [position, isDragging])
-
-  useEffect(() => {
-    onIndexChange?.(index, isDragging)
-  }, [index, isDragging])
+    onChange?.(index, position, isDragging)
+  }, [index, position, isDragging])
 
   return (
     <div
@@ -340,28 +335,17 @@ export namespace StepSlider {
     labelProvider?: (position: number, index: number) => string
 
     /**
-     * Handler invoked when index changes. This can either be invoked from the
-     * `index` prop being changed or from the slider being dragged. Note that if
-     * the event is emitted at the end of dragging due to
-     * `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here is
-     * still `true`. This event is emitted right after `onPositionChange`.
+     * Handler invoked when the index or position changes. This can either be
+     * invoked from the `index` prop being changed or from the slider being
+     * dragged. Note that if the event is emitted at the end of dragging due to
+     * `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here
+     * is still `true`.
      *
      * @param index The current slider index.
-     * @param isDragging Specifies if the index change is due to dragging.
-     */
-    onIndexChange?: (index: number, isDragging: boolean) => void
-
-    /**
-     * Handler invoked when position changes. This can either be invoked from the
-     * `index` prop being changed or from the slider being dragged. Note that if
-     * the event is emitted at the end of dragging due to
-     * `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here is
-     * still `true`. This event is emitted right before `onIndexChange`.
-     *
      * @param position The current slider position.
-     * @param isDragging Specifies if the position change is due to dragging.
+     * @param isDragging Specifies if the change is due to dragging.
      */
-    onPositionChange?: (position: number, isDragging: boolean) => void
+    onChange?: (index: number, position: number, isDragging: boolean) => void
 
     /**
      * Handler invoked when dragging ends.
@@ -372,7 +356,7 @@ export namespace StepSlider {
      * Handler invoked when dragging begins.
      */
     onDragStart?: () => void
-  } & Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'role'>
+  } & Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'onChange' | 'role'>
 }
 
 /**
