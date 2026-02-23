@@ -300,7 +300,8 @@ export namespace Accordion {
     collectionPadding?: number
 
     /**
-     * Label for the section header.
+     * Label for the section header, rendered as raw HTML via
+     * `dangerouslySetInnerHTML`. IMPORTANT: Sanitizing this value if needed.
      */
     label: string
 

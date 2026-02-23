@@ -47,7 +47,8 @@ export namespace WithTooltip {
     arrowWidth?: number
 
     /**
-     * The hint string to display in the tooltip.
+     * The hint string to display in the tooltip, rendered as raw HTML via
+     * `innerHTML`. IMPORTANT: Sanitizing this value if needed.
      */
     hint: string
 

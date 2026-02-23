@@ -254,7 +254,9 @@ export namespace Dropdown {
     collectionPadding?: number
 
     /**
-     * The label to appear on the toggle button.
+     * The label to appear on the toggle button, rendered as raw HTML via
+     * `dangerouslySetInnerHTML`. IMPORTANT: Sanitize the return value if
+     * needed.
      *
      * @param selection The current selection.
      */
