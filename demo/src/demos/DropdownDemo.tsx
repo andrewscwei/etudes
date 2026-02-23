@@ -13,7 +13,7 @@ export function DropdownDemo() {
   return (
     <Frame
       options={[
-        ['collapsesOnSelect: true', 'collapsesOnSelect: false'],
+        ['shouldCollapseOnSelect: true', 'shouldCollapseOnSelect: false'],
         ['isInverted: false', 'isInverted: true'],
         ['isSelectionTogglable: false', 'isSelectionTogglable: true'],
         ['layout: list', 'layout: grid'],
@@ -27,7 +27,7 @@ export function DropdownDemo() {
         setIsCollapsed(true)
       }}
     >
-      {({ collapsesOnSelect, layout, maxVisibleItems, orientation, selectionMode, isInverted, isSelectionTogglable }, toast) => (
+      {({ shouldCollapseOnSelect, layout, maxVisibleItems, orientation, selectionMode, isInverted, isSelectionTogglable }, toast) => (
         <Dropdown
           className={clsx('relative text-base', {
             'h-24 w-32': orientation === 'horizontal',
@@ -35,7 +35,7 @@ export function DropdownDemo() {
             'mb-24': orientation === 'vertical' && isInverted === 'false',
             'mt-24': orientation === 'vertical' && isInverted === 'true',
           })}
-          collapsesOnSelect={collapsesOnSelect === 'true'}
+          shouldCollapseOnSelect={shouldCollapseOnSelect === 'true'}
           itemLength={36}
           items={items}
           label={t => {

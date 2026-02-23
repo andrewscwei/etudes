@@ -23,10 +23,10 @@ const _Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider.Props
     isClipped = false,
     isInverted = false,
     isTrackInteractive = true,
+    shouldOnlyDispatchOnDragEnd = false,
     onChange,
     onDragEnd,
     onDragStart,
-    onlyDispatchesOnDragEnd = false,
     ...props
   },
   ref,
@@ -107,12 +107,12 @@ const _Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider.Props
   }, [externalPosition])
 
   useEffect(() => {
-    if (isDragging && onlyDispatchesOnDragEnd) return
+    if (isDragging && shouldOnlyDispatchOnDragEnd) return
     onChange?.(position, isDragging)
   }, [position])
 
   useEffect(() => {
-    if (isDragging || !onlyDispatchesOnDragEnd) return
+    if (isDragging || !shouldOnlyDispatchOnDragEnd) return
     onChange?.(position, true)
   }, [isDragging])
 
@@ -229,7 +229,7 @@ export namespace Slider {
      * ends. When disabled, aforementioned events are fired repeatedly while
      * dragging.
      */
-    onlyDispatchesOnDragEnd?: boolean
+    shouldOnlyDispatchOnDragEnd?: boolean
 
     /**
      * Padding between the track and the knob in pixels.
@@ -275,7 +275,7 @@ export namespace Slider {
      * Handler invoked when position changes. This can either be invoked from
      * the `position` prop being changed or from the slider being dragged. Note
      * that if the event is emitted at the end of dragging due to
-     * `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here
+     * `shouldOnlyDispatchOnDragEnd` set to `true`, the `isDragging` parameter here
      * is still `true`.
      *
      * @param position The current slider position.

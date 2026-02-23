@@ -14,7 +14,6 @@ import { type Dropdown } from './Dropdown.js'
 const _Accordion = /* #__PURE__ */ forwardRef((
   {
     style,
-    autoCollapseSections = false,
     children,
     expandedSectionIndices: externalExpandedSectionIndices,
     HeaderComponent,
@@ -24,6 +23,7 @@ const _Accordion = /* #__PURE__ */ forwardRef((
     sections,
     selection: externalSelection,
     selectionMode = 'single',
+    shouldAutoCollapse = false,
     onActivateAt,
     onCollapseSectionAt,
     onDeselectAt,
@@ -52,7 +52,7 @@ const _Accordion = /* #__PURE__ */ forwardRef((
 
     if (isSectionExpandedAt(sectionIndex)) {
       transform = val => val.filter(t => t !== sectionIndex)
-    } else if (autoCollapseSections) {
+    } else if (shouldAutoCollapse) {
       transform = _ => [sectionIndex]
     } else {
       transform = val => [...val.filter(t => t !== sectionIndex), sectionIndex]
@@ -355,7 +355,7 @@ export namespace Accordion {
      * Specifies if expanded sections should automatically collapse upon
      * expanding another section.
      */
-    autoCollapseSections?: boolean
+    shouldAutoCollapse?: boolean
 
     /**
      * Indices of sections that are expanded. If specified, the component will

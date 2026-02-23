@@ -49,7 +49,7 @@ export namespace Carousel {
      * Whether to track item exposure (0-1, 0 meaning the item is fully scrolled
      * out of view, 1 meaning the item is fully scrolled into view).
      */
-    tracksItemExposure?: boolean
+    shouldTrackExposure?: boolean
 
     /**
      * Handler invoked when auto advance pauses. This is invoked only when
@@ -94,8 +94,8 @@ export const Carousel = /* #__PURE__ */ forwardRef((
     ItemComponent,
     items = [],
     orientation = 'horizontal',
-    tracksItemExposure = false,
     isDragEnabled = true,
+    shouldTrackExposure = false,
     onAutoAdvancePause,
     onAutoAdvanceResume,
     onIndexChange,
@@ -224,7 +224,7 @@ export const Carousel = /* #__PURE__ */ forwardRef((
     isScrollTickingRef.current = true
 
     requestAnimationFrame(() => {
-      if (tracksItemExposure) {
+      if (shouldTrackExposure) {
         updateExposures()
       }
 
@@ -248,7 +248,7 @@ export const Carousel = /* #__PURE__ */ forwardRef((
 
       isScrollTickingRef.current = false
     })
-  }, [items.length, index, orientation, tracksItemExposure, updateExposures])
+  }, [items.length, index, orientation, shouldTrackExposure, updateExposures])
 
   useDrag(viewportRef, {
     isEnabled: !isTouchDevice && isDragEnabled && items.length > 1,
@@ -278,7 +278,7 @@ export const Carousel = /* #__PURE__ */ forwardRef((
 
     viewport.addEventListener('scroll', scrollListener)
 
-    if (tracksItemExposure) {
+    if (shouldTrackExposure) {
       updateExposures()
     }
 
@@ -294,7 +294,7 @@ export const Carousel = /* #__PURE__ */ forwardRef((
     return () => {
       viewport.removeEventListener('scroll', scrollListener)
     }
-  }, [index, tracksItemExposure, normalizeScrollPosition, scrollListener, updateExposures])
+  }, [index, shouldTrackExposure, normalizeScrollPosition, scrollListener, updateExposures])
 
   return (
     <div
@@ -314,7 +314,7 @@ export const Carousel = /* #__PURE__ */ forwardRef((
               <ItemComponent
                 style={styles(itemStyle, fixedStyles.item)}
                 aria-hidden={idx !== index}
-                exposure={tracksItemExposure ? exposures?.[idx] : undefined}
+                exposure={shouldTrackExposure ? exposures?.[idx] : undefined}
                 {...itemProps as any}
               />
             </div>

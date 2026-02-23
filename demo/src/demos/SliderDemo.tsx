@@ -15,14 +15,14 @@ export function SliderDemo() {
         ['isClipped: false', 'isClipped: true'],
         ['isInverted: false', 'isInverted: true'],
         ['isTrackInteractive: true', 'isTrackInteractive: false'],
-        ['onlyDispatchesOnDragEnd: true', 'onlyDispatchesOnDragEnd: false'],
+        ['shouldOnlyDispatchOnDragEnd: true', 'shouldOnlyDispatchOnDragEnd: false'],
         ['orientation: horizontal', 'orientation: vertical'],
       ]}
       title='Slider'
       usesMaxHeight={true}
       onReset={() => setPosition(0)}
     >
-      {({ orientation, isClipped, isInverted, isTrackInteractive, onlyDispatchesOnDragEnd }, toast) => (
+      {({ orientation, isClipped, isInverted, isTrackInteractive, shouldOnlyDispatchOnDragEnd }, toast) => (
         <Slider
           className={clsx('relative', {
             'h-1 w-44': orientation === 'horizontal',
@@ -41,7 +41,7 @@ export function SliderDemo() {
             setPosition(pos)
             toast(`Position: ${Math.round(pos * (max - min) + min)}`)
           }}
-          onlyDispatchesOnDragEnd={onlyDispatchesOnDragEnd === 'true'}
+          shouldOnlyDispatchOnDragEnd={shouldOnlyDispatchOnDragEnd === 'true'}
         >
           <Slider.Knob className='ia flex items-center justify-center border border-dark bg-dark'/>
           <Slider.KnobContainer

@@ -13,7 +13,6 @@ const _Dropdown = /* #__PURE__ */ forwardRef((
     className,
     style,
     children,
-    collapsesOnSelect = true,
     collectionPadding = 0,
     ItemComponent,
     itemLength: externalItemLength,
@@ -30,6 +29,7 @@ const _Dropdown = /* #__PURE__ */ forwardRef((
     isCollapsed: externalIsCollapsed,
     isInverted = false,
     isSelectionTogglable = false,
+    shouldCollapseOnSelect = true,
     onActivateAt,
     onCollapse,
     onDeselectAt,
@@ -86,7 +86,7 @@ const _Dropdown = /* #__PURE__ */ forwardRef((
   const selectAtHandler = (index: number) => {
     onSelectAt?.(index)
 
-    if (selectionMode === 'single' && collapsesOnSelect) {
+    if (selectionMode === 'single' && shouldCollapseOnSelect) {
       collapse()
     }
   }
@@ -245,7 +245,7 @@ export namespace Dropdown {
      * Specifies if the internal collection collapses when an item is selected.
      * This only works if `selectionMode` is `single`.
      */
-    collapsesOnSelect?: boolean
+    shouldCollapseOnSelect?: boolean
 
     /**
      * Padding (in pixels) between the toggle button and the internal

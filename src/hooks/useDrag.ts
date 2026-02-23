@@ -15,7 +15,7 @@ export type UseDragOptions = {
   /**
    * Specifies whether the cursor icon should update.
    */
-  updatesCursor?: boolean
+  shouldUpdateCursor?: boolean
 
   /**
    * Handler invoked when dragging starts.
@@ -58,8 +58,8 @@ export type UseDragOptions = {
 export function useDrag(
   target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined,
   {
-    updatesCursor = true,
     isEnabled = true,
+    shouldUpdateCursor = true,
     onDragEnd,
     onDragMove,
     onDragStart,
@@ -98,8 +98,8 @@ export function useDrag(
     element.removeEventListener('mouseup', mouseUpListener, { capture: true })
     element.removeEventListener('mouseleave', mouseUpListener)
 
-    if (updatesCursor) element.style.cursor = 'grab'
-  }, [target, updatesCursor, mouseMoveListener])
+    if (shouldUpdateCursor) element.style.cursor = 'grab'
+  }, [target, shouldUpdateCursor, mouseMoveListener])
 
   const mouseDownListener = useCallback((event: MouseEvent) => {
     const element = target && 'current' in target ? target.current : target
@@ -116,14 +116,14 @@ export function useDrag(
     element.addEventListener('mouseup', mouseUpListener, { capture: true })
     element.addEventListener('mouseleave', mouseUpListener)
 
-    if (updatesCursor) element.style.cursor = 'grabbing'
+    if (shouldUpdateCursor) element.style.cursor = 'grabbing'
 
     dragStartHandlerRef.current?.(position)
-  }, [target, updatesCursor, mouseMoveListener, mouseUpListener])
+  }, [target, shouldUpdateCursor, mouseMoveListener, mouseUpListener])
 
   useLayoutEffect(() => {
     const element = target && 'current' in target ? target.current : target
-    if (!element || !isEnabled || !updatesCursor) return
+    if (!element || !isEnabled || !shouldUpdateCursor) return
 
     const defaultCursor = element.style.cursor
     element.style.cursor = 'grab'
@@ -131,7 +131,7 @@ export function useDrag(
     return () => {
       element.style.cursor = defaultCursor
     }
-  }, [target, isEnabled, updatesCursor])
+  }, [target, isEnabled, shouldUpdateCursor])
 
   useLayoutEffect(() => {
     const element = target && 'current' in target ? target.current : target

@@ -13,14 +13,14 @@ export function StepSliderDemo() {
         ['isClipped: false', 'isClipped: true'],
         ['isInverted: false', 'isInverted: true'],
         ['isTrackInteractive: true', 'isTrackInteractive: false'],
-        ['onlyDispatchesOnDragEnd: true', 'onlyDispatchesOnDragEnd: false'],
+        ['shouldOnlyDispatchOnDragEnd: true', 'shouldOnlyDispatchOnDragEnd: false'],
         ['orientation: horizontal', 'orientation: vertical'],
       ]}
       title='StepSlider'
       usesMaxHeight={true}
       onReset={() => setIndex(0)}
     >
-      {({ orientation, isClipped, isInverted, isTrackInteractive, onlyDispatchesOnDragEnd }, toast) => (
+      {({ orientation, isClipped, isInverted, isTrackInteractive, shouldOnlyDispatchOnDragEnd }, toast) => (
         <StepSlider
           className={clsx('relative', {
             'h-1 w-44': orientation === 'horizontal',
@@ -39,7 +39,7 @@ export function StepSliderDemo() {
             setIndex(idx)
             toast(`Index: ${idx}`)
           }}
-          onlyDispatchesOnDragEnd={onlyDispatchesOnDragEnd === 'true'}
+          shouldOnlyDispatchOnDragEnd={shouldOnlyDispatchOnDragEnd === 'true'}
         >
           <StepSlider.Knob className='ia flex items-center justify-center border border-dark bg-dark'/>
           <StepSlider.KnobContainer

@@ -24,7 +24,7 @@ export type UseIntervalOptions = {
   /**
    * Specifies whether the interval should start automatically.
    */
-  autoStarts?: boolean
+  shouldAutoStart?: boolean
 
   /**
    * Specifies if the handler should be invoked initially (as opposed to waiting
@@ -45,7 +45,7 @@ export type UseIntervalOptions = {
  * @param options See {@link UseIntervalOptions}.
  */
 export function useInterval(interval: number, {
-  autoStarts = true,
+  shouldAutoStart = true,
   shouldInvokeInitially = false,
   onInterval,
 }: UseIntervalOptions, deps: DependencyList = []): UseIntervalOutput {
@@ -72,12 +72,12 @@ export function useInterval(interval: number, {
   }, [interval, shouldInvokeInitially, stop])
 
   useEffect(() => {
-    if (autoStarts && interval > 0) {
+    if (shouldAutoStart && interval > 0) {
       start()
     }
 
     return stop
-  }, [autoStarts, interval, start, stop, ...deps])
+  }, [shouldAutoStart, interval, start, stop, ...deps])
 
   return { start, stop }
 }

@@ -29,7 +29,7 @@ const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlid
     onChange,
     onDragEnd,
     onDragStart,
-    onlyDispatchesOnDragEnd = false,
+    shouldOnlyDispatchOnDragEnd = false,
     ...props
   },
   ref,
@@ -139,7 +139,7 @@ const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlid
 
   useEffect(() => {
     if (isDragging) {
-      if (onlyDispatchesOnDragEnd) return
+      if (shouldOnlyDispatchOnDragEnd) return
 
       setIndex(_getNearestIndexByPosition(position, steps))
     } else {
@@ -149,7 +149,7 @@ const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlid
       setPosition(nearestPosition)
       setIndex(nearestIndex)
     }
-  }, [position, isDragging, onlyDispatchesOnDragEnd, createKey(steps)])
+  }, [position, isDragging, shouldOnlyDispatchOnDragEnd, createKey(steps)])
 
   useEffect(() => {
     onChange?.(index, position, isDragging)
@@ -282,7 +282,7 @@ export namespace StepSlider {
      * ends. When disabled, aforementioned events are fired repeatedly while
      * dragging.
      */
-    onlyDispatchesOnDragEnd?: boolean
+    shouldOnlyDispatchOnDragEnd?: boolean
 
     /**
      * Padding between the track and the knob in pixels.
@@ -338,7 +338,7 @@ export namespace StepSlider {
      * Handler invoked when the index or position changes. This can either be
      * invoked from the `index` prop being changed or from the slider being
      * dragged. Note that if the event is emitted at the end of dragging due to
-     * `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here
+     * `shouldOnlyDispatchOnDragEnd` set to `true`, the `isDragging` parameter here
      * is still `true`.
      *
      * @param index The current slider index.

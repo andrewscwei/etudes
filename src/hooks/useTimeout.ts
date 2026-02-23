@@ -24,7 +24,7 @@ export type UseTimeoutOptions = {
   /**
    * Specifies whether the timeout should start automatically.
    */
-  autoStarts?: boolean
+  shouldAutoStart?: boolean
 
   /**
    * Handler invoked when the timeout is reached.
@@ -41,7 +41,7 @@ export type UseTimeoutOptions = {
  * @returns See {@link UseTimeoutOutput}.
  */
 export function useTimeout(timeout: number, {
-  autoStarts = true,
+  shouldAutoStart = true,
   onTimeout,
 }: UseTimeoutOptions, deps: DependencyList = []): UseTimeoutOutput {
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -67,12 +67,12 @@ export function useTimeout(timeout: number, {
   }, [timeout, stop])
 
   useEffect(() => {
-    if (autoStarts && timeout >= 0) {
+    if (shouldAutoStart && timeout >= 0) {
       start()
     }
 
     return stop
-  }, [autoStarts, timeout, start, stop, ...deps])
+  }, [shouldAutoStart, timeout, start, stop, ...deps])
 
   return { start, stop }
 }

@@ -33,7 +33,7 @@ export function AccordionDemo() {
     <Frame
       alignment='start'
       options={[
-        ['autoCollapseSections: true', 'autoCollapseSections: false'],
+        ['shouldAutoCollapse: true', 'shouldAutoCollapse: false'],
         ['orientation: vertical', 'orientation: horizontal'],
         ['selectionMode: single', 'selectionMode: multiple', 'selectionMode: none'],
       ]}
@@ -44,14 +44,14 @@ export function AccordionDemo() {
         setSelection([])
       }}
     >
-      {({ autoCollapseSections, orientation, selectionMode }, toast) => (
+      {({ shouldAutoCollapse, orientation, selectionMode }, toast) => (
         <Accordion
           className={clsx({
             'h-44': orientation === 'horizontal',
             'self-start mx-auto w-44': orientation === 'vertical',
           })}
           key={orientation}
-          autoCollapseSections={autoCollapseSections === 'true'}
+          shouldAutoCollapse={shouldAutoCollapse === 'true'}
           expandedSectionIndices={expandedSectionIndices}
           orientation={orientation as any}
           sections={sections}
