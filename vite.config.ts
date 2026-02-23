@@ -30,6 +30,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text-summary'],
     },
+    environment: 'happy-dom',
     include: [
       '**/*.spec.ts',
       '**/*.spec.tsx',
