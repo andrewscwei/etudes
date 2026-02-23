@@ -68,8 +68,6 @@ export function useDropzone<T = HTMLElement>(action: (file: File) => void): UseD
 
     if (files && files.length > 0) {
       const file = files[0]
-      const formData = new FormData()
-      formData.append('file', file)
 
       action(file)
     }
