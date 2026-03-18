@@ -7,13 +7,11 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
+      formats: ['es', 'umd'],
       name: 'etudes',
     },
     outDir: resolve(__dirname, 'build'),
     rollupOptions: {
-      external: [
-        'react',
-      ],
       output: {
         globals: {
           react: 'React',
@@ -25,7 +23,9 @@ export default defineConfig({
   },
   plugins: [
     dts(),
-    esmExternalRequirePlugin({ external: ['react'] }),
+    esmExternalRequirePlugin({
+      external: ['react'],
+    }),
   ],
   test: {
     coverage: {

@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => ({
   ],
   resolve: {
     alias: {
-      etudes: resolve(__dirname, '../src/index.ts'),
+      etudes: resolve(__dirname, '../'),
     },
   },
   root: __dirname,
