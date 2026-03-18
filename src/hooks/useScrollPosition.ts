@@ -4,10 +4,10 @@ import { Point } from 'spase'
 import { useLatest } from './useLatest.js'
 
 export type ScrollPositionInfo = {
-  maxPos: Point
-  minPos: Point
-  pos: Point
-  step: Point
+  current: Point
+  end: Point
+  progress: Point
+  start: Point
 }
 
 type Target = HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined
@@ -20,16 +20,16 @@ type Target = HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElemen
  * @param onChange Handler invoked when the scroll position changes.
  * @param deps Optional dependency list to control when the hook should re-run.
  */
-export function usePosition(
+export function useScrollPosition(
   target: Target,
   onChange: (newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void,
   deps?: DependencyList,
 ): void
-export function usePosition(
+export function useScrollPosition(
   onChange: (newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void,
   deps?: DependencyList,
 ): void
-export function usePosition(...args:
+export function useScrollPosition(...args:
   | [(newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void, DependencyList?]
   | [Target, (newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void, DependencyList?]) {
   const target = typeof args[0] === 'function' ? undefined : args[0]
@@ -93,10 +93,10 @@ function _getViewportScrollPositionInfo(): ScrollPositionInfo | undefined {
   const maxScrollTop = document.documentElement.scrollHeight - window.innerHeight
 
   return {
-    maxPos: Point.make(maxScrollLeft, maxScrollTop),
-    minPos: Point.make(0, 0),
-    pos: Point.make(scrollLeft, scrollTop),
-    step: Point.make(maxScrollLeft > 0 ? scrollLeft / maxScrollLeft : 0, maxScrollTop > 0 ? scrollTop / maxScrollTop : 0),
+    current: Point.make(scrollLeft, scrollTop),
+    end: Point.make(maxScrollLeft, maxScrollTop),
+    progress: Point.make(maxScrollLeft > 0 ? scrollLeft / maxScrollLeft : 0, maxScrollTop > 0 ? scrollTop / maxScrollTop : 0),
+    start: Point.make(0, 0),
   }
 }
 
@@ -107,9 +107,9 @@ function _getElementScrollPositionInfo(element: HTMLElement): ScrollPositionInfo
   const maxScrollTop = element.scrollHeight - element.clientHeight
 
   return {
-    maxPos: Point.make(maxScrollLeft, maxScrollTop),
-    minPos: Point.make(0, 0),
-    pos: Point.make(scrollLeft, scrollTop),
-    step: Point.make(maxScrollLeft > 0 ? scrollLeft / maxScrollLeft : 0, maxScrollTop > 0 ? scrollTop / maxScrollTop : 0),
+    current: Point.make(scrollLeft, scrollTop),
+    end: Point.make(maxScrollLeft, maxScrollTop),
+    progress: Point.make(maxScrollLeft > 0 ? scrollLeft / maxScrollLeft : 0, maxScrollTop > 0 ? scrollTop / maxScrollTop : 0),
+    start: Point.make(0, 0),
   }
 }
