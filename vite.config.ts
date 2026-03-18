@@ -1,4 +1,5 @@
 import { resolve } from 'node:path'
+import { esmExternalRequirePlugin } from 'vite'
 import dts from 'vite-plugin-dts'
 import { defineConfig } from 'vitest/config'
 
@@ -6,7 +7,6 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      formats: ['es'],
       name: 'etudes',
     },
     outDir: resolve(__dirname, 'build'),
@@ -25,6 +25,7 @@ export default defineConfig({
   },
   plugins: [
     dts(),
+    esmExternalRequirePlugin({ external: ['react'] }),
   ],
   test: {
     coverage: {
