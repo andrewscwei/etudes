@@ -1,8 +1,8 @@
-import clsx from 'clsx';
-import { Carousel, Conditional, Each } from 'etudes';
-import { useState } from 'react';
+import clsx from 'clsx'
+import { Carousel, Conditional, Each } from 'etudes'
+import { useState } from 'react'
 
-import { Frame } from '../components/Frame.js';
+import { Frame } from '../components/Frame.js'
 
 function Item({ className, exposure, label, ...props }: { className?: string; exposure?: number; label: string }) {
   return (
@@ -42,7 +42,7 @@ export function CarouselDemo() {
       usesMaxHeight={true}
       onReset={() => setIndex(0)}
     >
-      {({ autoAdvanceInterval, orientation, shouldTrackExposure, isDragEnabled }, toast) => (
+      {({ autoAdvanceInterval, orientation, isDragEnabled, shouldTrackExposure }, toast) => (
         <div className='flex size-full flex-col items-center justify-center gap-1'>
           <div className='flex w-full justify-stretch gap-1'>
             <Each
@@ -65,8 +65,8 @@ export function CarouselDemo() {
             ItemComponent={Item}
             items={items}
             orientation={orientation as any}
-            shouldTrackExposure={shouldTrackExposure === 'true'}
             isDragEnabled={isDragEnabled === 'true'}
+            shouldTrackExposure={shouldTrackExposure === 'true'}
             onIndexChange={t => {
               setIndex(t)
               toast(`Slide ${t + 1}`)

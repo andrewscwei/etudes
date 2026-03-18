@@ -27,7 +27,7 @@ export function DropdownDemo() {
         setIsCollapsed(true)
       }}
     >
-      {({ shouldCollapseOnSelect, layout, maxVisibleItems, orientation, selectionMode, isInverted, isSelectionTogglable }, toast) => (
+      {({ layout, maxVisibleItems, orientation, selectionMode, isInverted, isSelectionTogglable, shouldCollapseOnSelect }, toast) => (
         <Dropdown
           className={clsx('relative text-base', {
             'h-24 w-32': orientation === 'horizontal',
@@ -35,7 +35,6 @@ export function DropdownDemo() {
             'mb-24': orientation === 'vertical' && isInverted === 'false',
             'mt-24': orientation === 'vertical' && isInverted === 'true',
           })}
-          shouldCollapseOnSelect={shouldCollapseOnSelect === 'true'}
           itemLength={36}
           items={items}
           label={t => {
@@ -57,6 +56,7 @@ export function DropdownDemo() {
           isCollapsed={isCollapsed}
           isInverted={isInverted === 'true'}
           isSelectionTogglable={isSelectionTogglable === 'true'}
+          shouldCollapseOnSelect={shouldCollapseOnSelect === 'true'}
           onCollapse={() => setIsCollapsed(true)}
           onExpand={() => setIsCollapsed(false)}
           onSelectAt={t => toast(`Selected Item ${t + 1}`)}

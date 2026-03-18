@@ -44,19 +44,19 @@ export function AccordionDemo() {
         setSelection([])
       }}
     >
-      {({ shouldAutoCollapse, orientation, selectionMode }, toast) => (
+      {({ orientation, selectionMode, shouldAutoCollapse }, toast) => (
         <Accordion
           className={clsx({
             'h-44': orientation === 'horizontal',
             'self-start mx-auto w-44': orientation === 'vertical',
           })}
           key={orientation}
-          shouldAutoCollapse={shouldAutoCollapse === 'true'}
           expandedSectionIndices={expandedSectionIndices}
           orientation={orientation as any}
           sections={sections}
           selection={selection}
           selectionMode={selectionMode as any}
+          shouldAutoCollapse={shouldAutoCollapse === 'true'}
           onDeselectAt={(i, s) => toast(`<${Date.now()}>Deselected Item ${i + 1} at Section ${s + 1}`)}
           onExpandedSectionsChange={setExpandedSectionIndices}
           onSelectAt={(i, s) => toast(`<${Date.now()}>Selected Item ${i + 1} at Section ${s + 1}`)}

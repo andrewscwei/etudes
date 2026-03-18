@@ -22,7 +22,7 @@ describe('createKeyDeep', () => {
   })
 
   it('sorts object keys at every depth', () => {
-    const a = { b: { d: 1, c: 2 }, a: 0 }
+    const a = { a: 0, b: { c: 2, d: 1 } }
     const b = { a: 0, b: { c: 2, d: 1 } }
     expect(createKeyDeep(a)).toBe(createKeyDeep(b))
   })

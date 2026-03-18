@@ -35,11 +35,11 @@ export function StepSliderDemo() {
           isClipped={isClipped === 'true'}
           isInverted={isInverted === 'true'}
           isTrackInteractive={isTrackInteractive === 'true'}
+          shouldOnlyDispatchOnDragEnd={shouldOnlyDispatchOnDragEnd === 'true'}
           onChange={idx => {
             setIndex(idx)
             toast(`Index: ${idx}`)
           }}
-          shouldOnlyDispatchOnDragEnd={shouldOnlyDispatchOnDragEnd === 'true'}
         >
           <StepSlider.Knob className='ia flex items-center justify-center border border-dark bg-dark'/>
           <StepSlider.KnobContainer

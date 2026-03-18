@@ -37,11 +37,11 @@ export function SliderDemo() {
           isClipped={isClipped === 'true'}
           isInverted={isInverted === 'true'}
           isTrackInteractive={isTrackInteractive === 'true'}
+          shouldOnlyDispatchOnDragEnd={shouldOnlyDispatchOnDragEnd === 'true'}
           onChange={pos => {
             setPosition(pos)
             toast(`Position: ${Math.round(pos * (max - min) + min)}`)
           }}
-          shouldOnlyDispatchOnDragEnd={shouldOnlyDispatchOnDragEnd === 'true'}
         >
           <Slider.Knob className='ia flex items-center justify-center border border-dark bg-dark'/>
           <Slider.KnobContainer

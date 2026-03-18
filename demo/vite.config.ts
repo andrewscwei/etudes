@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: resolve(__dirname, '../.gh-pages'),
     rollupOptions: {
-      treeshake: 'smallest',
+      treeshake: true,
     },
     target: 'esnext',
   },
@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => ({
   ],
   resolve: {
     alias: {
-      etudes: resolve(__dirname, '../'),
+      etudes: resolve(__dirname, '../src/index.ts'),
     },
   },
   root: __dirname,

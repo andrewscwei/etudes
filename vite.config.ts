@@ -18,7 +18,7 @@ export default defineConfig({
           react: 'React',
         },
       },
-      treeshake: 'smallest',
+      treeshake: true,
     },
     target: 'esnext',
   },

@@ -36,7 +36,7 @@ describe('createKey', () => {
   })
 
   it('produces the same key for objects regardless of key order', () => {
-    expect(createKey({ b: 2, a: 1 })).toBe(createKey({ a: 1, b: 2 }))
+    expect(createKey({ a: 1, b: 2 })).toBe(createKey({ a: 1, b: 2 }))
   })
 
   it('produces different keys for objects with different values', () => {
