@@ -9,8 +9,7 @@
   "exports": {
     ".": {
       "types": "./build/index.d.ts",
-      "import": "./build/etudes.js",
-      "require": "./build/etudes.umd.cjs"
+      "import": "./build/etudes.js"
     }
   },
   "files": [
