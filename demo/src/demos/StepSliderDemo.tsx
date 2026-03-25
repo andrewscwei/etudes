@@ -36,7 +36,7 @@ export function StepSliderDemo() {
           isInverted={isInverted === 'true'}
           isTrackInteractive={isTrackInteractive === 'true'}
           shouldOnlyDispatchOnDragEnd={shouldOnlyDispatchOnDragEnd === 'true'}
-          onChange={idx => {
+          onIndexChange={idx => {
             setIndex(idx)
             toast(`Index: ${idx}`)
           }}

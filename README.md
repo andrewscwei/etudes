@@ -12,10 +12,7 @@ npm run dev
 npm run build
 
 # Run tests
-npm run unit
-
-# Run tests with coverage
-npm run unit -- --coverage
+npm test
 
 # Type-check without emitting
 npm run typecheck
