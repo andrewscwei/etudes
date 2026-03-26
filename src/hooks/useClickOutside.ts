@@ -54,6 +54,14 @@ export function useClickOutside(
     const pointerUpListener = (event: PointerEvent) => {
       if (pressedOutside && !resolve(event)) {
         handlerRef.current()
+
+        const stop = (e: Event) => {
+          e.preventDefault()
+          e.stopPropagation()
+        }
+
+        window.addEventListener('click', stop, { capture: true, once: true })
+        window.addEventListener('touchend', stop, { capture: true, once: true })
       }
 
       pressedOutside = false
