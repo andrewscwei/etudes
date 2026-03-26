@@ -1,4 +1,4 @@
-import { type RefObject, useLayoutEffect } from 'react'
+import { type RefObject, useEffect } from 'react'
 
 import { useLatest } from './useLatest.js'
 
@@ -9,7 +9,11 @@ type Options = {
 }
 
 /**
- * Hook for adding click outside interaction to an element.
+ * Hook for adding click outside interaction to an element. Click outside is
+ * detected when a pointer down event starts outside the target element and a
+ * pointer up event also happens outside the target element. This allows users
+ * to drag from inside the target element to outside of it without triggering
+ * the click outside handler.
  *
  * @param target The target element(s) or reference(s).
  * @param handler The handler to call when a click outside the target element is
@@ -25,38 +29,42 @@ export function useClickOutside(
   }: Options = {},
 ) {
   const handlerRef = useLatest(handler)
+  const targetsRef = useLatest(([] as Target[]).concat(target))
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!isEnabled) return
 
-    const listener = (event: MouseEvent) => {
-      if (!(event.target instanceof Node)) return
+    let pressedOutside = false
 
-      let isOutside = true
-      let el = event.target
+    const resolve = (event: PointerEvent) => {
+      const node = event.target
+      if (!(node instanceof Node)) return false
 
-      const els = ([] as Target[]).concat(target).map(v => v && 'current' in v ? v.current : v).filter(Boolean)
+      const els = targetsRef.current
+        .map(v => v && 'current' in v ? v.current : v)
+        .filter(Boolean)
 
-      while (el) {
-        if (els.find(t => t === el)) {
-          isOutside = false
-          break
-        }
+      return els.some(el => el?.contains(node))
+    }
 
-        if (!el.parentNode) break
+    const pointerDownListener = (event: PointerEvent) => {
+      pressedOutside = !resolve(event)
+    }
 
-        el = el.parentNode
+    const pointerUpListener = (event: PointerEvent) => {
+      if (pressedOutside && !resolve(event)) {
+        handlerRef.current()
       }
 
-      if (!isOutside) return
-
-      handlerRef.current()
+      pressedOutside = false
     }
 
-    window.addEventListener('click', listener, true)
+    window.addEventListener('pointerdown', pointerDownListener, true)
+    window.addEventListener('pointerup', pointerUpListener, true)
 
     return () => {
-      window.removeEventListener('click', listener, true)
+      window.removeEventListener('pointerdown', pointerDownListener, true)
+      window.removeEventListener('pointerup', pointerUpListener, true)
     }
-  }, [isEnabled, target])
+  }, [isEnabled])
 }
