@@ -10,10 +10,9 @@ type Options = {
 
 /**
  * Hook for adding click outside interaction to an element. Click outside is
- * detected when a pointer down event starts outside the target element and a
- * pointer up event also happens outside the target element. This allows users
- * to drag from inside the target element to outside of it without triggering
- * the click outside handler.
+ * detected when a pointer down event starts outside the target element. This
+ * allows users to drag from inside the target element to outside of it without
+ * triggering the click outside handler.
  *
  * @param target The target element(s) or reference(s).
  * @param handler The handler to call when a click outside the target element is
@@ -34,10 +33,9 @@ export function useClickOutside(
   useEffect(() => {
     if (!isEnabled) return
 
-    let pressedOutside = false
+    let isFromOutside = false
 
-    const resolve = (event: PointerEvent) => {
-      const node = event.target
+    const hitTest = (node: any) => {
       if (!(node instanceof Node)) return false
 
       const els = targetsRef.current
@@ -48,31 +46,22 @@ export function useClickOutside(
     }
 
     const pointerDownListener = (event: PointerEvent) => {
-      pressedOutside = !resolve(event)
+      isFromOutside = !hitTest(event.target)
     }
 
-    const pointerUpListener = (event: PointerEvent) => {
-      if (pressedOutside && !resolve(event)) {
-        handlerRef.current()
+    const clickListener = (event: MouseEvent) => {
+      if (!isFromOutside || hitTest(event.target)) return
 
-        const stop = (e: Event) => {
-          e.preventDefault()
-          e.stopPropagation()
-        }
-
-        window.addEventListener('click', stop, { capture: true, once: true })
-        window.addEventListener('touchend', stop, { capture: true, once: true })
-      }
-
-      pressedOutside = false
+      isFromOutside = false
+      handlerRef.current()
     }
 
     window.addEventListener('pointerdown', pointerDownListener, true)
-    window.addEventListener('pointerup', pointerUpListener, true)
+    window.addEventListener('click', clickListener, true)
 
     return () => {
       window.removeEventListener('pointerdown', pointerDownListener, true)
-      window.removeEventListener('pointerup', pointerUpListener, true)
+      window.removeEventListener('click', clickListener, true)
     }
   }, [isEnabled])
 }

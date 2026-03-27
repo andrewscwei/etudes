@@ -3,9 +3,9 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { useClickOutside } from './useClickOutside.js'
 
-function pointerDownUp(el: Element) {
+function pointerDownClick(el: Element) {
   el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }))
-  el.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, cancelable: true }))
+  el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
 }
 
 describe('useClickOutside', () => {
@@ -17,7 +17,7 @@ describe('useClickOutside', () => {
     document.body.appendChild(outside)
 
     renderHook(() => useClickOutside(target, handler))
-    pointerDownUp(outside)
+    pointerDownClick(outside)
 
     expect(handler).toHaveBeenCalledOnce()
 
@@ -31,7 +31,7 @@ describe('useClickOutside', () => {
     document.body.appendChild(target)
 
     renderHook(() => useClickOutside(target, handler))
-    pointerDownUp(target)
+    pointerDownClick(target)
 
     expect(handler).not.toHaveBeenCalled()
 
@@ -46,7 +46,7 @@ describe('useClickOutside', () => {
     document.body.appendChild(target)
 
     renderHook(() => useClickOutside(target, handler))
-    pointerDownUp(child)
+    pointerDownClick(child)
 
     expect(handler).not.toHaveBeenCalled()
 
@@ -61,7 +61,7 @@ describe('useClickOutside', () => {
     document.body.appendChild(outside)
 
     renderHook(() => useClickOutside(target, handler, { isEnabled: false }))
-    pointerDownUp(outside)
+    pointerDownClick(outside)
 
     expect(handler).not.toHaveBeenCalled()
 
@@ -78,7 +78,7 @@ describe('useClickOutside', () => {
 
     const { unmount } = renderHook(() => useClickOutside(target, handler))
     unmount()
-    pointerDownUp(outside)
+    pointerDownClick(outside)
 
     expect(handler).not.toHaveBeenCalled()
 
@@ -86,7 +86,7 @@ describe('useClickOutside', () => {
     document.body.removeChild(outside)
   })
 
-  it('does not trigger when pointer down is inside and pointer up is outside', () => {
+  it('does not trigger when pointer down is inside and click is outside', () => {
     const handler = vi.fn()
     const target = document.createElement('div')
     const outside = document.createElement('button')
@@ -95,7 +95,7 @@ describe('useClickOutside', () => {
 
     renderHook(() => useClickOutside(target, handler))
     target.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }))
-    outside.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, cancelable: true }))
+    outside.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
 
     expect(handler).not.toHaveBeenCalled()
 
@@ -103,7 +103,7 @@ describe('useClickOutside', () => {
     document.body.removeChild(outside)
   })
 
-  it('does not trigger when pointer down is outside and pointer up is inside', () => {
+  it('does not trigger when pointer down is outside and click is inside', () => {
     const handler = vi.fn()
     const target = document.createElement('div')
     const outside = document.createElement('button')
@@ -112,7 +112,7 @@ describe('useClickOutside', () => {
 
     renderHook(() => useClickOutside(target, handler))
     outside.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }))
-    target.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, cancelable: true }))
+    target.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
 
     expect(handler).not.toHaveBeenCalled()
 
@@ -131,13 +131,13 @@ describe('useClickOutside', () => {
 
     renderHook(() => useClickOutside([t1, t2], handler))
 
-    pointerDownUp(t1)
+    pointerDownClick(t1)
     expect(handler).not.toHaveBeenCalled()
 
-    pointerDownUp(t2)
+    pointerDownClick(t2)
     expect(handler).not.toHaveBeenCalled()
 
-    pointerDownUp(outside)
+    pointerDownClick(outside)
     expect(handler).toHaveBeenCalledOnce()
 
     document.body.removeChild(t1)
