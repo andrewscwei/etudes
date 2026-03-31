@@ -19,7 +19,6 @@ export default defineConfig({
       },
       treeshake: true,
     },
-    target: 'esnext',
   },
   plugins: [
     dts(),

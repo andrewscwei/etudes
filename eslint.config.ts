@@ -19,7 +19,10 @@ export default defineConfig(
       '@stylistic/array-bracket-spacing': ['error', 'never'],
       '@stylistic/array-element-newline': ['error', 'consistent'],
       '@stylistic/arrow-parens': ['error', 'as-needed'],
-      '@stylistic/arrow-spacing': ['error', { after: true, before: true }],
+      '@stylistic/arrow-spacing': ['error', {
+        after: true,
+        before: true,
+      }],
       '@stylistic/brace-style': ['error', '1tbs', {
         allowSingleLine: true,
       }],
@@ -53,7 +56,9 @@ export default defineConfig(
         multiline: 'consistent',
         singleline: 'consistent',
       }],
-      '@stylistic/jsx-curly-spacing': ['error', { when: 'never' }],
+      '@stylistic/jsx-curly-spacing': ['error', {
+        when: 'never',
+      }],
       '@stylistic/jsx-equals-spacing': ['error', 'never'],
       '@stylistic/jsx-first-prop-new-line': ['error', 'multiline'],
       '@stylistic/jsx-function-call-newline': ['error', 'multiline'],
@@ -63,8 +68,13 @@ export default defineConfig(
         when: 'multiline',
       }],
       '@stylistic/jsx-newline': 'off',
-      '@stylistic/jsx-one-expression-per-line': ['error', { allow: 'single-child' }],
-      '@stylistic/jsx-pascal-case': ['error', { allowAllCaps: true, allowLeadingUnderscore: true }],
+      '@stylistic/jsx-one-expression-per-line': ['error', {
+        allow: 'single-child',
+      }],
+      '@stylistic/jsx-pascal-case': ['error', {
+        allowAllCaps: true,
+        allowLeadingUnderscore: true,
+      }],
       '@stylistic/jsx-quotes': ['error', 'prefer-single'],
       '@stylistic/jsx-self-closing-comp': 'error',
       '@stylistic/jsx-tag-spacing': ['error', {
@@ -95,7 +105,9 @@ export default defineConfig(
       '@stylistic/linebreak-style': ['error', 'unix'],
       '@stylistic/lines-around-comment': 'off',
       '@stylistic/max-len': 'off',
-      '@stylistic/max-statements-per-line': ['warn', { max: 1 }],
+      '@stylistic/max-statements-per-line': ['warn', {
+        max: 1,
+      }],
       '@stylistic/member-delimiter-style': ['error', {
         multiline: {
           delimiter: 'none',
@@ -131,7 +143,9 @@ export default defineConfig(
         multiline: true,
       }],
       '@stylistic/object-curly-spacing': ['error', 'always'],
-      '@stylistic/object-property-newline': ['error', { allowAllPropertiesOnSameLine: true }],
+      '@stylistic/object-property-newline': ['error', {
+        allowAllPropertiesOnSameLine: true,
+      }],
       '@stylistic/one-var-declaration-per-line': ['error', 'initializations'],
       '@stylistic/operator-linebreak': ['error', 'after', {
         overrides: {
@@ -143,7 +157,9 @@ export default defineConfig(
       '@stylistic/padded-blocks': ['error', 'never'],
       '@stylistic/padding-line-between-statements': 'off',
       '@stylistic/quote-props': ['error', 'consistent-as-needed'],
-      '@stylistic/quotes': ['error', 'single', { avoidEscape: true }],
+      '@stylistic/quotes': ['error', 'single', {
+        avoidEscape: true,
+      }],
       '@stylistic/rest-spread-spacing': ['error', 'never'],
       '@stylistic/semi': ['error', 'never'],
       '@stylistic/semi-spacing': ['error', {
@@ -203,6 +219,7 @@ export default defineConfig(
       }],
       'perfectionist/sort-enums': ['error', {
         ignoreCase: false,
+        partitionByNewLine: true,
       }],
       'perfectionist/sort-export-attributes': ['error', {
         ignoreCase: false,
@@ -354,7 +371,6 @@ export default defineConfig(
         default: 'array',
       }],
       '@typescript-eslint/class-literal-property-style': ['error', 'getters'],
-      '@typescript-eslint/consistent-generic-constructors': 'error',
       '@typescript-eslint/consistent-indexed-object-style': 'error',
       '@typescript-eslint/consistent-type-assertions': 'error',
       '@typescript-eslint/consistent-type-imports': ['error', {
@@ -449,7 +465,7 @@ export default defineConfig(
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {
-          args: 'all',
+          args: 'none',
           argsIgnorePattern: '^_',
           caughtErrors: 'all',
           caughtErrorsIgnorePattern: '^_',
@@ -491,11 +507,13 @@ export default defineConfig(
       'capitalized-comments': 'off',
       'complexity': 'off',
       'curly': ['error', 'multi-line'],
-      'default-case': 'error',
+      'default-case': 'off',
       'default-case-last': 'error',
       'eqeqeq': ['error', 'smart'],
       'func-names': ['error', 'never'],
-      'func-style': ['error', 'declaration', { allowArrowFunctions: true }],
+      'func-style': ['error', 'declaration', {
+        allowArrowFunctions: true,
+      }],
       'guard-for-in': 'error',
       'id-denylist': [
         'error',
@@ -513,10 +531,14 @@ export default defineConfig(
       'no-alert': 'warn',
       'no-bitwise': 'off',
       'no-caller': 'error',
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-console': ['warn', {
+        allow: ['warn', 'error'],
+      }],
       'no-constant-binary-expression': 'error',
       'no-constructor-return': 'error',
-      'no-empty': ['error', { allowEmptyCatch: true }],
+      'no-empty': ['error', {
+        allowEmptyCatch: true,
+      }],
       'no-eval': 'error',
       'no-extra-bind': 'error',
       'no-fallthrough': 'off',
