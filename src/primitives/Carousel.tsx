@@ -46,6 +46,13 @@ export namespace Carousel {
     orientation?: Orientation
 
     /**
+     * The drag speed multiplier. Higher values result in faster dragging. The
+     * default value is `1`. This is only applicable when dragging with a
+     * non-touch pointer (e.g. mouse).
+     */
+    dragSpeed?: number
+
+    /**
      * Whether to track item exposure (0-1, 0 meaning the item is fully scrolled
      * out of view, 1 meaning the item is fully scrolled into view).
      */
@@ -90,6 +97,7 @@ export namespace Carousel {
 export const Carousel = /* #__PURE__ */ forwardRef((
   {
     autoAdvanceInterval = 0,
+    dragSpeed = 1.0,
     index = 0,
     ItemComponent,
     items = [],
@@ -112,6 +120,7 @@ export const Carousel = /* #__PURE__ */ forwardRef((
   const autoAdvancePauseHandlerRef = useLatest(onAutoAdvancePause)
   const autoAdvanceResumeHandlerRef = useLatest(onAutoAdvanceResume)
   const indexChangeHandlerRef = useLatest(onIndexChange)
+  const dragAccumulatorRef = useRef(Point.zero)
   const isDragTickingRef = useRef(false)
   const isScrollTickingRef = useRef(false)
   const isTouchDevice = useIsTouchDevice()
@@ -196,19 +205,29 @@ export const Carousel = /* #__PURE__ */ forwardRef((
 
   const dragHandler = useCallback(({ x, y }: Point) => {
     const viewport = viewportRef.current
-    if (!viewport || isDragTickingRef.current) return
+    if (!viewport) return
+
+    dragAccumulatorRef.current = Point.make(
+      dragAccumulatorRef.current.x + x,
+      dragAccumulatorRef.current.y + y,
+    )
+
+    if (isDragTickingRef.current) return
 
     unlockScrollEffect()
 
     isDragTickingRef.current = true
 
     requestAnimationFrame(() => {
+      const accumulated = dragAccumulatorRef.current
+      dragAccumulatorRef.current = Point.zero
+
       switch (orientation) {
         case 'horizontal':
-          viewport.scrollLeft -= x * 1.5
+          viewport.scrollLeft -= accumulated.x * dragSpeed
           break
         case 'vertical':
-          viewport.scrollTop -= y * 1.5
+          viewport.scrollTop -= accumulated.y * dragSpeed
           break
         default:
           console.error(`[etudes::Carousel] Unsupported orientation: ${orientation}`)
@@ -216,7 +235,7 @@ export const Carousel = /* #__PURE__ */ forwardRef((
 
       isDragTickingRef.current = false
     })
-  }, [orientation])
+  }, [orientation, dragSpeed])
 
   const scrollListener = useCallback(() => {
     const viewport = viewportRef.current
