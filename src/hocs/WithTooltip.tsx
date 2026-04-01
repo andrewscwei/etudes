@@ -1,29 +1,15 @@
-import clsx from 'clsx'
 import { type CSSProperties, type HTMLAttributes, useCallback, useEffect, useRef } from 'react'
 import { Rect, Size } from 'spase'
 
-import { useRect } from '../hooks/useRect.js'
-import { asStyleDict } from '../utils/asStyleDict.js'
-import { createKey } from '../utils/createKey.js'
 import { ExtractChild } from '../utils/ExtractChild.js'
+import { measureIntrinsicSize } from '../utils/measureIntrinsicSize.js'
+import { setStyles } from '../utils/setStyles.js'
 import { styles } from '../utils/styles.js'
 
 /**
  * Type describing the alignment of the tooltip relative to the wrapped element.
  */
 type Alignment = 'bc' | 'bl' | 'br' | 'cl' | 'cr' | 'tc' | 'tl' | 'tr'
-
-/**
- * Type describing the styling options of the tooltip.
- */
-type StyleOptions = {
-  alignment: Alignment
-  arrowSize: Size
-  fullDialogWidth: number
-  gap: number
-  maxDialogWidth: number
-  targetWidth: number
-}
 
 export namespace WithTooltip {
   /**
@@ -76,7 +62,7 @@ export namespace WithTooltip {
  * string when the target element is hovered.
  */
 export function WithTooltip({
-  className,
+  className = '',
   style,
   alignment: externalAlignment,
   arrowHeight = 6,
@@ -87,55 +73,86 @@ export function WithTooltip({
   maxWidth = 200,
   threshold = 100,
 }: Readonly<WithTooltip.Props>) {
+  const dialogRef = useRef<HTMLElement>(null)
+  const arrowRef = useRef<HTMLElement>(null)
   const targetRef = useRef<HTMLElement>(null)
-  const dialogRef = useRef<HTMLSpanElement>(null)
-  const targetRect = useRect(targetRef)
+  const intersectionObserverRef = useRef<IntersectionObserver>(undefined)
 
-  const createDialog = useCallback(() => {
-    const dialog = window.document.createElement('span')
-    dialog.className = clsx(className)
-    dialog.innerHTML = hint
-    dialog.role = 'tooltip'
+  const applyStyle = useCallback(() => {
+    const dialog = dialogRef.current
+    const arrow = arrowRef.current
+    const target = targetRef.current
+    if (!dialog || !arrow || !target) return
 
-    const alignment = externalAlignment ?? (targetRef.current ? _computeAlignment(targetRef.current, threshold) : 'tl')
-    const fullDialogSize = _computeMaxSize(dialog)
-    const fixedStyles = _getFixedStyles({ alignment, arrowSize: Size.make(arrowWidth, arrowHeight), fullDialogWidth: fullDialogSize.width, gap, maxDialogWidth: maxWidth, targetWidth: targetRect.width })
+    const targetRect = Rect.from(target)
+    const arrowSize = Size.make(arrowWidth, arrowHeight)
+    const dialogSize = measureIntrinsicSize(dialog, maxWidth)
+    const alignment = externalAlignment ?? _computeAlignment(targetRect, threshold)
+    const dialogStyle = _makeDynamicDialogStyle(alignment, dialogSize, arrowSize, gap, targetRect)
+    const arrowStyle = _makeDynamicArrowStyle(alignment, dialogSize, arrowSize, targetRect)
 
-    const dialogStyle = styles(style, fixedStyles.dialog)
-    Object.keys(dialogStyle).forEach(rule => (dialog.style as any)[rule] = (dialogStyle as any)[rule])
-
-    const arrow = window.document.createElement('span')
-    Object.keys(fixedStyles.arrow).forEach(rule => (arrow.style as any)[rule] = (fixedStyles.arrow as any)[rule])
-
-    dialog.appendChild(arrow)
-
-    return dialog
-  }, [className, externalAlignment, hint, maxWidth, createKey(style), targetRect.width, threshold, arrowHeight, arrowWidth, gap])
+    setStyles(styles(style, dialogStyle), { target: dialog })
+    setStyles(arrowStyle, { target: arrow })
+  }, [externalAlignment, maxWidth, style, threshold, arrowHeight, arrowWidth, gap])
 
   const mouseEnterHandler = useCallback(() => {
-    if (!dialogRef.current) return
+    const dialog = dialogRef.current
+    const target = targetRef.current
+    if (!dialog || !target) return
 
-    dialogRef.current.style.opacity = '1'
-    dialogRef.current.ariaHidden = 'false'
-  }, [])
+    const intersectionObserver = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (entry.target === target) {
+          applyStyle()
+          break
+        }
+      }
+    })
+
+    intersectionObserver.observe(target)
+    intersectionObserverRef.current = intersectionObserver
+
+    window.addEventListener('resize', applyStyle)
+
+    dialog.style.opacity = '1'
+    dialog.ariaHidden = 'false'
+
+    applyStyle()
+  }, [applyStyle])
 
   const mouseLeaveHandler = useCallback(() => {
-    if (!dialogRef.current) return
+    const el = dialogRef.current
+    if (!el) return
 
-    dialogRef.current.style.opacity = '0'
-    dialogRef.current.ariaHidden = 'true'
-  }, [])
+    el.style.opacity = '0'
+    el.ariaHidden = 'true'
+
+    intersectionObserverRef.current?.disconnect()
+    intersectionObserverRef.current = undefined
+
+    window.removeEventListener('resize', applyStyle)
+  }, [applyStyle])
 
   useEffect(() => {
-    const dialogNode = createDialog()
-    targetRef.current?.appendChild(dialogNode)
-    dialogRef.current = dialogNode
+    const { arrow, dialog } = _createDialog(className, hint)
+    arrowRef.current = arrow
+    dialogRef.current = dialog
+
+    window.document.body.appendChild(dialog)
+
+    mouseLeaveHandler()
 
     return () => {
-      targetRef.current?.removeChild(dialogNode)
+      window.document.body.removeChild(dialog)
+      arrowRef.current = null
       dialogRef.current = null
+
+      intersectionObserverRef.current?.disconnect()
+      intersectionObserverRef.current = undefined
+
+      window.removeEventListener('resize', applyStyle)
     }
-  }, [createDialog])
+  }, [className, hint])
 
   return (
     <ExtractChild
@@ -148,29 +165,41 @@ export function WithTooltip({
   )
 }
 
-function _computeMaxSize(element: HTMLElement) {
-  if (typeof window === 'undefined') return Size.zero
+function _createDialog(className: string, content: string): { arrow: HTMLElement; dialog: HTMLElement } {
+  const dialog = window.document.createElement('span')
+  dialog.className = className
+  dialog.innerHTML = content
+  dialog.role = 'tooltip'
 
-  const clone = element.cloneNode(false) as HTMLElement
-  clone.innerHTML = element.innerHTML
-  clone.style.visibility = 'hidden'
-  clone.style.whiteSpace = 'pre'
+  setStyles({
+    boxSizing: 'border-box',
+    height: 'auto',
+    margin: '0',
+    pointerEvents: 'none',
+    position: 'fixed',
+    userSelect: 'none',
+    zIndex: 100,
+  }, { target: dialog })
 
-  window.document.body.appendChild(clone)
-  const rect = clone.getBoundingClientRect()
-  window.document.body.removeChild(clone)
+  const arrow = window.document.createElement('span')
 
-  return Size.make(rect.width, rect.height)
+  setStyles({
+    background: 'inherit',
+    position: 'absolute',
+  }, { target: arrow })
+
+  dialog.appendChild(arrow)
+
+  return { arrow, dialog }
 }
 
-function _computeAlignment(element: HTMLElement, threshold: number) {
+function _computeAlignment(targetRect: Rect, threshold: number) {
   const vrect = Rect.fromViewport()
-  const irect = Rect.intersecting(element)
 
-  const leftBound = irect.left - vrect.left < threshold
-  const rightBound = vrect.right - irect.right < threshold
-  const topBound = irect.top - vrect.top < threshold
-  const bottomBound = vrect.bottom - irect.bottom < threshold
+  const leftBound = (targetRect.left - vrect.left) < threshold
+  const rightBound = (vrect.right - targetRect.right) < threshold
+  const topBound = (targetRect.top - vrect.top) < threshold
+  const bottomBound = (vrect.bottom - targetRect.bottom) < threshold
 
   if (leftBound && topBound) return 'br'
   if (leftBound && bottomBound) return 'tr'
@@ -183,52 +212,64 @@ function _computeAlignment(element: HTMLElement, threshold: number) {
   return 'tc'
 }
 
-function _makeDialogStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }: StyleOptions): CSSProperties {
-  const dialogWidth = Math.min(fullDialogWidth, maxDialogWidth)
-  const shouldRealign = targetWidth > dialogWidth
+function _makeDynamicDialogStyle(alignment: Alignment, dialogSize: Size, arrowSize: Size, gap: number, targetRect: Rect): CSSProperties {
+  const width = dialogSize.width
+  const shouldRealign = targetRect.width > width
+  const centerX = targetRect.left + targetRect.width / 2
+  const centerY = targetRect.top + targetRect.height / 2
+
+  const baseStyle = {
+    width: `${width}px`,
+  }
 
   switch (alignment) {
     case 'bc': return {
-      left: '50%',
-      top: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
+      ...baseStyle,
+      left: `${centerX}px`,
+      top: `${targetRect.bottom + arrowSize.height + gap}px`,
       transform: 'translateX(-50%)',
     }
     case 'bl': return {
-      left: shouldRealign ? '50%' : '',
-      right: shouldRealign ? '' : '0',
-      top: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
-      transform: `translate(${dialogWidth > targetWidth ? '0' : '-50%'}, 0)`,
+      ...baseStyle,
+      left: shouldRealign ? `${centerX}px` : `${targetRect.right}px`,
+      top: `${targetRect.bottom + arrowSize.height + gap}px`,
+      transform: shouldRealign ? 'translateX(-50%)' : 'translateX(-100%)',
     }
     case 'br': return {
-      left: shouldRealign ? '50%' : '0',
-      top: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
-      transform: `translate(${dialogWidth > targetWidth ? '0' : '-50%'}, 0)`,
+      ...baseStyle,
+      left: shouldRealign ? `${centerX}px` : `${targetRect.left}px`,
+      top: `${targetRect.bottom + arrowSize.height + gap}px`,
+      transform: shouldRealign ? 'translateX(-50%)' : '',
     }
     case 'cl': return {
-      right: `calc(100% + ${arrowSize.height + gap}px)`,
-      top: '50%',
-      transform: 'translate(0, -50%)',
+      ...baseStyle,
+      left: `${targetRect.left - arrowSize.height - gap}px`,
+      top: `${centerY}px`,
+      transform: 'translate(-100%, -50%)',
     }
     case 'cr': return {
-      left: `calc(100% + ${arrowSize.height + gap}px)`,
-      top: '50%',
-      transform: 'translate(0, -50%)',
+      ...baseStyle,
+      left: `${targetRect.right + arrowSize.height + gap}px`,
+      top: `${centerY}px`,
+      transform: 'translateY(-50%)',
     }
     case 'tc': return {
-      bottom: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
-      left: '50%',
-      transform: 'translateX(-50%)',
+      ...baseStyle,
+      left: `${centerX}px`,
+      top: `${targetRect.top - arrowSize.height - gap}px`,
+      transform: 'translate(-50%, -100%)',
     }
     case 'tl': return {
-      bottom: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
-      left: shouldRealign ? '50%' : '',
-      right: shouldRealign ? '' : '0',
-      transform: `translate(${dialogWidth > targetWidth ? '0' : '-50%'}, 0)`,
+      ...baseStyle,
+      left: shouldRealign ? `${centerX}px` : `${targetRect.right}px`,
+      top: `${targetRect.top - arrowSize.height - gap}px`,
+      transform: shouldRealign ? 'translate(-50%, -100%)' : 'translate(-100%, -100%)',
     }
     case 'tr': return {
-      bottom: `calc(100% + ${arrowSize.height}px + ${gap}px)`,
-      left: shouldRealign ? '50%' : '0',
-      transform: `translate(${dialogWidth > targetWidth ? '0' : '-50%'}, 0)`,
+      ...baseStyle,
+      left: shouldRealign ? `${centerX}px` : `${targetRect.left}px`,
+      top: `${targetRect.top - arrowSize.height - gap}px`,
+      transform: shouldRealign ? 'translate(-50%, -100%)' : 'translateY(-100%)',
     }
     default:
       console.error(`[etudes::WithTooltip] Invalid alignment: ${alignment}`)
@@ -237,104 +278,83 @@ function _makeDialogStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialo
   }
 }
 
-function _makeArrowStyle({ alignment, arrowSize, fullDialogWidth, maxDialogWidth, targetWidth }: StyleOptions): CSSProperties {
-  const dialogWidth = Math.min(fullDialogWidth, maxDialogWidth)
-  const shouldRealign = targetWidth > dialogWidth
+function _makeDynamicArrowStyle(alignment: Alignment, dialogSize: Size, arrowSize: Size, targetRect: Rect): CSSProperties {
+  const targetWidth = targetRect.width
+  const shouldRealign = targetWidth > dialogSize.width
+
+  const baseStyle = {
+    bottom: 'auto',
+    height: `${arrowSize.height}px`,
+    left: 'auto',
+    right: 'auto',
+    top: 'auto',
+    width: `${arrowSize.width}px`,
+  }
 
   switch (alignment) {
     case 'bc': return {
+      ...baseStyle,
       clipPath: 'polygon(50% 0,100% 100%,0 100%)',
-      height: `${arrowSize.height}px`,
       left: '50%',
       top: '0',
       transform: 'translate(-50%, -100%)',
-      width: `${arrowSize.width}px`,
     }
     case 'bl': return {
+      ...baseStyle,
       clipPath: 'polygon(50% 0,100% 100%,0 100%)',
-      height: `${arrowSize.height}px`,
       left: shouldRealign ? '50%' : '',
       right: shouldRealign ? '' : `${targetWidth - arrowSize.width / 2 - targetWidth / 2}px`,
       top: '0',
       transform: `translate(${shouldRealign ? '-50%' : '0'}, -100%)`,
-      width: `${arrowSize.width}px`,
     }
     case 'br': return {
+      ...baseStyle,
       clipPath: 'polygon(50% 0,100% 100%,0 100%)',
-      height: `${arrowSize.height}px`,
       left: shouldRealign ? '50%' : `${targetWidth - arrowSize.width / 2 - targetWidth / 2}px`,
       top: '0',
       transform: `translate(${shouldRealign ? '-50%' : '0'}, -100%)`,
-      width: `${arrowSize.width}px`,
     }
     case 'cl': return {
+      ...baseStyle,
       clipPath: 'polygon(0 0,100% 50%,0 100%)',
-      height: `${arrowSize.width}px`,
       right: '0',
       top: '50%',
       transform: 'translate(100%, -50%)',
-      width: `${arrowSize.height}px`,
     }
     case 'cr': return {
+      ...baseStyle,
       clipPath: 'polygon(100% 0,0 50%,100% 100%)',
-      height: `${arrowSize.width}px`,
       left: '0',
       top: '50%',
       transform: 'translate(-100%, -50%)',
-      width: `${arrowSize.height}px`,
     }
     case 'tc': return {
+      ...baseStyle,
       bottom: 0,
-      clipPath: 'polygon(50% 100%,100% 0,0 0)',
-      height: `${arrowSize.height}px`,
+      clipPath: 'polygon(50% 100%, 100% 0, 0 0)',
       left: '50%',
       transform: 'translate(-50%, 100%)',
-      width: `${arrowSize.width}px`,
     }
     case 'tl': return {
+      ...baseStyle,
       bottom: 0,
-      clipPath: 'polygon(50% 100%,100% 0,0 0)',
-      height: `${arrowSize.height}px`,
+      clipPath: 'polygon(50% 100%, 100% 0, 0 0)',
       left: shouldRealign ? '50%' : '',
       right: shouldRealign ? '' : `${targetWidth - arrowSize.width / 2 - targetWidth / 2}px`,
       transform: `translate(${shouldRealign ? '-50%' : '0'}, 100%)`,
-      width: `${arrowSize.width}px`,
     }
     case 'tr': return {
+      ...baseStyle,
       bottom: 0,
-      clipPath: 'polygon(50% 100%,100% 0,0 0)',
-      height: `${arrowSize.height}px`,
+      clipPath: 'polygon(50% 100%, 100% 0, 0 0)',
       left: shouldRealign ? '50%' : `${targetWidth - arrowSize.width / 2 - targetWidth / 2}px`,
       transform: `translate(${shouldRealign ? '-50%' : '0'}, 100%)`,
-      width: `${arrowSize.width}px`,
     }
     default:
       console.error(`[etudes::WithTooltip] Invalid alignment: ${alignment}`)
 
       return {}
   }
-}
-
-function _getFixedStyles({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }: StyleOptions) {
-  return asStyleDict({
-    arrow: {
-      background: 'inherit',
-      position: 'absolute',
-      ..._makeArrowStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }),
-    },
-    dialog: {
-      boxSizing: 'border-box',
-      height: 'auto',
-      margin: '0',
-      opacity: '0',
-      pointerEvents: 'none',
-      position: 'absolute',
-      userSelect: 'none',
-      whiteSpace: fullDialogWidth > maxDialogWidth ? 'normal' : 'pre',
-      width: fullDialogWidth > maxDialogWidth ? `${maxDialogWidth}px` : '',
-      ..._makeDialogStyle({ alignment, arrowSize, fullDialogWidth, gap, maxDialogWidth, targetWidth }),
-    },
-  })
 }
 
 if (process.env.NODE_ENV === 'development') {
