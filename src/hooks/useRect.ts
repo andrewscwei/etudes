@@ -1,5 +1,5 @@
 import { type RefObject, useLayoutEffect, useState } from 'react'
-import { Rect, Size } from 'spase'
+import { Rect } from 'spase'
 
 import { useIntersectionObserver } from './useIntersectionObserver.js'
 import { useSizeObserver } from './useSizeObserver.js'
@@ -20,13 +20,13 @@ export function useRect(target: HTMLElement | null | RefObject<HTMLElement> | Re
   useSizeObserver(target, el => {
     const newRect = Rect.from(el)
 
-    setRect(newRect)
+    setRect(prev => Rect.isEqual(prev, newRect) ? prev : newRect)
   })
 
   useIntersectionObserver(target, el => {
     const newRect = Rect.from(el)
 
-    setRect(newRect)
+    setRect(prev => Rect.isEqual(prev, newRect) ? prev : newRect)
   })
 
   useLayoutEffect(() => {
@@ -35,8 +35,8 @@ export function useRect(target: HTMLElement | null | RefObject<HTMLElement> | Re
 
     const newRect = Rect.from(element)
 
-    setRect(newRect)
-  }, [target, Size.toString(viewportSize)])
+    setRect(prev => Rect.isEqual(prev, newRect) ? prev : newRect)
+  }, [target, viewportSize])
 
   return rect
 }

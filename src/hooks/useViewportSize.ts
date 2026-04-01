@@ -12,7 +12,7 @@ export function useViewportSize(): Size {
   useLayoutEffect(() => {
     const listener = () => {
       const viewportSize = Rect.size(Rect.fromViewport())
-      setSize(viewportSize)
+      setSize(prev => Size.isEqual(prev, viewportSize) ? prev : viewportSize)
     }
 
     window.addEventListener('resize', listener)
