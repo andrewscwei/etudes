@@ -1,4 +1,4 @@
-import { type CSSProperties, type HTMLAttributes, useCallback, useEffect, useRef } from 'react'
+import { type CSSProperties, type HTMLAttributes, type RefObject, useCallback, useEffect, useRef } from 'react'
 import { Rect, Size } from 'spase'
 
 import { ExtractChild } from '../utils/ExtractChild.js'
@@ -31,6 +31,14 @@ export namespace WithTooltip {
      * The width of the arrow.
      */
     arrowWidth?: number
+
+    /**
+     * Specifies if the tooltip should be wrapped in a container element,
+     * defaults to `true`. If `false`, the tooltip will be directly attached to
+     * the child element, and the child element must be able to accept a ref and
+     * mouse event handlers.
+     */
+    forwardProps?: boolean
 
     /**
      * The hint string to display in the tooltip, rendered as raw HTML via
@@ -79,6 +87,7 @@ export function WithTooltip({
   arrowHeight = 6,
   arrowWidth = 12,
   children,
+  forwardProps = false,
   gap = 4,
   hint,
   maxWidth = 200,
@@ -96,14 +105,20 @@ export function WithTooltip({
     if (!dialog || !arrow || !target) return
 
     const targetRect = Rect.from(target)
+    const viewportRect = Rect.fromViewport()
+    const anchorRect = Rect.make({
+      height: targetRect.height,
+      width: targetRect.width,
+      x: targetRect.left - viewportRect.left,
+      y: targetRect.top - viewportRect.top,
+    })
+
     const arrowSize = Size.make(arrowWidth, arrowHeight)
     const dialogSize = measureIntrinsicSize(dialog, maxWidth)
-    const alignment = externalAlignment ?? _computeAlignment(targetRect, threshold)
-    const dialogStyle = _makeDynamicDialogStyle(alignment, dialogSize, arrowSize, gap, targetRect)
-    const arrowStyle = _makeDynamicArrowStyle(alignment, dialogSize, arrowSize, targetRect)
+    const alignment = externalAlignment ?? _computeAlignment(anchorRect, viewportRect, threshold)
 
-    setStyles(styles(style, dialogStyle), { target: dialog })
-    setStyles(arrowStyle, { target: arrow })
+    setStyles(styles(style, _makeDynamicDialogStyle(alignment, dialogSize, arrowSize, gap, anchorRect)), { target: dialog })
+    setStyles(_makeDynamicArrowStyle(alignment, dialogSize, arrowSize, anchorRect), { target: arrow })
   }, [externalAlignment, maxWidth, style, threshold, arrowHeight, arrowWidth, gap])
 
   const mouseEnterHandler = useCallback(() => {
@@ -125,23 +140,25 @@ export function WithTooltip({
 
     window.addEventListener('resize', applyStyle)
 
-    dialog.style.opacity = '1'
-    dialog.ariaHidden = 'false'
-
     applyStyle()
+
+    if (!dialog.isConnected) {
+      window.document.body.appendChild(dialog)
+    }
   }, [applyStyle])
 
   const mouseLeaveHandler = useCallback(() => {
-    const el = dialogRef.current
-    if (!el) return
-
-    el.style.opacity = '0'
-    el.ariaHidden = 'true'
+    const dialog = dialogRef.current
+    if (!dialog) return
 
     intersectionObserverRef.current?.disconnect()
     intersectionObserverRef.current = undefined
 
     window.removeEventListener('resize', applyStyle)
+
+    if (dialog.isConnected) {
+      window.document.body.removeChild(dialog)
+    }
   }, [applyStyle])
 
   useEffect(() => {
@@ -149,12 +166,11 @@ export function WithTooltip({
     arrowRef.current = arrow
     dialogRef.current = dialog
 
-    window.document.body.appendChild(dialog)
-
-    mouseLeaveHandler()
-
     return () => {
-      window.document.body.removeChild(dialog)
+      if (dialog.isConnected) {
+        window.document.body.removeChild(dialog)
+      }
+
       arrowRef.current = null
       dialogRef.current = null
 
@@ -165,15 +181,27 @@ export function WithTooltip({
     }
   }, [className, hint])
 
-  return (
-    <ExtractChild
-      ref={targetRef}
-      onMouseEnter={mouseEnterHandler}
-      onMouseLeave={mouseLeaveHandler}
-    >
-      {children}
-    </ExtractChild>
-  )
+  if (forwardProps) {
+    return (
+      <ExtractChild
+        ref={targetRef}
+        onMouseEnter={mouseEnterHandler}
+        onMouseLeave={mouseLeaveHandler}
+      >
+        {children}
+      </ExtractChild>
+    )
+  } else {
+    return (
+      <div
+        ref={targetRef as RefObject<HTMLDivElement>}
+        onMouseEnter={mouseEnterHandler}
+        onMouseLeave={mouseLeaveHandler}
+      >
+        {children}
+      </div>
+    )
+  }
 }
 
 function _createDialog(className: string, content: string): { arrow: HTMLElement; dialog: HTMLElement } {
@@ -204,13 +232,11 @@ function _createDialog(className: string, content: string): { arrow: HTMLElement
   return { arrow, dialog }
 }
 
-function _computeAlignment(targetRect: Rect, threshold: number) {
-  const vrect = Rect.fromViewport()
-
-  const leftBound = (targetRect.left - vrect.left) < threshold
-  const rightBound = (vrect.right - targetRect.right) < threshold
-  const topBound = (targetRect.top - vrect.top) < threshold
-  const bottomBound = (vrect.bottom - targetRect.bottom) < threshold
+function _computeAlignment(targetRect: Rect, viewportRect: Rect, threshold: number) {
+  const leftBound = (targetRect.left - viewportRect.left) < threshold
+  const rightBound = (viewportRect.right - targetRect.right) < threshold
+  const topBound = (targetRect.top - viewportRect.top) < threshold
+  const bottomBound = (viewportRect.bottom - targetRect.bottom) < threshold
 
   if (leftBound && topBound) return 'br'
   if (leftBound && bottomBound) return 'tr'
