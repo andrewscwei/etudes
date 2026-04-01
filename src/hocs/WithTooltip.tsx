@@ -58,8 +58,19 @@ export namespace WithTooltip {
 }
 
 /**
- * A component that wraps a target element and displays a tooltip with a hint
- * string when the target element is hovered.
+ * A component that wraps a child component and displays a tooltip with a hint
+ * string when the target element is hovered. The tooltip is rendered as a
+ * fixed-position element appended to the document body, and its position is
+ * dynamically computed based on the target element's position and the specified
+ * alignment. The tooltip automatically realigns itself if the target element is
+ * too close to the edge of the window.
+ *
+ * The following requirements must be met:
+ *   1. The child component must be a single React element
+ *   2. The child component must support a forwarding ref to an HTML element,
+ *      which will be used as the target of the tooltip
+ *   3. The child component must have `onMouseEnter` and `onMouseLeave` props,
+ *      which will be used to trigger the tooltip display and hide, respectively
  */
 export function WithTooltip({
   className = '',
