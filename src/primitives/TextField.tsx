@@ -1,11 +1,16 @@
 import clsx from 'clsx'
-import { type ChangeEvent, type FocusEvent, forwardRef, type HTMLInputTypeAttribute, type InputHTMLAttributes, useCallback } from 'react'
+import { type ChangeEvent, type FocusEvent, type HTMLInputTypeAttribute, type InputHTMLAttributes, type Ref, useCallback } from 'react'
 
 export namespace TextField {
   /**
    * Type describing the props of {@link TextField}.
    */
   export type Props = {
+    /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLInputElement>
+
     /**
      * The value to set to when the text field is empty.
      */
@@ -71,23 +76,7 @@ export namespace TextField {
 /**
  * A text field that supports custom value formatting and empty value.
  */
-export const TextField = /* #__PURE__ */ forwardRef<HTMLInputElement, Readonly<TextField.Props>>((
-  {
-    className,
-    emptyValue = '',
-    formatter,
-    placeholder,
-    type = 'text',
-    value,
-    isDisabled = false,
-    isRequired = false,
-    onChange,
-    onFocus,
-    onUnfocus,
-    ...props
-  },
-  ref,
-) => {
+export function TextField({ className, ref, emptyValue = '', formatter, placeholder, type = 'text', value, isDisabled = false, isRequired = false, onChange, onFocus, onUnfocus, ...props }: TextField.Props) {
   const handleValueChange = useCallback((newValue: string) => {
     const formatted = (formatter?.(newValue) ?? newValue) || emptyValue
 
@@ -112,7 +101,7 @@ export const TextField = /* #__PURE__ */ forwardRef<HTMLInputElement, Readonly<T
       onFocus={({ target }: FocusEvent<HTMLInputElement>) => onFocus?.(target.value)}
     />
   )
-})
+}
 
 if (process.env.NODE_ENV === 'development') {
   TextField.displayName = 'TextField'
