@@ -1,4 +1,4 @@
-import { forwardRef, type HTMLAttributes, useEffect } from 'react'
+import { type HTMLAttributes, type Ref, useEffect } from 'react'
 import { type Size } from 'spase'
 
 import { useImageSize } from '../hooks/useImageSize.js'
@@ -9,6 +9,11 @@ export namespace Image {
    * Type describing the props of {@link Image}.
    */
   export type Props = {
+    /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLImageElement>
+
     /**
      * Optional alt text.
      */
@@ -59,20 +64,7 @@ export namespace Image {
  * A component that renders an image with support for lazy loading, `srcSet`,
  * and `sizes` attributes.
  */
-export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<Image.Props>>((
-  {
-    alt,
-    loadingMode,
-    source,
-    src: fallbackSrc,
-    onError,
-    onLoad,
-    onLoadStart,
-    onSizeChange,
-    ...props
-  },
-  ref,
-) => {
+export function Image({ ref, alt, loadingMode, source, src: fallbackSrc, onError, onLoad, onLoadStart, onSizeChange, ...props }: Image.Props) {
   const resolvedImageSource = source ? ImageSource.asProps(source) : undefined
 
   const size = useImageSize({
@@ -99,7 +91,7 @@ export const Image = /* #__PURE__ */ forwardRef<HTMLImageElement, Readonly<Image
       src={fallbackSrc}
     />
   )
-})
+}
 
 if (process.env.NODE_ENV === 'development') {
   Image.displayName = 'Image'

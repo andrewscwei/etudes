@@ -1,4 +1,4 @@
-import { forwardRef, type HTMLAttributes, type RefObject, useRef, useState } from 'react'
+import { type HTMLAttributes, type Ref, type RefObject, useRef, useState } from 'react'
 import { Size } from 'spase'
 
 import { useRect } from '../hooks/useRect.js'
@@ -8,8 +8,16 @@ import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
-const _CoverVideo = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverVideo.Props>>(({
+/**
+ * A component that displays a video with a fixed aspect ratio. The video is
+ * centered and cropped to fit the container (a.k.a. viewport).
+ *
+ * @exports CoverVideo.Content Component for optional content inside the video.
+ * @exports CoverVideo.Viewport Component for the viewport.
+ */
+export function CoverVideo({
   className,
+  ref,
   style,
   aspectRatio: externalAspectRatio = NaN,
   autoLoop,
@@ -30,7 +38,7 @@ const _CoverVideo = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverVid
   onPlay,
   onSizeChange,
   ...props
-}, ref) => {
+}: Readonly<CoverVideo.Props>) {
   const handleSizeChange = (size?: Size) => {
     setLocalAspectRatio(size ? size.width / size.height : NaN)
     onSizeChange?.(size)
@@ -51,8 +59,8 @@ const _CoverVideo = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverVid
   )
 
   const components = asComponentDict(children, {
-    content: _Content,
-    viewport: _Viewport,
+    content: CoverVideo.Content,
+    viewport: CoverVideo.Viewport,
   })
 
   return (
@@ -98,25 +106,7 @@ const _CoverVideo = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverVid
       {components.content}
     </div>
   )
-})
-
-/**
- * Component for optional content inside a {@link CoverVideo}.
- */
-const _Content = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}>
-    {children}
-  </div>
-)
-
-/**
- * Component for the viewport of a {@link CoverVideo}.
- */
-const _Viewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}>
-    {children}
-  </div>
-)
+}
 
 export namespace CoverVideo {
   /**
@@ -124,31 +114,35 @@ export namespace CoverVideo {
    */
   export type Props = {
     /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLDivElement>
+
+    /**
      * The known aspect ratio of the video, expressed by width / height. If
      * unprovided, it will be inferred after loading the video.
      */
     aspectRatio?: number
   } & Omit<HTMLAttributes<HTMLDivElement>, 'onCanPlay' | 'onPause' | 'onPlay'> & Pick<Video.Props, 'autoLoop' | 'autoPlay' | 'hasControls' | 'isMuted' | 'onCanPlay' | 'onEnd' | 'onFullscreenChange' | 'onLoadMetadata' | 'onLoadMetadataComplete' | 'onLoadMetadataError' | 'onPause' | 'onPlay' | 'onSizeChange' | 'playsInline' | 'posterSrc' | 'src'>
-}
 
-/**
- * A component that displays a video with a fixed aspect ratio. The video is
- * centered and cropped to fit the container (a.k.a. viewport).
- *
- * @exports CoverVideo.Content Component for optional content inside the video.
- * @exports CoverVideo.Viewport Component for the viewport.
- */
-export const CoverVideo = /* #__PURE__ */ Object.assign(_CoverVideo, {
   /**
    * Component for optional content inside a {@link CoverVideo}.
    */
-  Content: _Content,
+  export const Content = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}>
+      {children}
+    </div>
+  )
 
   /**
    * Component for the viewport of a {@link CoverVideo}.
    */
-  Viewport: _Viewport,
-})
+  export const Viewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}>
+      {children}
+    </div>
+  )
+}
 
 const FIXED_STYLES = asStyleDict({
   root: {
@@ -163,8 +157,8 @@ const FIXED_STYLES = asStyleDict({
 })
 
 if (process.env.NODE_ENV === 'development') {
-  _CoverVideo.displayName = 'CoverVideo'
+  CoverVideo.displayName = 'CoverVideo'
 
-  _Content.displayName = 'CoverVideo.Content'
-  _Viewport.displayName = 'CoverVideo.Viewport'
+  CoverVideo.Content.displayName = 'CoverVideo.Content'
+  CoverVideo.Viewport.displayName = 'CoverVideo.Viewport'
 }

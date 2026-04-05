@@ -1,4 +1,4 @@
-import { forwardRef, type ReactEventHandler, type RefObject, useEffect, useRef, type VideoHTMLAttributes } from 'react'
+import { type ReactEventHandler, type Ref, type RefObject, useEffect, useRef, type VideoHTMLAttributes } from 'react'
 import { type Size } from 'spase'
 
 import { useVideoSize } from '../hooks/useVideoSize.js'
@@ -37,6 +37,11 @@ export namespace Video {
      * The URL of the video poster when video is unavailable or loading.
      */
     posterSrc?: string
+
+    /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLVideoElement>
 
     /**
      * The URL of the video to play.
@@ -114,7 +119,8 @@ export namespace Video {
  *
  * @see {@link https://www.npmjs.com/package/hls.js}
  */
-export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video.Props>>(({
+export function Video({
+  ref,
   autoLoop = true,
   autoPlay = true,
   playsInline = true,
@@ -133,7 +139,7 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video
   onSizeChange,
   onTimeUpdate,
   ...props
-}, ref) => {
+}: Video.Props) {
   const localRef = useRef<HTMLVideoElement>(null)
   const videoRef = ref as RefObject<HTMLVideoElement> ?? localRef
   const size = useVideoSize(src, {
@@ -238,7 +244,7 @@ export const Video = /* #__PURE__ */ forwardRef<HTMLVideoElement, Readonly<Video
       <source src={src}/>
     </video>
   )
-})
+}
 
 if (process.env.NODE_ENV === 'development') {
   Video.displayName = 'Video'

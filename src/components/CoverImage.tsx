@@ -1,4 +1,4 @@
-import { forwardRef, type HTMLAttributes, type RefObject, useRef, useState } from 'react'
+import { type HTMLAttributes, type Ref, type RefObject, useRef, useState } from 'react'
 import { Size } from 'spase'
 
 import { useRect } from '../hooks/useRect.js'
@@ -8,22 +8,27 @@ import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
-const _CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverImage.Props>>((
-  {
-    style,
-    alt,
-    aspectRatio: externalAspectRatio = NaN,
-    children,
-    loadingMode,
-    sources,
-    src,
-    onError,
-    onLoad,
-    onLoadStart,
-    ...props
-  },
+/**
+ * A component that displays an image with a fixed aspect ratio. The image is
+ * centered and cropped to fit the container (a.k.a. viewport).
+ *
+ * @exports CoverImage.Content Component for optional content inside the image.
+ * @exports CoverImage.Viewport Component for the viewport.
+ */
+export function CoverImage({
   ref,
-) => {
+  style,
+  alt,
+  aspectRatio: externalAspectRatio = NaN,
+  children,
+  loadingMode,
+  sources,
+  src,
+  onError,
+  onLoad,
+  onLoadStart,
+  ...props
+}: Readonly<CoverImage.Props>) {
   const handleSizeChange = (size?: Size) => {
     setLocalAspectRatio(size ? size.width / size.height : NaN)
   }
@@ -44,8 +49,8 @@ const _CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverIma
       : Math.max(rootRect.height, rootRect.width / aspectRatio),
   )
   const components = asComponentDict(children, {
-    content: _Content,
-    viewport: _Viewport,
+    content: CoverImage.Content,
+    viewport: CoverImage.Viewport,
   })
 
   return (
@@ -81,19 +86,7 @@ const _CoverImage = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<CoverIma
       {components.content}
     </div>
   )
-})
-
-export const _Content = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}>
-    {children}
-  </div>
-)
-
-export const _Viewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}>
-    {children}
-  </div>
-)
+}
 
 export namespace CoverImage {
   /**
@@ -101,31 +94,35 @@ export namespace CoverImage {
    */
   export type Props = {
     /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLDivElement>
+
+    /**
      * The known aspect ratio of the image, expressed by width / height. If
      * unprovided, it will be inferred after loading the image.
      */
     aspectRatio?: number
   } & Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<Picture.Props, 'alt' | 'loadingMode' | 'onError' | 'onLoad' | 'onLoadStart' | 'sources' | 'src'>
-}
 
-/**
- * A component that displays an image with a fixed aspect ratio. The image is
- * centered and cropped to fit the container (a.k.a. viewport).
- *
- * @exports CoverImage.Content Component for optional content inside the image.
- * @exports CoverImage.Viewport Component for the viewport.
- */
-export const CoverImage = /* #__PURE__ */ Object.assign(_CoverImage, {
   /**
    * Component for optional content inside a {@link CoverImage}.
    */
-  Content: _Content,
+  export const Content = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}>
+      {children}
+    </div>
+  )
 
   /**
    * Component for the viewport of a {@link CoverImage}.
    */
-  Viewport: _Viewport,
-})
+  export const Viewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}>
+      {children}
+    </div>
+  )
+}
 
 const FIXED_STYLES = asStyleDict({
   root: {
@@ -140,8 +137,7 @@ const FIXED_STYLES = asStyleDict({
 })
 
 if (process.env.NODE_ENV === 'development') {
-  _CoverImage.displayName = 'CoverImage'
-
-  _Content.displayName = 'CoverImage.Content'
-  _Viewport.displayName = 'CoverImage.Viewport'
+  CoverImage.displayName = 'CoverImage'
+  CoverImage.Content.displayName = 'CoverImage.Content'
+  CoverImage.Viewport.displayName = 'CoverImage.Viewport'
 }
