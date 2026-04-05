@@ -1,13 +1,20 @@
 import clsx from 'clsx'
-import { type ButtonHTMLAttributes, forwardRef } from 'react'
+import { type ButtonHTMLAttributes, type Ref } from 'react'
 
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { styles } from '../utils/styles.js'
 import { Burger } from './Burger.js'
 
-const _BurgerButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readonly<BurgerButton.Props>>(({
+/**
+ * Three-striped burger button component that transforms into an "X" when
+ * active.
+ *
+ * @exports BurgerButton.Bar Component for each bar in the burger button.
+ */
+export function BurgerButton({
   className,
+  ref,
   style,
   children,
   numberOfBars = 3,
@@ -18,7 +25,7 @@ const _BurgerButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readonly<Bur
   onDeactivate,
   onToggle,
   ...props
-}, ref) => {
+}: BurgerButton.Props) {
   const onClick = () => {
     const newIsActive = !isActive
 
@@ -58,18 +65,18 @@ const _BurgerButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readonly<Bur
       </Burger>
     </button>
   )
-})
-
-/**
- * Component for each bar in a {@link BurgerButton}.
- */
-const _Bar = Burger.Bar
+}
 
 export namespace BurgerButton {
   /**
    * Type describing the props of {@link BurgerButton}.
    */
   export type Props = {
+    /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLButtonElement>
+
     /**
      * Handler invoked when the button is activated.
      */
@@ -87,20 +94,12 @@ export namespace BurgerButton {
      */
     onToggle?: (isActive: boolean) => void
   } & Omit<Burger.Props & ButtonHTMLAttributes<HTMLButtonElement>, 'onToggle'>
-}
 
-/**
- * Three-striped burger button component that transforms into an "X" when
- * active.
- *
- * @exports BurgerButton.Bar Component for each bar in the burger button.
- */
-export const BurgerButton = /* #__PURE__ */ Object.assign(_BurgerButton, {
   /**
    * Component for each bar in a {@link BurgerButton}.
    */
-  Bar: _Bar,
-})
+  export const Bar = Burger.Bar
+}
 
 function _getFixedStyles() {
   return asStyleDict({
@@ -114,7 +113,6 @@ function _getFixedStyles() {
 }
 
 if (process.env.NODE_ENV === 'development') {
-  _BurgerButton.displayName = 'BurgerButton'
-
-  _Bar.displayName = 'BurgerButton.Bar'
+  BurgerButton.displayName = 'BurgerButton'
+  BurgerButton.Bar.displayName = 'BurgerButton.Bar'
 }
