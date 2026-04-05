@@ -1,21 +1,22 @@
-import { Children, forwardRef, type HTMLAttributes, isValidElement } from 'react'
+import { Children, type HTMLAttributes, isValidElement, type Ref } from 'react'
 
 import { cloneStyledElement } from './cloneStyledElement.js'
 
 /**
  * Type describing the properties of {@link ExtractChild}.
  */
-export type ExtractChildProps = HTMLAttributes<HTMLElement>
+export type ExtractChildProps = { ref?: Ref<HTMLElement> } & HTMLAttributes<HTMLElement>
 
 /**
  * Extracts a single child of a parent component into its own component. If the
  * parent component has multiple children, only the first one will be extracted,
  * the rest will be ignored.
  */
-export const ExtractChild = /* #__PURE__ */ forwardRef<HTMLElement, Readonly<ExtractChildProps>>(({
+export function ExtractChild({
+  ref,
   children,
   ...props
-}, ref) => {
+}: ExtractChildProps) {
   if (Array.isArray(children)) {
     console.error(`[etudes::ExtractChild] Only one child is expected, but found ${children.length}. Only the first child is extracted while the rest are discarded.`)
   }
@@ -29,7 +30,7 @@ export const ExtractChild = /* #__PURE__ */ forwardRef<HTMLElement, Readonly<Ext
       return child
     }
   })
-})
+}
 
 if (process.env.NODE_ENV === 'development') {
   ExtractChild.displayName = 'ExtractChild'
