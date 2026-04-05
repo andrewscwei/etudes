@@ -1,4 +1,4 @@
-import { type ComponentType, type ForwardedRef, forwardRef, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactElement, type RefObject, useCallback, useLayoutEffect, useRef, useState } from 'react'
+import { type ComponentType, type HTMLAttributes, type MouseEvent, type PointerEvent, type Ref, type RefObject, useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { Point, Rect } from 'spase'
 
 import { Each } from '../flows/Each.js'
@@ -81,6 +81,8 @@ export namespace Carousel {
      * The component to render for each item.
      */
     ItemComponent: ComponentType<I>
+
+    ref?: Ref<HTMLDivElement>
   } & Omit<HTMLAttributes<HTMLDivElement>, 'onClick' | 'onPointerCancel' | 'onPointerDown' | 'onPointerLeave' | 'onPointerUp' | 'role'>
 }
 
@@ -94,23 +96,21 @@ export namespace Carousel {
  *   - Supports tracking item exposure (0-1) to determine how much of the
  *     current item is visible in the viewport.
  */
-export const Carousel = /* #__PURE__ */ forwardRef((
-  {
-    autoAdvanceInterval = 0,
-    dragSpeed = 1.0,
-    index = 0,
-    ItemComponent,
-    items = [],
-    orientation = 'horizontal',
-    isDragEnabled = true,
-    shouldTrackExposure = false,
-    onAutoAdvancePause,
-    onAutoAdvanceResume,
-    onIndexChange,
-    ...props
-  },
+export function Carousel<I extends HTMLAttributes<HTMLElement>>({
   ref,
-) => {
+  autoAdvanceInterval = 0,
+  dragSpeed = 1.0,
+  index = 0,
+  ItemComponent,
+  items = [],
+  orientation = 'horizontal',
+  isDragEnabled = true,
+  shouldTrackExposure = false,
+  onAutoAdvancePause,
+  onAutoAdvanceResume,
+  onIndexChange,
+  ...props
+}: Carousel.Props<I>) {
   const prevIndexRef = useRef<number>(undefined)
   const viewportRef = useRef<HTMLDivElement>(null)
   const pointerDownPositionRef = useRef<Point>(undefined)
@@ -343,7 +343,7 @@ export const Carousel = /* #__PURE__ */ forwardRef((
       </div>
     </div>
   )
-}) as <I extends HTMLAttributes<HTMLElement>>(props: Readonly<{ ref?: ForwardedRef<HTMLDivElement> } & Carousel.Props<I>>) => ReactElement
+}
 
 function _scrollToIndex(ref: RefObject<HTMLDivElement | null>, index: number, orientation: Carousel.Orientation) {
   const viewport = ref?.current
@@ -426,5 +426,5 @@ function _getFixedStyles({ orientation = 'horizontal', scrollSnapEnabled = false
 }
 
 if (process.env.NODE_ENV === 'development') {
-  (Carousel as any).displayName = 'Carousel'
+  Carousel.displayName = 'Carousel'
 }
