@@ -1,10 +1,15 @@
-import { forwardRef, type HTMLAttributes } from 'react'
+import { type HTMLAttributes, type Ref } from 'react'
 
 export namespace Form {
   /**
    * Type describing the props of {@link Form}.
    */
   export type Props = {
+    /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLFormElement>
+
     /**
      * Handler invoked when the form is submitted.
      */
@@ -15,13 +20,7 @@ export namespace Form {
 /**
  * A form component overrides the default submission behavior.
  */
-export const Form = /* #__PURE__ */ forwardRef<HTMLFormElement, Form.Props>((
-  {
-    onSubmit,
-    ...props
-  },
-  ref,
-) => {
+export function Form({ ref, onSubmit, ...props }: Form.Props) {
   return (
     <form
       {...props}
@@ -32,7 +31,7 @@ export const Form = /* #__PURE__ */ forwardRef<HTMLFormElement, Form.Props>((
       }}
     />
   )
-})
+}
 
 if (process.env.NODE_ENV !== 'production') {
   Form.displayName = 'Form'

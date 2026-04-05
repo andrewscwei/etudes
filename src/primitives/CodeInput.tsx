@@ -1,4 +1,4 @@
-import { type ChangeEvent, type ClipboardEvent, forwardRef, type HTMLAttributes, type HTMLInputAutoCompleteAttribute, type KeyboardEvent, useEffect, useRef } from 'react'
+import { type ChangeEvent, type ClipboardEvent, type HTMLAttributes, type HTMLInputAutoCompleteAttribute, type KeyboardEvent, type Ref, useEffect, useRef } from 'react'
 
 import { Repeat } from '../flows/Repeat.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
@@ -6,29 +6,33 @@ import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
-const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
-  {
-    style,
-    autoComplete = 'one-time-code',
-    autoFocus = false,
-    children,
-    inputMode = 'numeric',
-    placeholder,
-    size,
-    value,
-    isDisabled = false,
-    isRequired = true,
-    onChange,
-    ...props
-  },
+/**
+ * A component for entering codes, such as verification codes or PINs, through
+ * multiple input fields.
+ *
+ * @exports CodeInput.Field Component for the each field in a {@link CodeInput}.
+ */
+export function CodeInput({
   ref,
-) => {
+  style,
+  autoComplete = 'one-time-code',
+  autoFocus = false,
+  children,
+  inputMode = 'numeric',
+  placeholder,
+  size,
+  value,
+  isDisabled = false,
+  isRequired = true,
+  onChange,
+  ...props
+}: CodeInput.Props) {
   const fields = _normalizeFields(value, size)
   const fieldRefs = useRef<HTMLInputElement[]>([])
   const fixedStyles = _getFixedStyles()
 
   const components = asComponentDict(children, {
-    field: _Field,
+    field: CodeInput.Field,
   })
 
   const focusOn = (index: number) => {
@@ -125,7 +129,7 @@ const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
             aria-required={isRequired}
             autoComplete={autoComplete}
             disabled={isDisabled}
-            element={components.field ?? <_Field/>}
+            element={components.field ?? <CodeInput.Field/>}
             inputMode={inputMode}
             placeholder={placeholder}
             required={isRequired}
@@ -138,22 +142,18 @@ const _CodeInput = /* #__PURE__ */ forwardRef<HTMLDivElement, CodeInput.Props>((
       </Repeat>
     </div>
   )
-})
-
-const _Field = ({ ...props }: HTMLAttributes<HTMLInputElement>) => (
-  <input
-    {...props}
-    autoCapitalize='off'
-    autoCorrect='off'
-    type='text'
-  />
-)
+}
 
 export namespace CodeInput {
   /**
    * Type describing the properties of {@link CodeInput}.
    */
   export type Props = {
+    /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLDivElement>
+
     /**
      * Specifies the autocomplete behavior for the code input.
      */
@@ -201,20 +201,19 @@ export namespace CodeInput {
      */
     onChange: (newValue: string[]) => void
   } & Omit<HTMLAttributes<HTMLDivElement>, 'onChange'>
-}
 
-/**
- * A component for entering codes, such as verification codes or PINs, through
- * multiple input fields.
- *
- * @exports CodeInput.Field Component for the each field in a {@link CodeInput}.
- */
-export const CodeInput = /* #__PURE__ */ Object.assign(_CodeInput, {
   /**
    * Component for the each field in a {@link CodeInput}.
    */
-  Field: _Field,
-})
+  export const Field = ({ ...props }: HTMLAttributes<HTMLInputElement>) => (
+    <input
+      {...props}
+      autoCapitalize='off'
+      autoCorrect='off'
+      type='text'
+    />
+  )
+}
 
 function _getFixedStyles() {
   return asStyleDict({
@@ -277,7 +276,6 @@ function _trimEdgeChar(str: string, char: string) {
 }
 
 if (process.env.NODE_ENV === 'development') {
-  _CodeInput.displayName = 'CodeInput'
-
-  _Field.displayName = 'CodeInput.Field'
+  CodeInput.displayName = 'CodeInput'
+  CodeInput.Field.displayName = 'CodeInput.Field'
 }
