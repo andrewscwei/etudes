@@ -1,4 +1,4 @@
-import { forwardRef, type HTMLAttributes, useCallback, useEffect, useRef, useState } from 'react'
+import { type HTMLAttributes, type Ref, useCallback, useEffect, useRef, useState } from 'react'
 import { Rect, Size } from 'spase'
 
 import { useImageSize } from '../hooks/useImageSize.js'
@@ -11,6 +11,11 @@ export namespace Panorama {
    * Type describing the props of {@link Panorama}.
    */
   export type Props = {
+    /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLDivElement>
+
     /**
      * The current angle in degrees, 0.0 - 360.0, inclusive. When angle is 0 or
      * 360, the `zeroAnchor` position of the image is at the left bound of the
@@ -98,24 +103,7 @@ export namespace Panorama {
  * A component containing a pannable 360° panorama image. The angle supports
  * two-way binding.
  */
-export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Panorama.Props>>((
-  {
-    angle: externalAngle = 0,
-    speed = 1,
-    src,
-    zeroAnchor = 0,
-    onAngleChange,
-    onDragEnd,
-    onDragStart,
-    onImageSizeChange,
-    onLoadImageComplete,
-    onLoadImageError,
-    onLoadImageStart,
-    onPositionChange,
-    ...props
-  },
-  ref,
-) => {
+export function Panorama({ ref, angle: externalAngle = 0, speed = 1, src, zeroAnchor = 0, onAngleChange, onDragEnd, onDragStart, onImageSizeChange, onLoadImageComplete, onLoadImageError, onLoadImageStart, onPositionChange, ...props }: Panorama.Props) {
   const mapDragPositionToDisplacement = useCallback((currentPosition: number, dx: number, _: number): number => {
     const newDisplacement = currentPosition - dx * speed
 
@@ -183,7 +171,7 @@ export const Panorama = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
       <div ref={bodyRef} style={fixedStyles.body}/>
     </div>
   )
-})
+}
 
 function _getFixedStyles({ displacement = NaN, src = '' }) {
   return asStyleDict({

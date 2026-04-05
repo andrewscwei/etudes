@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { forwardRef, type HTMLAttributes, type MouseEvent, useCallback, useEffect, useRef, useState } from 'react'
+import { type HTMLAttributes, type MouseEvent, type Ref, useCallback, useEffect, useRef, useState } from 'react'
 import { Rect } from 'spase'
 
 import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
@@ -11,30 +11,47 @@ import { createKey } from '../utils/createKey.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
-const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlider.Props>>((
-  {
-    className,
-    children,
-    index: externalIndex = 0,
-    knobHeight = 30,
-    knobPadding = 0,
-    knobWidth = 30,
-    labelProvider,
-    orientation = 'vertical',
-    steps = _generateSteps(10),
-    trackPadding = 0,
-    isClipped = false,
-    isInverted = false,
-    isTrackInteractive = true,
-    shouldOnlyDispatchOnDragEnd = false,
-    onDragEnd,
-    onDragStart,
-    onIndexChange,
-    onPositionChange,
-    ...props
-  },
+/**
+ * A "step" slider component supporting both horizontal and vertical
+ * orientations that automatically snaps to a set of predefined points on the
+ * slider when dragged. These points are referred to as "steps", indexed by an
+ * integer referred to as "index". This index can be two-way bound. The
+ * component consists of four customizable elements: a draggable knob, a label
+ * on the knob, a scroll track before the knob and a scroll track after the
+ * knob. While the width and height of the slider is inferred from its CSS
+ * rules, the width and height of the knob are set via props (`knobWidth` and
+ * `knobHeight`, respectively). The size of the knob does not impact the size of
+ * the slider. While dragging, the slider still emits a position change event,
+ * where the position is a decimal ranging between 0.0 and 1.0, inclusive.
+ *
+ * @exports StepSlider.Knob Component for the knob.
+ * @exports StepSlider.KnobContainer Component for the container of the knob.
+ * @exports StepSlider.Label Component for the label on the knob.
+ * @exports StepSlider.Track Component for the slide track on either side of the
+ *                           knob.
+ */
+export function StepSlider({
+  className,
   ref,
-) => {
+  children,
+  index: externalIndex = 0,
+  knobHeight = 30,
+  knobPadding = 0,
+  knobWidth = 30,
+  labelProvider,
+  orientation = 'vertical',
+  steps = _generateSteps(10),
+  trackPadding = 0,
+  isClipped = false,
+  isInverted = false,
+  isTrackInteractive = true,
+  shouldOnlyDispatchOnDragEnd = false,
+  onDragEnd,
+  onDragStart,
+  onIndexChange,
+  onPositionChange,
+  ...props
+}: StepSlider.Props) {
   const bodyRef = useRef<HTMLDivElement>(null)
   const knobContainerRef = useRef<HTMLButtonElement>(null)
   const rect = useRect(bodyRef)
@@ -125,10 +142,10 @@ const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlid
   const fixedClassNames = _getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
   const fixedStyles = _getFixedStyles({ knobHeight, knobPadding, knobWidth, naturalPosition, orientation, isClipped, isTrackInteractive })
   const components = asComponentDict(children, {
-    knob: _Knob,
-    knobContainer: _KnobContainer,
-    label: _Label,
-    track: _Track,
+    knob: StepSlider.Knob,
+    knobContainer: StepSlider.KnobContainer,
+    label: StepSlider.Label,
+    track: StepSlider.Track,
   })
 
   useEffect(() => {
@@ -178,7 +195,7 @@ const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlid
             left: '0',
             width: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
           })}
-          element={components.track ?? <_Track/>}
+          element={components.track ?? <StepSlider.Track/>}
           onClick={trackClickHandler}
         >
           <div style={fixedStyles.trackHitBox}/>
@@ -192,7 +209,7 @@ const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlid
             right: '0',
             width: `calc(${(_inverted(naturalPosition)) * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
           })}
-          element={components.track ?? <_Track/>}
+          element={components.track ?? <StepSlider.Track/>}
           onClick={trackClickHandler}
         >
           <div style={fixedStyles.trackHitBox}/>
@@ -201,12 +218,12 @@ const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlid
           className={clsx(fixedClassNames.knobContainer)}
           ref={knobContainerRef}
           style={styles(fixedStyles.knobContainer)}
-          element={components.knobContainer ?? <_KnobContainer/>}
+          element={components.knobContainer ?? <StepSlider.KnobContainer/>}
         >
-          <Styled className={clsx(fixedClassNames.knob)} style={styles(fixedStyles.knob)} element={components.knob ?? <_Knob/>}>
+          <Styled className={clsx(fixedClassNames.knob)} style={styles(fixedStyles.knob)} element={components.knob ?? <StepSlider.Knob/>}>
             <div style={fixedStyles.knobHitBox}/>
             {steps && labelProvider && (
-              <Styled className={clsx(fixedClassNames.label)} style={styles(fixedStyles.label)} element={components.label ?? <_Label/>}>
+              <Styled className={clsx(fixedClassNames.label)} style={styles(fixedStyles.label)} element={components.label ?? <StepSlider.Label/>}>
                 {labelProvider(position, _getNearestIndexByPosition(position, steps))}
               </Styled>
             )}
@@ -215,23 +232,7 @@ const _StepSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<StepSlid
       </div>
     </div>
   )
-})
-
-const _Knob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}/>
-)
-
-const _KnobContainer = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => (
-  <button {...props}/>
-)
-
-const _Label = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}/>
-)
-
-const _Track = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}/>
-)
+}
 
 function _generateSteps(length: number): readonly number[] {
   if (length <= 1) {
@@ -265,6 +266,11 @@ export namespace StepSlider {
    * Type describing the props of {@link StepSlider}.
    */
   export type Props = {
+    /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLDivElement>
+
     /**
      * Specifies if the knob is clipped to the track.
      */
@@ -315,10 +321,10 @@ export namespace StepSlider {
     orientation?: Orientation
 
     /**
-     * An array of step descriptors. A step is a position (0 - 1 inclusive) on the
-     * track where the knob should snap to if dragging stops near it. Ensure that
-     * there are at least two steps: one for the start of the track and one for
-     * the end.
+     * An array of step descriptors. A step is a position (0 - 1 inclusive) on
+     * the track where the knob should snap to if dragging stops near it. Ensure
+     * that there are at least two steps: one for the start of the track and one
+     * for the end.
      */
     steps?: readonly number[]
 
@@ -373,47 +379,34 @@ export namespace StepSlider {
      */
     onDragStart?: () => void
   } & Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'onChange' | 'role'>
-}
 
-/**
- * A "step" slider component supporting both horizontal and vertical
- * orientations that automatically snaps to a set of predefined points on the
- * slider when dragged. These points are referred to as "steps", indexed by an
- * integer referred to as "index". This index can be two-way bound. The
- * component consists of four customizable elements: a draggable knob, a label
- * on the knob, a scroll track before the knob and a scroll track after the
- * knob. While the width and height of the slider is inferred from its CSS
- * rules, the width and height of the knob are set via props (`knobWidth` and
- * `knobHeight`, respectively). The size of the knob does not impact the size of
- * the slider. While dragging, the slider still emits a position change event,
- * where the position is a decimal ranging between 0.0 and 1.0, inclusive.
- *
- * @exports StepSlider.Knob Component for the knob.
- * @exports StepSlider.KnobContainer Component for the container of the knob.
- * @exports StepSlider.Label Component for the label on the knob.
- * @exports StepSlider.Track Component for the slide track on either side of the
- *                           knob.
- */
-export const StepSlider = /* #__PURE__ */ Object.assign(_StepSlider, {
   /**
    * Component for the knob of a {@link StepSlider}.
    */
-  Knob: _Knob,
+  export const Knob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}/>
+  )
 
   /**
    * Component for the container of the knob of a {@link StepSlider}.
    */
-  KnobContainer: _KnobContainer,
+  export const KnobContainer = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => (
+    <button {...props}/>
+  )
 
   /**
    * Component for the label on the knob of a {@link StepSlider}.
    */
-  Label: _Label,
+  export const Label = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}/>
+  )
 
   /**
    * Component for the track of a {@link StepSlider}.
    */
-  Track: _Track,
+  export const Track = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}/>
+  )
 
   /**
    * Generates a set of steps compatible with this component.
@@ -423,8 +416,8 @@ export const StepSlider = /* #__PURE__ */ Object.assign(_StepSlider, {
    *
    * @returns An array of steps.
    */
-  generateSteps: _generateSteps,
-})
+  export const generateSteps = _generateSteps
+}
 
 function _getNearestIndexByPosition(position: number, steps: readonly number[]): number {
   let index = -1
@@ -562,10 +555,9 @@ function _clamped(value: number, max: number = 1, min: number = 0): number {
 }
 
 if (process.env.NODE_ENV === 'development') {
-  _StepSlider.displayName = 'StepSlider'
-
-  _Track.displayName = 'StepSlider.Track'
-  _Knob.displayName = 'StepSlider.Knob'
-  _KnobContainer.displayName = 'StepSlider.KnobContainer'
-  _Label.displayName = 'StepSlider.Label'
+  StepSlider.displayName = 'StepSlider'
+  StepSlider.Track.displayName = 'StepSlider.Track'
+  StepSlider.Knob.displayName = 'StepSlider.Knob'
+  StepSlider.KnobContainer.displayName = 'StepSlider.KnobContainer'
+  StepSlider.Label.displayName = 'StepSlider.Label'
 }

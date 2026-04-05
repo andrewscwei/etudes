@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { forwardRef, type HTMLAttributes, type MouseEvent, useCallback, useEffect, useRef } from 'react'
+import { type HTMLAttributes, type MouseEvent, type Ref, useCallback, useEffect, useRef } from 'react'
 import { Rect } from 'spase'
 
 import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
@@ -9,28 +9,41 @@ import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
-const _Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider.Props>>((
-  {
-    className,
-    children,
-    knobHeight = 30,
-    knobPadding = 0,
-    knobWidth = 30,
-    labelProvider,
-    orientation = 'vertical',
-    position: externalPosition = 0,
-    trackPadding = 0,
-    isClipped = false,
-    isInverted = false,
-    isTrackInteractive = true,
-    shouldOnlyDispatchOnDragEnd = false,
-    onChange,
-    onDragEnd,
-    onDragStart,
-    ...props
-  },
+/**
+ * A slider component supporting both horizontal and vertical orientations whose
+ * sliding position (a decimal between 0.0 and 1.0, inclusive) can be two-way
+ * bound. The component consists of three customizable elements: a draggable
+ * knob, a label on the knob, and a scroll track on either side of the knob.
+ * While the width and height of the slider is inferred from its CSS rules, the
+ * width and height of the knob are set via props (`knobWidth` and `knobHeight`,
+ * respectively). The size of the knob does not impact the size of the slider.
+ *
+ * @exports Slider.Knob Component for the knob.
+ * @exports Slider.KnobContainer Component for the container of the knob.
+ * @exports Slider.Label Component for the label on the knob.
+ * @exports Slider.Track Component for the slide track on either side of the
+ *                       knob.
+ */
+export function Slider({
+  className,
   ref,
-) => {
+  children,
+  knobHeight = 30,
+  knobPadding = 0,
+  knobWidth = 30,
+  labelProvider,
+  orientation = 'vertical',
+  position: externalPosition = 0,
+  trackPadding = 0,
+  isClipped = false,
+  isInverted = false,
+  isTrackInteractive = true,
+  shouldOnlyDispatchOnDragEnd = false,
+  onChange,
+  onDragEnd,
+  onDragStart,
+  ...props
+}: Readonly<Slider.Props>) {
   const bodyRef = useRef<HTMLDivElement>(null)
   const knobContainerRef = useRef<HTMLButtonElement>(null)
 
@@ -117,10 +130,10 @@ const _Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider.Props
   }, [isDragging])
 
   const components = asComponentDict(children, {
-    knob: _Knob,
-    knobContainer: _KnobContainer,
-    label: _Label,
-    track: _Track,
+    knob: Slider.Knob,
+    knobContainer: Slider.KnobContainer,
+    label: Slider.Label,
+    track: Slider.Track,
   })
 
   return (
@@ -142,7 +155,7 @@ const _Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider.Props
             left: '0',
             width: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
           })}
-          element={components.track ?? <_Track/>}
+          element={components.track ?? <Slider.Track/>}
           onClick={trackClickHandler}
         >
           <div style={fixedStyles.trackHitBox}/>
@@ -156,7 +169,7 @@ const _Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider.Props
             right: '0',
             width: `calc(${(1 - naturalPosition) * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
           })}
-          element={components.track ?? <_Track/>}
+          element={components.track ?? <Slider.Track/>}
           onClick={trackClickHandler}
         >
           <div style={fixedStyles.trackHitBox}/>
@@ -165,12 +178,12 @@ const _Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider.Props
           className={clsx(fixedClassNames.knobContainer)}
           ref={knobContainerRef}
           style={fixedStyles.knobContainer}
-          element={components.knobContainer ?? <_KnobContainer/>}
+          element={components.knobContainer ?? <Slider.KnobContainer/>}
         >
-          <Styled className={clsx(fixedClassNames.knob)} style={styles(fixedStyles.knob)} element={components.knob ?? <_Knob/>}>
+          <Styled className={clsx(fixedClassNames.knob)} style={styles(fixedStyles.knob)} element={components.knob ?? <Slider.Knob/>}>
             <div style={fixedStyles.knobHitBox}/>
             {labelProvider && (
-              <Styled className={clsx(fixedClassNames.label)} style={styles(fixedStyles.label)} element={components.label ?? <_Label/>}>
+              <Styled className={clsx(fixedClassNames.label)} style={styles(fixedStyles.label)} element={components.label ?? <Slider.Label/>}>
                 {labelProvider(position)}
               </Styled>
             )}
@@ -179,23 +192,7 @@ const _Slider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Slider.Props
       </div>
     </div>
   )
-})
-
-export const _Track = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}/>
-)
-
-export const _Knob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}/>
-)
-
-export const _KnobContainer = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => (
-  <button {...props}/>
-)
-
-export const _Label = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}/>
-)
+}
 
 export namespace Slider {
   /**
@@ -207,6 +204,11 @@ export namespace Slider {
    * Type describing the props of {@link Slider}.
    */
   export type Props = {
+    /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLDivElement>
+
     /**
      * Specifies if the knob is clipped to the track.
      */
@@ -275,8 +277,8 @@ export namespace Slider {
      * Handler invoked when position changes. This can either be invoked from
      * the `position` prop being changed or from the slider being dragged. Note
      * that if the event is emitted at the end of dragging due to
-     * `shouldOnlyDispatchOnDragEnd` set to `true`, the `isDragging` parameter here
-     * is still `true`.
+     * `shouldOnlyDispatchOnDragEnd` set to `true`, the `isDragging` parameter
+     * here is still `true`.
      *
      * @param position The current slider position.
      * @param isDragging Specifies if the position change is due to dragging.
@@ -293,45 +295,36 @@ export namespace Slider {
      */
     onDragStart?: () => void
   } & Omit<HTMLAttributes<HTMLDivElement>, 'aria-orientation' | 'aria-valuenow' | 'onChange' | 'role'>
-}
 
-/**
- * A slider component supporting both horizontal and vertical orientations whose
- * sliding position (a decimal between 0.0 and 1.0, inclusive) can be two-way
- * bound. The component consists of three customizable elements: a draggable
- * knob, a label on the knob, and a scroll track on either side of the knob.
- * While the width and height of the slider is inferred from its CSS rules, the
- * width and height of the knob are set via props (`knobWidth` and `knobHeight`,
- * respectively). The size of the knob does not impact the size of the slider.
- *
- * @exports Slider.Knob Component for the knob.
- * @exports Slider.KnobContainer Component for the container of the knob.
- * @exports Slider.Label Component for the label on the knob.
- * @exports Slider.Track Component for the slide track on either side of the
- *                       knob.
- */
-export const Slider = /* #__PURE__ */ Object.assign(_Slider, {
   /**
    * Component for the slide track on either side of the knob of a
    * {@link Slider}.
    */
-  Track: _Track,
+  export const Track = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}/>
+  )
 
   /**
    * Component for the knob of a {@link Slider}.
    */
-  Knob: _Knob,
+  export const Knob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}/>
+  )
 
   /**
    * Component for the container of the knob of a {@link Slider}.
    */
-  KnobContainer: _KnobContainer,
+  export const KnobContainer = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => (
+    <button {...props}/>
+  )
 
   /**
    * Component for the label on the knob of a {@link Slider}.
    */
-  Label: _Label,
-})
+  export const Label = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}/>
+  )
+}
 
 function _getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtStart = false, isDragging = false, isReleasing = false }) {
   return asClassNameDict({
@@ -435,10 +428,9 @@ function _getFixedStyles({ knobHeight = 0, knobPadding = 0, knobWidth = 0, natur
 }
 
 if (process.env.NODE_ENV === 'development') {
-  _Slider.displayName = 'Slider'
-
-  _Track.displayName = 'Slider.Track'
-  _Knob.displayName = 'Slider.Knob'
-  _KnobContainer.displayName = 'Slider.KnobContainer'
-  _Label.displayName = 'Slider.Label'
+  Slider.displayName = 'Slider'
+  Slider.Track.displayName = 'Slider.Track'
+  Slider.Knob.displayName = 'Slider.Knob'
+  Slider.KnobContainer.displayName = 'Slider.KnobContainer'
+  Slider.Label.displayName = 'Slider.Label'
 }

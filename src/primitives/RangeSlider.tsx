@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import { forwardRef, type HTMLAttributes, useCallback, useEffect, useRef, useState } from 'react'
+import { type HTMLAttributes, type Ref, useCallback, useEffect, useRef, useState } from 'react'
 import { Rect } from 'spase'
 
 import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
@@ -12,25 +12,32 @@ import { createKey } from '../utils/createKey.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
-const _RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<RangeSlider.Props>>((
-  {
-    className,
-    children,
-    decimalPlaces = 2,
-    knobHeight = 28,
-    knobPadding = 0,
-    knobWidth = 40,
-    max: maxValue,
-    min: minValue,
-    orientation = 'vertical',
-    range: externalRange,
-    steps = -1,
-    isClipped = false,
-    onChange,
-    ...props
-  },
+/**
+ * A slider component that allows the user to select a range of values.
+ *
+ * @exports RangeSlider.Gutter Component for the gutter.
+ * @exports RangeSlider.Highlight Component for the highlight.
+ * @exports RangeSlider.Knob Component for the knob.
+ * @exports RangeSlider.KnobContainer Component for the container of the knob.
+ * @exports RangeSlider.Label Component for the label.
+ */
+export function RangeSlider({
+  className,
   ref,
-) => {
+  children,
+  decimalPlaces = 2,
+  knobHeight = 28,
+  knobPadding = 0,
+  knobWidth = 40,
+  max: maxValue,
+  min: minValue,
+  orientation = 'vertical',
+  range: externalRange,
+  steps = -1,
+  isClipped = false,
+  onChange,
+  ...props
+}: RangeSlider.Props) {
   const bodyRef = useRef<HTMLDivElement>(null)
   const bodyRect = useRect(bodyRef)
   const startKnobContainerRef = useRef<HTMLDivElement>(null)
@@ -40,11 +47,11 @@ const _RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<RangeSl
   const [start, end] = range.map(t => _getDisplacementByValue(t, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped))
   const highlightLength = end - start
   const components = asComponentDict(children, {
-    gutter: _Gutter,
-    highlight: _Highlight,
-    knob: _Knob,
-    knobContainer: _KnobContainer,
-    label: _Label,
+    gutter: RangeSlider.Gutter,
+    highlight: RangeSlider.Highlight,
+    knob: RangeSlider.Knob,
+    knobContainer: RangeSlider.KnobContainer,
+    label: RangeSlider.Label,
   })
 
   const mapStartDragValueToValue = useCallback((value: number, dx: number, dy: number) => {
@@ -113,8 +120,8 @@ const _RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<RangeSl
       role='slider'
     >
       <div ref={bodyRef} style={fixedStyles.body}>
-        <Styled style={styles(fixedStyles.gutter)} element={components.gutter ?? <_Gutter/>}/>
-        <Styled style={styles(fixedStyles.highlight)} element={components.highlight ?? <_Highlight/>}/>
+        <Styled style={styles(fixedStyles.gutter)} element={components.gutter ?? <RangeSlider.Gutter/>}/>
+        <Styled style={styles(fixedStyles.highlight)} element={components.highlight ?? <RangeSlider.Highlight/>}/>
         <Styled
           className={fixedClassNames.startKnobContainer}
           ref={startKnobContainerRef}
@@ -128,12 +135,12 @@ const _RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<RangeSl
             top: `${start}px`,
           })}
           disabled={isDeepEqual([startValue, endValue], [minValue, minValue])}
-          element={components.knobContainer ?? <_KnobContainer/>}
+          element={components.knobContainer ?? <RangeSlider.KnobContainer/>}
         >
-          <Styled className={fixedClassNames.startKnob} style={styles(fixedStyles.knob)} element={components.knob ?? <_Knob/>}>
+          <Styled className={fixedClassNames.startKnob} style={styles(fixedStyles.knob)} element={components.knob ?? <RangeSlider.Knob/>}>
             <div style={fixedStyles.knobHitBox}/>
             {components.label && (
-              <Styled className={fixedClassNames.startLabel} style={styles(fixedStyles.label)} element={components.label ?? <_Label/>}>
+              <Styled className={fixedClassNames.startLabel} style={styles(fixedStyles.label)} element={components.label ?? <RangeSlider.Label/>}>
                 {Number(startValue.toFixed(decimalPlaces)).toLocaleString()}
               </Styled>
             )}
@@ -152,12 +159,12 @@ const _RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<RangeSl
             top: `${end}px`,
           })}
           disabled={isDeepEqual([startValue, endValue], [maxValue, maxValue])}
-          element={components.knobContainer ?? <_KnobContainer/>}
+          element={components.knobContainer ?? <RangeSlider.KnobContainer/>}
         >
-          <Styled className={fixedClassNames.endKnob} style={styles(fixedStyles.knob)} element={components.knob ?? <_Knob/>}>
+          <Styled className={fixedClassNames.endKnob} style={styles(fixedStyles.knob)} element={components.knob ?? <RangeSlider.Knob/>}>
             <div style={fixedStyles.knobHitBox}/>
             {components.label && (
-              <Styled className={fixedClassNames.endLabel} style={styles(fixedStyles.label)} element={components.label ?? <_Label/>}>
+              <Styled className={fixedClassNames.endLabel} style={styles(fixedStyles.label)} element={components.label ?? <RangeSlider.Label/>}>
                 {Number(endValue.toFixed(decimalPlaces)).toLocaleString()}
               </Styled>
             )}
@@ -166,27 +173,7 @@ const _RangeSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<RangeSl
       </div>
     </div>
   )
-})
-
-const _Gutter = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}/>
-)
-
-const _Label = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}/>
-)
-
-const _Highlight = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}/>
-)
-
-const _Knob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}/>
-)
-
-const _KnobContainer = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => (
-  <button {...props}/>
-)
+}
 
 export namespace RangeSlider {
   /**
@@ -203,6 +190,11 @@ export namespace RangeSlider {
    * Type describing the props of {@link RangeSlider}.
    */
   export type Props = {
+    /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLDivElement>
+
     /**
      * Number of decimal places to display.
      */
@@ -263,43 +255,42 @@ export namespace RangeSlider {
      */
     onChange?: (range: Range) => void
   } & Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuemax' | 'aria-valuemin' | 'onChange' | 'role'>
-}
 
-/**
- * A slider component that allows the user to select a range of values.
- *
- * @exports RangeSlider.Gutter Component for the gutter.
- * @exports RangeSlider.Highlight Component for the highlight.
- * @exports RangeSlider.Knob Component for the knob.
- * @exports RangeSlider.KnobContainer Component for the container of the knob.
- * @exports RangeSlider.Label Component for the label.
- */
-export const RangeSlider = /* #__PURE__ */ Object.assign(_RangeSlider, {
   /**
    * Component for the gutter of a {@link RangeSlider}.
    */
-  Gutter: _Gutter,
+  export const Gutter = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}/>
+  )
 
   /**
    * Component for the highlight of a {@link RangeSlider}.
    */
-  Highlight: _Highlight,
+  export const Highlight = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}/>
+  )
 
   /**
    * Component for the knob of a {@link RangeSlider}.
    */
-  Knob: _Knob,
+  export const Knob = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}/>
+  )
 
   /**
    * Component for the container of the knob of a {@link RangeSlider}.
    */
-  KnobContainer: _KnobContainer,
+  export const KnobContainer = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => (
+    <button {...props}/>
+  )
 
   /**
    * Component for the label of a {@link RangeSlider}.
    */
-  Label: _Label,
-})
+  export const Label = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}/>
+  )
+}
 
 function _getFixedClassNames({ isDraggingEndKnob = false, isDraggingStartKnob = false, isReleasingEndKnob = false, isReleasingStartKnob = false }) {
   return asClassNameDict({
@@ -471,10 +462,9 @@ function _createBreakpoints(min: number, max: number, steps: number): number[] |
 }
 
 if (process.env.NODE_ENV === 'development') {
-  _RangeSlider.displayName = 'RangeSlider'
-
-  _Gutter.displayName = 'RangeSlider.Gutter'
-  _Label.displayName = 'RangeSlider.Label'
-  _Highlight.displayName = 'RangeSlider.Highlight'
-  _Knob.displayName = 'RangeSlider.Knob'
+  RangeSlider.displayName = 'RangeSlider'
+  RangeSlider.Gutter.displayName = 'RangeSlider.Gutter'
+  RangeSlider.Label.displayName = 'RangeSlider.Label'
+  RangeSlider.Highlight.displayName = 'RangeSlider.Highlight'
+  RangeSlider.Knob.displayName = 'RangeSlider.Knob'
 }

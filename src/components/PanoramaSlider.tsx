@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { forwardRef, type HTMLAttributes, useCallback, useRef, useState } from 'react'
+import { type HTMLAttributes, type Ref, useCallback, useRef, useState } from 'react'
 import { Rect, type Size } from 'spase'
 
 import { useRect } from '../hooks/useRect.js'
@@ -9,30 +9,37 @@ import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
-const _PanoramaSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<PanoramaSlider.Props>>((
-  {
-    className,
-    style,
-    angle = 0,
-    autoDimension = 'width',
-    children,
-    fov,
-    speed = 1,
-    src,
-    viewportSize,
-    zeroAnchor = 0,
-    onAngleChange,
-    onDragEnd,
-    onDragStart,
-    onImageSizeChange,
-    onLoadImageComplete,
-    onLoadImageError,
-    onLoadImageStart,
-    onPositionChange,
-    ...props
-  },
+/**
+ * A slider for a {@link Panorama}.
+ *
+ * @exports Panorama.SliderIndicator Component for the active indicator that
+ *                                   appears when the slider is dragged.
+ * @exports Panorama.SliderReticle Component for the reticle that indicates the
+ *                                 FOV of the backing {@link Panorama}.
+ * @exports Panorama.SliderTrack Component for the slide track.
+ */
+export function PanoramaSlider({
+  className,
   ref,
-) => {
+  style,
+  angle = 0,
+  autoDimension = 'width',
+  children,
+  fov,
+  speed = 1,
+  src,
+  viewportSize,
+  zeroAnchor = 0,
+  onAngleChange,
+  onDragEnd,
+  onDragStart,
+  onImageSizeChange,
+  onLoadImageComplete,
+  onLoadImageError,
+  onLoadImageStart,
+  onPositionChange,
+  ...props
+}: Readonly<PanoramaSlider.Props>) {
   const panoramaRef = useRef<HTMLDivElement>(null)
   const panoramaRect = useRect(panoramaRef)
 
@@ -76,9 +83,9 @@ const _PanoramaSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
   }, [onDragEnd])
 
   const components = asComponentDict(children, {
-    indicator: _Indicator,
-    reticle: _Reticle,
-    track: _Track,
+    indicator: PanoramaSlider.Indicator,
+    reticle: PanoramaSlider.Reticle,
+    track: PanoramaSlider.Track,
   })
 
   const fixedStyles = _getFixedStyles({ aspectRatio, autoDimension, panoramaRect, reticleWidth })
@@ -108,33 +115,26 @@ const _PanoramaSlider = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Pano
       />
       <div style={fixedStyles.body}>
         <div style={fixedStyles.controls}>
-          <Styled className={clsx({ dragging: isDragging })} style={fixedStyles.track} element={components.track ?? <_Track/>}/>
-          <Styled className={clsx({ dragging: isDragging })} style={fixedStyles.reticle} element={components.reticle ?? <_Reticle/>}/>
-          <Styled className={clsx({ dragging: isDragging })} style={fixedStyles.track} element={components.track ?? <_Track/>}/>
+          <Styled className={clsx({ dragging: isDragging })} style={fixedStyles.track} element={components.track ?? <PanoramaSlider.Track/>}/>
+          <Styled className={clsx({ dragging: isDragging })} style={fixedStyles.reticle} element={components.reticle ?? <PanoramaSlider.Reticle/>}/>
+          <Styled className={clsx({ dragging: isDragging })} style={fixedStyles.track} element={components.track ?? <PanoramaSlider.Track/>}/>
         </div>
       </div>
-      <Styled className={clsx({ dragging: isDragging })} style={fixedStyles.indicator} element={components.indicator ?? <_Indicator/>}/>
+      <Styled className={clsx({ dragging: isDragging })} style={fixedStyles.indicator} element={components.indicator ?? <PanoramaSlider.Indicator/>}/>
     </div>
   )
-})
-
-const _Indicator = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}/>
-)
-
-const _Reticle = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}/>
-)
-
-const _Track = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}/>
-)
+}
 
 export namespace PanoramaSlider {
   /**
    * Type describing the props of {@link PanoramaSlider}.
    */
   export type Props = {
+    /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLDivElement>
+
     /**
      * Field-of-view (0.0 - 360.0 degrees, inclusive) that represents the size
      * of the reticle. 360 indicates the reticle covers the entire image. If
@@ -159,33 +159,28 @@ export namespace PanoramaSlider {
      */
     viewportSize?: Size
   } & Panorama.Props
-}
 
-/**
- * A slider for a {@link Panorama}.
- *
- * @exports Panorama.SliderIndicator Component for the active indicator that
- *                                  appears when the slider is dragged.
- * @exports Panorama.SliderReticle Component for the reticle that indicates the
- *                                FOV of the backing {@link Panorama}.
- * @exports Panorama.SliderTrack Component for the slide track.
- */
-export const PanoramaSlider = /* #__PURE__ */ Object.assign(_PanoramaSlider, {
   /**
    * Component for the active indicator of a {@link PanoramaSlider}.
    */
-  Indicator: _Indicator,
+  export const Indicator = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}/>
+  )
 
   /**
    * Component for the active reticle of a {@link PanoramaSlider}.
    */
-  Reticle: _Reticle,
+  export const Reticle = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}/>
+  )
 
   /**
    * Component for the slide track of a {@link PanoramaSlider}.
    */
-  Track: _Track,
-})
+  export const Track = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}/>
+  )
+}
 
 function _getFixedStyles({ aspectRatio = 0, autoDimension = 'width', panoramaRect = Rect.zero, reticleWidth = 0 }) {
   return asStyleDict({
@@ -233,9 +228,8 @@ function _getFixedStyles({ aspectRatio = 0, autoDimension = 'width', panoramaRec
 }
 
 if (process.env.NODE_ENV === 'development') {
-  _PanoramaSlider.displayName = 'PanoramaSlider'
-
-  _Indicator.displayName = 'PanoramaSlider.Indicator'
-  _Reticle.displayName = 'PanoramaSlider.Reticle'
-  _Track.displayName = 'PanoramaSlider.Track'
+  PanoramaSlider.displayName = 'PanoramaSlider'
+  PanoramaSlider.Indicator.displayName = 'PanoramaSlider.Indicator'
+  PanoramaSlider.Reticle.displayName = 'PanoramaSlider.Reticle'
+  PanoramaSlider.Track.displayName = 'PanoramaSlider.Track'
 }
