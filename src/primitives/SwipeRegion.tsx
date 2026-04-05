@@ -1,4 +1,4 @@
-import { forwardRef, type HTMLAttributes, useState } from 'react'
+import { type HTMLAttributes, type Ref, useState } from 'react'
 import { Point } from 'spase'
 
 export namespace SwipeRegion {
@@ -6,6 +6,11 @@ export namespace SwipeRegion {
    * Type describing the props of {@link SwipeRegion}.
    */
   export type Props = {
+    /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLDivElement>
+
     /**
      * Specifies if swipe detection is enabled.
      */
@@ -42,19 +47,7 @@ export namespace SwipeRegion {
 /**
  * An {@link HTMLDivElement} container that detects swipe gestures.
  */
-export const SwipeRegion = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<SwipeRegion.Props>>((
-  {
-    children,
-    threshold = 0.5,
-    isEnabled = true,
-    onSwipeDown,
-    onSwipeLeft,
-    onSwipeRight,
-    onSwipeUp,
-    ...props
-  },
-  ref,
-) => {
+export function SwipeRegion({ ref, children, threshold = 0.5, isEnabled = true, onSwipeDown, onSwipeLeft, onSwipeRight, onSwipeUp, ...props }: SwipeRegion.Props) {
   const [dragStartPosition, setDragStartPosition] = useState<Point | undefined>(undefined)
   const [dragEndPosition, setDragEndPosition] = useState<Point | undefined>(undefined)
   const [dragStartTime, setDragStartTime] = useState(NaN)
@@ -132,7 +125,7 @@ export const SwipeRegion = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<S
       {children}
     </div>
   )
-})
+}
 
 if (process.env.NODE_ENV === 'development') {
   SwipeRegion.displayName = 'SwipeRegion'

@@ -1,30 +1,34 @@
-import { forwardRef, type HTMLAttributes, type SVGAttributes } from 'react'
+import { type HTMLAttributes, type Ref, type SVGAttributes } from 'react'
 
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
-const _Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Dial.Props>>((
-  {
-    style,
-    angle = 0,
-    children,
-    knobLength = 30,
-    knobThickness = 10,
-    radius = 50,
-    trackGap = 0,
-    trackThickness = 2,
-    ...props
-  },
+/**
+ * A circular dial with a knob and a track.
+ *
+ * @exports Dial.Knob Component for the knob.
+ * @exports Dial.Track Component for the track.
+ */
+export function Dial({
   ref,
-) => {
+  style,
+  angle = 0,
+  children,
+  knobLength = 30,
+  knobThickness = 10,
+  radius = 50,
+  trackGap = 0,
+  trackThickness = 2,
+  ...props
+}: Dial.Props) {
   const diameter = radius * 2
   const clampedKnobAngle = Math.max(0, Math.min(360, knobLength))
 
   const components = asComponentDict(children, {
-    knob: _Knob,
-    track: _Track,
+    knob: Dial.Knob,
+    track: Dial.Track,
   })
 
   const fixedStyles = _getFixedStyles({ angle, diameter })
@@ -36,7 +40,7 @@ const _Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Dial.Props>>((
           <Styled
             cx={radius}
             cy={radius}
-            element={components.track ?? <_Track/>}
+            element={components.track ?? <Dial.Track/>}
             fill='none'
             r={radius - trackThickness / 2}
             strokeDasharray={trackGap}
@@ -48,7 +52,7 @@ const _Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Dial.Props>>((
         <svg style={fixedStyles.svgContainer} viewBox={`0 0 ${diameter} ${diameter}`} xmlns='http://www.w3.org/2000/svg'>
           <Styled
             d={_arcPath(radius, radius, radius - knobThickness / 2 - (trackThickness - knobThickness) / 2, -clampedKnobAngle / 2, clampedKnobAngle / 2)}
-            element={components.knob ?? <_Knob/>}
+            element={components.knob ?? <Dial.Knob/>}
             fill='none'
             strokeWidth={knobThickness}
           />
@@ -56,21 +60,18 @@ const _Dial = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Dial.Props>>((
       </div>
     </div>
   )
-})
-
-const _Track = ({ ...props }: SVGAttributes<SVGCircleElement>) => (
-  <circle {...props}/>
-)
-
-const _Knob = ({ ...props }: SVGAttributes<SVGPathElement>) => (
-  <path {...props}/>
-)
+}
 
 export namespace Dial {
   /**
    * Type describing the props of {@link Dial}.
    */
   export type Props = {
+    /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLDivElement>
+
     /**
      * Current angle reading of the compass, between 0.0 - 360.0 degrees,
      * inclusive.
@@ -109,25 +110,21 @@ export namespace Dial {
      */
     trackThickness?: number
   } & HTMLAttributes<HTMLDivElement>
-}
 
-/**
- * A circular dial with a knob and a track.
- *
- * @exports Dial.Knob Component for the knob.
- * @exports Dial.Track Component for the track.
- */
-export const Dial = /* #__PURE__ */ Object.assign(_Dial, {
   /**
    * Component for the track of a {@link Dial}.
    */
-  Track: _Track,
+  export const Track = ({ ...props }: SVGAttributes<SVGCircleElement>) => (
+    <circle {...props}/>
+  )
 
   /**
    * Component for the knob of a {@link Dial}.
    */
-  Knob: _Knob,
-})
+  export const Knob = ({ ...props }: SVGAttributes<SVGPathElement>) => (
+    <path {...props}/>
+  )
+}
 
 function _polarToCartesian(centerX: number, centerY: number, radius: number, angleInDegrees: number) {
   const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0
@@ -196,7 +193,6 @@ function _getFixedStyles({ angle = 0, diameter = 0 }) {
 
 if (process.env.NODE_ENV === 'development') {
   Dial.displayName = 'Dial'
-
-  _Track.displayName = 'Dial.Track'
-  _Knob.displayName = 'Dial.Knob'
+  Dial.Track.displayName = 'Dial.Track'
+  Dial.Knob.displayName = 'Dial.Knob'
 }

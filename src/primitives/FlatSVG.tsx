@@ -1,11 +1,16 @@
 import { XMLBuilder, XMLParser } from 'fast-xml-parser'
-import { forwardRef, type HTMLAttributes } from 'react'
+import { type HTMLAttributes, type Ref } from 'react'
 
 export namespace FlatSVG {
   /**
    * Type describing the props of {@link FlatSVG}.
    */
   export type Props = {
+    /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLDivElement>
+
     /**
      * Specifies how the SVG should be resized:
      * - `preserve`: Default: the SVG size attributes are unchanged.
@@ -55,18 +60,7 @@ export namespace FlatSVG {
  * will attempt to sanitize the markup (i.e. stripping useless attributes)
  * according to the props specified.
  */
-export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<FlatSVG.Props>>((
-  {
-    fillMode = 'preserve',
-    svg,
-    shouldStripClasses = true,
-    shouldStripIds = true,
-    shouldStripPositions = true,
-    shouldStripStyles = true,
-    ...props
-  },
-  ref,
-) => {
+export function FlatSVG({ ref, fillMode = 'preserve', svg, shouldStripClasses = true, shouldStripIds = true, shouldStripPositions = true, shouldStripStyles = true, ...props }: FlatSVG.Props) {
   const attributeNamePrefix = '@_'
   const idAttributes = ['id'].map(t => `${attributeNamePrefix}${t}`)
   const classAttributes = ['class'].map(t => `${attributeNamePrefix}${t}`)
@@ -141,7 +135,7 @@ export const FlatSVG = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<FlatS
       dangerouslySetInnerHTML={{ __html: sanitizedMarkup() }}
     />
   )
-})
+}
 
 if (process.env.NODE_ENV === 'development') {
   FlatSVG.displayName = 'FlatSVG'

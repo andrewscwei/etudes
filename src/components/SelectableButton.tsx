@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { type ButtonHTMLAttributes, forwardRef } from 'react'
+import { type ButtonHTMLAttributes, type Ref } from 'react'
 
 export namespace SelectableButton {
   /**
@@ -27,6 +27,11 @@ export namespace SelectableButton {
     label?: string
 
     /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLButtonElement>
+
+    /**
      * Handler invoked when the button is deselected.
      */
     onDeselect?: () => void
@@ -48,8 +53,9 @@ export namespace SelectableButton {
 /**
  * A button component that can be selected or deselected.
  */
-export const SelectableButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readonly<SelectableButton.Props>>(({
+export function SelectableButton({
   className,
+  ref,
   children,
   label,
   isDeselectable = false,
@@ -59,7 +65,7 @@ export const SelectableButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Re
   onSelect,
   onToggle,
   ...props
-}, ref) => {
+}: SelectableButton.Props) {
   const onClick = () => {
     if (isDisabled) return
 
@@ -87,7 +93,7 @@ export const SelectableButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Re
       {children ?? label}
     </button>
   )
-})
+}
 
 if (process.env.NODE_ENV === 'development') {
   SelectableButton.displayName = 'SelectableButton'

@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { forwardRef, type HTMLAttributes, useCallback, useEffect, useRef, useState } from 'react'
+import { type HTMLAttributes, type Ref, useCallback, useEffect, useRef, useState } from 'react'
 import { Rect } from 'spase'
 
 import { useSizeObserver } from '../hooks/useSizeObserver.js'
@@ -18,6 +18,11 @@ export namespace MasonryGrid {
    * Type describing the props of {@link MasonryGrid}.
    */
   export type Props = {
+    /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLDivElement>
+
     alignSections?: boolean
     horizontalSpacing?: number
     orientation?: Orientation
@@ -43,20 +48,7 @@ export namespace MasonryGrid {
  * sections* refers to the *number of rows*, whereas in a horizontally oriented
  * grid, *number of sections* refers to the *number of columns*.
  */
-export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<MasonryGrid.Props>>((
-  {
-    className,
-    alignSections = false,
-    children,
-    horizontalSpacing = 0,
-    orientation = 'vertical',
-    sections = 3,
-    verticalSpacing = 0,
-    isReversed = false,
-    ...props
-  },
-  ref,
-) => {
+export function MasonryGrid({ className, ref, alignSections = false, children, horizontalSpacing = 0, orientation = 'vertical', sections = 3, verticalSpacing = 0, isReversed = false, ...props }: MasonryGrid.Props) {
   const bodyRef = useRef<HTMLDivElement>(null)
 
   const [minWidth, setMinWidth] = useState(NaN)
@@ -216,7 +208,7 @@ export const MasonryGrid = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<M
       </div>
     </div>
   )
-})
+}
 
 function _getFixedClassNames({ orientation = 'horizontal' }) {
   return asClassNameDict({
