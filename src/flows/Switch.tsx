@@ -1,6 +1,23 @@
 import { Children, isValidElement, type PropsWithChildren, type ReactElement } from 'react'
 
-function _Switch<T>({
+/**
+ * A component that renders one of its children based on the provided condition.
+ * It is used to create a switch-case-like structure in React.
+ *
+ * @exports Switch.Case A component that represents a case in a {@link Switch}.
+ * @exports Switch.Default A component that represents the default case in a
+ *                         {@link Switch}.
+ *
+ * @example
+ * ```tsx
+ * <Switch condition={someValue}>
+ *   <Case value="case1">Case 1</Case>
+ *   <Case value="case2">Case 2</Case>
+ *   <Default>Default case</Default>
+ * </Switch>
+ * ```
+ */
+export function Switch<T>({
   children,
   condition,
 }: Switch.Props<T>) {
@@ -18,7 +35,7 @@ function _Switch<T>({
     return (<></>)
   }
 
-  const defaultChildren = childrenArray.filter(child => child.type === _Default)
+  const defaultChildren = childrenArray.filter(child => child.type === Switch.Default)
 
   if (defaultChildren.length > 1) {
     console.error('[etudes::Switch] `Switch` can only have maximum one `Default` child')
@@ -41,14 +58,6 @@ function _Switch<T>({
   if (defaultChild) {
     return defaultChild
   }
-}
-
-function _Case<T>({ children }: Switch.CaseProps<T>) {
-  return children
-}
-
-function _Default({ children }: Switch.DefaultProps) {
-  return children
 }
 
 export namespace Switch {
@@ -78,47 +87,32 @@ export namespace Switch {
    * Type describing the properties of {@link Default}.
    */
   export type DefaultProps = PropsWithChildren
-}
 
-/**
- * A component that renders one of its children based on the provided condition.
- * It is used to create a switch-case-like structure in React.
- *
- * @exports Switch.Case A component that represents a case in a {@link Switch}.
- * @exports Switch.Default A component that represents the default case in a
- *                         {@link Switch}.
- *
- * @example
- * ```tsx
- * <Switch condition={someValue}>
- *   <Case value="case1">Case 1</Case>
- *   <Case value="case2">Case 2</Case>
- *   <Default>Default case</Default>
- * </Switch>
- * ```
- */
-export const Switch = /* #__PURE__*/ Object.assign(_Switch, {
   /**
    * A component that represents a case in a {@link Switch} component. It is
    * used to define a specific condition and the content to render if that
    * condition is met.
    */
-  Case: _Case,
+  export function Case<T>({ children }: CaseProps<T>) {
+    return children
+  }
 
   /**
    * A component that represents the default case in a {@link Switch} component.
    * It is used to define the content to render if none of the cases match the
    * provided condition.
    */
-  Default: _Default,
-})
+  export function Default({ children }: DefaultProps) {
+    return children
+  }
+}
 
 function _childrenIsValidElement<T>(children: ReturnType<typeof Children.toArray>): children is ReactElement[] {
-  return children.every(child => isValidElement(child) && (child.type === _Case<T> || child.type === _Default))
+  return children.every(child => isValidElement(child) && (child.type === Switch.Case<T> || child.type === Switch.Default))
 }
 
 if (process.env.NODE_ENV === 'development') {
-  _Switch.displayName = 'Switch'
-  _Case.displayName = 'Switch.Case'
-  _Default.displayName = 'Switch.Default'
+  Switch.displayName = 'Switch'
+  Switch.Case.displayName = 'Switch.Case'
+  Switch.Default.displayName = 'Switch.Default'
 }
