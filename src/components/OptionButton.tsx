@@ -1,4 +1,4 @@
-import { type ButtonHTMLAttributes, forwardRef, useCallback } from 'react'
+import { type ButtonHTMLAttributes, type Ref, useCallback } from 'react'
 
 import { Button } from '../primitives/Button.js'
 
@@ -23,6 +23,11 @@ export namespace OptionButton {
     options: { label: string; value: string }[] | string[]
 
     /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLButtonElement>
+
+    /**
      * Handler invoked when the button is clicked.
      *
      * @param value The value of the next option.
@@ -35,13 +40,14 @@ export namespace OptionButton {
 /**
  * A button component that cycles through a list of options when clicked.
  */
-export const OptionButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readonly<OptionButton.Props>>(({
+export function OptionButton({
+  ref,
   index = 0,
   options,
   isDisabled = false,
   onChange,
   ...props
-}, ref) => {
+}: OptionButton.Props) {
   const maxIndex = options.length - 1
   const option = options[index]
   const label = typeof option === 'string' ? option : option?.label
@@ -65,7 +71,7 @@ export const OptionButton = /* #__PURE__ */ forwardRef<HTMLButtonElement, Readon
       isDisabled={isDisabled}
     />
   )
-})
+}
 
 if (process.env.NODE_ENV === 'development') {
   OptionButton.displayName = 'OptionButton'

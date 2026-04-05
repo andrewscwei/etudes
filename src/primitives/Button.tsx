@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { type AnchorHTMLAttributes, type ButtonHTMLAttributes, forwardRef } from 'react'
+import { type AnchorHTMLAttributes, type ButtonHTMLAttributes, type Ref } from 'react'
 
 type ButtonVariantProps = {
   label?: string
@@ -18,7 +18,7 @@ export namespace Button {
   /**
    * Type describing the props of {@link Button}.
    */
-  export type Props = AnchorVariantProps | ButtonVariantProps
+  export type Props = { ref?: Ref<HTMLAnchorElement | HTMLButtonElement> } & (AnchorVariantProps | ButtonVariantProps)
 }
 
 /**
@@ -26,10 +26,10 @@ export namespace Button {
  * {@link HTMLAnchorElement}, or {@link HTMLButtonElement} depending on the
  * structure of its props.
  */
-export const Button = /* #__PURE__ */ forwardRef<HTMLAnchorElement | HTMLButtonElement, Button.Props>((props: Readonly<Button.Props>, ref) => {
+export function Button(props: Button.Props) {
   switch (true) {
     case _isAnchor(props): {
-      const { className, action, children, label, opensInNewTab, isDisabled, ...uniqProps } = props
+      const { className, ref, action, children, label, opensInNewTab, isDisabled, ...uniqProps } = props
 
       return (
         <a
@@ -47,7 +47,7 @@ export const Button = /* #__PURE__ */ forwardRef<HTMLAnchorElement | HTMLButtonE
       )
     }
     case _isButton(props): {
-      const { className, action, children, label, type = 'button', isDisabled, ...uniqProps } = props
+      const { className, ref, action, children, label, type = 'button', isDisabled, ...uniqProps } = props
 
       return (
         <button
@@ -69,7 +69,7 @@ export const Button = /* #__PURE__ */ forwardRef<HTMLAnchorElement | HTMLButtonE
 
       return undefined
   }
-})
+}
 
 function _isAnchor(props: Button.Props): props is AnchorVariantProps {
   if (typeof props.action === 'string') return true
