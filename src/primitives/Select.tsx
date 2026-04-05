@@ -1,28 +1,35 @@
-import { type ChangeEvent, forwardRef, type HTMLAttributes } from 'react'
+import { type ChangeEvent, type HTMLAttributes, type Ref } from 'react'
 
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
-const _Select = /* #__PURE__ */ forwardRef<HTMLDivElement, Select.Props>((
-  {
-    id,
-    children,
-    name,
-    options,
-    placeholder,
-    value = '',
-    isRequired = false,
-    onChange,
-    ...props
-  },
+/**
+ * A select component that allows users to select an option from a dropdown
+ * toggle.
+ *
+ * @exports Select.ExpandIcon Component for the expand icon.
+ * @exports Select.Option Component for each option.
+ * @exports Select.Toggle Component for the toggle.
+ */
+export function Select<T extends string>({
+  id,
   ref,
-) => {
+  children,
+  formatValue = v => v,
+  name,
+  options,
+  placeholder,
+  value,
+  isRequired = false,
+  onChange,
+  ...props
+}: Select.Props<T>) {
   const components = asComponentDict(children, {
-    expandIcon: _ExpandIcon,
-    option: _Option,
-    toggle: _Toggle,
+    expandIcon: Select.ExpandIcon,
+    option: Select.Option,
+    toggle: Select.Toggle,
   })
 
   return (
@@ -30,17 +37,17 @@ const _Select = /* #__PURE__ */ forwardRef<HTMLDivElement, Select.Props>((
       <Styled
         style={FIXED_STYLES.select}
         aria-required={isRequired ? 'true' : undefined}
-        element={components.toggle ?? <_Toggle/>}
+        element={components.toggle ?? <Select.Toggle/>}
         name={name}
         required={isRequired}
         value={value}
-        onChange={(event: ChangeEvent<HTMLSelectElement>) => onChange?.(event.target.value)}
+        onChange={(event: ChangeEvent<HTMLSelectElement>) => onChange?.(event.target.value as T)}
       >
         {placeholder !== undefined && (
-          <Styled disabled element={components.option ?? <_Option/>} hidden value=''>{placeholder}</Styled>
+          <Styled disabled element={components.option ?? <Select.Option/>} hidden value=''>{placeholder}</Styled>
         )}
         {options.map((val, idx) => (
-          <Styled key={`${idx}-${val}`} element={components.option ?? <_Option/>} value={val}>{val}</Styled>
+          <Styled key={`${idx}-${val}`} element={components.option ?? <Select.Option/>} value={val}>{formatValue(val)}</Styled>
         ))}
       </Styled>
       {components.expandIcon && (
@@ -48,25 +55,18 @@ const _Select = /* #__PURE__ */ forwardRef<HTMLDivElement, Select.Props>((
       )}
     </div>
   )
-})
-
-const _ExpandIcon = ({ style, children, ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <figure {...props} style={styles(style, { pointerEvents: 'none' })} aria-hidden={true}>{children}</figure>
-)
-
-const _Toggle = ({ children, ...props }: HTMLAttributes<HTMLSelectElement>) => (
-  <select {...props}>{children}</select>
-)
-
-const _Option = ({ ...props }: HTMLAttributes<HTMLOptionElement>) => (
-  <option {...props}/>
-)
+}
 
 export namespace Select {
   /**
    * Type describing the props of {@link Select}.
    */
-  export type Props = {
+  export type Props<T extends string> = {
+    /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLDivElement>
+
     /**
      * Specifies if a selection is required.
      */
@@ -80,8 +80,7 @@ export namespace Select {
     /**
      * The options to display in the `select` element.
      */
-    options: string[]
-
+    options: readonly T[]
     /**
      * Placeholder text to display when no option is selected (i.e. when the
      * value is `''`).
@@ -91,41 +90,47 @@ export namespace Select {
     /**
      * Current value of the `select` element.
      */
-    value?: string
+    value?: NoInfer<T>
+
+    /**
+     * Function to format the value of the `select` element for display in the
+     * toggle. If not provided, the value will be displayed as is.
+     *
+     * @param value The current value of the `select` element.
+     *
+     * @returns The formatted value to display in the toggle.
+     */
+    formatValue?: (value: NoInfer<T>) => string
 
     /**
      * Handler invoked when the value of the `select` element changes.
      *
      * @param value The new value of the `select` element.
      */
-    onChange?: (value: string) => void
+    onChange?: (value: NoInfer<T>) => void
   } & Omit<HTMLAttributes<HTMLDivElement>, 'onChange'>
-}
 
-/**
- * A select component that allows users to select an option from a dropdown
- * toggle.
- *
- * @exports Select.ExpandIcon Component for the expand icon.
- * @exports Select.Option Component for each option.
- * @exports Select.Toggle Component for the toggle.
- */
-export const Select = /* #__PURE__ */ Object.assign(_Select, {
   /**
    * Component for the expand icon of a {@link Select}.
    */
-  ExpandIcon: _ExpandIcon,
+  export const ExpandIcon = ({ style, children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <figure {...props} style={styles(style, { pointerEvents: 'none' })} aria-hidden={true}>{children}</figure>
+  )
 
   /**
    * Component for each option of a {@link Select}.
    */
-  Option: _Option,
+  export const Option = ({ ...props }: HTMLAttributes<HTMLOptionElement>) => (
+    <option {...props}/>
+  )
 
   /**
    * Component for the `select` element of a {@link Select}.
    */
-  Toggle: _Toggle,
-})
+  export const Toggle = ({ children, ...props }: HTMLAttributes<HTMLSelectElement>) => (
+    <select {...props}>{children}</select>
+  )
+}
 
 const FIXED_STYLES = asStyleDict({
   expandIcon: {
@@ -151,9 +156,8 @@ const FIXED_STYLES = asStyleDict({
 })
 
 if (process.env.NODE_ENV === 'development') {
-  _Select.displayName = 'Select'
-
-  _ExpandIcon.displayName = 'Select.ExpandIcon'
-  _Option.displayName = 'Select.Option'
-  _Toggle.displayName = 'Select.Toggle'
+  Select.displayName = 'Select'
+  Select.ExpandIcon.displayName = 'Select.ExpandIcon'
+  Select.Option.displayName = 'Select.Option'
+  Select.Toggle.displayName = 'Select.Toggle'
 }

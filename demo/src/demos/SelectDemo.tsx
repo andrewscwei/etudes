@@ -5,11 +5,11 @@ import $$ExpandIcon from '../assets/expand-icon.svg?raw'
 import { Frame } from '../components/Frame.js'
 
 export function SelectDemo() {
-  const options = ['Option 1', 'Option 2', 'Option 3']
-  const [value, setValue] = useState('')
+  const options = ['Option 1', 'Option 2', 'Option 3'] as const
+  const [value, setValue] = useState<(typeof options)[number]>(options[0])
 
   return (
-    <Frame title='Select' onReset={() => setValue('')}>
+    <Frame title='Select' onReset={() => setValue(options[0])}>
       {(_, toast) => {
         useEffect(() => {
           toast(`Selected option: ${value || 'none'}`)

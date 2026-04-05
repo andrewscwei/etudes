@@ -2,9 +2,9 @@ import clsx from 'clsx'
 import { type AnchorHTMLAttributes, type ButtonHTMLAttributes, forwardRef } from 'react'
 
 type ButtonVariantProps = {
-  action?: () => void
   label?: string
   isDisabled?: boolean
+  action?: () => void
 } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-disabled' | 'aria-label' | 'disabled' | 'onClick' | 'rel'>
 
 type AnchorVariantProps = {
