@@ -305,6 +305,10 @@ export default defineConfig(
             groupName: 'flag',
           },
           {
+            groupName: 'method',
+            selector: 'method',
+          },
+          {
             elementNamePattern: '^on.+',
             groupName: 'callback',
           },
@@ -315,6 +319,7 @@ export default defineConfig(
           'data',
           'unknown',
           'flag',
+          'method',
           'callback',
         ],
         ignoreCase: false,
@@ -339,6 +344,10 @@ export default defineConfig(
             groupName: 'flag',
           },
           {
+            groupName: 'method',
+            selector: 'method',
+          },
+          {
             elementNamePattern: '^on.+',
             groupName: 'callback',
           },
@@ -349,6 +358,7 @@ export default defineConfig(
           'data',
           'unknown',
           'flag',
+          'method',
           'callback',
         ],
         ignoreCase: false,
