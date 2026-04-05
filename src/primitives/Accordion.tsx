@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import { type ComponentType, forwardRef, type HTMLAttributes, type ReactElement, type Ref, type RefObject, useRef } from 'react'
+import { type ComponentType, type HTMLAttributes, type Ref, type RefObject, useRef } from 'react'
 
 import { Each } from '../flows/Each.js'
 import { useSize } from '../hooks/useSize.js'
@@ -11,32 +11,41 @@ import { styles } from '../utils/styles.js'
 import { Collection } from './Collection.js'
 import { type Dropdown } from './Dropdown.js'
 
-const _Accordion = /* #__PURE__ */ forwardRef((
-  {
-    style,
-    children,
-    expandedSectionIndices: externalExpandedSectionIndices,
-    HeaderComponent,
-    ItemComponent,
-    orientation = 'vertical',
-    sectionPadding = 0,
-    sections,
-    selection: externalSelection,
-    selectionMode = 'single',
-    shouldAutoCollapse = false,
-    onActivateAt,
-    onCollapseSectionAt,
-    onDeselectAt,
-    onExpandedSectionsChange,
-    onExpandSectionAt,
-    onHeaderCustomEvent,
-    onItemCustomEvent,
-    onSelectAt,
-    onSelectionChange,
-    ...props
-  },
+/**
+ * A collection of selectable items laid out in sections in an accordion. Items
+ * are generated based on the provided `ItemComponent` while each section header
+ * is optionally provided by `HeaderComponent` or generated automatically.
+ *
+ * @exports Accordion.Header Component for each section header.
+ * @exports Accordion.ExpandIcon Component for the expand icon of each section.
+ * @exports Accordion.CollapseIcon Component for the collapse icon of each
+ * @exports Accordion.Section Component for each section.
+ * @exports Accordion.Item Component for each item in each section.
+ */
+export function Accordion<I, S extends Accordion.SectionProps<I> = Accordion.SectionProps<I>>({
   ref,
-) => {
+  style,
+  children,
+  expandedSectionIndices: externalExpandedSectionIndices,
+  HeaderComponent,
+  ItemComponent,
+  orientation = 'vertical',
+  sectionPadding = 0,
+  sections,
+  selection: externalSelection,
+  selectionMode = 'single',
+  shouldAutoCollapse = false,
+  onActivateAt,
+  onCollapseSectionAt,
+  onDeselectAt,
+  onExpandedSectionsChange,
+  onExpandSectionAt,
+  onHeaderCustomEvent,
+  onItemCustomEvent,
+  onSelectAt,
+  onSelectionChange,
+  ...props
+}: Accordion.Props<I, S>) {
   const selection = _sanitizeSelection(externalSelection ?? {}, sections)
   const expandedSectionIndices = _sanitizeExpandedSectionIndices(externalExpandedSectionIndices ?? [], sections)
   const fixedStyles = _getFixedStyles({ orientation })
@@ -137,11 +146,11 @@ const _Accordion = /* #__PURE__ */ forwardRef((
   }
 
   const components = asComponentDict(children, {
-    collapseIcon: _CollapseIcon,
-    expandIcon: _ExpandIcon,
-    header: _Header,
-    item: _Item,
-    section: _Section,
+    collapseIcon: Accordion.CollapseIcon,
+    expandIcon: Accordion.ExpandIcon,
+    header: Accordion.Header,
+    item: Accordion.Item,
+    section: Accordion.Section,
   })
 
   return (
@@ -178,7 +187,7 @@ const _Accordion = /* #__PURE__ */ forwardRef((
                   visibility: 'hidden',
                 },
               })}
-              element={components.section ?? <_Section/>}
+              element={components.section ?? <Accordion.Section/>}
             >
               <div
                 ref={headerRefs[sectionIndex]}
@@ -201,7 +210,7 @@ const _Accordion = /* #__PURE__ */ forwardRef((
                     className={clsx({ collapsed: isCollapsed, expanded: !isCollapsed })}
                     style={styles(fixedStyles.header)}
                     aria-expanded={!isCollapsed}
-                    element={components.header ?? <_Header/>}
+                    element={components.header ?? <Accordion.Header/>}
                     role='button'
                     onClick={() => toggleSectionAt(sectionIndex)}
                   >
@@ -250,7 +259,7 @@ const _Accordion = /* #__PURE__ */ forwardRef((
                   onDeselectAt={itemIndex => handleDeselectAt(itemIndex, sectionIndex)}
                   onSelectAt={itemIndex => handleSelectAt(itemIndex, sectionIndex)}
                 >
-                  {!ItemComponent && (components.item ?? <_Item/>)}
+                  {!ItemComponent && (components.item ?? <Accordion.Item/>)}
                 </Collection>
               </div>
             </Styled>
@@ -259,27 +268,42 @@ const _Accordion = /* #__PURE__ */ forwardRef((
       </Each>
     </div>
   )
-}) as <I, S extends Accordion.SectionProps<I> = Accordion.SectionProps<I>>(props: Readonly<{ ref?: Ref<HTMLDivElement> } & Accordion.Props<I, S>>) => ReactElement
-
-const _Header = ({ children, ...props }: Dropdown.ToggleProps & HTMLAttributes<HTMLButtonElement>) => (
-  <button {...props}>{children}</button>
-)
-
-const _ExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <figure {...props}>{children}</figure>
-)
-
-const _CollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <figure {...props}>{children}</figure>
-)
-
-const _Section = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <div {...props}>{children}</div>
-)
-
-const _Item = Collection.Item
+}
 
 export namespace Accordion {
+  /**
+   * Component for each section header of an {@link Accordion}.
+   */
+  export const Header = ({ children, ...props }: Dropdown.ToggleProps & HTMLAttributes<HTMLButtonElement>) => (
+    <button {...props}>{children}</button>
+  )
+
+  /**
+   * Component for the expand icon of each section of an {@link Accordion}.
+   */
+  export const ExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <figure {...props}>{children}</figure>
+  )
+
+  /**
+   * Component for the collapse icon of each section of an {@link Accordion}.
+   */
+  export const CollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <figure {...props}>{children}</figure>
+  )
+
+  /**
+   * Component for each section in an {@link Accordion}.
+   */
+  export const Section = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <div {...props}>{children}</div>
+  )
+
+  /**
+   * Component for each item of each section of an {@link Accordion}.
+   */
+  export const Item = Collection.Item
+
   /**
    * Type describing the current item selection of {@link Accordion}, composed
    * of a dictionary whose key corresponds the section index and value
@@ -352,6 +376,11 @@ export namespace Accordion {
    * Type describing the props of {@link Accordion}.
    */
   export type Props<I, S extends SectionProps<I> = SectionProps<I>> = {
+    /**
+     * Ref to the root element.
+     */
+    ref?: Ref<HTMLDivElement>
+
     /**
      * Specifies if expanded sections should automatically collapse upon
      * expanding another section.
@@ -506,44 +535,6 @@ export namespace Accordion {
   } & HTMLAttributes<HTMLDivElement>
 }
 
-/**
- * A collection of selectable items laid out in sections in an accordion. Items
- * are generated based on the provided `ItemComponent` while each section header
- * is optionally provided by `HeaderComponent` or generated automatically.
- *
- * @exports Accordion.Header Component for each section header.
- * @exports Accordion.ExpandIcon Component for the expand icon of each section.
- * @exports Accordion.CollapseIcon Component for the collapse icon of each
- * @exports Accordion.Section Component for each section.
- * @exports Accordion.Item Component for each item in each section.
- */
-export const Accordion = /* #__PURE__ */ Object.assign(_Accordion, {
-  /**
-   * Component for each section header of an {@link Accordion}.
-   */
-  Header: _Header,
-
-  /**
-   * Component for the expand icon of each section of an {@link Accordion}.
-   */
-  ExpandIcon: _ExpandIcon,
-
-  /**
-   * Component for the collapse icon of each section of an {@link Accordion}.
-   */
-  CollapseIcon: _CollapseIcon,
-
-  /**
-   * Component for each section in an {@link Accordion}.
-   */
-  Section: _Section,
-
-  /**
-   * Component for each item of each section of an {@link Accordion}.
-   */
-  Item: _Item,
-})
-
 function _isSectionIndexOutOfRange<T>(sectionIndex: number, sections: Accordion.SectionProps<T>[]) {
   if (sectionIndex >= sections.length) return true
   if (sectionIndex < 0) return true
@@ -646,10 +637,9 @@ function _getFixedStyles({ orientation = 'vertical' }) {
 }
 
 if (process.env.NODE_ENV === 'development') {
-  (_Accordion as any).displayName = 'Accordion'
-
-  _Header.displayName = 'Accordion.Header'
-  _ExpandIcon.displayName = 'Accordion.ExpandIcon'
-  _CollapseIcon.displayName = 'Accordion.CollapseIcon'
-  _Item.displayName = 'Accordion.Item'
+  Accordion.displayName = 'Accordion'
+  Accordion.Header.displayName = 'Accordion.Header'
+  Accordion.ExpandIcon.displayName = 'Accordion.ExpandIcon'
+  Accordion.CollapseIcon.displayName = 'Accordion.CollapseIcon';
+  (Accordion.Item as any).displayName = 'Accordion.Item'
 }

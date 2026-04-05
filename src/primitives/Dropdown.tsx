@@ -1,46 +1,55 @@
 import clsx from 'clsx'
-import { type ComponentType, forwardRef, type HTMLAttributes, type ReactElement, type Ref, useEffect, useRef, useState } from 'react'
+import { type ComponentType, type HTMLAttributes, type Ref, useEffect, useRef, useState } from 'react'
 
 import { useRect } from '../hooks/useRect.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
-import { Collection } from './Collection.js'
+import { Collection as _Collection } from './Collection.js'
 
-const _Dropdown = /* #__PURE__ */ forwardRef((
-  {
-    className,
-    style,
-    children,
-    collectionPadding = 0,
-    ItemComponent,
-    itemLength: externalItemLength,
-    itemPadding = 0,
-    items = [],
-    label,
-    layout = 'list',
-    maxVisibleItems = -1,
-    numSegments = 1,
-    orientation = 'vertical',
-    selection: externalSelection = [],
-    selectionMode = 'single',
-    ToggleComponent,
-    isCollapsed: externalIsCollapsed,
-    isInverted = false,
-    isSelectionTogglable = false,
-    shouldCollapseOnSelect = true,
-    onActivateAt,
-    onCollapse,
-    onDeselectAt,
-    onExpand,
-    onSelectAt,
-    onSelectionChange,
-    onToggleCustomEvent,
-    ...props
-  },
+/**
+ * A dropdown component that is invertible (i.e. can "dropup" instead) and
+ * supports both horizontal and vertical orientations. Provide `items` and
+ * `ItemComponent` props to populate.
+ *
+ * @exports Dropdown.Collection Component containing the items.
+ * @exports Dropdown.Item Component for each item.
+ * @exports Dropdown.Toggle Component for the toggle button.
+ * @exports Dropdown.CollapseIcon Component for the collapse icon.
+ * @exports Dropdown.ExpandIcon Component for the expand icon.
+ */
+export function Dropdown<T>({
+  className,
   ref,
-) => {
+  style,
+  children,
+  collectionPadding = 0,
+  ItemComponent,
+  itemLength: externalItemLength,
+  itemPadding = 0,
+  items = [],
+  label,
+  layout = 'list',
+  maxVisibleItems = -1,
+  numSegments = 1,
+  orientation = 'vertical',
+  selection: externalSelection = [],
+  selectionMode = 'single',
+  ToggleComponent,
+  isCollapsed: externalIsCollapsed,
+  isInverted = false,
+  isSelectionTogglable = false,
+  shouldCollapseOnSelect = true,
+  onActivateAt,
+  onCollapse,
+  onDeselectAt,
+  onExpand,
+  onSelectAt,
+  onSelectionChange,
+  onToggleCustomEvent,
+  ...props
+}: Dropdown.Props<T>) {
   const bodyRef = useRef<HTMLDivElement>(null)
   const bodyRect = useRect(bodyRef)
   const numItems = items.length
@@ -54,11 +63,11 @@ const _Dropdown = /* #__PURE__ */ forwardRef((
   const fixedStyles = _getFixedStyles({ collectionPadding, maxVisibleItems, menuLength, numItems, orientation, isCollapsed, isInverted })
 
   const components = asComponentDict(children, {
-    collapseIcon: _CollapseIcon,
-    collection: _Collection,
-    expandIcon: _ExpandIcon,
-    item: _Item,
-    toggle: _Toggle,
+    collapseIcon: Dropdown.CollapseIcon,
+    collection: Dropdown.Collection,
+    expandIcon: Dropdown.ExpandIcon,
+    item: Dropdown.Item,
+    toggle: Dropdown.Toggle,
   })
 
   const expand = () => {
@@ -151,7 +160,7 @@ const _Dropdown = /* #__PURE__ */ forwardRef((
             style={styles(fixedStyles.toggle)}
             aria-expanded={!isCollapsed}
             aria-haspopup='listbox'
-            element={components.toggle ?? <_Toggle/>}
+            element={components.toggle ?? <Dropdown.Toggle/>}
             onClick={toggleClickHandler}
           >
             <span dangerouslySetInnerHTML={{ __html: label?.(selection) ?? (selection.length > 0 ? selection.map(t => items[t]).join(', ') : '') }}/>
@@ -166,7 +175,7 @@ const _Dropdown = /* #__PURE__ */ forwardRef((
         )}
         <Styled
           style={styles(fixedStyles.collection)}
-          element={components.collection ?? <_Collection/>}
+          element={components.collection ?? <Dropdown.Collection/>}
           ItemComponent={ItemComponent}
           itemLength={itemLength}
           itemPadding={itemPadding}
@@ -182,41 +191,25 @@ const _Dropdown = /* #__PURE__ */ forwardRef((
           onSelectAt={selectAtHandler}
           onSelectionChange={onSelectionChange}
         >
-          {!ItemComponent && (components.item ?? <_Item/>)}
+          {!ItemComponent && (components.item ?? <Dropdown.Item/>)}
         </Styled>
       </div>
     </div>
   )
-}) as <T>(props: Readonly<{ ref?: Ref<HTMLDivElement> } & Dropdown.Props<T>>) => ReactElement
-
-const _Collection = Collection
-
-const _Item = Collection.Item
-
-const _Toggle = ({ children, ...props }: Dropdown.ToggleProps) => (
-  <button {...props}>{children}</button>
-)
-
-const _CollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <figure {...props} aria-hidden={true}>{children}</figure>
-)
-
-const _ExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
-  <figure {...props} aria-hidden={true}>{children}</figure>
-)
+}
 
 export namespace Dropdown {
   /**
    * Type describing the orientation of {@link Dropdown}.
    */
-  export type Orientation = Collection.Orientation
+  export type Orientation = _Collection.Orientation
 
   /**
    * Type describing the current item selection of {@link Dropdown}, composed of
    * an array of indices of items that are selected. If the selection mode of
    * the {@link Dropdown} is `single`, only one index is expected in this array.
    */
-  export type Selection = Collection.Selection
+  export type Selection = _Collection.Selection
 
   /**
    * Type describing the props of `ToggleComponent` provided to
@@ -235,12 +228,17 @@ export namespace Dropdown {
   /**
    * Type describing the props of `ItemComponent` provided to {@link Dropdown}.
    */
-  export type ItemProps<T> = Collection.ItemProps<T>
+  export type ItemProps<T> = _Collection.ItemProps<T>
 
   /**
    * Type describing the props of {@link Dropdown}.
    */
-  export type Props<T> = {
+  export type Props<T> = _Collection.Props<T> & {
+    /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLDivElement>
+
     /**
      * Specifies if the internal collection collapses when an item is selected.
      * This only works if `selectionMode` is `single`.
@@ -305,46 +303,40 @@ export namespace Dropdown {
      * the component. When absent, one will be generated automatically.
      */
     ToggleComponent?: ComponentType<ToggleProps>
-  } & Collection.Props<T> & HTMLAttributes<HTMLDivElement>
-}
+  } & HTMLAttributes<HTMLDivElement>
 
-/**
- * A dropdown component that is invertible (i.e. can "dropup" instead) and
- * supports both horizontal and vertical orientations. Provide `items` and
- * `ItemComponent` props to populate.
- *
- * @exports Dropdown.Collection Component containing the items.
- * @exports Dropdown.Item Component for each item.
- * @exports Dropdown.Toggle Component for the toggle button.
- * @exports Dropdown.CollapseIcon Component for the collapse icon.
- * @exports Dropdown.ExpandIcon Component for the expand icon.
- */
-export const Dropdown = /* #__PURE__ */ Object.assign(_Dropdown, {
   /**
    * Component containing the items in a {@link Dropdown}.
    */
-  Collection: _Collection,
+
+  export const Collection = _Collection
 
   /**
    * Component for the collapse icon of a {@link Dropdown}.
    */
-  CollapseIcon: _CollapseIcon,
+  export const CollapseIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <figure {...props} aria-hidden={true}>{children}</figure>
+  )
 
   /**
    * Component for the expand icon of a {@link Dropdown}.
    */
-  ExpandIcon: _ExpandIcon,
+  export const ExpandIcon = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+    <figure {...props} aria-hidden={true}>{children}</figure>
+  )
 
   /**
    * Component for each item in a {@link Dropdown}.
    */
-  Item: _Item,
+  export const Item = _Collection.Item
 
   /**
    * Component for the toggle button of a {@link Dropdown}.
    */
-  Toggle: _Toggle,
-})
+  export const Toggle = ({ children, ...props }: ToggleProps) => (
+    <button {...props}>{children}</button>
+  )
+}
 
 function _isIndexOutOfRange<T>(index: number, items: T[]) {
   if (isNaN(index)) return true
@@ -362,7 +354,7 @@ function _sortIndices(indices: number[]): number[] {
   return indices.sort((a, b) => a - b)
 }
 
-function _getNumVisibleItems<T>(items: T[], maxVisible: number, numSegments: number, layout: Collection.Layout) {
+function _getNumVisibleItems<T>(items: T[], maxVisible: number, numSegments: number, layout: _Collection.Layout) {
   const numItems = items.length
 
   switch (layout) {
@@ -440,11 +432,10 @@ function _getFixedStyles({ collectionPadding = 0, maxVisibleItems = 0, menuLengt
 }
 
 if (process.env.NODE_ENV === 'development') {
-  (_Dropdown as any).displayName = 'Dropdown';
-
-  (_Collection as any).displayName = 'Dropdown.Collection'
-  _CollapseIcon.displayName = 'Dropdown.CollapseIcon'
-  _ExpandIcon.displayName = 'Dropdown.ExpandIcon'
-  _Item.displayName = 'Dropdown.Item'
-  _Toggle.displayName = 'Dropdown.Toggle'
+  Dropdown.displayName = 'Dropdown'
+  Dropdown.Collection.displayName = 'Dropdown.Collection'
+  Dropdown.CollapseIcon.displayName = 'Dropdown.CollapseIcon'
+  Dropdown.ExpandIcon.displayName = 'Dropdown.ExpandIcon'
+  Dropdown.Item.displayName = 'Dropdown.Item'
+  Dropdown.Toggle.displayName = 'Dropdown.Toggle'
 }
