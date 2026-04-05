@@ -1,26 +1,32 @@
 import clsx from 'clsx'
-import { forwardRef, type HTMLAttributes, useEffect, useState } from 'react'
+import { type HTMLAttributes, type Ref, useEffect, useState } from 'react'
 
 import { usePrevious } from '../hooks/usePrevious.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
-import { TextField } from './TextField.js'
+import { TextField as _TextField } from './TextField.js'
 
-const _Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Counter.Props>>((
-  {
-    style,
-    allowsInput = true,
-    children,
-    max = NaN,
-    min = NaN,
-    quantity = 0,
-    onChange,
-    ...props
-  },
+/**
+ * A component that allows the user to increment or decrement a quantity using
+ * buttons or by typing in a text field.
+ *
+ * @exports Counter.TextField Component for the text field.
+ * @exports Counter.AddButton Component for the add button.
+ * @exports Counter.SubtractButton Component for the subtract button.
+ */
+export function Counter({
   ref,
-) => {
+  style,
+  allowsInput = true,
+  children,
+  max = NaN,
+  min = NaN,
+  quantity = 0,
+  onChange,
+  ...props
+}: Counter.Props) {
   const handleSubtract = () => {
     onChange?.(clamp(quantity - 1))
   }
@@ -77,9 +83,9 @@ const _Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Counter.Pro
   }, [quantity, min, max])
 
   const components = asComponentDict(children, {
-    addButton: _AddButton,
-    subscribeButton: _SubtractButton,
-    textField: _TextField,
+    addButton: Counter.AddButton,
+    subscribeButton: Counter.SubtractButton,
+    textField: Counter.TextField,
   })
 
   return (
@@ -87,12 +93,12 @@ const _Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Counter.Pro
       <Styled
         className={clsx({ disabled: isSubtractingDisabled })}
         style={styles(FIXED_STYLES.subtract)}
-        element={components.subscribeButton ?? <_SubtractButton/>}
+        element={components.subscribeButton ?? <Counter.SubtractButton/>}
         onClick={() => handleSubtract()}
       />
       <Styled
         style={styles(FIXED_STYLES.textField)}
-        element={components.textField ?? <_TextField/>}
+        element={components.textField ?? <Counter.TextField/>}
         value={text}
         isDisabled={!allowsInput}
         onChange={handleInputProgress}
@@ -101,34 +107,23 @@ const _Counter = /* #__PURE__ */ forwardRef<HTMLDivElement, Readonly<Counter.Pro
       <Styled
         className={clsx({ disabled: isAddingDisabled })}
         style={styles(FIXED_STYLES.add)}
-        element={components.addButton ?? <_AddButton/>}
+        element={components.addButton ?? <Counter.AddButton/>}
         onClick={() => handleAdd()}
       />
     </div>
   )
-})
-
-const _TextField = ({ ...props }: TextField.Props) => (
-  <TextField {...props}/>
-)
-
-const _AddButton = ({ children, ...props }: HTMLAttributes<HTMLButtonElement>) => (
-  <button {...props}>
-    {children}
-  </button>
-)
-
-const _SubtractButton = ({ children, ...props }: HTMLAttributes<HTMLButtonElement>) => (
-  <button {...props}>
-    {children}
-  </button>
-)
+}
 
 export namespace Counter {
   /**
    * Type describing the props of {@link Counter}.
    */
   export type Props = {
+    /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLDivElement>
+
     /**
      * The minimum quantity that can be set.
      */
@@ -156,32 +151,32 @@ export namespace Counter {
      */
     onChange?: (quantity: number) => void
   } & Omit<HTMLAttributes<HTMLElement>, 'onChange'>
-}
 
-/**
- * A component that allows the user to increment or decrement a quantity using
- * buttons or by typing in a text field.
- *
- * @exports Counter.TextField Component for the text field.
- * @exports Counter.AddButton Component for the add button.
- * @exports Counter.SubtractButton Component for the subtract button.
- */
-export const Counter = /* #__PURE__ */ Object.assign(_Counter, {
   /**
    * Component for the text field in a {@link Counter}.
    */
-  TextField: _TextField,
+  export const TextField = ({ ...props }: _TextField.Props) => (
+    <_TextField {...props}/>
+  )
 
   /**
    * Component for the add button in a {@link Counter}.
    */
-  AddButton: _AddButton,
+  export const AddButton = ({ children, ...props }: HTMLAttributes<HTMLButtonElement>) => (
+    <button {...props}>
+      {children}
+    </button>
+  )
 
   /**
    * Component for the subtract button in a {@link Counter}.
    */
-  SubtractButton: _SubtractButton,
-})
+  export const SubtractButton = ({ children, ...props }: HTMLAttributes<HTMLButtonElement>) => (
+    <button {...props}>
+      {children}
+    </button>
+  )
+}
 
 const FIXED_STYLES = asStyleDict({
   add: {
@@ -202,9 +197,8 @@ const FIXED_STYLES = asStyleDict({
 })
 
 if (process.env.NODE_ENV === 'development') {
-  _Counter.displayName = 'Counter'
-
-  _AddButton.displayName = 'Counter.AddButton'
-  _SubtractButton.displayName = 'Counter.SubtractButton'
-  _TextField.displayName = 'Counter.TextField'
+  Counter.displayName = 'Counter'
+  Counter.AddButton.displayName = 'Counter.AddButton'
+  Counter.SubtractButton.displayName = 'Counter.SubtractButton'
+  Counter.TextField.displayName = 'Counter.TextField'
 }
