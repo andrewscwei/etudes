@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import { type ComponentType, forwardRef, type HTMLAttributes, type ReactElement, type Ref, useEffect } from 'react'
+import { type ComponentType, type HTMLAttributes, type Ref, useEffect } from 'react'
 
 import { Each } from '../flows/Each.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
@@ -8,8 +8,16 @@ import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
-const _Collection = /* #__PURE__ */ forwardRef(({
+/**
+ * A collection of selectable items with generic data. Items are generated based
+ * on the provided `ItemComponent`. This component supports different layouts in
+ * both horizontal and vertical orientations.
+ *
+ * @exports Collection.Item Component for each item in the collection.
+ */
+export function Collection<T>({
   className,
+  ref,
   style,
   children,
   ItemComponent,
@@ -28,7 +36,7 @@ const _Collection = /* #__PURE__ */ forwardRef(({
   onSelectAt,
   onSelectionChange,
   ...props
-}, ref) => {
+}: Collection.Props<T>) {
   const selection = _sanitizeSelection(externalSelection ?? [], items)
   const fixedStyles = _getFixedStyles({ itemLength, itemPadding, layout, numSegments, orientation })
 
@@ -120,7 +128,7 @@ const _Collection = /* #__PURE__ */ forwardRef(({
   }, [selectionMode])
 
   const components = asComponentDict(children, {
-    item: _Item,
+    item: Collection.Item,
   })
 
   return (
@@ -170,7 +178,7 @@ const _Collection = /* #__PURE__ */ forwardRef(({
                 className={clsx({ active: isSelected })}
                 style={itemStyles}
                 aria-selected={isSelected}
-                element={components.item ?? <_Item/>}
+                element={components.item ?? <Collection.Item/>}
                 role={role}
                 selectionMode={selectionMode}
                 onActivateAt={onActivateAt}
@@ -184,14 +192,6 @@ const _Collection = /* #__PURE__ */ forwardRef(({
       </Each>
     </div>
   )
-}) as <T>(props: Readonly<{ ref?: Ref<HTMLDivElement> } & Collection.Props<T>>) => ReactElement
-
-const _Item = ({ children, selectionMode, onActivateAt, ...props }: HTMLAttributes<HTMLButtonElement | HTMLDivElement> & Pick<Collection.Props<any>, 'onActivateAt' | 'selectionMode'>) => {
-  if (onActivateAt || selectionMode === 'single' || selectionMode === 'multiple') {
-    return (<button {...props}>{children}</button>)
-  } else {
-    return (<div {...props}>{children}</div>)
-  }
 }
 
 export namespace Collection {
@@ -262,6 +262,11 @@ export namespace Collection {
    * Type describing the props of {@link Collection}.
    */
   export type Props<T> = {
+    /**
+     * Ref to the root element.
+     */
+    ref?: Ref<HTMLDivElement>
+
     /**
      * Indicates if item selection can be toggled, i.e. they can be deselected
      * if selected again.
@@ -380,26 +385,24 @@ export namespace Collection {
 
     /**
      * Custom component type for generating items in this collection. If this is
-     * provided, the {@link _Item} provided as part of the children will
-     * be ignored.
+     * provided, the {@link Collection.Item} provided as part of the children
+     * will be ignored.
      */
     ItemComponent?: ComponentType<ItemProps<T>>
   } & HTMLAttributes<HTMLDivElement>
-}
 
-/**
- * A collection of selectable items with generic data. Items are generated based
- * on the provided `ItemComponent`. This component supports different layouts in
- * both horizontal and vertical orientations.
- *
- * @exports Collection.Item Component for each item in the collection.
- */
-export const Collection = /* #__PURE__ */ Object.assign(_Collection, {
   /**
-   * Component for each item in a {@link Collection}.
+   * Component for each item in the collection. This is used when
+   * `ItemComponent` is not provided in the props of {@link Collection}.
    */
-  Item: _Item,
-})
+  export const Item = ({ children, selectionMode, onActivateAt, ...props }: HTMLAttributes<HTMLButtonElement | HTMLDivElement> & Pick<Collection.Props<any>, 'onActivateAt' | 'selectionMode'>) => {
+    if (onActivateAt || selectionMode === 'single' || selectionMode === 'multiple') {
+      return (<button {...props}>{children}</button>)
+    } else {
+      return (<div {...props}>{children}</div>)
+    }
+  }
+}
 
 function _isIndexOutOfRange<T>(index: number, items: T[]) {
   if (isNaN(index)) return true
@@ -459,7 +462,6 @@ function _getFixedStyles({ itemLength = NaN, itemPadding = 0, layout = 'collecti
 }
 
 if (process.env.NODE_ENV === 'development') {
-  (_Collection as any).displayName = 'Collection'
-
-  _Item.displayName = 'Collection.Item'
+  Collection.displayName = 'Collection'
+  Collection.Item.displayName = 'Collection.Item'
 }
