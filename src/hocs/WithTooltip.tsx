@@ -42,7 +42,7 @@ export namespace WithTooltip {
 
     /**
      * The hint string to display in the tooltip, rendered as raw HTML via
-     * `innerHTML`. IMPORTANT: Sanitizing this value if needed.
+     * `innerHTML`. IMPORTANT: Sanitize this value if needed.
      */
     hint: string
 
