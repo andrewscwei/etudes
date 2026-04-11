@@ -56,12 +56,6 @@ export namespace WithTooltip {
      * The maximum width (in pixels) of the tooltip.
      */
     maxWidth?: number
-
-    /**
-     * The minimum space (in pixels) between the target element and the edge of
-     * the window required to trigger an alignment change, defaults to `100px`.
-     */
-    threshold?: number
   } & Pick<HTMLAttributes<HTMLElement>, 'children' | 'className' | 'style'>
 }
 
@@ -91,7 +85,6 @@ export function WithTooltip({
   gap = 4,
   hint,
   maxWidth = 200,
-  threshold = 100,
 }: Readonly<WithTooltip.Props>) {
   const dialogRef = useRef<HTMLElement>(null)
   const arrowRef = useRef<HTMLElement>(null)
@@ -115,11 +108,11 @@ export function WithTooltip({
 
     const arrowSize = Size.make(arrowWidth, arrowHeight)
     const dialogSize = measureIntrinsicSize(dialog, maxWidth)
-    const alignment = externalAlignment ?? _computeAlignment(anchorRect, viewportRect, threshold)
+    const alignment = externalAlignment ?? _computeAlignment(anchorRect, viewportRect)
 
     setStyles(styles(style, _makeDynamicDialogStyle(alignment, dialogSize, arrowSize, gap, anchorRect)), { target: dialog })
     setStyles(_makeDynamicArrowStyle(alignment, dialogSize, arrowSize, anchorRect), { target: arrow })
-  }, [externalAlignment, maxWidth, style, threshold, arrowHeight, arrowWidth, gap])
+  }, [externalAlignment, maxWidth, style, arrowHeight, arrowWidth, gap])
 
   const mouseEnterHandler = useCallback(() => {
     const dialog = dialogRef.current
@@ -232,21 +225,44 @@ function _createDialog(className: string, content: string): { arrow: HTMLElement
   return { arrow, dialog }
 }
 
-function _computeAlignment(targetRect: Rect, viewportRect: Rect, threshold: number) {
-  const leftBound = (targetRect.left - viewportRect.left) < threshold
-  const rightBound = (viewportRect.right - targetRect.right) < threshold
-  const topBound = (targetRect.top - viewportRect.top) < threshold
-  const bottomBound = (viewportRect.bottom - targetRect.bottom) < threshold
+function _computeAlignment(anchorRect: Rect, viewportRect: Rect): Alignment {
+  const spaceAbove = anchorRect.top
+  const spaceBelow = viewportRect.height - anchorRect.bottom
+  const spaceLeft = anchorRect.left
+  const spaceRight = viewportRect.width - anchorRect.right
+  const threshold = 1.5
 
-  if (leftBound && topBound) return 'br'
-  if (leftBound && bottomBound) return 'tr'
-  if (rightBound && topBound) return 'bl'
-  if (rightBound && bottomBound) return 'tl'
-  if (leftBound) return 'cr'
-  if (rightBound) return 'cl'
-  if (bottomBound) return 'tc'
+  const h = spaceRight <= 0 || (spaceLeft / spaceRight > threshold)
+    ? 'left'
+    : spaceLeft <= 0 || (spaceRight / spaceLeft > threshold)
+      ? 'right'
+      : 'center'
 
-  return 'tc'
+  const v = spaceBelow <= 0 || (spaceAbove / spaceBelow > threshold)
+    ? 'top'
+    : spaceAbove <= 0 || (spaceBelow / spaceAbove) > threshold
+      ? 'bottom'
+      : 'center'
+
+  if (h === 'center' && v === 'center') {
+    return 'bc'
+  } else if (h === 'center') {
+    switch (v) {
+      case 'top':
+        return 'tc'
+      default:
+        return 'bc'
+    }
+  } else if (v === 'center') {
+    switch (h) {
+      case 'left':
+        return 'cl'
+      default:
+        return 'cr'
+    }
+  } else {
+    return v.charAt(0) + h.charAt(0) as Alignment
+  }
 }
 
 function _makeDynamicDialogStyle(alignment: Alignment, dialogSize: Size, arrowSize: Size, gap: number, targetRect: Rect): CSSProperties {
