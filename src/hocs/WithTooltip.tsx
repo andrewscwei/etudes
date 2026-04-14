@@ -334,14 +334,16 @@ function _makeDynamicDialogStyle(alignment: Alignment, dialogSize: Size, arrowSi
 function _makeDynamicArrowStyle(alignment: Alignment, dialogSize: Size, arrowSize: Size, targetRect: Rect): CSSProperties {
   const targetWidth = targetRect.width
   const shouldRealign = targetWidth > dialogSize.width
+  const isHorizontal = alignment === 'cl' || alignment === 'cr'
+  const normalizedSize = isHorizontal ? Size.rotate(arrowSize) : arrowSize
 
   const baseStyle = {
     bottom: 'auto',
-    height: `${arrowSize.height}px`,
+    height: `${normalizedSize.height}px`,
     left: 'auto',
     right: 'auto',
     top: 'auto',
-    width: `${arrowSize.width}px`,
+    width: `${normalizedSize.width}px`,
   }
 
   switch (alignment) {
@@ -356,14 +358,14 @@ function _makeDynamicArrowStyle(alignment: Alignment, dialogSize: Size, arrowSiz
       ...baseStyle,
       clipPath: 'polygon(50% 0,100% 100%,0 100%)',
       left: shouldRealign ? '50%' : '',
-      right: shouldRealign ? '' : `${targetWidth - arrowSize.width / 2 - targetWidth / 2}px`,
+      right: shouldRealign ? '' : `${targetWidth - normalizedSize.width / 2 - targetWidth / 2}px`,
       top: '0',
       transform: `translate(${shouldRealign ? '-50%' : '0'}, -100%)`,
     }
     case 'br': return {
       ...baseStyle,
       clipPath: 'polygon(50% 0,100% 100%,0 100%)',
-      left: shouldRealign ? '50%' : `${targetWidth - arrowSize.width / 2 - targetWidth / 2}px`,
+      left: shouldRealign ? '50%' : `${targetWidth - normalizedSize.width / 2 - targetWidth / 2}px`,
       top: '0',
       transform: `translate(${shouldRealign ? '-50%' : '0'}, -100%)`,
     }
@@ -393,14 +395,14 @@ function _makeDynamicArrowStyle(alignment: Alignment, dialogSize: Size, arrowSiz
       bottom: 0,
       clipPath: 'polygon(50% 100%, 100% 0, 0 0)',
       left: shouldRealign ? '50%' : '',
-      right: shouldRealign ? '' : `${targetWidth - arrowSize.width / 2 - targetWidth / 2}px`,
+      right: shouldRealign ? '' : `${targetWidth - normalizedSize.width / 2 - targetWidth / 2}px`,
       transform: `translate(${shouldRealign ? '-50%' : '0'}, 100%)`,
     }
     case 'tr': return {
       ...baseStyle,
       bottom: 0,
       clipPath: 'polygon(50% 100%, 100% 0, 0 0)',
-      left: shouldRealign ? '50%' : `${targetWidth - arrowSize.width / 2 - targetWidth / 2}px`,
+      left: shouldRealign ? '50%' : `${targetWidth - normalizedSize.width / 2 - targetWidth / 2}px`,
       transform: `translate(${shouldRealign ? '-50%' : '0'}, 100%)`,
     }
     default:
