@@ -1,6 +1,6 @@
 {
   "name": "etudes",
-  "version": "28.2.0",
+  "version": "28.2.1",
   "description": "A study of headless React components",
   "type": "module",
   "sideEffects": false,
