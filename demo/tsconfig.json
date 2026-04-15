@@ -3,7 +3,8 @@
   "compilerOptions": {
     "paths": {
       "etudes": ["../"]
-    }
+    },
+    "rootDir": "src"
   },
   "include": [
     "src"
