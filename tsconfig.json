@@ -13,6 +13,7 @@
     "strict": true,
     "strictNullChecks": true,
     "target": "esnext",
+    "rootDir": "src",
     "types": [
       "node"
     ]
