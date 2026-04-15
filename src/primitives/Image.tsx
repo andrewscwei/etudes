@@ -1,4 +1,4 @@
-import { type HTMLAttributes, type Ref, useEffect } from 'react'
+import { type ImgHTMLAttributes, type Ref, useEffect } from 'react'
 import { type Size } from 'spase'
 
 import { useImageSize } from '../hooks/useImageSize.js'
@@ -57,7 +57,7 @@ export namespace Image {
      * @param size Size of the loaded image.
      */
     onSizeChange?: (size?: Size) => void
-  } & Omit<HTMLAttributes<HTMLImageElement>, 'alt' | 'loading' | 'onError' | 'onLoad' | 'onLoadStart' | 'sizes' | 'src' | 'srcSet'>
+  } & Omit<ImgHTMLAttributes<HTMLImageElement>, 'alt' | 'loading' | 'onError' | 'onLoad' | 'onLoadStart' | 'sizes' | 'src' | 'srcSet'>
 }
 
 /**
