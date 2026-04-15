@@ -7,13 +7,15 @@
       "DOM",
       "ESNext"
     ],
-    "module": "ESNext",
-    "moduleResolution": "Node",
+    "module": "esnext",
     "noImplicitAny": true,
     "skipLibCheck": true,
     "strict": true,
     "strictNullChecks": true,
-    "target": "ESNext"
+    "target": "esnext",
+    "types": [
+      "node"
+    ]
   },
   "include": [
     "src"
