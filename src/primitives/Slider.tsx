@@ -99,7 +99,7 @@ export function Slider({
     }
   }, [bodyRef.current, isInverted, isTrackInteractive, orientation])
 
-  const { setValue: setPosition, value: position, isDragging, isReleasing } = useInertiaDragValue(knobContainerRef, {
+  const { value: position, isDragging, isReleasing, setValue: setPosition } = useInertiaDragValue(knobContainerRef, {
     initialValue: externalPosition,
     transform: mapDragValueToPosition,
     onDragEnd,

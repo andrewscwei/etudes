@@ -119,7 +119,7 @@ export function Panorama({ ref, angle: externalAngle = 0, speed = 1, src, zeroAn
   })
   const [angle, setAngle] = useState(externalAngle)
 
-  const { setValue: setDisplacement, value: displacement, isDragging } = useInertiaDragValue(bodyRef, {
+  const { value: displacement, isDragging, setValue: setDisplacement } = useInertiaDragValue(bodyRef, {
     initialValue: 0,
     transform: mapDragPositionToDisplacement,
     onDragEnd,

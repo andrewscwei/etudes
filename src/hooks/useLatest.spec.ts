@@ -11,7 +11,7 @@ describe('useLatest', () => {
 
   it('reflects the latest value after rerender', () => {
     let value = 1
-    const { rerender, result } = renderHook(() => useLatest(value))
+    const { result, rerender } = renderHook(() => useLatest(value))
     expect(result.current.current).toBe(1)
 
     value = 2
@@ -20,7 +20,7 @@ describe('useLatest', () => {
   })
 
   it('returns the same ref object across rerenders', () => {
-    const { rerender, result } = renderHook(() => useLatest(0))
+    const { result, rerender } = renderHook(() => useLatest(0))
     const ref = result.current
     rerender()
     expect(result.current).toBe(ref)

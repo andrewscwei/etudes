@@ -84,7 +84,7 @@ export function StepSlider({
     }
   }, [rect.width, rect.height, isClipped, isInverted, knobWidth, knobHeight, orientation])
 
-  const { setValue: setPosition, value: position, isDragging, isReleasing } = useInertiaDragValue(knobContainerRef, {
+  const { value: position, isDragging, isReleasing, setValue: setPosition } = useInertiaDragValue(knobContainerRef, {
     initialValue: _getPositionAt(externalIndex, steps),
     transform: mapDragValueToPosition,
     onDragEnd,

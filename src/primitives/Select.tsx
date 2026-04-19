@@ -17,12 +17,12 @@ export function Select<T extends string>({
   id,
   ref,
   children,
-  formatValue = v => v,
   name,
   options,
   placeholder,
   value,
   isRequired = false,
+  formatValue = v => v,
   onChange,
   ...props
 }: Select.Props<T>) {

@@ -1,19 +1,17 @@
 {
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
     "jsx": "react-jsx",
     "lib": [
-      "DOM.Iterable",
       "DOM",
       "ESNext"
     ],
     "module": "esnext",
     "noImplicitAny": true,
+    "rootDir": "src",
     "skipLibCheck": true,
     "strict": true,
     "strictNullChecks": true,
     "target": "esnext",
-    "rootDir": "src",
     "types": [
       "node"
     ]

@@ -72,12 +72,12 @@ export function RangeSlider({
     return _getValueByDisplacement(Math.max(dMin, Math.min(dMax, dCurr)), minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
   }, [knobWidth, knobHeight, isClipped, minValue, maxValue, orientation, range[0], Rect.toString(bodyRect)])
 
-  const { setValue: setStartValue, value: startValue, isDragging: isDraggingStartKnob, isReleasing: isReleasingStartKnob } = useInertiaDragValue(startKnobContainerRef, {
+  const { value: startValue, isDragging: isDraggingStartKnob, isReleasing: isReleasingStartKnob, setValue: setStartValue } = useInertiaDragValue(startKnobContainerRef, {
     initialValue: externalRange?.[0] ?? minValue,
     transform: mapStartDragValueToValue,
   })
 
-  const { setValue: setEndValue, value: endValue, isDragging: isDraggingEndKnob, isReleasing: isReleasingEndKnob } = useInertiaDragValue(endKnobContainerRef, {
+  const { value: endValue, isDragging: isDraggingEndKnob, isReleasing: isReleasingEndKnob, setValue: setEndValue } = useInertiaDragValue(endKnobContainerRef, {
     initialValue: externalRange?.[1] ?? maxValue,
     transform: mapEndDragValueToValue,
   })

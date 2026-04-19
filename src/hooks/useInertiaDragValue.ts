@@ -125,10 +125,10 @@ export function useInertiaDragValue<T = [number, number]>(
   }, [value])
 
   return {
-    setValue,
     value,
     isDragging,
     isReleasing,
+    setValue,
   }
 }
 

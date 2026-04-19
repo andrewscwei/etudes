@@ -11,7 +11,7 @@ describe('usePrevious', () => {
 
   it('returns the previous value after a rerender', () => {
     let value = 1
-    const { rerender, result } = renderHook(() => usePrevious(value))
+    const { result, rerender } = renderHook(() => usePrevious(value))
 
     value = 2
     rerender()
@@ -20,7 +20,7 @@ describe('usePrevious', () => {
 
   it('lags one render behind', () => {
     let value = 'a'
-    const { rerender, result } = renderHook(() => usePrevious(value))
+    const { result, rerender } = renderHook(() => usePrevious(value))
 
     value = 'b'
     rerender()
