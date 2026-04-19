@@ -29,13 +29,18 @@ export default defineConfig({
   test: {
     coverage: {
       provider: 'v8',
-      reporter: ['text-summary'],
+      reportsDirectory: resolve(__dirname, 'coverage'),
     },
     environment: 'happy-dom',
+    globals: true,
     include: [
-      '**/*.spec.ts',
-      '**/*.spec.tsx',
+      '**/*.spec.(ts|tsx)',
+      '**/*.test.(ts|tsx)',
     ],
     passWithNoTests: true,
+    reporters: [
+      'tree',
+      ...process.env.GITHUB_ACTIONS === 'true' ? ['github-actions'] : [],
+    ],
   },
 })
