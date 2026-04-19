@@ -86,14 +86,14 @@ export function useInertiaDragValue<T = [number, number]>(
   const dragEndHandlerRef = useLatest(onDragEnd)
   const transformRef = useLatest(transform)
 
-  const dragStartHandler = (startPosition: Point) => {
+  const dragStartHandler = (startPosition: Point.Point) => {
     setIsDragging(true)
     setIsReleasing(false)
 
     dragStartHandlerRef.current?.(startPosition)
   }
 
-  const dragMoveHandler = (displacement: Point, currentPosition: Point, startPosition: Point) => {
+  const dragMoveHandler = (displacement: Point.Point, currentPosition: Point.Point, startPosition: Point.Point) => {
     const newValue = transformRef.current(valueRef.current, displacement.x, displacement.y)
 
     if (_setValueRef(valueRef, newValue)) {
@@ -106,7 +106,7 @@ export function useInertiaDragValue<T = [number, number]>(
     dragMoveHandlerRef.current?.(displacement, currentPosition, startPosition)
   }
 
-  const dragEndHandler = (endPosition: Point, startPosition: Point) => {
+  const dragEndHandler = (endPosition: Point.Point, startPosition: Point.Point) => {
     setIsDragging(false)
     setIsReleasing(true)
 

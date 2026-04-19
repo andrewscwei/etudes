@@ -43,7 +43,7 @@ export function PanoramaSlider({
   const panoramaRef = useRef<HTMLDivElement>(null)
   const panoramaRect = useRect(panoramaRef)
 
-  const [imageSize, setImageSize] = useState<Size | undefined>()
+  const [imageSize, setImageSize] = useState<Size.Size | undefined>()
   const [isDragging, setIsDragging] = useState(false)
 
   const getAspectRatio = useCallback(() => {
@@ -157,7 +157,7 @@ export namespace PanoramaSlider {
      * used to automatically calculate the FOV if `fov` prop is not specified.
      * If it is, this prop is ignored.
      */
-    viewportSize?: Size
+    viewportSize?: Size.Size
   } & Panorama.Props
 
   /**

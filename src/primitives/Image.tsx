@@ -56,7 +56,7 @@ export namespace Image {
      *
      * @param size Size of the loaded image.
      */
-    onSizeChange?: (size?: Size) => void
+    onSizeChange?: (size?: Size.Size) => void
   } & Omit<ImgHTMLAttributes<HTMLImageElement>, 'alt' | 'loading' | 'onError' | 'onLoad' | 'onLoadStart' | 'sizes' | 'src' | 'srcSet'>
 }
 

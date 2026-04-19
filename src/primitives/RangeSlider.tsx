@@ -383,7 +383,7 @@ function _getPositionByValue(value: number, min: number, max: number) {
   return (value - min) / (max - min)
 }
 
-function _getPositionByDisplacement(displacement: number, orientation: RangeSlider.Orientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
+function _getPositionByDisplacement(displacement: number, orientation: RangeSlider.Orientation, rect: Rect.Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
   switch (orientation) {
     case 'horizontal': {
       const maxWidth = isClipped ? rect.width - knobWidth : rect.width
@@ -404,13 +404,13 @@ function _getValueByPosition(position: number, min: number, max: number) {
   return position * (max - min) + min
 }
 
-function _getValueByDisplacement(displacement: number, min: number, max: number, orientation: RangeSlider.Orientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
+function _getValueByDisplacement(displacement: number, min: number, max: number, orientation: RangeSlider.Orientation, rect: Rect.Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
   const position = _getPositionByDisplacement(displacement, orientation, rect, knobWidth, knobHeight, isClipped)
 
   return _getValueByPosition(position, min, max)
 }
 
-function _getDisplacementByPosition(position: number, orientation: RangeSlider.Orientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
+function _getDisplacementByPosition(position: number, orientation: RangeSlider.Orientation, rect: Rect.Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
   switch (orientation) {
     case 'horizontal': {
       const maxWidth = isClipped ? rect.width - knobWidth : rect.width
@@ -427,7 +427,7 @@ function _getDisplacementByPosition(position: number, orientation: RangeSlider.O
   }
 }
 
-function _getDisplacementByValue(value: number, min: number, max: number, orientation: RangeSlider.Orientation, rect: Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
+function _getDisplacementByValue(value: number, min: number, max: number, orientation: RangeSlider.Orientation, rect: Rect.Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
   const position = _getPositionByValue(value, min, max)
 
   return _getDisplacementByPosition(position, orientation, rect, knobWidth, knobHeight, isClipped)

@@ -29,8 +29,8 @@ export function useVideoSize(src?: string, {
   onError,
   onLoad,
   onLoadStart,
-}: UseVideoSizeOptions = {}): Size | undefined {
-  const [size, setSize] = useState<Size>()
+}: UseVideoSizeOptions = {}): Size.Size | undefined {
+  const [size, setSize] = useState<Size.Size>()
   const loadStartHandlerRef = useLatest(onLoadStart)
   const loadCompleteHandlerRef = useLatest(onLoad)
   const loadErrorHandlerRef = useLatest(onError)
@@ -62,7 +62,7 @@ export function useVideoSize(src?: string, {
   return size
 }
 
-function _getSize(element?: HTMLVideoElement): Size | undefined {
+function _getSize(element?: HTMLVideoElement): Size.Size | undefined {
   if (!element) return undefined
   if (typeof element.videoWidth !== 'number') return undefined
   if (typeof element.videoHeight !== 'number') return undefined

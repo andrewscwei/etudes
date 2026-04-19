@@ -113,8 +113,8 @@ export function Carousel<I extends HTMLAttributes<HTMLElement>>({
 }: Carousel.Props<I>) {
   const prevIndexRef = useRef<number>(undefined)
   const viewportRef = useRef<HTMLDivElement>(null)
-  const pointerDownPositionRef = useRef<Point>(undefined)
-  const pointerUpPositionRef = useRef<Point>(undefined)
+  const pointerDownPositionRef = useRef<Point.Point>(undefined)
+  const pointerUpPositionRef = useRef<Point.Point>(undefined)
   const autoScrollTimeoutRef = useRef<NodeJS.Timeout>(undefined)
   const autoScrollTimeoutMs = 1000
   const autoAdvancePauseHandlerRef = useLatest(onAutoAdvancePause)
@@ -203,7 +203,7 @@ export function Carousel<I extends HTMLAttributes<HTMLElement>>({
     indexChangeHandlerRef.current?.(nextIndex)
   }, [isPointerDown, index, items.length])
 
-  const dragHandler = useCallback(({ x, y }: Point) => {
+  const dragHandler = useCallback(({ x, y }: Point.Point) => {
     const viewport = viewportRef.current
     if (!viewport) return
 

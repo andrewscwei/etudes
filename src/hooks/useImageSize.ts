@@ -38,8 +38,8 @@ export function useImageSize({
   onError,
   onLoad,
   onLoadStart,
-}: UseImageSizeOptions = {}): Size | undefined {
-  const [size, setSize] = useState<Size | undefined>()
+}: UseImageSizeOptions = {}): Size.Size | undefined {
+  const [size, setSize] = useState<Size.Size | undefined>()
   const loadStartHandlerRef = useLatest(onLoadStart)
   const loadCompleteHandlerRef = useLatest(onLoad)
   const loadErrorHandlerRef = useLatest(onError)
@@ -71,7 +71,7 @@ export function useImageSize({
   return size
 }
 
-function _getSize(element?: HTMLImageElement): Size | undefined {
+function _getSize(element?: HTMLImageElement): Size.Size | undefined {
   if (!element) return undefined
   if (typeof element.width !== 'number') return undefined
   if (typeof element.height !== 'number') return undefined

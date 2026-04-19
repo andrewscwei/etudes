@@ -95,7 +95,7 @@ export namespace Panorama {
      * @param size The actual size of the loaded image. If no images are loaded
      *               yet, the size is `undefined`.
      */
-    onImageSizeChange?: (size?: Size) => void
+    onImageSizeChange?: (size?: Size.Size) => void
   } & Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'role'>
 }
 
@@ -187,7 +187,7 @@ function _getFixedStyles({ displacement = NaN, src = '' }) {
   })
 }
 
-function _getFilledImageSize(originalSize: Size, sizeToFill: Size): Size {
+function _getFilledImageSize(originalSize: Size.Size, sizeToFill: Size.Size): Size.Size {
   const { height: originalHeight, width: originalWidth } = originalSize
   const { height: filledHeight } = sizeToFill
 
@@ -199,7 +199,7 @@ function _getFilledImageSize(originalSize: Size, sizeToFill: Size): Size {
   return Size.make(filledWidth, filledHeight)
 }
 
-function _getDisplacementFromAngle(angle: number, originalImageSize: Size, componentSize: Size, zeroAnchor: number): number {
+function _getDisplacementFromAngle(angle: number, originalImageSize: Size.Size, componentSize: Size.Size, zeroAnchor: number): number {
   const { width: imageWidth } = _getFilledImageSize(originalImageSize, componentSize)
   const { width: componentWidth } = componentSize
   const offset = componentWidth * zeroAnchor
@@ -207,7 +207,7 @@ function _getDisplacementFromAngle(angle: number, originalImageSize: Size, compo
   return angle / 360 * imageWidth - offset
 }
 
-function _getAngleFromDisplacement(displacement: number, originalImageSize: Size, componentSize: Size, zeroAnchor: number): number {
+function _getAngleFromDisplacement(displacement: number, originalImageSize: Size.Size, componentSize: Size.Size, zeroAnchor: number): number {
   const { width: imageWidth } = _getFilledImageSize(originalImageSize, componentSize)
   const { width: componentWidth } = componentSize
   const offset = componentWidth * zeroAnchor

@@ -19,7 +19,7 @@ export type UseInertiaDragOptions = {
   /**
    * Handler invoked when dragging starts.
    */
-  onDragStart?: (startPosition: Point) => void
+  onDragStart?: (startPosition: Point.Point) => void
 
   /**
    * Handler invoked when dragging.
@@ -30,7 +30,7 @@ export type UseInertiaDragOptions = {
    *                        currently at.
    * @param startPosition The position (in pixels) where the drag started.
    */
-  onDragMove?: (displacement: Point, currentPosition: Point, startPosition: Point) => void
+  onDragMove?: (displacement: Point.Point, currentPosition: Point.Point, startPosition: Point.Point) => void
 
   /**
    * Handler invoked when dragging ends.
@@ -38,7 +38,7 @@ export type UseInertiaDragOptions = {
    * @param endPosition The position (in pixels) where the drag ended.
    * @param startPosition The position (in pixels) where the drag started.
    */
-  onDragEnd?: (endPosition: Point, startPosition: Point) => void
+  onDragEnd?: (endPosition: Point.Point, startPosition: Point.Point) => void
 } & Omit<InteractDraggableOptions, 'onend' | 'onmove' | 'onstart'>
 
 /**

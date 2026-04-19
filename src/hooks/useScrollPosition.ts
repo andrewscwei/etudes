@@ -4,10 +4,10 @@ import { Point } from 'spase'
 import { useLatest } from './useLatest.js'
 
 export type ScrollPositionInfo = {
-  current: Point
-  end: Point
-  progress: Point
-  start: Point
+  current: Point.Point
+  end: Point.Point
+  progress: Point.Point
+  start: Point.Point
 }
 
 type Target = HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined

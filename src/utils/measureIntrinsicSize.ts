@@ -10,7 +10,7 @@ import { Size } from 'spase'
  * @returns The intrinsic size of the element, considering the max width
  *          constraint if provided.
  */
-export function measureIntrinsicSize(element: HTMLElement, maxWidth?: number): Size {
+export function measureIntrinsicSize(element: HTMLElement, maxWidth?: number): Size.Size {
   if (typeof window === 'undefined') return Size.zero
 
   const el = element.cloneNode(true) as HTMLElement

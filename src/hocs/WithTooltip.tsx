@@ -225,7 +225,7 @@ function _createDialog(className: string, content: string): { arrow: HTMLElement
   return { arrow, dialog }
 }
 
-function _computeAlignment(anchorRect: Rect, viewportRect: Rect): Alignment {
+function _computeAlignment(anchorRect: Rect.Rect, viewportRect: Rect.Rect): Alignment {
   const spaceAbove = anchorRect.top
   const spaceBelow = viewportRect.height - anchorRect.bottom
   const spaceLeft = anchorRect.left
@@ -265,7 +265,7 @@ function _computeAlignment(anchorRect: Rect, viewportRect: Rect): Alignment {
   }
 }
 
-function _makeDynamicDialogStyle(alignment: Alignment, dialogSize: Size, arrowSize: Size, gap: number, targetRect: Rect): CSSProperties {
+function _makeDynamicDialogStyle(alignment: Alignment, dialogSize: Size.Size, arrowSize: Size.Size, gap: number, targetRect: Rect.Rect): CSSProperties {
   const width = dialogSize.width
   const shouldRealign = targetRect.width > width
   const centerX = targetRect.left + targetRect.width / 2
@@ -331,7 +331,7 @@ function _makeDynamicDialogStyle(alignment: Alignment, dialogSize: Size, arrowSi
   }
 }
 
-function _makeDynamicArrowStyle(alignment: Alignment, dialogSize: Size, arrowSize: Size, targetRect: Rect): CSSProperties {
+function _makeDynamicArrowStyle(alignment: Alignment, dialogSize: Size.Size, arrowSize: Size.Size, targetRect: Rect.Rect): CSSProperties {
   const targetWidth = targetRect.width
   const shouldRealign = targetWidth > dialogSize.width
   const isHorizontal = alignment === 'cl' || alignment === 'cr'

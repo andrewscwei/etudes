@@ -96,7 +96,7 @@ export namespace Video {
      *
      * @param size The new size of the video.
      */
-    onSizeChange?: (size?: Size) => void
+    onSizeChange?: (size?: Size.Size) => void
 
     /**
      * Handler invoked when the video time updates.

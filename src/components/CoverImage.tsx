@@ -29,7 +29,7 @@ export function CoverImage({
   onLoadStart,
   ...props
 }: Readonly<CoverImage.Props>) {
-  const handleSizeChange = (size?: Size) => {
+  const handleSizeChange = (size?: Size.Size) => {
     setLocalAspectRatio(size ? size.width / size.height : NaN)
   }
 

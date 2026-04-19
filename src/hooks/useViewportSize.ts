@@ -6,8 +6,8 @@ import { Rect, Size } from 'spase'
  *
  * @returns The most current viewport size.
  */
-export function useViewportSize(): Size {
-  const [size, setSize] = useState<Size>(Size.zero)
+export function useViewportSize(): Size.Size {
+  const [size, setSize] = useState<Size.Size>(Size.zero)
 
   useLayoutEffect(() => {
     const listener = () => {

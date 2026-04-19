@@ -11,10 +11,10 @@ import { useViewportSize } from './useViewportSize.js'
  *
  * @param target The target element or reference.
  *
- * @returns The most current {@link Rect} of the target element.
+ * @returns The most current rect of the target element.
  */
-export function useRect(target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined): Rect {
-  const [rect, setRect] = useState<Rect>(Rect.zero)
+export function useRect(target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined): Rect.Rect {
+  const [rect, setRect] = useState<Rect.Rect>(Rect.zero)
   const viewportSize = useViewportSize()
 
   useSizeObserver(target, el => {

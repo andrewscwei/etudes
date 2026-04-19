@@ -48,8 +48,8 @@ export namespace SwipeRegion {
  * An {@link HTMLDivElement} container that detects swipe gestures.
  */
 export function SwipeRegion({ ref, children, threshold = 0.5, isEnabled = true, onSwipeDown, onSwipeLeft, onSwipeRight, onSwipeUp, ...props }: SwipeRegion.Props) {
-  const [dragStartPosition, setDragStartPosition] = useState<Point | undefined>(undefined)
-  const [dragEndPosition, setDragEndPosition] = useState<Point | undefined>(undefined)
+  const [dragStartPosition, setDragStartPosition] = useState<Point.Point | undefined>(undefined)
+  const [dragEndPosition, setDragEndPosition] = useState<Point.Point | undefined>(undefined)
   const [dragStartTime, setDragStartTime] = useState(NaN)
 
   const onDragStart = (x: number, y: number) => {

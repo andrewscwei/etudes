@@ -22,7 +22,7 @@ export type UseDragOptions = {
    *
    * @param startPosition The element that was dragged.
    */
-  onDragStart?: (startPosition: Point) => void
+  onDragStart?: (startPosition: Point.Point) => void
 
   /**
    * Handler invoked when dragging.
@@ -33,7 +33,7 @@ export type UseDragOptions = {
    *                        at.
    * @param startPosition The position (in pixels) where the drag started.
    */
-  onDragMove?: (displacement: Point, currentPosition: Point, startPosition: Point) => void
+  onDragMove?: (displacement: Point.Point, currentPosition: Point.Point, startPosition: Point.Point) => void
 
   /**
    * Handler invoked when dragging ends.
@@ -43,7 +43,7 @@ export type UseDragOptions = {
    * @param endPosition The position (in pixels) where the drag ended.
    * @param startPosition The position (in pixels) where the drag started.
    */
-  onDragEnd?: (displacement: Point, endPosition: Point, startPosition: Point) => void
+  onDragEnd?: (displacement: Point.Point, endPosition: Point.Point, startPosition: Point.Point) => void
 }
 
 /**
@@ -65,8 +65,8 @@ export function useDrag(
     onDragStart,
   }: UseDragOptions,
 ) {
-  const startPositionRef = useRef<Point>(undefined)
-  const dragPositionRef = useRef<Point>(undefined)
+  const startPositionRef = useRef<Point.Point>(undefined)
+  const dragPositionRef = useRef<Point.Point>(undefined)
   const dragStartHandlerRef = useLatest(onDragStart)
   const dragMoveHandlerRef = useLatest(onDragMove)
   const dragEndHandlerRef = useLatest(onDragEnd)

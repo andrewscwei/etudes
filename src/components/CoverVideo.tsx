@@ -39,7 +39,7 @@ export function CoverVideo({
   onSizeChange,
   ...props
 }: Readonly<CoverVideo.Props>) {
-  const handleSizeChange = (size?: Size) => {
+  const handleSizeChange = (size?: Size.Size) => {
     setLocalAspectRatio(size ? size.width / size.height : NaN)
     onSizeChange?.(size)
   }

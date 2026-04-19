@@ -8,10 +8,10 @@ import { useSizeObserver } from './useSizeObserver.js'
  *
  * @param target Reference to the target element.
  *
- * @returns The most current {@link Size} of the target element.
+ * @returns The most current size of the target element.
  */
-export function useSize(target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined): Size {
-  const [size, setSize] = useState<Size>(Size.zero)
+export function useSize(target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined): Size.Size {
+  const [size, setSize] = useState<Size.Size>(Size.zero)
 
   useSizeObserver(target, el => {
     const rect = Rect.from(el)
