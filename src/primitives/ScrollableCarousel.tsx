@@ -20,6 +20,11 @@ export namespace ScrollableCarousel {
    */
   export type Props<I> = {
     /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLDivElement>
+
+    /**
      * Current item index.
      */
     index?: number
@@ -81,8 +86,6 @@ export namespace ScrollableCarousel {
      * The component to render for each item.
      */
     ItemComponent: ComponentType<I>
-
-    ref?: Ref<HTMLDivElement>
   } & Omit<HTMLAttributes<HTMLDivElement>, 'onClick' | 'onPointerCancel' | 'onPointerDown' | 'onPointerLeave' | 'onPointerUp' | 'role'>
 }
 
