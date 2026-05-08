@@ -1,6 +1,8 @@
 import { type ComponentType, type HTMLAttributes, type MouseEvent, type PointerEvent, type Ref, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Point } from 'spase'
 
+import { easeInOut } from '../animations/easing.js'
+import { useAnimatedValue } from '../animations/useAnimatedValue.js'
 import { Each } from '../flows/Each.js'
 import { useInterval } from '../hooks/useInterval.js'
 import { useLatest } from '../hooks/useLatest.js'
@@ -9,9 +11,6 @@ import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
-
-const RUBBER_BAND_FACTOR = 0.3
-const DRAG_THRESHOLD_PX = 5
 
 /**
  * A headless carousel component that displays a list of items and lets the user
@@ -31,13 +30,16 @@ const DRAG_THRESHOLD_PX = 5
  */
 export function Carousel<T extends HTMLAttributes<HTMLElement>>({
   ref,
+  animationDuration = 300,
   autoAdvanceInterval = 0,
   children,
   dragSpeed = 1.0,
+  dragThreshold = 5,
   index = 0,
   ItemComponent,
   items = [],
   orientation = 'horizontal',
+  overscrollResistance = 0.7,
   shouldTrackExposure = false,
   onAutoAdvancePause,
   onAutoAdvanceResume,
@@ -48,12 +50,19 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
   const dragStartPointRef = useRef<Point.Point>(undefined)
   const dragStartDisplacementRef = useRef(0)
   const wasDraggedRef = useRef(false)
+  const prevAxisSizeRef = useRef(0)
 
   const autoAdvancePauseHandlerRef = useLatest(onAutoAdvancePause)
   const autoAdvanceResumeHandlerRef = useLatest(onAutoAdvanceResume)
   const indexChangeHandlerRef = useLatest(onIndexChange)
 
-  const [displacement, setDisplacement] = useState(0)
+  const {
+    animateTo: animateDisplacementTo,
+    cancel: cancelAnimation,
+    value: displacement,
+    setValue: setDisplacement,
+  } = useAnimatedValue(0, { duration: animationDuration, easing: easeInOut })
+
   const [isPointerDown, setIsPointerDown] = useState(false)
 
   const { height, width } = useSize(viewportRef)
@@ -61,7 +70,7 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
   const minDisplacement = -axisSize * Math.max(0, items.length - 1)
 
   const displayedDisplacement = isPointerDown
-    ? _applyRubberBand(displacement, minDisplacement, 0, RUBBER_BAND_FACTOR)
+    ? _applyRubberBand(displacement, minDisplacement, 0, overscrollResistance)
     : displacement
 
   const exposures = shouldTrackExposure
@@ -80,6 +89,8 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
     if (!event.isPrimary) return
     if (event.button !== 0) return
     if (items.length <= 1) return
+
+    cancelAnimation()
 
     event.currentTarget.setPointerCapture(event.pointerId)
 
@@ -111,16 +122,15 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
 
     const dx = event.clientX - start.x
     const dy = event.clientY - start.y
-    wasDraggedRef.current = Math.abs(dx) > DRAG_THRESHOLD_PX || Math.abs(dy) > DRAG_THRESHOLD_PX
+    wasDraggedRef.current = Math.abs(dx) > dragThreshold || Math.abs(dy) > dragThreshold
 
     const newIndex = axisSize > 0
       ? Math.max(0, Math.min(items.length - 1, Math.round(-displacement / axisSize)))
       : 0
 
-    setDisplacement(-axisSize * newIndex)
-
     dragStartPointRef.current = undefined
 
+    setDisplacement(_applyRubberBand(displacement, minDisplacement, 0, overscrollResistance))
     setIsPointerDown(false)
 
     if (newIndex !== index) {
@@ -152,7 +162,16 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
     if (isPointerDown) return
     if (axisSize <= 0) return
 
-    setDisplacement(-axisSize * index)
+    const target = -axisSize * index
+    const isSizeChange = prevAxisSizeRef.current !== axisSize
+    prevAxisSizeRef.current = axisSize
+
+    if (isSizeChange) {
+      cancelAnimation()
+      setDisplacement(target)
+    } else {
+      animateDisplacementTo(target)
+    }
   }, [index, axisSize, isPointerDown])
 
   useEffect(() => {
@@ -192,9 +211,8 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
             transform: orientation === 'horizontal'
               ? `translateX(${displayedDisplacement}px)`
               : `translateY(${displayedDisplacement}px)`,
-            ...isPointerDown ? { transitionProperty: 'none' } : {},
           }}
-          element={components.list ?? <Carousel.List style={{ transitionDuration: '300ms', transitionTimingFunction: 'ease-in-out' }}/>}
+          element={components.list ?? <Carousel.List/>}
         >
           <Each in={items}>
             {({ style: itemStyle, ...itemProps }, idx) => (
@@ -233,15 +251,36 @@ export namespace Carousel {
     ref?: Ref<HTMLDivElement>
 
     /**
-     * Current item index.
+     * The duration in milliseconds for the animation when changing items. This
+     * is used when the user drags and releases, or when the index changes
+     * without dragging (e.g. auto advance or external index change). The
+     * default value is `300` ms.
      */
-    index?: number
+    animationDuration?: number
 
     /**
      * The interval in milliseconds to wait before automatically advancing to
      * the next item (auto loops).
      */
     autoAdvanceInterval?: number
+
+    /**
+     * The drag speed multiplier. Higher values result in faster dragging. The
+     * default value is `1`.
+     */
+    dragSpeed?: number
+
+    /**
+     * Minimum pixel distance the pointer must travel between pointer-down and
+     * pointer-up for the gesture to be classified as a drag. Movements within
+     * this threshold are treated as a click and are allowed to propagate.
+     */
+    dragThreshold?: number
+
+    /**
+     * Current item index.
+     */
+    index?: number
 
     /**
      * Props for each item component
@@ -254,16 +293,23 @@ export namespace Carousel {
     orientation?: Orientation
 
     /**
-     * The drag speed multiplier. Higher values result in faster dragging. The
-     * default value is `1`.
+     * Resistance applied when the user drags past the first or last item. `0`
+     * lets the overshoot track the pointer 1:1 (no resistance); `1` clamps hard
+     * at the boundary (max resistance, no overshoot). Values in between produce
+     * a rubber-band effect—higher means more resistance.
      */
-    dragSpeed?: number
+    overscrollResistance?: number
 
     /**
      * Whether to track item exposure (0-1, 0 meaning the item is fully scrolled
      * out of view, 1 meaning the item is fully scrolled into view).
      */
     shouldTrackExposure?: boolean
+
+    /**
+     * The component to render for each item.
+     */
+    ItemComponent: ComponentType<T>
 
     /**
      * Handler invoked when auto advance pauses. This is invoked only when
@@ -283,11 +329,6 @@ export namespace Carousel {
      * @param index The item index.
      */
     onIndexChange?: (index: number) => void
-
-    /**
-     * The component to render for each item.
-     */
-    ItemComponent: ComponentType<T>
   } & Omit<HTMLAttributes<HTMLDivElement>, 'onClick' | 'onPointerCancel' | 'onPointerDown' | 'onPointerMove' | 'onPointerUp' | 'role'>
 
   /**
@@ -312,7 +353,9 @@ export namespace Carousel {
   )
 }
 
-function _applyRubberBand(value: number, min: number, max: number, factor: number) {
+function _applyRubberBand(value: number, min: number, max: number, resistance: number) {
+  const factor = 1 - resistance
+
   if (value > max) return max + (value - max) * factor
   if (value < min) return min + (value - min) * factor
 
@@ -359,7 +402,6 @@ function _getFixedStyles({ orientation = 'horizontal' }) {
       left: '0',
       position: 'absolute',
       top: '0',
-      transitionProperty: 'transform',
       userSelect: 'none',
       width: '100%',
       ...orientation === 'horizontal' ? {
