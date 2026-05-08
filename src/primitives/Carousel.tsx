@@ -77,8 +77,6 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
     ? _computeItemExposures(displayedDisplacement, axisSize, items.length)
     : undefined
 
-  const fixedStyles = _getFixedStyles({ orientation })
-
   const components = asComponentDict(children, {
     itemContainer: Carousel.ItemContainer,
     list: Carousel.List,
@@ -193,7 +191,7 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
     >
       <Styled
         ref={viewportRef}
-        style={styles(fixedStyles.viewport, {
+        style={styles(FIXED_STYLES.viewport, {
           cursor: isPointerDown ? 'grabbing' : 'grab',
           touchAction: items.length > 1
             ? (orientation === 'horizontal' ? 'pan-y' : 'pan-x')
@@ -207,21 +205,25 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
       >
         <Styled
           style={{
-            ...fixedStyles.list,
-            transform: orientation === 'horizontal'
-              ? `translateX(${displayedDisplacement}px)`
-              : `translateY(${displayedDisplacement}px)`,
+            ...FIXED_STYLES.list,
+            ...orientation === 'horizontal' ? {
+              flexDirection: 'row',
+              transform: `translateX(${displayedDisplacement}px)`,
+            } : {
+              flexDirection: 'column',
+              transform: `translateY(${displayedDisplacement}px)`,
+            },
           }}
           element={components.list ?? <Carousel.List/>}
         >
           <Each in={items}>
             {({ style: itemStyle, ...itemProps }, idx) => (
               <Styled
-                style={styles(fixedStyles.itemContainer)}
+                style={styles(FIXED_STYLES.itemContainer)}
                 element={components.itemContainer ?? <Carousel.ItemContainer/>}
               >
                 <ItemComponent
-                  style={styles(itemStyle, fixedStyles.item)}
+                  style={styles(itemStyle, FIXED_STYLES.item)}
                   aria-hidden={idx !== index}
                   exposure={shouldTrackExposure ? exposures?.[idx] : undefined}
                   {...itemProps as any}
@@ -382,42 +384,35 @@ function _computeItemExposures(displacement: number, axisSize: number, count: nu
   return exposures
 }
 
-function _getFixedStyles({ orientation = 'horizontal' }) {
-  return asStyleDict({
-    item: {
-      height: '100%',
-      width: '100%',
-    },
-    itemContainer: {
-      flex: '0 0 auto',
-      height: '100%',
-      overflow: 'hidden',
-      width: '100%',
-    },
-    list: {
-      alignItems: 'center',
-      display: 'flex',
-      height: '100%',
-      justifyContent: 'flex-start',
-      left: '0',
-      position: 'absolute',
-      top: '0',
-      userSelect: 'none',
-      width: '100%',
-      ...orientation === 'horizontal' ? {
-        flexDirection: 'row',
-      } : {
-        flexDirection: 'column',
-      },
-    },
-    viewport: {
-      height: '100%',
-      overflow: 'hidden',
-      position: 'relative',
-      width: '100%',
-    },
-  })
-}
+const FIXED_STYLES = asStyleDict({
+  item: {
+    height: '100%',
+    width: '100%',
+  },
+  itemContainer: {
+    flex: '0 0 auto',
+    height: '100%',
+    overflow: 'hidden',
+    width: '100%',
+  },
+  list: {
+    alignItems: 'center',
+    display: 'flex',
+    height: '100%',
+    justifyContent: 'flex-start',
+    left: '0',
+    position: 'absolute',
+    top: '0',
+    userSelect: 'none',
+    width: '100%',
+  },
+  viewport: {
+    height: '100%',
+    overflow: 'hidden',
+    position: 'relative',
+    width: '100%',
+  },
+})
 
 if (process.env.NODE_ENV === 'development') {
   Carousel.displayName = 'Carousel'
