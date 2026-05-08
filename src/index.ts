@@ -49,6 +49,7 @@ export * from './hooks/useViewportSize.js'
 
 export * from './primitives/Accordion.js'
 export * from './primitives/Button.js'
+export * from './primitives/Carousel.js'
 export * from './primitives/CodeInput.js'
 export * from './primitives/Collection.js'
 export * from './primitives/Counter.js'
