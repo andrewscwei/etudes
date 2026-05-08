@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { Carousel, Conditional, Each } from 'etudes'
+import { Conditional, Each, ScrollableCarousel } from 'etudes'
 import { useState } from 'react'
 
 import { Frame } from '../components/Frame.js'
@@ -15,7 +15,7 @@ function Item({ className, exposure, label, ...props }: { className?: string; ex
   )
 }
 
-export function CarouselDemo() {
+export function ScrollableCarouselDemo() {
   const [index, setIndex] = useState(0)
 
   const items = [{
@@ -38,7 +38,7 @@ export function CarouselDemo() {
         ['orientation: horizontal', 'orientation: vertical'],
         ['shouldTrackExposure: false', 'shouldTrackExposure: true'],
       ]}
-      title='Carousel'
+      title='ScrollableCarousel'
       usesMaxHeight={true}
       onReset={() => setIndex(0)}
     >
@@ -58,7 +58,7 @@ export function CarouselDemo() {
               )}
             />
           </div>
-          <Carousel
+          <ScrollableCarousel
             className='w-full grow'
             autoAdvanceInterval={Number(autoAdvanceInterval)}
             index={index}

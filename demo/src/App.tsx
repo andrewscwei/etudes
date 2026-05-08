@@ -5,7 +5,6 @@ import { Header } from './components/Header.js'
 import { AccordionDemo } from './demos/AccordionDemo.js'
 import { BurgerButtonDemo } from './demos/BurgerButtonDemo.js'
 import { ButtonDemo } from './demos/ButtonDemo.js'
-import { CarouselDemo } from './demos/CarouselDemo.js'
 import { CodeInputDemo } from './demos/CodeInputDemo.js'
 import { CollectionDemo } from './demos/CollectionDemo.js'
 import { CounterDemo } from './demos/CounterDemo.js'
@@ -21,6 +20,7 @@ import { PanoramaDemo } from './demos/PanoramaDemo.js'
 import { PanoramaSliderDemo } from './demos/PanoramaSliderDemo.js'
 import { PictureDemo } from './demos/PictureDemo.js'
 import { RangeSliderDemo } from './demos/RangeSliderDemo.js'
+import { ScrollableCarouselDemo } from './demos/ScrollableCarouselDemo.js'
 import { SelectableButtonDemo } from './demos/SelectableButtonDemo.js'
 import { SelectDemo } from './demos/SelectDemo.js'
 import { SliderDemo } from './demos/SliderDemo.js'
@@ -44,7 +44,6 @@ export function App() {
           <AccordionDemo/>
           <BurgerButtonDemo/>
           <ButtonDemo/>
-          <CarouselDemo/>
           <CodeInputDemo/>
           <CollectionDemo/>
           <CounterDemo/>
@@ -60,6 +59,7 @@ export function App() {
           <PanoramaSliderDemo/>
           <PictureDemo/>
           <RangeSliderDemo/>
+          <ScrollableCarouselDemo/>
           <SelectableButtonDemo/>
           <SelectDemo/>
           <SliderDemo/>

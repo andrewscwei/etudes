@@ -9,14 +9,14 @@ import { useLatest } from '../hooks/useLatest.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { styles } from '../utils/styles.js'
 
-export namespace Carousel {
+export namespace ScrollableCarousel {
   /**
-   * Type describing the orientation of {@link Carousel}.
+   * Type describing the orientation of {@link ScrollableCarousel}.
    */
   export type Orientation = 'horizontal' | 'vertical'
 
   /**
-   * Type describing the props of {@link Carousel}.
+   * Type describing the props of {@link ScrollableCarousel}.
    */
   export type Props<I> = {
     /**
@@ -96,7 +96,7 @@ export namespace Carousel {
  *   - Supports tracking item exposure (0-1) to determine how much of the
  *     current item is visible in the viewport.
  */
-export function Carousel<I extends HTMLAttributes<HTMLElement>>({
+export function ScrollableCarousel<I extends HTMLAttributes<HTMLElement>>({
   ref,
   autoAdvanceInterval = 0,
   dragSpeed = 1.0,
@@ -110,7 +110,7 @@ export function Carousel<I extends HTMLAttributes<HTMLElement>>({
   onAutoAdvanceResume,
   onIndexChange,
   ...props
-}: Carousel.Props<I>) {
+}: ScrollableCarousel.Props<I>) {
   const prevIndexRef = useRef<number>(undefined)
   const viewportRef = useRef<HTMLDivElement>(null)
   const pointerDownPositionRef = useRef<Point.Point>(undefined)
@@ -230,7 +230,7 @@ export function Carousel<I extends HTMLAttributes<HTMLElement>>({
           viewport.scrollTop -= accumulated.y * dragSpeed
           break
         default:
-          console.error(`[etudes::Carousel] Unsupported orientation: ${orientation}`)
+          console.error(`[etudes::ScrollableCarousel] Unsupported orientation: ${orientation}`)
       }
 
       isDragTickingRef.current = false
@@ -345,7 +345,7 @@ export function Carousel<I extends HTMLAttributes<HTMLElement>>({
   )
 }
 
-function _scrollToIndex(ref: RefObject<HTMLDivElement | null>, index: number, orientation: Carousel.Orientation) {
+function _scrollToIndex(ref: RefObject<HTMLDivElement | null>, index: number, orientation: ScrollableCarousel.Orientation) {
   const viewport = ref?.current
   if (!viewport) return
 
@@ -357,7 +357,7 @@ function _scrollToIndex(ref: RefObject<HTMLDivElement | null>, index: number, or
   viewport.scrollTo({ behavior: 'smooth', left, top })
 }
 
-function _getItemExposures(ref: RefObject<HTMLDivElement | null>, orientation: Carousel.Orientation) {
+function _getItemExposures(ref: RefObject<HTMLDivElement | null>, orientation: ScrollableCarousel.Orientation) {
   const viewport = ref?.current
   if (!viewport) return undefined
 
@@ -370,7 +370,7 @@ function _getItemExposures(ref: RefObject<HTMLDivElement | null>, orientation: C
   return exposures
 }
 
-function _getItemExposureAt(idx: number, ref: RefObject<HTMLDivElement | null>, orientation: Carousel.Orientation) {
+function _getItemExposureAt(idx: number, ref: RefObject<HTMLDivElement | null>, orientation: ScrollableCarousel.Orientation) {
   const viewport = ref?.current
   const child = viewport?.children[idx]
   if (!child) return 0
@@ -383,7 +383,7 @@ function _getItemExposureAt(idx: number, ref: RefObject<HTMLDivElement | null>, 
     case 'vertical':
       return Math.max(0, Math.min(1, Math.round((intersection.height / viewport.clientHeight + Number.EPSILON) * 1000) / 1000))
     default:
-      console.error(`[etudes::Carousel] Unsupported orientation: ${orientation}`)
+      console.error(`[etudes::ScrollableCarousel] Unsupported orientation: ${orientation}`)
       return NaN
   }
 }
@@ -426,5 +426,5 @@ function _getFixedStyles({ orientation = 'horizontal', scrollSnapEnabled = false
 }
 
 if (process.env.NODE_ENV === 'development') {
-  Carousel.displayName = 'Carousel'
+  ScrollableCarousel.displayName = 'ScrollableCarousel'
 }
