@@ -40,6 +40,8 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
   items = [],
   orientation = 'horizontal',
   overscrollResistance = 0.7,
+  swipeLiftWindow = 100,
+  swipeVelocityThreshold = 0.4,
   shouldTrackExposure = false,
   onAutoAdvancePause,
   onAutoAdvanceResume,
@@ -49,6 +51,9 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
   const viewportRef = useRef<HTMLDivElement>(null)
   const dragStartPointRef = useRef<Point.Point>(undefined)
   const dragStartDisplacementRef = useRef(0)
+  const lastMovePointRef = useRef<Point.Point>(undefined)
+  const lastMoveTimeRef = useRef(0)
+  const lastVelocityRef = useRef(0)
   const wasDraggedRef = useRef(false)
   const prevAxisSizeRef = useRef(0)
 
@@ -68,9 +73,10 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
   const { height, width } = useSize(viewportRef)
   const axisSize = orientation === 'horizontal' ? width : height
   const minDisplacement = -axisSize * Math.max(0, items.length - 1)
+  const maxDisplacement = 0
 
   const displayedDisplacement = isPointerDown
-    ? _applyRubberBand(displacement, minDisplacement, 0, overscrollResistance)
+    ? _applyRubberBand(displacement, minDisplacement, maxDisplacement, overscrollResistance)
     : displacement
 
   const exposures = shouldTrackExposure
@@ -94,6 +100,9 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
 
     dragStartPointRef.current = Point.make(event.clientX, event.clientY)
     dragStartDisplacementRef.current = displacement
+    lastMovePointRef.current = dragStartPointRef.current
+    lastMoveTimeRef.current = performance.now()
+    lastVelocityRef.current = 0
     wasDraggedRef.current = false
 
     setIsPointerDown(true)
@@ -108,6 +117,22 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
       : (event.clientY - start.y) * dragSpeed
 
     setDisplacement(dragStartDisplacementRef.current + delta)
+
+    const now = performance.now()
+    const prevPoint = lastMovePointRef.current
+    const prevTime = lastMoveTimeRef.current
+    const dt = now - prevTime
+
+    if (prevPoint && dt > 0) {
+      const axialDelta = orientation === 'horizontal'
+        ? event.clientX - prevPoint.x
+        : event.clientY - prevPoint.y
+
+      lastVelocityRef.current = axialDelta / dt
+    }
+
+    lastMovePointRef.current = Point.make(event.clientX, event.clientY)
+    lastMoveTimeRef.current = now
   }
 
   const pointerUpHandler = (event: PointerEvent<HTMLDivElement>) => {
@@ -122,13 +147,20 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
     const dy = event.clientY - start.y
     wasDraggedRef.current = Math.abs(dx) > dragThreshold || Math.abs(dy) > dragThreshold
 
-    const newIndex = axisSize > 0
-      ? Math.max(0, Math.min(items.length - 1, Math.round(-displacement / axisSize)))
-      : 0
+    const releaseDt = performance.now() - lastMoveTimeRef.current
+    const releaseVelocity = lastVelocityRef.current
+    const isSwipe = releaseDt <= swipeLiftWindow && Math.abs(releaseVelocity) > swipeVelocityThreshold
+
+    const newIndex = isSwipe
+      ? Math.max(0, Math.min(items.length - 1, index + (releaseVelocity < 0 ? 1 : -1)))
+      : axisSize > 0
+        ? Math.max(0, Math.min(items.length - 1, Math.round(-displacement / axisSize)))
+        : 0
 
     dragStartPointRef.current = undefined
+    lastMovePointRef.current = undefined
 
-    setDisplacement(_applyRubberBand(displacement, minDisplacement, 0, overscrollResistance))
+    setDisplacement(_applyRubberBand(displacement, minDisplacement, maxDisplacement, overscrollResistance))
     setIsPointerDown(false)
 
     if (newIndex !== index) {
@@ -307,6 +339,22 @@ export namespace Carousel {
      * out of view, 1 meaning the item is fully scrolled into view).
      */
     shouldTrackExposure?: boolean
+
+    /**
+     * Maximum gap in milliseconds between the last pointer move and the pointer
+     * release for the gesture to register as a swipe. If the pointer was held
+     * stationary longer than this before release, no swipe is detected and the
+     * release falls back to position-based snapping.
+     */
+    swipeLiftWindow?: number
+
+    /**
+     * Minimum axial pointer velocity (in pixels per millisecond) at release for
+     * the gesture to register as a swipe. A detected swipe advances the index
+     * by one in the swipe direction, regardless of how far the displacement has
+     * traveled.
+     */
+    swipeVelocityThreshold?: number
 
     /**
      * The component to render for each item.
