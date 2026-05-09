@@ -1,12 +1,13 @@
-import clsx from 'clsx'
-import { Carousel, Conditional, Each } from 'etudes'
+import { Carousel, Conditional, Each, useCarouselItem } from 'etudes'
 import { useState } from 'react'
 
 import { Frame } from '../components/Frame.js'
 
-function Item({ className, exposure, label, ...props }: { className?: string; exposure?: number; label: string }) {
+function Item({ label }: { label: string }) {
+  const { exposure } = useCarouselItem()
+
   return (
-    <div {...props} className={clsx(className, 'relative flex items-center justify-center border border-dark text-base')}>
+    <div className='relative flex size-full items-center justify-center border border-dark text-base'>
       <span>{label}</span>
       <Conditional if={exposure}>
         <span className='absolute top-1/2 left-1/2 mt-5 -translate-1/2'>{`(exposure: ${exposure})`}</span>
@@ -61,15 +62,22 @@ export function CarouselDemo() {
             className='w-full grow'
             autoAdvanceInterval={Number(autoAdvanceInterval)}
             index={index}
-            ItemComponent={Item}
-            items={items}
             orientation={orientation as any}
             shouldTrackExposure={shouldTrackExposure === 'true'}
             onIndexChange={t => {
               setIndex(t)
               toast(`Slide ${t + 1}`)
             }}
-          />
+          >
+            <Carousel.Content>
+              {items.map(item => (
+                <Item
+                  key={item.label}
+                  label={item.label}
+                />
+              ))}
+            </Carousel.Content>
+          </Carousel>
         </div>
       )}
     </Frame>

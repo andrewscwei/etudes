@@ -1,9 +1,8 @@
-import { type ComponentType, type HTMLAttributes, type MouseEvent, type PointerEvent, type Ref, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { Children, createContext, type HTMLAttributes, type MouseEvent, type PointerEvent, type Ref, use, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Point } from 'spase'
 
 import { easeInOut } from '../animations/easing.js'
 import { useAnimatedValue } from '../animations/useAnimatedValue.js'
-import { Each } from '../flows/Each.js'
 import { useInterval } from '../hooks/useInterval.js'
 import { useLatest } from '../hooks/useLatest.js'
 import { useSize } from '../hooks/useSize.js'
@@ -11,6 +10,14 @@ import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
+
+type CarouselItemContextValue = {
+  exposure: number | undefined
+  index: number
+  isActive: boolean
+}
+
+const CarouselItemContext = createContext<CarouselItemContextValue | undefined>(undefined)
 
 /**
  * A headless carousel component that displays a list of items and lets the user
@@ -27,8 +34,10 @@ import { styles } from '../utils/styles.js'
  * @exports Carousel.Viewport Component for the viewport.
  * @exports Carousel.Content Component for the list holding all items.
  * @exports Carousel.ItemContainer Component containing each item.
+ * @exports useCarouselItem Hook for reading the current item's index, exposure,
+ *                          and active state from within an item's subtree.
  */
-export function Carousel<T extends HTMLAttributes<HTMLElement>>({
+export function Carousel({
   ref,
   animationDuration = 200,
   autoAdvanceInterval = 0,
@@ -36,8 +45,6 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
   dragSpeed = 1.0,
   dragThreshold = 5,
   index = 0,
-  ItemComponent,
-  items = [],
   orientation = 'horizontal',
   overscrollResistance = 0.7,
   swipeLiftWindow = 100,
@@ -47,7 +54,7 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
   onAutoAdvanceResume,
   onIndexChange,
   ...props
-}: Carousel.Props<T>) {
+}: Carousel.Props) {
   const viewportRef = useRef<HTMLDivElement>(null)
   const dragStartPointRef = useRef<Point.Point>(undefined)
   const dragStartDisplacementRef = useRef(0)
@@ -70,9 +77,18 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
 
   const [isPointerDown, setIsPointerDown] = useState(false)
 
+  const components = asComponentDict(children, {
+    content: Carousel.Content,
+    itemContainer: Carousel.ItemContainer,
+    viewport: Carousel.Viewport,
+  })
+
+  const contentChildren = Children.toArray(components.content?.props.children)
+  const itemCount = contentChildren.length
+
   const { height, width } = useSize(viewportRef)
   const axisSize = orientation === 'horizontal' ? width : height
-  const minDisplacement = -axisSize * Math.max(0, items.length - 1)
+  const minDisplacement = -axisSize * Math.max(0, itemCount - 1)
   const maxDisplacement = 0
 
   const displayedDisplacement = isPointerDown
@@ -80,19 +96,13 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
     : displacement
 
   const exposures = shouldTrackExposure
-    ? _computeItemExposures(displayedDisplacement, axisSize, items.length)
+    ? _computeItemExposures(displayedDisplacement, axisSize, itemCount)
     : undefined
-
-  const components = asComponentDict(children, {
-    content: Carousel.Content,
-    itemContainer: Carousel.ItemContainer,
-    viewport: Carousel.Viewport,
-  })
 
   const pointerDownHandler = (event: PointerEvent<HTMLDivElement>) => {
     if (!event.isPrimary) return
     if (event.button !== 0) return
-    if (items.length <= 1) return
+    if (itemCount <= 1) return
 
     cancelAnimation()
 
@@ -152,9 +162,9 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
     const isSwipe = releaseDt <= swipeLiftWindow && Math.abs(releaseVelocity) > swipeVelocityThreshold
 
     const newIndex = isSwipe
-      ? Math.max(0, Math.min(items.length - 1, index + (releaseVelocity < 0 ? 1 : -1)))
+      ? Math.max(0, Math.min(itemCount - 1, index + (releaseVelocity < 0 ? 1 : -1)))
       : axisSize > 0
-        ? Math.max(0, Math.min(items.length - 1, Math.round(-displacement / axisSize)))
+        ? Math.max(0, Math.min(itemCount - 1, Math.round(-displacement / axisSize)))
         : 0
 
     dragStartPointRef.current = undefined
@@ -177,9 +187,9 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
   }
 
   const autoAdvanceHandler = () => {
-    if (items.length <= 1) return
+    if (itemCount <= 1) return
 
-    const nextIndex = (index + 1) % items.length
+    const nextIndex = (index + 1) % itemCount
 
     indexChangeHandlerRef.current?.(nextIndex)
   }
@@ -225,9 +235,7 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
         ref={viewportRef}
         style={styles(FIXED_STYLES.viewport, {
           cursor: isPointerDown ? 'grabbing' : 'grab',
-          touchAction: items.length > 1
-            ? (orientation === 'horizontal' ? 'pan-y' : 'pan-x')
-            : 'auto',
+          touchAction: itemCount > 1 ? (orientation === 'horizontal' ? 'pan-y' : 'pan-x') : 'auto',
         })}
         element={components.viewport ?? <Carousel.Viewport/>}
         onPointerCancel={pointerUpHandler}
@@ -248,21 +256,20 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
           }}
           element={components.content ?? <Carousel.Content/>}
         >
-          <Each in={items}>
-            {({ style: itemStyle, ...itemProps }, idx) => (
+          {contentChildren.map((child, idx) => (
+            <CarouselItemContext.Provider
+              key={idx}
+              value={{ exposure: exposures?.[idx], index: idx, isActive: idx === index }}
+            >
               <Styled
                 style={styles(FIXED_STYLES.itemContainer)}
+                aria-hidden={idx !== index}
                 element={components.itemContainer ?? <Carousel.ItemContainer/>}
               >
-                <ItemComponent
-                  style={styles(itemStyle, FIXED_STYLES.item)}
-                  aria-hidden={idx !== index}
-                  exposure={shouldTrackExposure ? exposures?.[idx] : undefined}
-                  {...itemProps as any}
-                />
+                {child}
               </Styled>
-            )}
-          </Each>
+            </CarouselItemContext.Provider>
+          ))}
         </Styled>
       </Styled>
     </div>
@@ -278,7 +285,7 @@ export namespace Carousel {
   /**
    * Type describing the props of {@link Carousel}.
    */
-  export type Props<T> = {
+  export type Props = {
     /**
      * Reference to the root element.
      */
@@ -317,11 +324,6 @@ export namespace Carousel {
     index?: number
 
     /**
-     * Props for each item component
-     */
-    items?: Omit<T, 'exposure'>[]
-
-    /**
      * Orientation of the carousel.
      */
     orientation?: Orientation
@@ -355,11 +357,6 @@ export namespace Carousel {
      * traveled.
      */
     swipeVelocityThreshold?: number
-
-    /**
-     * The component to render for each item.
-     */
-    ItemComponent: ComponentType<T>
 
     /**
      * Handler invoked when auto advance pauses. This is invoked only when
@@ -403,6 +400,18 @@ export namespace Carousel {
   )
 }
 
+/**
+ * Hook for reading the current item's `index`, `exposure`, and `isActive` state
+ * from within a {@link Carousel} item's subtree. Throws when called outside of
+ * an item.
+ */
+export function useCarouselItem(): CarouselItemContextValue {
+  const ctx = use(CarouselItemContext)
+  if (!ctx) throw Error('[etudes::useCarouselItem] Called outside of a Carousel.Content subtree')
+
+  return ctx
+}
+
 function _applyRubberBand(value: number, min: number, max: number, resistance: number) {
   const factor = 1 - resistance
 
@@ -442,10 +451,6 @@ const FIXED_STYLES = asStyleDict({
     position: 'absolute',
     top: '0',
     userSelect: 'none',
-    width: '100%',
-  },
-  item: {
-    height: '100%',
     width: '100%',
   },
   itemContainer: {
