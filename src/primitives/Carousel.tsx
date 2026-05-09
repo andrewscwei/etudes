@@ -30,7 +30,7 @@ import { styles } from '../utils/styles.js'
  */
 export function Carousel<T extends HTMLAttributes<HTMLElement>>({
   ref,
-  animationDuration = 300,
+  animationDuration = 200,
   autoAdvanceInterval = 0,
   children,
   dragSpeed = 1.0,
@@ -288,7 +288,7 @@ export namespace Carousel {
      * The duration in milliseconds for the animation when changing items. This
      * is used when the user drags and releases, or when the index changes
      * without dragging (e.g. auto advance or external index change). The
-     * default value is `300` ms.
+     * default value is `200` ms.
      */
     animationDuration?: number
 
