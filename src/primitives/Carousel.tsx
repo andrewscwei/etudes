@@ -25,7 +25,7 @@ import { styles } from '../utils/styles.js'
  *     item.
  *
  * @exports Carousel.Viewport Component for the viewport.
- * @exports Carousel.List Component for the list holding all items.
+ * @exports Carousel.Content Component for the list holding all items.
  * @exports Carousel.ItemContainer Component containing each item.
  */
 export function Carousel<T extends HTMLAttributes<HTMLElement>>({
@@ -84,8 +84,8 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
     : undefined
 
   const components = asComponentDict(children, {
+    content: Carousel.Content,
     itemContainer: Carousel.ItemContainer,
-    list: Carousel.List,
     viewport: Carousel.Viewport,
   })
 
@@ -237,7 +237,7 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
       >
         <Styled
           style={{
-            ...FIXED_STYLES.list,
+            ...FIXED_STYLES.content,
             ...orientation === 'horizontal' ? {
               flexDirection: 'row',
               transform: `translateX(${displayedDisplacement}px)`,
@@ -246,7 +246,7 @@ export function Carousel<T extends HTMLAttributes<HTMLElement>>({
               transform: `translateY(${displayedDisplacement}px)`,
             },
           }}
-          element={components.list ?? <Carousel.List/>}
+          element={components.content ?? <Carousel.Content/>}
         >
           <Each in={items}>
             {({ style: itemStyle, ...itemProps }, idx) => (
@@ -391,7 +391,7 @@ export namespace Carousel {
   /**
    * Component for the list holding all items inside a {@link Carousel}.
    */
-  export const List = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
+  export const Content = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
     <div {...props}>{children}</div>
   )
 
@@ -433,17 +433,7 @@ function _computeItemExposures(displacement: number, axisSize: number, count: nu
 }
 
 const FIXED_STYLES = asStyleDict({
-  item: {
-    height: '100%',
-    width: '100%',
-  },
-  itemContainer: {
-    flex: '0 0 auto',
-    height: '100%',
-    overflow: 'hidden',
-    width: '100%',
-  },
-  list: {
+  content: {
     alignItems: 'center',
     display: 'flex',
     height: '100%',
@@ -452,6 +442,16 @@ const FIXED_STYLES = asStyleDict({
     position: 'absolute',
     top: '0',
     userSelect: 'none',
+    width: '100%',
+  },
+  item: {
+    height: '100%',
+    width: '100%',
+  },
+  itemContainer: {
+    flex: '0 0 auto',
+    height: '100%',
+    overflow: 'hidden',
     width: '100%',
   },
   viewport: {
@@ -465,6 +465,6 @@ const FIXED_STYLES = asStyleDict({
 if (process.env.NODE_ENV === 'development') {
   Carousel.displayName = 'Carousel'
   Carousel.Viewport.displayName = 'Carousel.Viewport'
-  Carousel.List.displayName = 'Carousel.List'
+  Carousel.Content.displayName = 'Carousel.Content'
   Carousel.ItemContainer.displayName = 'Carousel.ItemContainer'
 }
