@@ -1,4 +1,4 @@
-import { Children, createContext, type HTMLAttributes, type MouseEvent, type PointerEvent, type Ref, use, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { Children, createContext, type HTMLAttributes, type MouseEvent, type PointerEvent, type Ref, use, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Point } from 'spase'
 
 import { easeInOut } from '../animations/easing.js'
@@ -31,6 +31,10 @@ const CarouselItemContext = createContext<CarouselItemContextValue | undefined>(
  *   - Supports rubber-band resistance when dragging past the first or last
  *     item.
  *
+ * The root element is rendered with `role='region'`. To meet accessibility
+ * requirements for landmark regions, pass `aria-label` (or `aria-labelledby`)
+ * so the region has an accessible name.
+ *
  * @exports Carousel.Viewport Component for the viewport.
  * @exports Carousel.Content Component for the list holding all items.
  * @exports Carousel.ItemContainer Component containing each item.
@@ -62,6 +66,7 @@ export function Carousel({
   const lastMoveTimeRef = useRef(0)
   const lastVelocityRef = useRef(0)
   const wasDraggedRef = useRef(false)
+  const wasPointerDownRef = useRef(false)
   const prevAxisSizeRef = useRef(0)
 
   const autoAdvancePauseHandlerRef = useLatest(onAutoAdvancePause)
@@ -85,6 +90,7 @@ export function Carousel({
 
   const contentChildren = Children.toArray(components.content?.props.children)
   const itemCount = contentChildren.length
+  const safeIndex = itemCount > 0 ? Math.max(0, Math.min(index, itemCount - 1)) : 0
 
   const { height, width } = useSize(viewportRef)
   const axisSize = orientation === 'horizontal' ? width : height
@@ -95,9 +101,9 @@ export function Carousel({
     ? _applyRubberBand(displacement, minDisplacement, maxDisplacement, overscrollResistance)
     : displacement
 
-  const exposures = shouldTrackExposure
-    ? _computeItemExposures(displayedDisplacement, axisSize, itemCount)
-    : undefined
+  const exposures = useMemo(() => {
+    return shouldTrackExposure ? _computeItemExposures(displayedDisplacement, axisSize, itemCount) : undefined
+  }, [shouldTrackExposure, displayedDisplacement, axisSize, itemCount])
 
   const pointerDownHandler = (event: PointerEvent<HTMLDivElement>) => {
     if (!event.isPrimary) return
@@ -162,7 +168,7 @@ export function Carousel({
     const isSwipe = releaseDt <= swipeLiftWindow && Math.abs(releaseVelocity) > swipeVelocityThreshold
 
     const newIndex = isSwipe
-      ? Math.max(0, Math.min(itemCount - 1, index + (releaseVelocity < 0 ? 1 : -1)))
+      ? Math.max(0, Math.min(itemCount - 1, safeIndex + (releaseVelocity < 0 ? 1 : -1)))
       : axisSize > 0
         ? Math.max(0, Math.min(itemCount - 1, Math.round(-displacement / axisSize)))
         : 0
@@ -173,7 +179,7 @@ export function Carousel({
     setDisplacement(_applyRubberBand(displacement, minDisplacement, maxDisplacement, overscrollResistance))
     setIsPointerDown(false)
 
-    if (newIndex !== index) {
+    if (newIndex !== safeIndex) {
       indexChangeHandlerRef.current?.(newIndex)
     }
   }
@@ -189,20 +195,20 @@ export function Carousel({
   const autoAdvanceHandler = () => {
     if (itemCount <= 1) return
 
-    const nextIndex = (index + 1) % itemCount
+    const nextIndex = (safeIndex + 1) % itemCount
 
     indexChangeHandlerRef.current?.(nextIndex)
   }
 
   useInterval((isPointerDown || autoAdvanceInterval <= 0) ? -1 : autoAdvanceInterval, {
     onInterval: autoAdvanceHandler,
-  }, [index])
+  }, [safeIndex])
 
   useLayoutEffect(() => {
     if (isPointerDown) return
     if (axisSize <= 0) return
 
-    const target = -axisSize * index
+    const target = -axisSize * safeIndex
     const isSizeChange = prevAxisSizeRef.current !== axisSize
     prevAxisSizeRef.current = axisSize
 
@@ -212,10 +218,13 @@ export function Carousel({
     } else {
       animateDisplacementTo(target)
     }
-  }, [index, axisSize, isPointerDown])
+  }, [safeIndex, axisSize, isPointerDown])
 
   useEffect(() => {
     if (autoAdvanceInterval <= 0) return
+    if (wasPointerDownRef.current === isPointerDown) return
+
+    wasPointerDownRef.current = isPointerDown
 
     if (isPointerDown) {
       autoAdvancePauseHandlerRef.current?.()
@@ -256,20 +265,24 @@ export function Carousel({
           }}
           element={components.content ?? <Carousel.Content/>}
         >
-          {contentChildren.map((child, idx) => (
-            <CarouselItemContext.Provider
-              key={idx}
-              value={{ exposure: exposures?.[idx], index: idx, isActive: idx === index }}
-            >
-              <Styled
-                style={styles(FIXED_STYLES.itemContainer)}
-                aria-hidden={idx !== index}
-                element={components.itemContainer ?? <Carousel.ItemContainer/>}
+          {contentChildren.map((child, idx) => {
+            const key = (child as { key?: null | string }).key ?? idx
+
+            return (
+              <CarouselItemContext.Provider
+                key={key}
+                value={{ exposure: exposures?.[idx], index: idx, isActive: idx === safeIndex }}
               >
-                {child}
-              </Styled>
-            </CarouselItemContext.Provider>
-          ))}
+                <Styled
+                  style={styles(FIXED_STYLES.itemContainer)}
+                  aria-hidden={idx !== safeIndex}
+                  element={components.itemContainer ?? <Carousel.ItemContainer/>}
+                >
+                  {child}
+                </Styled>
+              </CarouselItemContext.Provider>
+            )
+          })}
         </Styled>
       </Styled>
     </div>
