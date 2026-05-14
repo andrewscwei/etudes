@@ -356,10 +356,19 @@ export function Carousel({
       }
     }
 
+    const touchMoveHandler = (e: TouchEvent) => {
+      const g = gestureRef.current
+
+      if (g === 'pending' || g === 'axis') {
+        if (e.cancelable) e.preventDefault()
+      }
+    }
+
     viewport.addEventListener('pointerdown', pointerDownHandler, { passive: true })
     viewport.addEventListener('pointermove', pointerMoveHandler, { passive: true })
     viewport.addEventListener('pointerup', pointerUpHandler, { passive: true })
     viewport.addEventListener('pointercancel', pointerUpHandler, { passive: true })
+    viewport.addEventListener('touchmove', touchMoveHandler, { passive: false })
 
     return () => {
       stopTicking()
@@ -368,6 +377,7 @@ export function Carousel({
       viewport.removeEventListener('pointermove', pointerMoveHandler)
       viewport.removeEventListener('pointerup', pointerUpHandler)
       viewport.removeEventListener('pointercancel', pointerUpHandler)
+      viewport.removeEventListener('touchmove', touchMoveHandler)
 
       activePointerIdRef.current = null
       gestureRef.current = 'idle'
