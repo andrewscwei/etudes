@@ -174,6 +174,7 @@ export function Dropdown<T>({
           </Styled>
         )}
         <Styled
+          key={orientation}
           style={styles(fixedStyles.collection)}
           element={components.collection ?? <Dropdown.Collection/>}
           ItemComponent={ItemComponent}
