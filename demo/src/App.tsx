@@ -13,7 +13,6 @@ import { CoverImageDemo } from './demos/CoverImageDemo.js'
 import { CoverVideoDemo } from './demos/CoverVideoDemo.js'
 import { DialDemo } from './demos/DialDemo.js'
 import { DropdownDemo } from './demos/DropdownDemo.js'
-import { FlatSVGDemo } from './demos/FlatSVGDemo.js'
 import { ImageDemo } from './demos/ImageDemo.js'
 import { MasonryGridDemo } from './demos/MasonryGridDemo.js'
 import { OptionButtonDemo } from './demos/OptionButtonDemo.js'
@@ -53,7 +52,6 @@ export function App() {
           <CoverVideoDemo/>
           <DialDemo/>
           <DropdownDemo/>
-          <FlatSVGDemo/>
           <ImageDemo/>
           <MasonryGridDemo/>
           <OptionButtonDemo/>

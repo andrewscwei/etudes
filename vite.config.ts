@@ -14,8 +14,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         globals: {
-          'fast-xml-parser': 'fast-xml-parser',
-          'react': 'react',
+          react: 'react',
         },
       },
       treeshake: true,
@@ -25,7 +24,6 @@ export default defineConfig({
     dts(),
     esmExternalRequirePlugin({
       external: [
-        'fast-xml-parser',
         'react',
       ],
     }),

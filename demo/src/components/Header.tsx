@@ -1,6 +1,4 @@
-import { FlatSVG } from 'etudes'
-
-import $$GitHubIcon from '../assets/github-icon.svg?raw'
+import GitHubIcon from '../assets/github-icon.svg?react'
 
 export function Header() {
   return (
@@ -12,8 +10,12 @@ export function Header() {
           </div>
           <div className='flex items-center gap-2'>
             <span>{`v${import.meta.env.VERSION}`}</span>
-            <a className='ia flex size-4' href='https://github.com/andrewscwei/etudes' rel='noopener,noreferrer'>
-              <FlatSVG className='size-full [&_svg]:fill-dark' svg={$$GitHubIcon}/>
+            <a
+              className='ia flex size-4 items-center justify-center **:fill-dark!'
+              href='https://github.com/andrewscwei/etudes'
+              rel='noopener,noreferrer'
+            >
+              <GitHubIcon className='size-full'/>
             </a>
           </div>
         </div>

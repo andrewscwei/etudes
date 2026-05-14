@@ -58,7 +58,6 @@
     "concurrently": "^9.2.1",
     "eslint": "^10.3.0",
     "eslint-plugin-perfectionist": "^5.9.0",
-    "fast-xml-parser": "^5.7.3",
     "happy-dom": "^20.9.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
@@ -69,6 +68,7 @@
     "typescript-eslint": "^8.59.2",
     "vite": "^8.0.11",
     "vite-plugin-dts": "^5.0.0",
+    "vite-plugin-svgr": "^5.2.0",
     "vitest": "^4.1.5",
     "wait-on": "^9.0.5"
   },
@@ -79,13 +79,9 @@
     "spase": "^13.1.0"
   },
   "peerDependencies": {
-    "fast-xml-parser": "^5.7.3",
     "react": "^19.0.0"
   },
   "peerDependenciesMeta": {
-    "fast-xml-parser": {
-      "optional": true
-    },
     "react": {
       "optional": true
     }
