@@ -1,23 +1,58 @@
-import { Children, createContext, type HTMLAttributes, type MouseEvent, type PointerEvent, type Ref, use, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { Point } from 'spase'
+import { Children, createContext, type HTMLAttributes, type MouseEvent, type Ref, use, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
-import { easeInOut } from '../animations/easing.js'
-import { useAnimatedValue } from '../animations/useAnimatedValue.js'
+import { elastic } from '../animations/overscroll/elastic.js'
 import { useInterval } from '../hooks/useInterval.js'
 import { useLatest } from '../hooks/useLatest.js'
+import { usePrevious } from '../hooks/usePrevious.js'
 import { useSize } from '../hooks/useSize.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
-type CarouselItemContextValue = {
-  exposure: number | undefined
-  index: number
-  isActive: boolean
+type GestureState = 'axis' | 'cross' | 'idle' | 'pending'
+
+type StateSnapshot = {
+  dragSpeed: number
+  dragStartThreshold: number
+  itemCount: number
+  maxDisplacement: number
+  minDisplacement: number
+  orientation: Carousel.Orientation
+  overscrollResistance: number
+  safeIndex: number
+  swipeLiftWindow: number
+  swipeVelocityThreshold: number
+  viewportLength: number
+  shouldTrackExposure: boolean
 }
 
-const CarouselItemContext = createContext<CarouselItemContextValue | undefined>(undefined)
+// Per-frame velocity decay of the release spring. Lower = stronger drag, faster
+// settle.
+const FRICTION = 0.55
+
+// Spring force pulling position toward the target index. Higher = snappier
+// snap, more overshoot.
+const SPRING_STIFFNESS = 0.05
+
+// Extra velocity damping applied each frame while the spring is past `[min,
+// max]`. Lower = less bounce when the spring crosses the edge.
+const OVERSHOOT_DAMPING = 0.55
+
+// Position is considered settled (in pixels) when within this distance of the
+// target.
+const POSITION_EPSILON = 0.5
+
+// Velocity is considered settled (in px/frame) when below this magnitude.
+const VELOCITY_EPSILON = 0.02
+
+// Time window (ms) used to compute release velocity. Only pointer samples
+// within the last N ms before pointer-up contribute.
+const VELOCITY_SAMPLE_WINDOW = 100
+
+// Converts pointer velocity (px/ms) into the per-frame velocity the spring loop
+// expects (px/frame at 60fps).
+const MS_PER_FRAME = 1000 / 60
 
 /**
  * A headless carousel component that displays a list of items and lets the user
@@ -43,11 +78,10 @@ const CarouselItemContext = createContext<CarouselItemContextValue | undefined>(
  */
 export function Carousel({
   ref,
-  animationDuration = 200,
   autoAdvanceInterval = 0,
   children,
   dragSpeed = 1.0,
-  dragThreshold = 5,
+  dragStartThreshold = 5,
   index = 0,
   orientation = 'horizontal',
   overscrollResistance = 0.7,
@@ -60,27 +94,29 @@ export function Carousel({
   ...props
 }: Carousel.Props) {
   const viewportRef = useRef<HTMLDivElement>(null)
-  const dragStartPointRef = useRef<Point.Point>(undefined)
-  const dragStartDisplacementRef = useRef(0)
-  const lastMovePointRef = useRef<Point.Point>(undefined)
-  const lastMoveTimeRef = useRef(0)
-  const lastVelocityRef = useRef(0)
-  const wasDraggedRef = useRef(false)
-  const wasPointerDownRef = useRef(false)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const positionRef = useRef(0)
+  const velocityRef = useRef(0)
+  const targetRef = useRef(0)
+  const rafRef = useRef(0)
+  const samplesRef = useRef<{ p: number; t: number }[]>([])
+  const dragStartPositionRef = useRef(0)
+  const dragStartAxialRef = useRef(0)
+  const dragStartXRef = useRef(0)
+  const dragStartYRef = useRef(0)
+  const gestureRef = useRef<GestureState>('idle')
+  const activePointerIdRef = useRef<number | undefined>(null)
+  const dragStartedRef = useRef(false)
   const prevAxisSizeRef = useRef(0)
 
   const autoAdvancePauseHandlerRef = useLatest(onAutoAdvancePause)
   const autoAdvanceResumeHandlerRef = useLatest(onAutoAdvanceResume)
   const indexChangeHandlerRef = useLatest(onIndexChange)
 
-  const {
-    animateTo: animateDisplacementTo,
-    cancel: cancelAnimation,
-    value: displacement,
-    setValue: setDisplacement,
-  } = useAnimatedValue(0, { duration: animationDuration, easing: easeInOut })
+  const [exposures, setExposures] = useState<number[] | undefined>()
 
-  const [isPointerDown, setIsPointerDown] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const wasDragging = usePrevious(isDragging, isDragging)
 
   const components = asComponentDict(children, {
     content: Carousel.Content,
@@ -88,150 +124,300 @@ export function Carousel({
     viewport: Carousel.Viewport,
   })
 
-  const contentChildren = Children.toArray(components.content?.props.children)
-  const itemCount = contentChildren.length
-  const safeIndex = itemCount > 0 ? Math.max(0, Math.min(index, itemCount - 1)) : 0
+  const items = Children.toArray(components.content?.props.children)
+  const itemCount = items.length
+  const safeIdx = _clampIndex(index, itemCount)
 
   const { height, width } = useSize(viewportRef)
-  const axisSize = orientation === 'horizontal' ? width : height
-  const minDisplacement = -axisSize * Math.max(0, itemCount - 1)
+  const viewportLength = orientation === 'horizontal' ? width : height
+  const minDisplacement = -viewportLength * Math.max(0, itemCount - 1)
   const maxDisplacement = 0
 
-  const displayedDisplacement = isPointerDown
-    ? _applyRubberBand(displacement, minDisplacement, maxDisplacement, overscrollResistance)
-    : displacement
-
-  const exposures = useMemo(() => {
-    return shouldTrackExposure ? _computeItemExposures(displayedDisplacement, axisSize, itemCount) : undefined
-  }, [shouldTrackExposure, displayedDisplacement, axisSize, itemCount])
-
-  const pointerDownHandler = (event: PointerEvent<HTMLDivElement>) => {
-    if (!event.isPrimary) return
-    if (event.button !== 0) return
-    if (itemCount <= 1) return
-
-    cancelAnimation()
-
-    event.currentTarget.setPointerCapture(event.pointerId)
-
-    dragStartPointRef.current = Point.make(event.clientX, event.clientY)
-    dragStartDisplacementRef.current = displacement
-    lastMovePointRef.current = dragStartPointRef.current
-    lastMoveTimeRef.current = performance.now()
-    lastVelocityRef.current = 0
-    wasDraggedRef.current = false
-
-    setIsPointerDown(true)
-  }
-
-  const pointerMoveHandler = (event: PointerEvent<HTMLDivElement>) => {
-    const start = dragStartPointRef.current
-    if (!start) return
-
-    const delta = orientation === 'horizontal'
-      ? (event.clientX - start.x) * dragSpeed
-      : (event.clientY - start.y) * dragSpeed
-
-    setDisplacement(dragStartDisplacementRef.current + delta)
-
-    const now = performance.now()
-    const prevPoint = lastMovePointRef.current
-    const prevTime = lastMoveTimeRef.current
-    const dt = now - prevTime
-
-    if (prevPoint && dt > 0) {
-      const axialDelta = orientation === 'horizontal'
-        ? event.clientX - prevPoint.x
-        : event.clientY - prevPoint.y
-
-      lastVelocityRef.current = axialDelta / dt
-    }
-
-    lastMovePointRef.current = Point.make(event.clientX, event.clientY)
-    lastMoveTimeRef.current = now
-  }
-
-  const pointerUpHandler = (event: PointerEvent<HTMLDivElement>) => {
-    const start = dragStartPointRef.current
-    if (!start) return
-
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId)
-    }
-
-    const dx = event.clientX - start.x
-    const dy = event.clientY - start.y
-    wasDraggedRef.current = Math.abs(dx) > dragThreshold || Math.abs(dy) > dragThreshold
-
-    const releaseDt = performance.now() - lastMoveTimeRef.current
-    const releaseVelocity = lastVelocityRef.current
-    const isSwipe = releaseDt <= swipeLiftWindow && Math.abs(releaseVelocity) > swipeVelocityThreshold
-
-    const newIndex = isSwipe
-      ? Math.max(0, Math.min(itemCount - 1, safeIndex + (releaseVelocity < 0 ? 1 : -1)))
-      : axisSize > 0
-        ? Math.max(0, Math.min(itemCount - 1, Math.round(-displacement / axisSize)))
-        : 0
-
-    dragStartPointRef.current = undefined
-    lastMovePointRef.current = undefined
-
-    setDisplacement(_applyRubberBand(displacement, minDisplacement, maxDisplacement, overscrollResistance))
-    setIsPointerDown(false)
-
-    if (newIndex !== safeIndex) {
-      indexChangeHandlerRef.current?.(newIndex)
-    }
+  const snapshotRef = useRef<StateSnapshot>(undefined!)
+  snapshotRef.current = {
+    dragSpeed,
+    dragStartThreshold,
+    itemCount,
+    maxDisplacement,
+    minDisplacement,
+    orientation,
+    overscrollResistance,
+    safeIndex: safeIdx,
+    swipeLiftWindow,
+    swipeVelocityThreshold,
+    viewportLength,
+    shouldTrackExposure,
   }
 
   const clickHandler = (event: MouseEvent) => {
-    if (!wasDraggedRef.current) return
-
-    event.stopPropagation()
-
-    wasDraggedRef.current = false
+    // If click occurs after drag started, prevent all click handlers from
+    // firing.
+    if (dragStartedRef.current) {
+      event.stopPropagation()
+      dragStartedRef.current = false
+    }
   }
 
   const autoAdvanceHandler = () => {
     if (itemCount <= 1) return
 
-    const nextIndex = (safeIndex + 1) % itemCount
+    const nextIndex = (safeIdx + 1) % itemCount
 
     indexChangeHandlerRef.current?.(nextIndex)
   }
 
-  useInterval((isPointerDown || autoAdvanceInterval <= 0) ? -1 : autoAdvanceInterval, {
-    onInterval: autoAdvanceHandler,
-  }, [safeIndex])
+  const updateExposures = () => {
+    const snapshot = snapshotRef.current
+    if (!snapshot.shouldTrackExposure) return
+
+    const next = _computeExposures(positionRef.current, snapshot.viewportLength, snapshot.itemCount)
+
+    setExposures(prev => _areExposuresEqual(prev, next) ? prev : next)
+  }
+
+  const startTicking = () => {
+    if (rafRef.current) return
+
+    rafRef.current = requestAnimationFrame(tick)
+  }
+
+  const stopTicking = () => {
+    if (!rafRef.current) return
+
+    cancelAnimationFrame(rafRef.current)
+    rafRef.current = 0
+  }
+
+  const tick = () => {
+    const { maxDisplacement: max, minDisplacement: min, orientation: orient } = snapshotRef.current
+    const target = targetRef.current
+
+    const force = (target - positionRef.current) * SPRING_STIFFNESS
+    velocityRef.current = velocityRef.current * FRICTION + force
+    positionRef.current += velocityRef.current
+
+    if (positionRef.current > max || positionRef.current < min) {
+      velocityRef.current *= OVERSHOOT_DAMPING
+    }
+
+    const isSettled = Math.abs(velocityRef.current) < VELOCITY_EPSILON &&
+      Math.abs(target - positionRef.current) < POSITION_EPSILON
+
+    if (isSettled) {
+      positionRef.current = target
+      velocityRef.current = 0
+      rafRef.current = 0
+      _applyTransform(contentRef.current, target, orient)
+      updateExposures()
+
+      return
+    }
+
+    _applyTransform(contentRef.current, positionRef.current, orient)
+    updateExposures()
+    rafRef.current = requestAnimationFrame(tick)
+  }
 
   useLayoutEffect(() => {
-    if (isPointerDown) return
-    if (axisSize <= 0) return
+    const viewport = viewportRef.current
+    if (!viewport) return
 
-    const target = -axisSize * safeIndex
-    const isSizeChange = prevAxisSizeRef.current !== axisSize
-    prevAxisSizeRef.current = axisSize
+    const pointerDownHandler = (e: PointerEvent) => {
+      const { itemCount: count, orientation: orient } = snapshotRef.current
+
+      if (!e.isPrimary) return
+      if (e.button !== 0) return
+      if (count <= 1) return
+      if (activePointerIdRef.current !== null) return
+
+      activePointerIdRef.current = e.pointerId
+
+      const axial = orient === 'horizontal' ? e.clientX : e.clientY
+      dragStartPositionRef.current = positionRef.current
+      dragStartAxialRef.current = axial
+      dragStartXRef.current = e.clientX
+      dragStartYRef.current = e.clientY
+      samplesRef.current = [{ p: axial, t: performance.now() }]
+      dragStartedRef.current = false
+      gestureRef.current = 'pending'
+    }
+
+    const pointerMoveHandler = (e: PointerEvent) => {
+      if (activePointerIdRef.current !== e.pointerId) return
+      if (gestureRef.current === 'idle' || gestureRef.current === 'cross') return
+
+      const {
+        dragSpeed: speed,
+        dragStartThreshold: threshold,
+        maxDisplacement: max,
+        minDisplacement: min,
+        orientation: orient,
+        overscrollResistance: resistance,
+      } = snapshotRef.current
+
+      if (gestureRef.current === 'pending') {
+        const dx = Math.abs(e.clientX - dragStartXRef.current)
+        const dy = Math.abs(e.clientY - dragStartYRef.current)
+        const axial = orient === 'horizontal' ? dx : dy
+        const cross = orient === 'horizontal' ? dy : dx
+
+        if (Math.max(axial, cross) < threshold) return
+
+        if (axial >= cross) {
+          gestureRef.current = 'axis'
+          stopTicking()
+          viewport.setPointerCapture(e.pointerId)
+          setIsDragging(true)
+        } else {
+          gestureRef.current = 'cross'
+
+          return
+        }
+      }
+
+      const delta = orient === 'horizontal' ? e.clientX : e.clientY
+      const totalDelta = (delta - dragStartAxialRef.current) * speed
+      const pos = dragStartPositionRef.current + totalDelta
+
+      positionRef.current = elastic(pos, min, max, resistance)
+      _applyTransform(contentRef.current, positionRef.current, orient)
+      updateExposures()
+
+      if (Math.abs(totalDelta) > threshold) {
+        dragStartedRef.current = true
+      }
+
+      const now = performance.now()
+      const samples = samplesRef.current
+
+      samples.push({ p: delta, t: now })
+
+      while (samples.length > 0 && now - samples[0].t > VELOCITY_SAMPLE_WINDOW) {
+        samples.shift()
+      }
+    }
+
+    const pointerUpHandler = (e: PointerEvent) => {
+      if (activePointerIdRef.current !== e.pointerId) return
+
+      if (viewport.hasPointerCapture(e.pointerId)) {
+        viewport.releasePointerCapture(e.pointerId)
+      }
+
+      activePointerIdRef.current = null
+
+      const wasAxisLocked = gestureRef.current === 'axis'
+      gestureRef.current = 'idle'
+
+      if (!wasAxisLocked) {
+        samplesRef.current = []
+
+        return
+      }
+
+      const {
+        dragSpeed: speed,
+        itemCount: count,
+        safeIndex: currentIndex,
+        swipeLiftWindow: liftWindow,
+        swipeVelocityThreshold: velocityThreshold,
+        viewportLength: size,
+      } = snapshotRef.current
+
+      const samples = samplesRef.current
+      const now = performance.now()
+      let releaseVelocity = 0
+
+      if (samples.length >= 2) {
+        const first = samples[0]
+        const last = samples[samples.length - 1]
+        const span = last.t - first.t
+
+        if (span > 0) releaseVelocity = (last.p - first.p) / span
+      }
+
+      const sinceLastSample = samples.length > 0 ? now - samples[samples.length - 1].t : Infinity
+      const isSwipe = sinceLastSample <= liftWindow && Math.abs(releaseVelocity) > velocityThreshold
+
+      const proposed = isSwipe
+        ? currentIndex + (releaseVelocity < 0 ? 1 : -1)
+        : size > 0 ? Math.round(-positionRef.current / size) : currentIndex
+      const newIndex = _clampIndex(proposed, count)
+
+      samplesRef.current = []
+
+      targetRef.current = -size * newIndex
+      velocityRef.current = releaseVelocity * speed * MS_PER_FRAME
+      startTicking()
+
+      setIsDragging(false)
+
+      if (newIndex !== currentIndex) {
+        indexChangeHandlerRef.current?.(newIndex)
+      }
+    }
+
+    viewport.addEventListener('pointerdown', pointerDownHandler, { passive: true })
+    viewport.addEventListener('pointermove', pointerMoveHandler, { passive: true })
+    viewport.addEventListener('pointerup', pointerUpHandler, { passive: true })
+    viewport.addEventListener('pointercancel', pointerUpHandler, { passive: true })
+
+    return () => {
+      stopTicking()
+
+      viewport.removeEventListener('pointerdown', pointerDownHandler)
+      viewport.removeEventListener('pointermove', pointerMoveHandler)
+      viewport.removeEventListener('pointerup', pointerUpHandler)
+      viewport.removeEventListener('pointercancel', pointerUpHandler)
+
+      activePointerIdRef.current = null
+      gestureRef.current = 'idle'
+    }
+  }, [])
+
+  useLayoutEffect(() => {
+    if (isDragging) return
+    if (viewportLength <= 0) return
+
+    const target = -viewportLength * safeIdx
+    const isSizeChange = prevAxisSizeRef.current !== viewportLength
+    prevAxisSizeRef.current = viewportLength
+
+    targetRef.current = target
 
     if (isSizeChange) {
-      cancelAnimation()
-      setDisplacement(target)
-    } else {
-      animateDisplacementTo(target)
+      stopTicking()
+      positionRef.current = target
+      velocityRef.current = 0
+      _applyTransform(contentRef.current, target, orientation)
+      updateExposures()
+    } else if (positionRef.current !== target || velocityRef.current !== 0) {
+      startTicking()
     }
-  }, [safeIndex, axisSize, isPointerDown])
+  }, [safeIdx, viewportLength, isDragging, orientation, shouldTrackExposure])
+
+  useEffect(() => {
+    if (shouldTrackExposure) {
+      updateExposures()
+    } else {
+      setExposures(undefined)
+    }
+  }, [shouldTrackExposure, viewportLength, itemCount])
+
+  useInterval((isDragging || autoAdvanceInterval <= 0) ? -1 : autoAdvanceInterval, {
+    onInterval: autoAdvanceHandler,
+  }, [safeIdx])
 
   useEffect(() => {
     if (autoAdvanceInterval <= 0) return
-    if (wasPointerDownRef.current === isPointerDown) return
+    if (wasDragging === isDragging) return
 
-    wasPointerDownRef.current = isPointerDown
-
-    if (isPointerDown) {
+    if (isDragging) {
       autoAdvancePauseHandlerRef.current?.()
     } else {
       autoAdvanceResumeHandlerRef.current?.()
     }
-  }, [isPointerDown, autoAdvanceInterval])
+  }, [isDragging, autoAdvanceInterval])
 
   return (
     <div
@@ -243,44 +429,37 @@ export function Carousel({
       <Styled
         ref={viewportRef}
         style={styles(FIXED_STYLES.viewport, {
-          cursor: isPointerDown ? 'grabbing' : 'grab',
+          cursor: isDragging ? 'grabbing' : 'grab',
           touchAction: itemCount > 1 ? (orientation === 'horizontal' ? 'pan-y' : 'pan-x') : 'auto',
         })}
         element={components.viewport ?? <Carousel.Viewport/>}
-        onPointerCancel={pointerUpHandler}
-        onPointerDown={pointerDownHandler}
-        onPointerMove={pointerMoveHandler}
-        onPointerUp={pointerUpHandler}
       >
         <Styled
+          ref={contentRef}
           style={{
             ...FIXED_STYLES.content,
-            ...orientation === 'horizontal' ? {
-              flexDirection: 'row',
-              transform: `translateX(${displayedDisplacement}px)`,
-            } : {
-              flexDirection: 'column',
-              transform: `translateY(${displayedDisplacement}px)`,
-            },
+            flexDirection: orientation === 'horizontal' ? 'row' : 'column',
           }}
           element={components.content ?? <Carousel.Content/>}
         >
-          {contentChildren.map((child, idx) => {
-            const key = (child as { key?: null | string }).key ?? idx
+          {items.map((child, idx) => {
+            const key = (child as any).key ?? idx
+            const exposure = exposures?.[idx]
+            const isActive = idx === safeIdx
 
             return (
-              <CarouselItemContext.Provider
+              <Carousel.ItemContext
                 key={key}
-                value={{ exposure: exposures?.[idx], index: idx, isActive: idx === safeIndex }}
+                value={{ exposure, index: idx, isActive }}
               >
                 <Styled
                   style={styles(FIXED_STYLES.itemContainer)}
-                  aria-hidden={idx !== safeIndex}
+                  aria-hidden={!isActive}
                   element={components.itemContainer ?? <Carousel.ItemContainer/>}
                 >
                   {child}
                 </Styled>
-              </CarouselItemContext.Provider>
+              </Carousel.ItemContext>
             )
           })}
         </Styled>
@@ -305,14 +484,6 @@ export namespace Carousel {
     ref?: Ref<HTMLDivElement>
 
     /**
-     * The duration in milliseconds for the animation when changing items. This
-     * is used when the user drags and releases, or when the index changes
-     * without dragging (e.g. auto advance or external index change). The
-     * default value is `200` ms.
-     */
-    animationDuration?: number
-
-    /**
      * The interval in milliseconds to wait before automatically advancing to
      * the next item (auto loops).
      */
@@ -329,7 +500,7 @@ export namespace Carousel {
      * pointer-up for the gesture to be classified as a drag. Movements within
      * this threshold are treated as a click and are allowed to propagate.
      */
-    dragThreshold?: number
+    dragStartThreshold?: number
 
     /**
      * Current item index.
@@ -392,6 +563,21 @@ export namespace Carousel {
   } & Omit<HTMLAttributes<HTMLDivElement>, 'onClick' | 'onPointerCancel' | 'onPointerDown' | 'onPointerMove' | 'onPointerUp' | 'role'>
 
   /**
+   * Type describing the value provided by {@link ItemContext} for each item.
+   */
+  export type ItemContextValue = {
+    exposure: number | undefined
+    index: number
+    isActive: boolean
+  }
+
+  /**
+   * Context providing the current item's `index`, `exposure`, and `isActive`
+   * state to each item in the carousel.
+   */
+  export const ItemContext = createContext<ItemContextValue | undefined>(undefined)
+
+  /**
    * Component for the viewport of a {@link Carousel}.
    */
   export const Viewport = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
@@ -411,42 +597,62 @@ export namespace Carousel {
   export const ItemContainer = ({ children, ...props }: HTMLAttributes<HTMLDivElement>) => (
     <div {...props}>{children}</div>
   )
+
+  /**
+   * Hook for reading the current item's `index`, `exposure`, and `isActive`
+   * state from within a {@link Carousel} item's subtree.
+   *
+   * @throws Error if the hook is called outside of a `Carousel.Content`
+   * subtree.
+   */
+  export function useItem(): ItemContextValue {
+    const ctx = use(ItemContext)
+    if (!ctx) throw Error('[etudes::Carousel] useItem is called outside of a Carousel.Content subtree')
+
+    return ctx
+  }
 }
 
-/**
- * Hook for reading the current item's `index`, `exposure`, and `isActive` state
- * from within a {@link Carousel} item's subtree. Throws when called outside of
- * an item.
- */
-export function useCarouselItem(): CarouselItemContextValue {
-  const ctx = use(CarouselItemContext)
-  if (!ctx) throw Error('[etudes::useCarouselItem] Called outside of a Carousel.Content subtree')
+function _applyTransform(element: HTMLElement | null, position: number, orientation: Carousel.Orientation) {
+  if (!element) return
 
-  return ctx
+  if (orientation === 'horizontal') {
+    element.style.transform = `translate3d(${position}px,0,0)`
+  } else {
+    element.style.transform = `translate3d(0,${position}px,0)`
+  }
 }
 
-function _applyRubberBand(value: number, min: number, max: number, resistance: number) {
-  const factor = 1 - resistance
+function _clampIndex(index: number, count: number): number {
+  if (count <= 0) return 0
 
-  if (value > max) return max + (value - max) * factor
-  if (value < min) return min + (value - min) * factor
-
-  return value
+  return Math.max(0, Math.min(count - 1, index))
 }
 
-function _computeItemExposures(displacement: number, axisSize: number, count: number): number[] {
-  if (count <= 0) return []
-  if (axisSize <= 0) return new Array(count).fill(0)
+function _areExposuresEqual(a?: number[], b?: number[]): boolean {
+  if (a === b) return true
+  if (!a || !b || a.length !== b.length) return false
+
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false
+  }
+
+  return true
+}
+
+function _computeExposures(displacement: number, viewportSize: number, itemCount: number): number[] {
+  if (itemCount <= 0) return []
+  if (viewportSize <= 0) return new Array(itemCount).fill(0)
 
   const exposures: number[] = []
 
-  for (let i = 0; i < count; i++) {
-    const itemStart = i * axisSize + displacement
-    const itemEnd = itemStart + axisSize
+  for (let i = 0; i < itemCount; i++) {
+    const itemStart = i * viewportSize + displacement
+    const itemEnd = itemStart + viewportSize
     const visibleStart = Math.max(0, itemStart)
-    const visibleEnd = Math.min(axisSize, itemEnd)
+    const visibleEnd = Math.min(viewportSize, itemEnd)
     const visible = Math.max(0, visibleEnd - visibleStart)
-    const exposure = Math.max(0, Math.min(1, Math.round((visible / axisSize + Number.EPSILON) * 1000) / 1000))
+    const exposure = Math.max(0, Math.min(1, Math.round((visible / viewportSize + Number.EPSILON) * 1000) / 1000))
 
     exposures.push(exposure)
   }

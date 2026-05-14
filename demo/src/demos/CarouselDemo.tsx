@@ -1,10 +1,10 @@
-import { Carousel, Conditional, Each, useCarouselItem } from 'etudes'
+import { Carousel, Conditional, Each } from 'etudes'
 import { useState } from 'react'
 
 import { Frame } from '../components/Frame.js'
 
 function Item({ label }: { label: string }) {
-  const { exposure } = useCarouselItem()
+  const { exposure } = Carousel.useItem()
 
   return (
     <div className='relative flex size-full items-center justify-center border border-dark text-base'>
