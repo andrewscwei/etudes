@@ -1,5 +1,3 @@
-export * from './animations/useAnimatedValue.js'
-
 export * from './components/Burger.js'
 export * from './components/BurgerButton.js'
 export * from './components/CoverImage.js'

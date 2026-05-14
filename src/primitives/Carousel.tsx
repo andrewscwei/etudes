@@ -1,6 +1,5 @@
 import { Children, createContext, type HTMLAttributes, type MouseEvent, type Ref, use, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
-import { elastic } from '../animations/overscroll/elastic.js'
 import { useInterval } from '../hooks/useInterval.js'
 import { useLatest } from '../hooks/useLatest.js'
 import { usePrevious } from '../hooks/usePrevious.js'
@@ -279,7 +278,7 @@ export function Carousel({
       const totalDelta = (delta - dragStartAxialRef.current) * speed
       const pos = dragStartPositionRef.current + totalDelta
 
-      positionRef.current = elastic(pos, min, max, resistance)
+      positionRef.current = _withResistance(pos, min, max, resistance)
       _applyTransform(contentRef.current, positionRef.current, orient)
       updateExposures()
 
@@ -658,6 +657,15 @@ function _computeExposures(displacement: number, viewportSize: number, itemCount
   }
 
   return exposures
+}
+
+function _withResistance(value: number, min: number, max: number, resistance: number): number {
+  const factor = 1 - resistance
+
+  if (value > max) return max + (value - max) * factor
+  if (value < min) return min + (value - min) * factor
+
+  return value
 }
 
 const FIXED_STYLES = asStyleDict({
