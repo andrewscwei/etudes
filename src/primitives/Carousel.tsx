@@ -403,8 +403,8 @@ export function Carousel({
     }
   }, [shouldTrackExposure, viewportLength, itemCount])
 
-  useInterval((isDragging || autoAdvanceInterval <= 0) ? -1 : autoAdvanceInterval, {
-    onInterval: autoAdvanceHandler,
+  useInterval(autoAdvanceInterval, autoAdvanceHandler, {
+    isEnabled: !isDragging,
   }, [safeIdx])
 
   useEffect(() => {

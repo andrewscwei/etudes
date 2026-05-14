@@ -278,8 +278,8 @@ export function ScrollableCarousel<I extends HTMLAttributes<HTMLElement>>({
     onDragMove: dragHandler,
   })
 
-  useInterval((isPointerDown || !shouldAutoAdvance) ? -1 : autoAdvanceInterval, {
-    onInterval: intervalHandler,
+  useInterval(autoAdvanceInterval, intervalHandler, {
+    isEnabled: !isPointerDown,
   }, [index])
 
   useLayoutEffect(() => {
