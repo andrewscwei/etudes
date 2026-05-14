@@ -1,11 +1,11 @@
+import type { DraggableOptions as InteractDraggableOptions } from '@interactjs/actions/drag/plugin'
+
 import interact from 'interactjs'
 import { type RefObject, useLayoutEffect } from 'react'
 import { Point } from 'spase'
 
 import { createKey } from '../utils/createKey.js'
 import { useLatest } from './useLatest.js'
-
-type InteractDraggableOptions = Parameters<Interact.Interactable['draggable']>[0]
 
 /**
  * Type describing the options of {@link useInertiaDrag}.
