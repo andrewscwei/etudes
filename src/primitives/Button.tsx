@@ -29,7 +29,7 @@ export namespace Button {
 export function Button(props: Button.Props) {
   switch (true) {
     case _isAnchor(props): {
-      const { className, ref, action, children, label, opensInNewTab, isDisabled, ...uniqProps } = props
+      const { className, ref, action, children, label, opensInNewTab, title, isDisabled, ...uniqProps } = props
 
       return (
         <a
@@ -37,17 +37,18 @@ export function Button(props: Button.Props) {
           {...isDisabled ? { 'aria-disabled': true } : {}}
           className={clsx(className, { disabled: isDisabled })}
           ref={ref as React.Ref<HTMLAnchorElement>}
-          aria-label={label}
+          aria-label={label ?? title}
           href={action}
           rel={opensInNewTab ? 'noopener,noreferrer' : undefined}
           target={opensInNewTab ? '_blank' : undefined}
+          title={title}
         >
           {children ?? label}
         </a>
       )
     }
     case _isButton(props): {
-      const { className, ref, action, children, label, type = 'button', isDisabled, ...uniqProps } = props
+      const { className, ref, action, children, label, title, type = 'button', isDisabled, ...uniqProps } = props
 
       return (
         <button
@@ -55,8 +56,9 @@ export function Button(props: Button.Props) {
           {...isDisabled ? { 'aria-disabled': true } : {}}
           className={className}
           ref={ref as React.Ref<HTMLButtonElement>}
-          aria-label={label}
+          aria-label={label ?? title}
           disabled={isDisabled}
+          title={title}
           type={type}
           onClick={action}
         >
