@@ -52,7 +52,7 @@ export function SliderDemo() {
             })}
           />
           <Slider.Label className='text-base text-light'/>
-          <Slider.Track className='ia bg-dark/40 data-[position=start]:bg-dark'/>
+          <Slider.Track className='ia bg-dark/40 data-[side=start]:bg-dark'/>
         </Slider>
       )}
     </Frame>

@@ -244,7 +244,7 @@ export function StepSlider({
           className={fixedClassNames.track}
           ref={startTrackRef}
           style={styles(fixedStyles.track, orientation === 'vertical' ? { top: '0' } : { left: '0' })}
-          data-position={isInverted ? 'end' : 'start'}
+          data-side={isInverted ? 'end' : 'start'}
           element={components.track ?? <StepSlider.Track/>}
           onClick={trackClickHandler}
         >
@@ -254,7 +254,7 @@ export function StepSlider({
           className={fixedClassNames.track}
           ref={endTrackRef}
           style={styles(fixedStyles.track, orientation === 'vertical' ? { bottom: '0' } : { right: '0' })}
-          data-position={isInverted ? 'start' : 'end'}
+          data-side={isInverted ? 'start' : 'end'}
           element={components.track ?? <StepSlider.Track/>}
           onClick={trackClickHandler}
         >

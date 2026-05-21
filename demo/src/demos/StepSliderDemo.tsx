@@ -50,7 +50,7 @@ export function StepSliderDemo() {
             })}
           />
           <StepSlider.Label className='text-base text-light'/>
-          <StepSlider.Track className='ia bg-dark/40 data-[position=start]:bg-dark'/>
+          <StepSlider.Track className='ia bg-dark/40 data-[side=start]:bg-dark'/>
         </StepSlider>
       )}
     </Frame>
