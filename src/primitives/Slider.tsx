@@ -61,14 +61,14 @@ export function Slider({
       case 'horizontal': {
         const maxWidth = isClipped ? bodyRect.width - knobWidth : bodyRect.width
         const newX = vPos * maxWidth + dx
-        const newVPos = Math.max(0, Math.min(1, (newX) / maxWidth))
+        const newVPos = _clamped(newX / maxWidth)
 
         return _mapVisualPositionToValuePosition(newVPos, isInverted)
       }
       case 'vertical': {
         const maxHeight = isClipped ? bodyRect.height - knobHeight : bodyRect.height
         const newY = vPos * maxHeight + dy
-        const newVPos = Math.max(0, Math.min(1, newY / maxHeight))
+        const newVPos = _clamped(newY / maxHeight)
 
         return _mapVisualPositionToValuePosition(newVPos, isInverted)
       }
@@ -384,6 +384,10 @@ function _mapVisualPositionToValuePosition(vPos: number, isInverted: boolean) {
 
 function _mapValuePositionToVisualPosition(pos: number, isInverted: boolean) {
   return isInverted ? 1 - pos : pos
+}
+
+function _clamped(value: number, max: number = 1, min: number = 0): number {
+  return Math.max(min, Math.min(max, value))
 }
 
 function _getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtStart = false, isDragging = false, isReleasing = false }) {
