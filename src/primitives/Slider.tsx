@@ -91,11 +91,13 @@ export function Slider({
         if (knob) knob.style.left = isClipped ? `calc(${vPos * 100}% + ${knobWidth * 0.5 - vPos * knobWidth}px)` : `${vPos * 100}%`
         if (startTrack) startTrack.style.width = `calc(${vPos * 100}% - ${computeTrackOffset(knobWidth)})`
         if (endTrack) endTrack.style.width = `calc(${(1 - vPos) * 100}% - ${computeTrackOffset(knobWidth)})`
+
         break
       case 'vertical':
         if (knob) knob.style.top = isClipped ? `calc(${vPos * 100}% + ${knobHeight * 0.5 - vPos * knobHeight}px)` : `${vPos * 100}%`
         if (startTrack) startTrack.style.height = `calc(${vPos * 100}% - ${computeTrackOffset(knobHeight)})`
         if (endTrack) endTrack.style.height = `calc(${(1 - vPos) * 100}% - ${computeTrackOffset(knobHeight)})`
+
         break
       default:
         break
@@ -114,36 +116,33 @@ export function Slider({
     if (!isTrackInteractive) return
 
     const vrect = Rect.fromViewport()
+    let newPos: number
 
     switch (orientation) {
       case 'horizontal': {
         const newVPos = (event.clientX + vrect.left - bodyRect.left) / bodyRect.width
-        const newPos = _mapVisualPositionToValuePosition(newVPos, isInverted)
-        const hasChanged = newPos !== positionRef.current
-
-        if (hasChanged) {
-          positionRef.current = newPos
-          applyPosition(newPos)
-          onChange?.(newPos, false)
-        }
+        newPos = _mapVisualPositionToValuePosition(newVPos, isInverted)
 
         break
       }
       case 'vertical': {
         const newVPos = (event.clientY + vrect.top - bodyRect.top) / bodyRect.height
-        const newPos = _mapVisualPositionToValuePosition(newVPos, isInverted)
-        const hasChanged = newPos !== positionRef.current
-
-        if (hasChanged) {
-          positionRef.current = newPos
-          applyPosition(newPos)
-          onChange?.(newPos, false)
-        }
+        newPos = _mapVisualPositionToValuePosition(newVPos, isInverted)
 
         break
       }
       default:
         console.error(`[etudes::Slider] Invalid orientation: ${orientation}`)
+
+        return
+    }
+
+    const hasChanged = newPos !== positionRef.current
+
+    if (hasChanged) {
+      positionRef.current = newPos
+      applyPosition(newPos)
+      onChange?.(newPos, false)
     }
   }, [bodyRect, isInverted, isTrackInteractive, orientation])
 
@@ -154,7 +153,8 @@ export function Slider({
       setIsDragging(false)
       setIsReleasing(true)
 
-      onDragEnd?.(positionRef.current)
+      onChange?.(positionRef.current, false)
+      onDragEnd?.()
     },
     onDragMove: ({ x, y }) => {
       const newPosition = withDraggedValue(positionRef.current, x, y)
@@ -339,10 +339,8 @@ export namespace Slider {
 
     /**
      * Handler invoked when dragging ends.
-     *
-     * @param position The current slider position.
      */
-    onDragEnd?: (position: number) => void
+    onDragEnd?: () => void
 
     /**
      * Handler invoked when dragging begins.

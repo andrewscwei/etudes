@@ -43,9 +43,6 @@ export function SliderDemo() {
               toast(`Position: ${Math.round(pos * (max - min) + min)}`)
             }
           }}
-          onDragEnd={pos => {
-            toast(`Position: ${Math.round(pos * (max - min) + min)}`)
-          }}
         >
           <Slider.Knob className='ia flex items-center justify-center border border-dark bg-dark'/>
           <Slider.KnobContainer
