@@ -179,11 +179,6 @@ export function Slider({
     },
   })
 
-  const isAtEnd = isInverted ? position === 0 : position === 1
-  const isAtStart = isInverted ? position === 1 : position === 0
-  const fixedClassNames = useMemo(() => _getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing }), [orientation, isAtEnd, isAtStart, isDragging, isReleasing])
-  const fixedStyles = useMemo(() => _getFixedStyles({ knobHeight, knobPadding, knobWidth, orientation, isTrackInteractive }), [knobHeight, knobPadding, knobWidth, orientation, isTrackInteractive])
-
   useLayoutEffect(() => {
     if (isDragging) return
 
@@ -191,6 +186,11 @@ export function Slider({
 
     applyPosition(position)
   }, [position, isDragging, applyPosition])
+
+  const isAtEnd = isInverted ? position === 0 : position === 1
+  const isAtStart = isInverted ? position === 1 : position === 0
+  const fixedClassNames = useMemo(() => _getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing }), [orientation, isAtEnd, isAtStart, isDragging, isReleasing])
+  const fixedStyles = useMemo(() => _getFixedStyles({ knobHeight, knobPadding, knobWidth, orientation, isTrackInteractive }), [knobHeight, knobPadding, knobWidth, orientation, isTrackInteractive])
 
   const components = asComponentDict(children, {
     knob: Slider.Knob,
