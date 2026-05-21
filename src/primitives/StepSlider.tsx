@@ -63,10 +63,6 @@ export function StepSlider({
   const [isDragging, setIsDragging] = useState(false)
   const [isReleasing, setIsReleasing] = useState(false)
 
-  // The position the knob rests at for the controlled `index`. Used for the
-  // label, the at-start/at-end flags and as the drag accumulator's base.
-  const position = _getPositionAt(index, steps)
-
   const withDraggedValue = useCallback((pos: number, dx: number, dy: number) => {
     const vPos = _mapValuePositionToVisualPosition(pos, isInverted)
 
@@ -223,6 +219,7 @@ export function StepSlider({
     applyPosition(target)
   }, [index, isDragging, applyPosition, createKey(steps)])
 
+  const position = _getPositionAt(index, steps)
   const isAtEnd = isInverted ? position === 0 : position === 1
   const isAtStart = isInverted ? position === 1 : position === 0
   const fixedClassNames = useMemo(() => _getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing }), [orientation, isAtEnd, isAtStart, isDragging, isReleasing])
