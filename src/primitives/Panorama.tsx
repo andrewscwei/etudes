@@ -6,91 +6,6 @@ import { useInertiaDrag } from '../hooks/useInertiaDrag.js'
 import { useSize } from '../hooks/useSize.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 
-export namespace Panorama {
-  /**
-   * Type describing the props of {@link Panorama}.
-   */
-  export type Props = {
-    /**
-     * Reference to the root element.
-     */
-    ref?: Ref<HTMLDivElement>
-
-    /**
-     * The current angle in degrees, 0.0 - 360.0, inclusive. When angle is 0 or
-     * 360, the `zeroAnchor` position of the image is at the left bound of the
-     * component.
-     */
-    angle?: number
-
-    /**
-     * The panning speed. This is expressed a multiplier of the number of pixels
-     * dragged, i.e. when set to 1, the image will shift the same amount of
-     * pixels that were dragged.
-     */
-    speed?: number
-
-    /**
-     * The source URL of the image.
-     */
-    src: string
-
-    /**
-     * A decimal percentage of the image width indicating where 0° should be,
-     * i.e. if `zeroAnchor` is `0`, the `angle` would be 0° when the left edge
-     * of the image is at the left edge of the component.
-     */
-    zeroAnchor?: number
-
-    /**
-     * Handler invoked when the position changes.
-     *
-     * @param position The current position.
-     */
-    onPositionChange?: (position: number) => void
-
-    /**
-     * Handler invoked when the angle changes.
-     *
-     * @param angle The current angle.
-     */
-    onAngleChange?: (angle: number) => void
-
-    /**
-     * Handler invoked when dragging starts.
-     */
-    onDragStart?: () => void
-
-    /**
-     * Handler invoked when dragging ends.
-     */
-    onDragEnd?: () => void
-
-    /**
-     * Handler invoked when the image begins loading.
-     */
-    onLoadImageStart?: () => void
-
-    /**
-     * Handler invoked when the image is done loading.
-     */
-    onLoadImageComplete?: () => void
-
-    /**
-     * Handler invoked when there is an error loading the image.
-     */
-    onLoadImageError?: () => void
-
-    /**
-     * Handler invoked when the image size changes. This is the actual size of
-     * the loaded image. When no images are loaded yet, the size is `undefined`.
-     *
-     * @param size The actual size of the loaded image.
-     */
-    onImageSizeChange?: (size?: Size.Size) => void
-  } & Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'role'>
-}
-
 /**
  * A component containing a pannable 360° panorama image.
  */
@@ -183,6 +98,91 @@ export function Panorama({
       />
     </div>
   )
+}
+
+export namespace Panorama {
+  /**
+   * Type describing the props of {@link Panorama}.
+   */
+  export type Props = {
+    /**
+     * Reference to the root element.
+     */
+    ref?: Ref<HTMLDivElement>
+
+    /**
+     * The current angle in degrees, 0.0 - 360.0, inclusive. When angle is 0 or
+     * 360, the `zeroAnchor` position of the image is at the left bound of the
+     * component.
+     */
+    angle?: number
+
+    /**
+     * The panning speed. This is expressed a multiplier of the number of pixels
+     * dragged, i.e. when set to 1, the image will shift the same amount of
+     * pixels that were dragged.
+     */
+    speed?: number
+
+    /**
+     * The source URL of the image.
+     */
+    src: string
+
+    /**
+     * A decimal percentage of the image width indicating where 0° should be,
+     * i.e. if `zeroAnchor` is `0`, the `angle` would be 0° when the left edge
+     * of the image is at the left edge of the component.
+     */
+    zeroAnchor?: number
+
+    /**
+     * Handler invoked when the position changes.
+     *
+     * @param position The current position.
+     */
+    onPositionChange?: (position: number) => void
+
+    /**
+     * Handler invoked when the angle changes.
+     *
+     * @param angle The current angle.
+     */
+    onAngleChange?: (angle: number) => void
+
+    /**
+     * Handler invoked when dragging starts.
+     */
+    onDragStart?: () => void
+
+    /**
+     * Handler invoked when dragging ends.
+     */
+    onDragEnd?: () => void
+
+    /**
+     * Handler invoked when the image begins loading.
+     */
+    onLoadImageStart?: () => void
+
+    /**
+     * Handler invoked when the image is done loading.
+     */
+    onLoadImageComplete?: () => void
+
+    /**
+     * Handler invoked when there is an error loading the image.
+     */
+    onLoadImageError?: () => void
+
+    /**
+     * Handler invoked when the image size changes. This is the actual size of
+     * the loaded image. When no images are loaded yet, the size is `undefined`.
+     *
+     * @param size The actual size of the loaded image.
+     */
+    onImageSizeChange?: (size?: Size.Size) => void
+  } & Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'role'>
 }
 
 const FIXED_STYLES = asStyleDict({
