@@ -1,9 +1,9 @@
-import { type HTMLAttributes, type Ref, useCallback, useEffect, useRef, useState } from 'react'
-import { Rect, Size } from 'spase'
+import { type HTMLAttributes, type Ref, useCallback, useEffect, useLayoutEffect, useRef } from 'react'
+import { Size } from 'spase'
 
 import { useImageSize } from '../hooks/useImageSize.js'
-import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
-import { useRect } from '../hooks/useRect.js'
+import { useInertiaDrag } from '../hooks/useInertiaDrag.js'
+import { useSize } from '../hooks/useSize.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 
 export namespace Panorama {
@@ -43,25 +43,18 @@ export namespace Panorama {
     zeroAnchor?: number
 
     /**
-     * Handler invoked when the position changes. This can either be invoked
-     * from the `angle` prop being changed or from the image being dragged.
+     * Handler invoked when the position changes.
      *
      * @param position The current position.
-     * @param isDragging Specifies if the position change is due to dragging.
      */
-    onPositionChange?: (position: number, isDragging: boolean) => void
+    onPositionChange?: (position: number) => void
 
     /**
-     * Handler invoked when the angle changes. This can either be invoked from
-     * the `angle` prop being changed or from the image being dragged. When
-     * `angle` is being double-bound, ensure that the value is only being set by
-     * this handler when `isDragging` is `true` to avoid potential update
-     * overflow.
+     * Handler invoked when the angle changes.
      *
      * @param angle The current angle.
-     * @param isDragging Specifies if the angle change is due to dragging.
      */
-    onAngleChange?: (angle: number, isDragging: boolean) => void
+    onAngleChange?: (angle: number) => void
 
     /**
      * Handler invoked when dragging starts.
@@ -92,74 +85,87 @@ export namespace Panorama {
      * Handler invoked when the image size changes. This is the actual size of
      * the loaded image. When no images are loaded yet, the size is `undefined`.
      *
-     * @param size The actual size of the loaded image. If no images are loaded
-     *               yet, the size is `undefined`.
+     * @param size The actual size of the loaded image.
      */
     onImageSizeChange?: (size?: Size.Size) => void
   } & Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'role'>
 }
 
 /**
- * A component containing a pannable 360° panorama image. The angle supports
- * two-way binding.
+ * A component containing a pannable 360° panorama image.
  */
-export function Panorama({ ref, angle: externalAngle = 0, speed = 1, src, zeroAnchor = 0, onAngleChange, onDragEnd, onDragStart, onImageSizeChange, onLoadImageComplete, onLoadImageError, onLoadImageStart, onPositionChange, ...props }: Panorama.Props) {
-  const mapDragPositionToDisplacement = useCallback((currentPosition: number, dx: number, _: number): number => {
-    const newDisplacement = currentPosition - dx * speed
-
-    return newDisplacement
-  }, [speed])
-
+export function Panorama({
+  ref,
+  angle = 0,
+  speed = 1,
+  src,
+  zeroAnchor = 0,
+  onAngleChange,
+  onDragEnd,
+  onDragStart,
+  onImageSizeChange,
+  onLoadImageComplete,
+  onLoadImageError,
+  onLoadImageStart,
+  onPositionChange,
+  ...props
+}: Panorama.Props) {
   const bodyRef = useRef<HTMLDivElement>(null)
-  const bodyRect = useRect(bodyRef)
+  const bodySize = useSize(bodyRef)
   const imageSize = useImageSize({ src }, {
     onError: onLoadImageError,
     onLoad: onLoadImageComplete,
     onLoadStart: onLoadImageStart,
   })
-  const [angle, setAngle] = useState(externalAngle)
+  const isDraggingRef = useRef(false)
+  const displacementRef = useRef(0)
 
-  const { value: displacement, isDragging, setValue: setDisplacement } = useInertiaDragValue(bodyRef, {
-    initialValue: 0,
-    transform: mapDragPositionToDisplacement,
-    onDragEnd,
-    onDragStart,
-  })
+  const mapDragPositionToDisplacement = useCallback((pos: number, dx: number): number => {
+    return pos - dx * speed
+  }, [speed])
 
-  useEffect(() => {
-    if (isDragging || !imageSize) return
+  const applyDisplacement = useCallback((value: number) => {
+    if (!bodyRef.current) return
 
-    const newDisplacement = _getDisplacementFromAngle(externalAngle, imageSize, Rect.size(bodyRect), zeroAnchor)
+    bodyRef.current.style.backgroundPositionX = `${-value}px`
+  }, [])
 
-    if (newDisplacement !== displacement) {
-      setDisplacement(newDisplacement)
-    }
+  useLayoutEffect(() => {
+    if (isDraggingRef.current || !imageSize) return
 
-    if (externalAngle !== angle) {
-      setAngle(externalAngle)
-    }
-  }, [externalAngle, imageSize, bodyRect.width, bodyRect.height, zeroAnchor])
+    const newDisplacement = _mapAngleToDisplacement(angle, imageSize, bodySize, zeroAnchor)
 
-  useEffect(() => {
-    if (!isDragging || !imageSize) return
-
-    const newAngle = _getAngleFromDisplacement(displacement, imageSize, Rect.size(bodyRect), zeroAnchor)
-
-    if (angle !== newAngle) {
-      setAngle(newAngle)
-    }
-  }, [displacement, imageSize, bodyRect.width, bodyRect.height, zeroAnchor])
-
-  useEffect(() => {
-    onAngleChange?.(angle, isDragging)
-    onPositionChange?.(angle / 360, isDragging)
-  }, [angle])
+    displacementRef.current = newDisplacement
+    applyDisplacement(newDisplacement)
+  }, [angle, imageSize, bodySize, zeroAnchor])
 
   useEffect(() => {
     onImageSizeChange?.(imageSize)
-  }, [imageSize?.width, imageSize?.height])
+  }, [imageSize])
 
-  const fixedStyles = _getFixedStyles({ displacement, src })
+  useInertiaDrag(bodyRef, {
+    onDragEnd: () => {
+      isDraggingRef.current = false
+      onDragEnd?.()
+    },
+    onDragMove: ({ x }) => {
+      if (!imageSize) return
+
+      const newDisplacement = mapDragPositionToDisplacement(displacementRef.current, x)
+      const newAngle = _mapDisplacementToAngle(newDisplacement, imageSize, bodySize, zeroAnchor)
+      const newPosition = _mapAngleToPosition(newAngle)
+
+      displacementRef.current = newDisplacement
+      applyDisplacement(newDisplacement)
+
+      onAngleChange?.(newAngle)
+      onPositionChange?.(newPosition)
+    },
+    onDragStart: () => {
+      isDraggingRef.current = true
+      onDragStart?.()
+    },
+  })
 
   return (
     <div
@@ -168,24 +174,26 @@ export function Panorama({ ref, angle: externalAngle = 0, speed = 1, src, zeroAn
       aria-valuenow={angle}
       role='slider'
     >
-      <div ref={bodyRef} style={fixedStyles.body}/>
+      <div
+        ref={bodyRef}
+        style={{
+          ...FIXED_STYLES.body,
+          backgroundImage: `url(${src})`,
+        }}
+      />
     </div>
   )
 }
 
-function _getFixedStyles({ displacement = NaN, src = '' }) {
-  return asStyleDict({
-    body: {
-      backgroundImage: `url(${src})`,
-      backgroundPositionX: `${-displacement}px`,
-      backgroundRepeat: 'repeat',
-      backgroundSize: 'auto 100%',
-      height: '100%',
-      touchAction: 'none',
-      width: '100%',
-    },
-  })
-}
+const FIXED_STYLES = asStyleDict({
+  body: {
+    backgroundRepeat: 'repeat',
+    backgroundSize: 'auto 100%',
+    height: '100%',
+    touchAction: 'none',
+    width: '100%',
+  },
+})
 
 function _getFilledImageSize(originalSize: Size.Size, sizeToFill: Size.Size): Size.Size {
   const { height: originalHeight, width: originalWidth } = originalSize
@@ -199,7 +207,7 @@ function _getFilledImageSize(originalSize: Size.Size, sizeToFill: Size.Size): Si
   return Size.make(filledWidth, filledHeight)
 }
 
-function _getDisplacementFromAngle(angle: number, originalImageSize: Size.Size, componentSize: Size.Size, zeroAnchor: number): number {
+function _mapAngleToDisplacement(angle: number, originalImageSize: Size.Size, componentSize: Size.Size, zeroAnchor: number): number {
   const { width: imageWidth } = _getFilledImageSize(originalImageSize, componentSize)
   const { width: componentWidth } = componentSize
   const offset = componentWidth * zeroAnchor
@@ -207,7 +215,11 @@ function _getDisplacementFromAngle(angle: number, originalImageSize: Size.Size, 
   return angle / 360 * imageWidth - offset
 }
 
-function _getAngleFromDisplacement(displacement: number, originalImageSize: Size.Size, componentSize: Size.Size, zeroAnchor: number): number {
+function _mapAngleToPosition(angle: number): number {
+  return angle / 360
+}
+
+function _mapDisplacementToAngle(displacement: number, originalImageSize: Size.Size, componentSize: Size.Size, zeroAnchor: number): number {
   const { width: imageWidth } = _getFilledImageSize(originalImageSize, componentSize)
   const { width: componentWidth } = componentSize
   const offset = componentWidth * zeroAnchor
