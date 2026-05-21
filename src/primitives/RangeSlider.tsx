@@ -223,9 +223,9 @@ export function RangeSlider({
           style={styles(fixedStyles.knobContainer, {
             pointerEvents: isDeepEqual([startValue, endValue], [minValue, minValue]) ? 'none' : 'auto',
           }, orientation === 'horizontal' ? {
-            top: `${bodyRect.height * 0.5}px`,
+            top: '50%',
           } : {
-            left: `${bodyRect.width * 0.5}px`,
+            left: '50%',
           })}
           disabled={isDeepEqual([startValue, endValue], [minValue, minValue])}
           element={components.knobContainer ?? <RangeSlider.KnobContainer/>}
@@ -253,9 +253,9 @@ export function RangeSlider({
           style={styles(fixedStyles.knobContainer, {
             pointerEvents: isDeepEqual([startValue, endValue], [maxValue, maxValue]) ? 'none' : 'auto',
           }, orientation === 'horizontal' ? {
-            top: `${bodyRect.height * 0.5}px`,
+            top: '50%',
           } : {
-            left: `${bodyRect.width * 0.5}px`,
+            left: '50%',
           })}
           disabled={isDeepEqual([startValue, endValue], [maxValue, maxValue])}
           element={components.knobContainer ?? <RangeSlider.KnobContainer/>}
@@ -507,10 +507,14 @@ function _getPositionByDisplacement(displacement: number, orientation: RangeSlid
   switch (orientation) {
     case 'horizontal': {
       const maxWidth = isClipped ? rect.width - knobWidth : rect.width
+      if (maxWidth <= 0) return 0
+
       return (displacement - (isClipped ? knobWidth * 0.5 : 0)) / maxWidth
     }
     case 'vertical': {
       const maxHeight = isClipped ? rect.height - knobHeight : rect.height
+      if (maxHeight <= 0) return 0
+
       return (displacement - (isClipped ? knobHeight * 0.5 : 0)) / maxHeight
     }
     default:
