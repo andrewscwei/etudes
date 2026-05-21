@@ -86,7 +86,7 @@
   }
 
   .ia {
-    @apply transition-[opacity,background,color] hover:opacity-60;
+    @apply transition-[opacity,background,color,width,height] hover:opacity-60;
   }
 }
 

@@ -15,14 +15,13 @@ export function SliderDemo() {
         ['isClipped: false', 'isClipped: true'],
         ['isInverted: false', 'isInverted: true'],
         ['isTrackInteractive: true', 'isTrackInteractive: false'],
-        ['shouldOnlyDispatchOnDragEnd: true', 'shouldOnlyDispatchOnDragEnd: false'],
         ['orientation: horizontal', 'orientation: vertical'],
       ]}
       title='Slider'
       usesMaxHeight={true}
       onReset={() => setPosition(0)}
     >
-      {({ orientation, isClipped, isInverted, isTrackInteractive, shouldOnlyDispatchOnDragEnd }, toast) => (
+      {({ orientation, isClipped, isInverted, isTrackInteractive }, toast) => (
         <Slider
           className={clsx('relative', {
             'h-1 w-44': orientation === 'horizontal',
@@ -30,28 +29,33 @@ export function SliderDemo() {
           })}
           knobHeight={28}
           knobWidth={40}
-          labelProvider={pos => `${Math.round(pos * (max - min) + min)}`}
           orientation={orientation as any}
           position={position}
           trackPadding={0}
           isClipped={isClipped === 'true'}
           isInverted={isInverted === 'true'}
           isTrackInteractive={isTrackInteractive === 'true'}
-          shouldOnlyDispatchOnDragEnd={shouldOnlyDispatchOnDragEnd === 'true'}
-          onChange={pos => {
+          formatPosition={pos => `${Math.round(pos * (max - min) + min)}`}
+          onChange={(pos, isDragging) => {
             setPosition(pos)
+
+            if (!isDragging) {
+              toast(`Position: ${Math.round(pos * (max - min) + min)}`)
+            }
+          }}
+          onDragEnd={pos => {
             toast(`Position: ${Math.round(pos * (max - min) + min)}`)
           }}
         >
           <Slider.Knob className='ia flex items-center justify-center border border-dark bg-dark'/>
           <Slider.KnobContainer
             className={clsx({
-              '[:not(.dragging)]:transition-[left]': orientation === 'horizontal',
-              '[:not(.dragging)]:transition-[top]': orientation === 'vertical',
+              'transition-[left]': orientation === 'horizontal',
+              'transition-[top]': orientation === 'vertical',
             })}
           />
           <Slider.Label className='text-base text-light'/>
-          <Slider.Track className='ia bg-dark/40 [.start]:bg-dark'/>
+          <Slider.Track className='ia bg-dark/40 data-[position=start]:bg-dark'/>
         </Slider>
       )}
     </Frame>
