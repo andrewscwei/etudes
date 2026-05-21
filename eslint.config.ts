@@ -268,7 +268,7 @@ export default defineConfig(
             groupName: 'component',
           },
           {
-            elementNamePattern: '^((get|set|parse|format|render|dispatch)[A-Z].+)|(render)$',
+            elementNamePattern: '^((get|set|parse|format|dispatch)[A-Z].+)|(render)$',
             groupName: 'function',
           },
           {
@@ -320,7 +320,7 @@ export default defineConfig(
             groupName: 'flag',
           },
           {
-            elementNamePattern: '^((get|set|parse|format|render|dispatch)[A-Z].+)|(render)$',
+            elementNamePattern: '^((get|set|parse|format|dispatch)[A-Z].+)|(render)$',
             groupName: 'function',
           },
           {
@@ -370,7 +370,7 @@ export default defineConfig(
             groupName: 'component',
           },
           {
-            elementNamePattern: '^((get|set|parse|format|render|dispatch)[A-Z].+)|(render)$',
+            elementNamePattern: '^((get|set|parse|format|dispatch)[A-Z].+)|(render)$',
             groupName: 'function',
           },
           {

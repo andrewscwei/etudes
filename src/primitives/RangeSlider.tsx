@@ -1,114 +1,202 @@
 import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import { type HTMLAttributes, type Ref, useCallback, useEffect, useRef, useState } from 'react'
+import { type HTMLAttributes, type Ref, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Rect } from 'spase'
 
-import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
+import { useInertiaDrag } from '../hooks/useInertiaDrag.js'
 import { useRect } from '../hooks/useRect.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
-import { createKey } from '../utils/createKey.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
 /**
  * A slider component that allows the user to select a range of values.
  *
- * @exports RangeSlider.Gutter Component for the gutter.
- * @exports RangeSlider.Highlight Component for the highlight.
  * @exports RangeSlider.Knob Component for the knob.
  * @exports RangeSlider.KnobContainer Component for the container of the knob.
  * @exports RangeSlider.Label Component for the label.
+ * @exports RangeSlider.Track Component for the track.
+ * @exports RangeSlider.TrackHighlight Component for the track highlight.
  */
 export function RangeSlider({
   className,
   ref,
   children,
-  decimalPlaces = 2,
   knobHeight = 28,
   knobPadding = 0,
   knobWidth = 40,
   max: maxValue,
   min: minValue,
   orientation = 'vertical',
-  range: externalRange,
+  range = [minValue, maxValue],
   steps = -1,
   isClipped = false,
+  formatLabel,
   onChange,
+  onDragEnd,
+  onDragStart,
   ...props
 }: RangeSlider.Props) {
   const bodyRef = useRef<HTMLDivElement>(null)
-  const bodyRect = useRect(bodyRef)
   const startKnobContainerRef = useRef<HTMLDivElement>(null)
   const endKnobContainerRef = useRef<HTMLDivElement>(null)
-  const [range, setRange] = useState<RangeSlider.Range>(externalRange ?? [minValue, maxValue])
-  const breakpoints = _createBreakpoints(minValue, maxValue, steps)
-  const [start, end] = range.map(t => _getDisplacementByValue(t, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped))
-  const highlightLength = end - start
+  const trackHighlightRef = useRef<HTMLDivElement>(null)
+
+  const [startValue, endValue] = range
+  const startValueRef = useRef(startValue)
+  const endValueRef = useRef(endValue)
+
+  const bodyRect = useRect(bodyRef)
+
+  const [isDraggingStartKnob, setIsDraggingStartKnob] = useState(false)
+  const [isReleasingStartKnob, setIsReleasingStartKnob] = useState(false)
+  const [isDraggingEndKnob, setIsDraggingEndKnob] = useState(false)
+  const [isReleasingEndKnob, setIsReleasingEndKnob] = useState(false)
+
+  const breakpoints = useMemo(() => _createBreakpoints(minValue, maxValue, steps), [minValue, maxValue, steps])
   const components = asComponentDict(children, {
-    gutter: RangeSlider.Gutter,
-    highlight: RangeSlider.Highlight,
     knob: RangeSlider.Knob,
     knobContainer: RangeSlider.KnobContainer,
     label: RangeSlider.Label,
+    track: RangeSlider.Track,
+    trackHighlight: RangeSlider.TrackHighlight,
   })
 
-  const mapStartDragValueToValue = useCallback((value: number, dx: number, dy: number) => {
+  const withDraggedStartValue = useCallback((value: number, dx: number, dy: number) => {
     const delta = orientation === 'horizontal' ? dx : dy
     const dMin = _getDisplacementByValue(minValue, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
-    const dMax = _getDisplacementByValue(range[1], minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
+    const dMax = _getDisplacementByValue(endValueRef.current, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
     const dCurr = _getDisplacementByValue(value, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped) + delta
 
     return _getValueByDisplacement(Math.max(dMin, Math.min(dMax, dCurr)), minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
-  }, [knobWidth, knobHeight, isClipped, minValue, maxValue, orientation, range[1], Rect.toString(bodyRect)])
+  }, [knobWidth, knobHeight, isClipped, minValue, maxValue, orientation, Rect.toString(bodyRect)])
 
-  const mapEndDragValueToValue = useCallback((value: number, dx: number, dy: number) => {
+  const withDraggedEndValue = useCallback((value: number, dx: number, dy: number) => {
     const delta = orientation === 'horizontal' ? dx : dy
-    const dMin = _getDisplacementByValue(range[0], minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
+    const dMin = _getDisplacementByValue(startValueRef.current, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
     const dMax = _getDisplacementByValue(maxValue, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
     const dCurr = _getDisplacementByValue(value, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped) + delta
 
     return _getValueByDisplacement(Math.max(dMin, Math.min(dMax, dCurr)), minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
-  }, [knobWidth, knobHeight, isClipped, minValue, maxValue, orientation, range[0], Rect.toString(bodyRect)])
+  }, [knobWidth, knobHeight, isClipped, minValue, maxValue, orientation, Rect.toString(bodyRect)])
 
-  const { value: startValue, isDragging: isDraggingStartKnob, isReleasing: isReleasingStartKnob, setValue: setStartValue } = useInertiaDragValue(startKnobContainerRef, {
-    initialValue: externalRange?.[0] ?? minValue,
-    transform: mapStartDragValueToValue,
+  const applyKnobs = useCallback(() => {
+    const startDisplacement = _getDisplacementByValue(startValueRef.current, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
+    const endDisplacement = _getDisplacementByValue(endValueRef.current, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
+    const startKnob = startKnobContainerRef.current
+    const endKnob = endKnobContainerRef.current
+    const trackHighlight = trackHighlightRef.current
+
+    if (orientation === 'horizontal') {
+      if (startKnob) startKnob.style.left = `${startDisplacement}px`
+      if (endKnob) endKnob.style.left = `${endDisplacement}px`
+      if (trackHighlight) {
+        trackHighlight.style.transform = `translate(${startDisplacement}px, 0)`
+        trackHighlight.style.width = `${endDisplacement - startDisplacement}px`
+      }
+    } else {
+      if (startKnob) startKnob.style.top = `${startDisplacement}px`
+      if (endKnob) endKnob.style.top = `${endDisplacement}px`
+      if (trackHighlight) {
+        trackHighlight.style.transform = `translate(0, ${startDisplacement}px)`
+        trackHighlight.style.height = `${endDisplacement - startDisplacement}px`
+      }
+    }
+  }, [isClipped, knobHeight, knobWidth, maxValue, minValue, orientation, Rect.toString(bodyRect)])
+
+  const suppressTransitions = useCallback((knob: HTMLElement | null, suppressed: boolean) => {
+    const value = suppressed ? 'none' : ''
+
+    for (const el of [knob, trackHighlightRef.current]) {
+      if (el) el.style.transition = value
+    }
+  }, [])
+
+  useInertiaDrag(startKnobContainerRef, {
+    onDragEnd: () => {
+      suppressTransitions(startKnobContainerRef.current, false)
+
+      const snapped = breakpoints ? _getClosestSteppedValue(startValueRef.current, breakpoints) : startValueRef.current
+      startValueRef.current = snapped
+
+      setIsDraggingStartKnob(false)
+      setIsReleasingStartKnob(true)
+
+      onChange?.([snapped, endValueRef.current], false)
+      onDragEnd?.()
+    },
+    onDragMove: ({ x, y }) => {
+      const newValue = withDraggedStartValue(startValueRef.current, x, y)
+      const hasChanged = newValue !== startValueRef.current
+
+      if (hasChanged) {
+        startValueRef.current = newValue
+        applyKnobs()
+        onChange?.([newValue, endValueRef.current], true)
+      }
+
+      setIsDraggingStartKnob(true)
+      setIsReleasingStartKnob(false)
+    },
+    onDragStart: () => {
+      suppressTransitions(startKnobContainerRef.current, true)
+
+      setIsDraggingStartKnob(true)
+      setIsReleasingStartKnob(false)
+
+      onDragStart?.()
+    },
   })
 
-  const { value: endValue, isDragging: isDraggingEndKnob, isReleasing: isReleasingEndKnob, setValue: setEndValue } = useInertiaDragValue(endKnobContainerRef, {
-    initialValue: externalRange?.[1] ?? maxValue,
-    transform: mapEndDragValueToValue,
+  useInertiaDrag(endKnobContainerRef, {
+    onDragEnd: () => {
+      suppressTransitions(endKnobContainerRef.current, false)
+
+      const snapped = breakpoints ? _getClosestSteppedValue(endValueRef.current, breakpoints) : endValueRef.current
+      endValueRef.current = snapped
+
+      setIsDraggingEndKnob(false)
+      setIsReleasingEndKnob(true)
+
+      onChange?.([startValueRef.current, snapped], false)
+      onDragEnd?.()
+    },
+    onDragMove: ({ x, y }) => {
+      const newValue = withDraggedEndValue(endValueRef.current, x, y)
+      const hasChanged = newValue !== endValueRef.current
+
+      if (hasChanged) {
+        endValueRef.current = newValue
+        applyKnobs()
+        onChange?.([startValueRef.current, newValue], true)
+      }
+
+      setIsDraggingEndKnob(true)
+      setIsReleasingEndKnob(false)
+    },
+    onDragStart: () => {
+      suppressTransitions(endKnobContainerRef.current, true)
+
+      setIsDraggingEndKnob(true)
+      setIsReleasingEndKnob(false)
+
+      onDragStart?.()
+    },
   })
 
-  const fixedClassNames = _getFixedClassNames({ isDraggingEndKnob, isDraggingStartKnob, isReleasingEndKnob, isReleasingStartKnob })
-  const fixedStyles = _getFixedStyles({ highlightLength, knobHeight, knobPadding, knobWidth, orientation, start })
+  useLayoutEffect(() => {
+    if (isDraggingStartKnob || isDraggingEndKnob) return
 
-  useEffect(() => {
-    setRange([startValue, endValue])
-  }, [startValue, endValue])
+    startValueRef.current = startValue
+    endValueRef.current = endValue
 
-  useEffect(() => {
-    onChange?.(range)
-  }, [range[0], range[1]])
+    applyKnobs()
+  }, [startValue, endValue, isDraggingStartKnob, isDraggingEndKnob, applyKnobs])
 
-  useEffect(() => {
-    if (isDraggingStartKnob || isDraggingEndKnob || isReleasingEndKnob || isDeepEqual(externalRange, range)) return
-    setRange(externalRange ?? [minValue, maxValue])
-    setStartValue(externalRange?.[0] ?? minValue)
-    setEndValue(externalRange?.[1] ?? maxValue)
-  }, [externalRange?.[0], externalRange?.[1], isDraggingStartKnob, isDraggingEndKnob, isReleasingEndKnob])
-
-  useEffect(() => {
-    if (!breakpoints) return
-    setStartValue(_getClosestSteppedValue(startValue, breakpoints))
-  }, [isReleasingStartKnob, createKey(breakpoints)])
-
-  useEffect(() => {
-    if (!breakpoints || !isReleasingEndKnob) return
-    setEndValue(_getClosestSteppedValue(endValue, breakpoints))
-  }, [isReleasingEndKnob, createKey(breakpoints)])
+  const fixedClassNames = useMemo(() => _getFixedClassNames({ isDraggingEndKnob, isDraggingStartKnob, isReleasingEndKnob, isReleasingStartKnob }), [isDraggingEndKnob, isDraggingStartKnob, isReleasingEndKnob, isReleasingStartKnob])
+  const fixedStyles = useMemo(() => _getFixedStyles({ knobHeight, knobPadding, knobWidth, orientation }), [knobHeight, knobPadding, knobWidth, orientation])
 
   return (
     <div
@@ -120,28 +208,41 @@ export function RangeSlider({
       role='slider'
     >
       <div ref={bodyRef} style={fixedStyles.body}>
-        <Styled style={styles(fixedStyles.gutter)} element={components.gutter ?? <RangeSlider.Gutter/>}/>
-        <Styled style={styles(fixedStyles.highlight)} element={components.highlight ?? <RangeSlider.Highlight/>}/>
+        <Styled
+          style={styles(fixedStyles.track)}
+          element={components.track ?? <RangeSlider.Track/>}
+        />
+        <Styled
+          ref={trackHighlightRef}
+          style={styles(fixedStyles.trackHighlight)}
+          element={components.trackHighlight ?? <RangeSlider.TrackHighlight/>}
+        />
         <Styled
           className={fixedClassNames.startKnobContainer}
           ref={startKnobContainerRef}
           style={styles(fixedStyles.knobContainer, {
             pointerEvents: isDeepEqual([startValue, endValue], [minValue, minValue]) ? 'none' : 'auto',
           }, orientation === 'horizontal' ? {
-            left: `${start}px`,
             top: `${bodyRect.height * 0.5}px`,
           } : {
             left: `${bodyRect.width * 0.5}px`,
-            top: `${start}px`,
           })}
           disabled={isDeepEqual([startValue, endValue], [minValue, minValue])}
           element={components.knobContainer ?? <RangeSlider.KnobContainer/>}
         >
-          <Styled className={fixedClassNames.startKnob} style={styles(fixedStyles.knob)} element={components.knob ?? <RangeSlider.Knob/>}>
+          <Styled
+            className={fixedClassNames.startKnob}
+            style={styles(fixedStyles.knob)}
+            element={components.knob ?? <RangeSlider.Knob/>}
+          >
             <div style={fixedStyles.knobHitBox}/>
-            {components.label && (
-              <Styled className={fixedClassNames.startLabel} style={styles(fixedStyles.label)} element={components.label ?? <RangeSlider.Label/>}>
-                {Number(startValue.toFixed(decimalPlaces)).toLocaleString()}
+            {components.label && formatLabel && (
+              <Styled
+                className={fixedClassNames.startLabel}
+                style={styles(fixedStyles.label)}
+                element={components.label ?? <RangeSlider.Label/>}
+              >
+                {formatLabel(startValue, 'start')}
               </Styled>
             )}
           </Styled>
@@ -152,20 +253,26 @@ export function RangeSlider({
           style={styles(fixedStyles.knobContainer, {
             pointerEvents: isDeepEqual([startValue, endValue], [maxValue, maxValue]) ? 'none' : 'auto',
           }, orientation === 'horizontal' ? {
-            left: `${end}px`,
             top: `${bodyRect.height * 0.5}px`,
           } : {
             left: `${bodyRect.width * 0.5}px`,
-            top: `${end}px`,
           })}
           disabled={isDeepEqual([startValue, endValue], [maxValue, maxValue])}
           element={components.knobContainer ?? <RangeSlider.KnobContainer/>}
         >
-          <Styled className={fixedClassNames.endKnob} style={styles(fixedStyles.knob)} element={components.knob ?? <RangeSlider.Knob/>}>
+          <Styled
+            className={fixedClassNames.endKnob}
+            style={styles(fixedStyles.knob)}
+            element={components.knob ?? <RangeSlider.Knob/>}
+          >
             <div style={fixedStyles.knobHitBox}/>
-            {components.label && (
-              <Styled className={fixedClassNames.endLabel} style={styles(fixedStyles.label)} element={components.label ?? <RangeSlider.Label/>}>
-                {Number(endValue.toFixed(decimalPlaces)).toLocaleString()}
+            {components.label && formatLabel && (
+              <Styled
+                className={fixedClassNames.endLabel}
+                style={styles(fixedStyles.label)}
+                element={components.label ?? <RangeSlider.Label/>}
+              >
+                {formatLabel(endValue, 'end')}
               </Styled>
             )}
           </Styled>
@@ -194,11 +301,6 @@ export namespace RangeSlider {
      * Reference to the root element.
      */
     ref?: Ref<HTMLDivElement>
-
-    /**
-     * Number of decimal places to display.
-     */
-    decimalPlaces?: number
 
     /**
      * Specifies if the knobs are clipped to the track.
@@ -249,24 +351,50 @@ export namespace RangeSlider {
     steps?: number
 
     /**
-     * Handler invoked when the range of values changes.
+     * A function that formats the labels displayed on the knobs based on the
+     * selected values. If not provided, no label will be rendered.
+     *
+     * @param value The value of the side specified by `side`.
+     * @param side Specifies which side the label is for, either the 'start' or
+     *             'end' knob.
+     *
+     * @returns The formatted string.
+     */
+    formatLabel?: (value: number, side: 'end' | 'start') => string
+
+    /**
+     * Handler invoked when the range of values changes due to dragging a knob.
+     * While dragging it is invoked repeatedly with `isDragging` set to `true`;
+     * when a knob is released it is invoked once more with the stepped range and
+     * `isDragging` set to `false`.
      *
      * @param range The current range of values.
+     * @param isDragging Specifies if the change is from an in-progress drag.
      */
-    onChange?: (range: Range) => void
+    onChange?: (range: Range, isDragging: boolean) => void
+
+    /**
+     * Handler invoked when dragging a knob ends.
+     */
+    onDragEnd?: () => void
+
+    /**
+     * Handler invoked when dragging a knob begins.
+     */
+    onDragStart?: () => void
   } & Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuemax' | 'aria-valuemin' | 'onChange' | 'role'>
 
   /**
-   * Component for the gutter of a {@link RangeSlider}.
+   * Component for the track of a {@link RangeSlider}.
    */
-  export const Gutter = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+  export const Track = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
     <div {...props}/>
   )
 
   /**
-   * Component for the highlight of a {@link RangeSlider}.
+   * Component for the track highlight of a {@link RangeSlider}.
    */
-  export const Highlight = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
+  export const TrackHighlight = ({ ...props }: HTMLAttributes<HTMLDivElement>) => (
     <div {...props}/>
   )
 
@@ -321,33 +449,11 @@ function _getFixedClassNames({ isDraggingEndKnob = false, isDraggingStartKnob = 
   })
 }
 
-function _getFixedStyles({ highlightLength = 0, knobHeight = 0, knobPadding = 0, knobWidth = 0, orientation = 'horizontal', start = 0 }) {
+function _getFixedStyles({ knobHeight = 0, knobPadding = 0, knobWidth = 0, orientation = 'horizontal' }) {
   return asStyleDict({
     body: {
       height: '100%',
       width: '100%',
-    },
-    gutter: {
-      display: 'block',
-      height: '100%',
-      left: '0',
-      position: 'absolute',
-      top: '0',
-      width: '100%',
-    },
-    highlight: {
-      left: '0',
-      position: 'absolute',
-      top: '0',
-      ...orientation === 'horizontal' ? {
-        height: '100%',
-        transform: `translate(${start}px, 0)`,
-        width: `${highlightLength}px`,
-      } : {
-        height: `${highlightLength}px`,
-        transform: `translate(0, ${start}px)`,
-        width: '100%',
-      },
     },
     knob: {
       height: `${knobHeight}px`,
@@ -375,6 +481,20 @@ function _getFixedStyles({ highlightLength = 0, knobHeight = 0, knobPadding = 0,
       pointerEvents: 'none',
       position: 'relative',
       userSelect: 'none',
+    },
+    track: {
+      display: 'block',
+      height: '100%',
+      left: '0',
+      position: 'absolute',
+      top: '0',
+      width: '100%',
+    },
+    trackHighlight: {
+      left: '0',
+      position: 'absolute',
+      top: '0',
+      ...orientation === 'horizontal' ? { height: '100%' } : { width: '100%' },
     },
   })
 }
@@ -463,8 +583,8 @@ function _createBreakpoints(min: number, max: number, steps: number): number[] |
 
 if (process.env.NODE_ENV === 'development') {
   RangeSlider.displayName = 'RangeSlider'
-  RangeSlider.Gutter.displayName = 'RangeSlider.Gutter'
-  RangeSlider.Label.displayName = 'RangeSlider.Label'
-  RangeSlider.Highlight.displayName = 'RangeSlider.Highlight'
   RangeSlider.Knob.displayName = 'RangeSlider.Knob'
+  RangeSlider.Label.displayName = 'RangeSlider.Label'
+  RangeSlider.Track.displayName = 'RangeSlider.Track'
+  RangeSlider.TrackHighlight.displayName = 'RangeSlider.TrackHighlight'
 }

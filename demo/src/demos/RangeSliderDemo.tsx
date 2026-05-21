@@ -27,7 +27,6 @@ export function RangeSliderDemo() {
             'h-1 w-44': orientation === 'horizontal',
             'h-32 w-1': orientation === 'vertical',
           })}
-          decimalPlaces={0}
           knobHeight={28}
           knobWidth={40}
           max={100}
@@ -36,14 +35,18 @@ export function RangeSliderDemo() {
           range={[min, max]}
           steps={99}
           isClipped={isClipped === 'true'}
-          onChange={range => {
+          formatLabel={pos => Number(pos.toFixed()).toLocaleString()}
+          onChange={(range, isDragging) => {
             setMin(range[0])
             setMax(range[1])
-            toast(`Min: ${Math.round(range[0])}, Max: ${Math.round(range[1])}`)
+
+            if (!isDragging) {
+              toast(`Min: ${Math.round(range[0])}, Max: ${Math.round(range[1])}`)
+            }
           }}
         >
-          <RangeSlider.Gutter className='bg-dark/40'/>
-          <RangeSlider.Highlight className='bg-dark'/>
+          <RangeSlider.Track className='bg-dark/40'/>
+          <RangeSlider.TrackHighlight className='bg-dark'/>
           <RangeSlider.Knob className='ia flex items-center justify-center border border-dark bg-dark'/>
           <RangeSlider.KnobContainer
             className={clsx({
