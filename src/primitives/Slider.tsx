@@ -37,7 +37,7 @@ export function Slider({
   isClipped = false,
   isInverted = false,
   isTrackInteractive = true,
-  formatPosition,
+  formatLabel,
   onChange,
   onDragEnd,
   onDragStart,
@@ -241,13 +241,13 @@ export function Slider({
             element={components.knob ?? <Slider.Knob/>}
           >
             <div style={fixedStyles.knobHitBox}/>
-            {formatPosition && (
+            {formatLabel && (
               <Styled
                 className={fixedClassNames.label}
                 style={styles(fixedStyles.label)}
                 element={components.label ?? <Slider.Label/>}
               >
-                {formatPosition(position)}
+                {formatLabel(position)}
               </Styled>
             )}
           </Styled>
@@ -327,7 +327,7 @@ export namespace Slider {
      *
      * @returns The formatted string.
      */
-    formatPosition?: (position: number) => string
+    formatLabel?: (position: number) => string
 
     /**
      * Handler invoked when position changes.

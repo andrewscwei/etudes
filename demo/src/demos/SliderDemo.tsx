@@ -35,7 +35,7 @@ export function SliderDemo() {
           isClipped={isClipped === 'true'}
           isInverted={isInverted === 'true'}
           isTrackInteractive={isTrackInteractive === 'true'}
-          formatPosition={pos => `${Math.round(pos * (max - min) + min)}`}
+          formatLabel={pos => `${Math.round(pos * (max - min) + min)}`}
           onChange={(pos, isDragging) => {
             setPosition(pos)
 
