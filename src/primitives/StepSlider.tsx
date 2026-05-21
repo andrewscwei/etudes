@@ -1,8 +1,8 @@
 import clsx from 'clsx'
-import { type HTMLAttributes, type MouseEvent, type Ref, useCallback, useEffect, useRef, useState } from 'react'
+import { type HTMLAttributes, type MouseEvent, type Ref, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Rect } from 'spase'
 
-import { useInertiaDragValue } from '../hooks/useInertiaDragValue.js'
+import { useInertiaDrag } from '../hooks/useInertiaDrag.js'
 import { useRect } from '../hooks/useRect.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
@@ -13,16 +13,16 @@ import { styles } from '../utils/styles.js'
 
 /**
  * A "step" slider component supporting both horizontal and vertical
- * orientations that automatically snaps to a set of predefined points on the
- * slider when dragged. These points are referred to as "steps", indexed by an
- * integer referred to as "index". This index can be two-way bound. The
- * component consists of four customizable elements: a draggable knob, a label
- * on the knob, a scroll track before the knob and a scroll track after the
- * knob. While the width and height of the slider is inferred from its CSS
- * rules, the width and height of the knob are set via props (`knobWidth` and
- * `knobHeight`, respectively). The size of the knob does not impact the size of
- * the slider. While dragging, the slider still emits a position change event,
- * where the position is a decimal ranging between 0.0 and 1.0, inclusive.
+ * orientations that automatically whose knob snaps to a set of predefined
+ * points on the track upon drag release. These points are referred to as
+ * "steps", indexed by an integer referred to as "index". The index is
+ * controlled via the `index` prop; feed the value reported by `onIndexChange`
+ * back into it to persist changes. While the width and height of the slider is
+ * inferred from its CSS rules, the width and height of the knob are set via
+ * props (`knobWidth` and `knobHeight`, respectively). The size of the knob does
+ * not impact the size of the slider. While dragging, the slider still emits a
+ * position change event, where the position is a decimal ranging between 0.0
+ * and 1.0, inclusive.
  *
  * @exports StepSlider.Knob Component for the knob.
  * @exports StepSlider.KnobContainer Component for the container of the knob.
@@ -34,18 +34,17 @@ export function StepSlider({
   className,
   ref,
   children,
-  index: externalIndex = 0,
+  index = 0,
   knobHeight = 30,
   knobPadding = 0,
   knobWidth = 30,
-  labelProvider,
   orientation = 'vertical',
   steps = _generateSteps(10),
   trackPadding = 0,
   isClipped = false,
   isInverted = false,
   isTrackInteractive = true,
-  shouldOnlyDispatchOnDragEnd = false,
+  formatLabel: labelProvider,
   onDragEnd,
   onDragStart,
   onIndexChange,
@@ -54,128 +53,186 @@ export function StepSlider({
 }: StepSlider.Props) {
   const bodyRef = useRef<HTMLDivElement>(null)
   const knobContainerRef = useRef<HTMLButtonElement>(null)
-  const rect = useRect(bodyRef)
-  const [index, setIndex] = useState(externalIndex)
+  const startTrackRef = useRef<HTMLDivElement>(null)
+  const endTrackRef = useRef<HTMLDivElement>(null)
+  const positionRef = useRef(_getPositionAt(index, steps))
+  const indexRef = useRef(index)
 
-  const mapDragValueToPosition = useCallback((value: number, dx: number, dy: number) => {
-    const truePosition = isInverted ? _inverted(value) : value
+  const bodyRect = useRect(bodyRef)
+
+  const [isDragging, setIsDragging] = useState(false)
+  const [isReleasing, setIsReleasing] = useState(false)
+
+  // The position the knob rests at for the controlled `index`. Used for the
+  // label, the at-start/at-end flags and as the drag accumulator's base.
+  const position = _getPositionAt(index, steps)
+
+  const withDraggedValue = useCallback((pos: number, dx: number, dy: number) => {
+    const vPos = _mapValuePositionToVisualPosition(pos, isInverted)
 
     switch (orientation) {
       case 'horizontal': {
-        const maxWidth = isClipped ? rect.width - knobWidth : rect.width
-        const trueNewPositionX = truePosition * maxWidth + dx
-        const trueNewPosition = _clamped(trueNewPositionX / maxWidth)
-        const normalizedPosition = isInverted ? _inverted(trueNewPosition) : trueNewPosition
+        const maxWidth = isClipped ? bodyRect.width - knobWidth : bodyRect.width
+        const newX = vPos * maxWidth + dx
+        const newVPos = _clamped(newX / maxWidth)
 
-        return normalizedPosition
+        return _mapVisualPositionToValuePosition(newVPos, isInverted)
       }
       case 'vertical': {
-        const maxHeight = isClipped ? rect.height - knobHeight : rect.height
-        const trueNewPositionY = truePosition * maxHeight + dy
-        const trueNewPosition = _clamped(trueNewPositionY / maxHeight)
-        const normalizedPosition = isInverted ? _inverted(trueNewPosition) : trueNewPosition
+        const maxHeight = isClipped ? bodyRect.height - knobHeight : bodyRect.height
+        const newY = vPos * maxHeight + dy
+        const newVPos = _clamped(newY / maxHeight)
 
-        return normalizedPosition
+        return _mapVisualPositionToValuePosition(newVPos, isInverted)
       }
       default:
         console.error(`[etudes::StepSlider] Invalid orientation: ${orientation}`)
 
         return NaN
     }
-  }, [rect.width, rect.height, isClipped, isInverted, knobWidth, knobHeight, orientation])
+  }, [bodyRect.width, bodyRect.height, isClipped, isInverted, knobWidth, knobHeight, orientation])
 
-  const { value: position, isDragging, isReleasing, setValue: setPosition } = useInertiaDragValue(knobContainerRef, {
-    initialValue: _getPositionAt(externalIndex, steps),
-    transform: mapDragValueToPosition,
-    onDragEnd,
-    onDragStart,
-  })
+  const applyPosition = useCallback((pos: number) => {
+    const vPos = _mapValuePositionToVisualPosition(pos, isInverted)
+    const knob = knobContainerRef.current
+    const startTrack = startTrackRef.current
+    const endTrack = endTrackRef.current
+    const computeTrackOffset = (size: number) => `${trackPadding <= 0 ? 0 : size * 0.5}px - ${trackPadding}px`
+
+    switch (orientation) {
+      case 'horizontal':
+        if (knob) knob.style.left = isClipped ? `calc(${vPos * 100}% + ${knobWidth * 0.5 - vPos * knobWidth}px)` : `${vPos * 100}%`
+        if (startTrack) startTrack.style.width = `calc(${vPos * 100}% - ${computeTrackOffset(knobWidth)})`
+        if (endTrack) endTrack.style.width = `calc(${(1 - vPos) * 100}% - ${computeTrackOffset(knobWidth)})`
+
+        break
+      case 'vertical':
+        if (knob) knob.style.top = isClipped ? `calc(${vPos * 100}% + ${knobHeight * 0.5 - vPos * knobHeight}px)` : `${vPos * 100}%`
+        if (startTrack) startTrack.style.height = `calc(${vPos * 100}% - ${computeTrackOffset(knobHeight)})`
+        if (endTrack) endTrack.style.height = `calc(${(1 - vPos) * 100}% - ${computeTrackOffset(knobHeight)})`
+
+        break
+      default:
+        break
+    }
+  }, [isClipped, isInverted, knobHeight, knobWidth, orientation, trackPadding])
+
+  const suppressTransitions = useCallback((suppressed: boolean) => {
+    const value = suppressed ? 'none' : ''
+
+    for (const el of [knobContainerRef.current, startTrackRef.current, endTrackRef.current]) {
+      if (el) el.style.transition = value
+    }
+  }, [])
 
   const trackClickHandler = useCallback((event: MouseEvent) => {
     if (!isTrackInteractive) return
 
     const vrect = Rect.fromViewport()
+    let newPos: number
 
     switch (orientation) {
       case 'horizontal': {
-        const trackPosition = (event.clientX + vrect.left - rect.left) / rect.width
-        const normalizedPosition = isInverted ? _inverted(trackPosition) : trackPosition
-        const nearestIndex = _getNearestIndexByPosition(normalizedPosition, steps)
-
-        if (nearestIndex === index) {
-          const newIndex = normalizedPosition > position ? nearestIndex + 1 : nearestIndex - 1
-          setIndex(_clamped(newIndex, steps.length - 1))
-        } else {
-          setIndex(nearestIndex)
-        }
-
+        const newVPos = (event.clientX + vrect.left - bodyRect.left) / bodyRect.width
+        newPos = _mapVisualPositionToValuePosition(newVPos, isInverted)
         break
       }
       case 'vertical': {
-        const trackPosition = (event.clientY + vrect.top - rect.top) / rect.height
-        const normalizedPosition = isInverted ? _inverted(trackPosition) : trackPosition
-        const nearestIndex = _getNearestIndexByPosition(normalizedPosition, steps)
-
-        if (nearestIndex === index) {
-          const newIndex = normalizedPosition > position ? nearestIndex + 1 : nearestIndex - 1
-          const newPosition = _getPositionAt(newIndex, steps)
-          setPosition(newPosition)
-          setIndex(_clamped(newIndex, steps.length - 1))
-        } else {
-          const newPosition = _getPositionAt(nearestIndex, steps)
-          setPosition(newPosition)
-          setIndex(nearestIndex)
-        }
+        const newVPos = (event.clientY + vrect.top - bodyRect.top) / bodyRect.height
+        newPos = _mapVisualPositionToValuePosition(newVPos, isInverted)
 
         break
       }
       default:
         console.error(`[etudes::StepSlider] Invalid orientation: ${orientation}`)
-    }
-  }, [rect.width, rect.left, rect.top, rect.height, index, position, isInverted, isTrackInteractive, orientation, createKey(steps)])
 
-  // Natural position is the position affecting internal components accounting
-  // for `isInverted`.
-  const naturalPosition = isInverted ? _inverted(position) : position
+        return
+    }
+
+    const nearestIndex = _getNearestIndexByPosition(newPos, steps)
+    const newIndex = nearestIndex === indexRef.current
+      ? _clamped(newPos > positionRef.current ? nearestIndex + 1 : nearestIndex - 1, steps.length - 1)
+      : nearestIndex
+    const hasChanged = newIndex !== indexRef.current
+
+    if (hasChanged) {
+      const newPosition = _getPositionAt(newIndex, steps)
+      indexRef.current = newIndex
+      positionRef.current = newPosition
+
+      applyPosition(newPosition)
+
+      onPositionChange?.(newPosition, false)
+      onIndexChange?.(newIndex, false)
+    }
+  }, [bodyRect.width, bodyRect.left, bodyRect.top, bodyRect.height, isInverted, isTrackInteractive, orientation, applyPosition, createKey(steps)])
+
+  useInertiaDrag(knobContainerRef, {
+    onDragEnd: () => {
+      suppressTransitions(false)
+
+      setIsDragging(false)
+      setIsReleasing(true)
+
+      const nearestIndex = _getNearestIndexByPosition(positionRef.current, steps)
+      const nearestPosition = _getPositionAt(nearestIndex, steps)
+      positionRef.current = nearestPosition
+      indexRef.current = nearestIndex
+
+      onPositionChange?.(nearestPosition, false)
+      onIndexChange?.(nearestIndex, false)
+      onDragEnd?.()
+    },
+    onDragMove: ({ x, y }) => {
+      const newPosition = withDraggedValue(positionRef.current, x, y)
+      const hasChanged = newPosition !== positionRef.current
+
+      if (hasChanged) {
+        positionRef.current = newPosition
+        applyPosition(newPosition)
+        onPositionChange?.(newPosition, true)
+
+        const nearestIndex = _getNearestIndexByPosition(newPosition, steps)
+
+        if (nearestIndex !== indexRef.current) {
+          indexRef.current = nearestIndex
+          onIndexChange?.(nearestIndex, true)
+        }
+      }
+
+      setIsDragging(true)
+      setIsReleasing(false)
+    },
+    onDragStart: () => {
+      suppressTransitions(true)
+
+      setIsDragging(true)
+      setIsReleasing(false)
+
+      onDragStart?.()
+    },
+  })
+
+  useLayoutEffect(() => {
+    if (isDragging) return
+
+    const target = _getPositionAt(index, steps)
+    indexRef.current = index
+    positionRef.current = target
+
+    applyPosition(target)
+  }, [index, isDragging, applyPosition, createKey(steps)])
+
   const isAtEnd = isInverted ? position === 0 : position === 1
   const isAtStart = isInverted ? position === 1 : position === 0
-  const fixedClassNames = _getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing })
-  const fixedStyles = _getFixedStyles({ knobHeight, knobPadding, knobWidth, naturalPosition, orientation, isClipped, isTrackInteractive })
+  const fixedClassNames = useMemo(() => _getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing }), [orientation, isAtEnd, isAtStart, isDragging, isReleasing])
+  const fixedStyles = useMemo(() => _getFixedStyles({ knobHeight, knobPadding, knobWidth, orientation, isTrackInteractive }), [knobHeight, knobPadding, knobWidth, orientation, isTrackInteractive])
   const components = asComponentDict(children, {
     knob: StepSlider.Knob,
     knobContainer: StepSlider.KnobContainer,
     label: StepSlider.Label,
     track: StepSlider.Track,
   })
-
-  useEffect(() => {
-    if (isDragging) return
-
-    setPosition(_getPositionAt(externalIndex, steps))
-    setIndex(externalIndex)
-  }, [externalIndex, isDragging, createKey(steps)])
-
-  useEffect(() => {
-    if (isDragging) {
-      if (shouldOnlyDispatchOnDragEnd) return
-
-      setIndex(_getNearestIndexByPosition(position, steps))
-    } else {
-      const nearestIndex = _getNearestIndexByPosition(position, steps)
-      const nearestPosition = _getPositionAt(nearestIndex, steps)
-
-      setPosition(nearestPosition)
-      setIndex(nearestIndex)
-    }
-  }, [position, isDragging, shouldOnlyDispatchOnDragEnd, createKey(steps)])
-
-  useEffect(() => {
-    onPositionChange?.(position, isDragging)
-  }, [position, isDragging])
-
-  useEffect(() => {
-    onIndexChange?.(index, isDragging)
-  }, [index, isDragging])
 
   return (
     <div
@@ -187,44 +244,44 @@ export function StepSlider({
     >
       <div ref={bodyRef} style={fixedStyles.body}>
         <Styled
-          className={clsx(isInverted ? 'end' : 'start', fixedClassNames.track)}
-          style={styles(fixedStyles.track, orientation === 'vertical' ? {
-            height: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
-            top: '0',
-          } : {
-            left: '0',
-            width: `calc(${naturalPosition * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
-          })}
+          className={fixedClassNames.track}
+          ref={startTrackRef}
+          style={styles(fixedStyles.track, orientation === 'vertical' ? { top: '0' } : { left: '0' })}
+          data-position={isInverted ? 'end' : 'start'}
           element={components.track ?? <StepSlider.Track/>}
           onClick={trackClickHandler}
         >
           <div style={fixedStyles.trackHitBox}/>
         </Styled>
         <Styled
-          className={clsx(isInverted ? 'start' : 'end', fixedClassNames.track)}
-          style={styles(fixedStyles.track, orientation === 'vertical' ? {
-            bottom: '0',
-            height: `calc(${(_inverted(naturalPosition)) * 100}% - ${trackPadding <= 0 ? 0 : knobHeight * 0.5}px - ${trackPadding}px)`,
-          } : {
-            right: '0',
-            width: `calc(${(_inverted(naturalPosition)) * 100}% - ${trackPadding <= 0 ? 0 : knobWidth * 0.5}px - ${trackPadding}px)`,
-          })}
+          className={fixedClassNames.track}
+          ref={endTrackRef}
+          style={styles(fixedStyles.track, orientation === 'vertical' ? { bottom: '0' } : { right: '0' })}
+          data-position={isInverted ? 'start' : 'end'}
           element={components.track ?? <StepSlider.Track/>}
           onClick={trackClickHandler}
         >
           <div style={fixedStyles.trackHitBox}/>
         </Styled>
         <Styled
-          className={clsx(fixedClassNames.knobContainer)}
+          className={fixedClassNames.knobContainer}
           ref={knobContainerRef}
           style={styles(fixedStyles.knobContainer)}
           element={components.knobContainer ?? <StepSlider.KnobContainer/>}
         >
-          <Styled className={clsx(fixedClassNames.knob)} style={styles(fixedStyles.knob)} element={components.knob ?? <StepSlider.Knob/>}>
+          <Styled
+            className={fixedClassNames.knob}
+            style={styles(fixedStyles.knob)}
+            element={components.knob ?? <StepSlider.Knob/>}
+          >
             <div style={fixedStyles.knobHitBox}/>
-            {steps && labelProvider && (
-              <Styled className={clsx(fixedClassNames.label)} style={styles(fixedStyles.label)} element={components.label ?? <StepSlider.Label/>}>
-                {labelProvider(position, _getNearestIndexByPosition(position, steps))}
+            {labelProvider && (
+              <Styled
+                className={fixedClassNames.label}
+                style={styles(fixedStyles.label)}
+                element={components.label ?? <StepSlider.Label/>}
+              >
+                {labelProvider(position, index)}
               </Styled>
             )}
           </Styled>
@@ -232,28 +289,6 @@ export function StepSlider({
       </div>
     </div>
   )
-}
-
-function _generateSteps(length: number): readonly number[] {
-  if (length <= 1) {
-    console.error('[etudes::StepSlider] `length` value must be greater than or equal to 2')
-
-    return []
-  }
-
-  if (Math.round(length) !== length) {
-    console.error('[etudes::StepSlider] `length` value must be an integer')
-
-    return []
-  }
-
-  const interval = 1 / (length - 1)
-
-  return Array(length).fill(null).map((_, i) => {
-    const position = interval * i
-
-    return position
-  })
 }
 
 export namespace StepSlider {
@@ -287,13 +322,6 @@ export namespace StepSlider {
      * Specifies if the track is clickable to set the position of the knob.
      */
     isTrackInteractive?: boolean
-
-    /**
-     * Indicates if position/index change events are dispatched only when dragging
-     * ends. When disabled, aforementioned events are fired repeatedly while
-     * dragging.
-     */
-    shouldOnlyDispatchOnDragEnd?: boolean
 
     /**
      * Padding between the track and the knob in pixels.
@@ -343,31 +371,7 @@ export namespace StepSlider {
      *
      * @returns The label.
      */
-    labelProvider?: (position: number, index: number) => string
-
-    /**
-     * Handler invoked when index changes. This can either be invoked from the
-     * `index` prop being changed or from the slider being dragged. Note that if
-     * the event is emitted at the end of dragging due to
-     * `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here
-     * is still `true`. This event is emitted right after `onPositionChange`.
-     *
-     * @param index The current slider index.
-     * @param isDragging Specifies if the index change is due to dragging.
-     */
-    onIndexChange?: (index: number, isDragging: boolean) => void
-
-    /**
-     * Handler invoked when position changes. This can either be invoked from
-     * the `index` prop being changed or from the slider being dragged. Note
-     * that if the event is emitted at the end of dragging due to
-     * `onlyDispatchesOnDragEnd` set to `true`, the `isDragging` parameter here
-     * is still `true`. This event is emitted right before `onIndexChange`.
-     *
-     * @param position The current slider position.
-     * @param isDragging Specifies if the position change is due to dragging.
-     */
-    onPositionChange?: (position: number, isDragging: boolean) => void
+    formatLabel?: (position: number, index: number) => string
 
     /**
      * Handler invoked when dragging ends.
@@ -378,6 +382,28 @@ export namespace StepSlider {
      * Handler invoked when dragging begins.
      */
     onDragStart?: () => void
+
+    /**
+     * Handler invoked when the nearest step index changes due to dragging or a
+     * track click. While dragging it is invoked with `isDragging` set to
+     * `true`; on release (after snapping) and on a track click it is invoked
+     * with `isDragging` set to `false`. Emitted right after `onPositionChange`.
+     *
+     * @param index The current slider index.
+     * @param isDragging Specifies if the change is from an in-progress drag.
+     */
+    onIndexChange?: (index: number, isDragging: boolean) => void
+
+    /**
+     * Handler invoked when the continuous position changes due to dragging or a
+     * track click. While dragging it is invoked with `isDragging` set to
+     * `true`; on release (after snapping) and on a track click it is invoked
+     * with `isDragging` set to `false`. Emitted right before `onIndexChange`.
+     *
+     * @param position The current slider position.
+     * @param isDragging Specifies if the change is from an in-progress drag.
+     */
+    onPositionChange?: (position: number, isDragging: boolean) => void
   } & Omit<HTMLAttributes<HTMLDivElement>, 'aria-valuenow' | 'onChange' | 'role'>
 
   /**
@@ -419,6 +445,28 @@ export namespace StepSlider {
   export const generateSteps = _generateSteps
 }
 
+function _generateSteps(length: number): readonly number[] {
+  if (length <= 1) {
+    console.error('[etudes::StepSlider] `length` value must be greater than or equal to 2')
+
+    return []
+  }
+
+  if (Math.round(length) !== length) {
+    console.error('[etudes::StepSlider] `length` value must be an integer')
+
+    return []
+  }
+
+  const interval = 1 / (length - 1)
+
+  return Array(length).fill(null).map((_, i) => {
+    const position = interval * i
+
+    return position
+  })
+}
+
 function _getNearestIndexByPosition(position: number, steps: readonly number[]): number {
   let index = -1
   let minDelta = NaN
@@ -443,6 +491,18 @@ function _getPositionAt(index: number, steps: readonly number[]): number {
   if (index >= steps.length) return NaN
 
   return steps[index]
+}
+
+function _mapVisualPositionToValuePosition(vPos: number, isInverted: boolean): number {
+  return isInverted ? 1 - vPos : vPos
+}
+
+function _mapValuePositionToVisualPosition(pos: number, isInverted: boolean): number {
+  return isInverted ? 1 - pos : pos
+}
+
+function _clamped(value: number, max: number = 1, min: number = 0): number {
+  return Math.max(min, Math.min(max, value))
 }
 
 function _getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtStart = false, isDragging = false, isReleasing = false }) {
@@ -480,7 +540,7 @@ function _getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtSt
   })
 }
 
-function _getFixedStyles({ knobHeight = 0, knobPadding = 0, knobWidth = 0, naturalPosition = 0, orientation = 'vertical', isClipped = false, isTrackInteractive = false }) {
+function _getFixedStyles({ knobHeight = 0, knobPadding = 0, knobWidth = 0, orientation = 'vertical', isTrackInteractive = false }) {
   return asStyleDict({
     body: {
       height: '100%',
@@ -498,13 +558,7 @@ function _getFixedStyles({ knobHeight = 0, knobPadding = 0, knobWidth = 0, natur
       position: 'absolute',
       transform: 'translate3d(-50%, -50%, 0)',
       zIndex: '1',
-      ...orientation === 'vertical' ? {
-        left: '50%',
-        top: isClipped ? `calc(${naturalPosition * 100}% + ${knobHeight * 0.5 - naturalPosition * knobHeight}px)` : `${naturalPosition * 100}%`,
-      } : {
-        left: isClipped ? `calc(${naturalPosition * 100}% + ${knobWidth * 0.5 - naturalPosition * knobWidth}px)` : `${naturalPosition * 100}%`,
-        top: '50%',
-      },
+      ...orientation === 'vertical' ? { left: '50%' } : { top: '50%' },
     },
     knobHitBox: {
       background: 'none',
@@ -544,14 +598,6 @@ function _getFixedStyles({ knobHeight = 0, knobPadding = 0, knobWidth = 0, natur
       width: '100%',
     },
   })
-}
-
-function _inverted(value: number): number {
-  return 1 - value
-}
-
-function _clamped(value: number, max: number = 1, min: number = 0): number {
-  return Math.max(min, Math.min(max, value))
 }
 
 if (process.env.NODE_ENV === 'development') {
