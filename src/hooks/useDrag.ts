@@ -70,6 +70,7 @@ export function useDrag(
   const dragStartHandlerRef = useLatest(onDragStart)
   const dragMoveHandlerRef = useLatest(onDragMove)
   const dragEndHandlerRef = useLatest(onDragEnd)
+  const element = target && 'current' in target ? target.current : target
 
   const mouseMoveListener = useCallback((event: MouseEvent) => {
     if (!startPositionRef.current) return
@@ -83,7 +84,6 @@ export function useDrag(
   }, [])
 
   const mouseUpListener = useCallback((event: MouseEvent) => {
-    const element = target && 'current' in target ? target.current : target
     if (!element || !startPositionRef.current) return
 
     const position = Point.make(event.clientX, event.clientY)
@@ -99,10 +99,9 @@ export function useDrag(
     element.removeEventListener('mouseleave', mouseUpListener)
 
     if (shouldUpdateCursor) element.style.cursor = 'grab'
-  }, [target, shouldUpdateCursor, mouseMoveListener])
+  }, [element, shouldUpdateCursor, mouseMoveListener])
 
   const mouseDownListener = useCallback((event: MouseEvent) => {
-    const element = target && 'current' in target ? target.current : target
     if (!element) return
 
     event.preventDefault()
@@ -119,10 +118,9 @@ export function useDrag(
     if (shouldUpdateCursor) element.style.cursor = 'grabbing'
 
     dragStartHandlerRef.current?.(position)
-  }, [target, shouldUpdateCursor, mouseMoveListener, mouseUpListener])
+  }, [element, shouldUpdateCursor, mouseMoveListener, mouseUpListener])
 
   useLayoutEffect(() => {
-    const element = target && 'current' in target ? target.current : target
     if (!element || !isEnabled || !shouldUpdateCursor) return
 
     const defaultCursor = element.style.cursor
@@ -131,10 +129,9 @@ export function useDrag(
     return () => {
       element.style.cursor = defaultCursor
     }
-  }, [target, isEnabled, shouldUpdateCursor])
+  }, [element, isEnabled, shouldUpdateCursor])
 
   useLayoutEffect(() => {
-    const element = target && 'current' in target ? target.current : target
     if (!element || !isEnabled) return
 
     element.addEventListener('mousedown', mouseDownListener)
@@ -145,5 +142,5 @@ export function useDrag(
       element.removeEventListener('mouseup', mouseUpListener, { capture: true })
       element.removeEventListener('mouseleave', mouseUpListener)
     }
-  }, [target, isEnabled, mouseMoveListener, mouseUpListener, mouseDownListener])
+  }, [element, isEnabled, mouseMoveListener, mouseUpListener, mouseDownListener])
 }

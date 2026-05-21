@@ -64,17 +64,20 @@ export function useInertiaDrag(
   const dragStartHandlerRef = useLatest(onDragStart)
   const dragMoveHandlerRef = useLatest(onDragMove)
   const dragEndHandlerRef = useLatest(onDragEnd)
+  const element = target && 'current' in target ? target.current : target
 
   useLayoutEffect(() => {
     if (!isEnabled) return
-
-    const element = target && 'current' in target ? target.current : target
     if (!element) return
+
+    let isDragging = false
 
     const interactable = interact(element).draggable({
       inertia: true,
       ...options,
       onend: ({ client, clientX0, clientY0 }) => {
+        isDragging = false
+
         const startPosition = Point.make(clientX0, clientY0)
         const endPosition = Point.make(client)
 
@@ -88,6 +91,8 @@ export function useInertiaDrag(
         dragMoveHandlerRef.current?.(displacement, currentPosition, startPosition)
       },
       onstart: ({ client }) => {
+        isDragging = true
+
         const startPosition = Point.make(client)
 
         dragStartHandlerRef.current?.(startPosition)
@@ -97,7 +102,9 @@ export function useInertiaDrag(
     return () => {
       interactable.unset()
 
-      dragEndHandlerRef.current?.(Point.zero, Point.zero)
+      if (isDragging) {
+        dragEndHandlerRef.current?.(Point.zero, Point.zero)
+      }
     }
-  }, [target, isEnabled, createKey(options)])
+  }, [element, isEnabled, createKey(options)])
 }

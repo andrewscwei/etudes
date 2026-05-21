@@ -13,9 +13,9 @@ export function useSizeObserver(
   handler: (element: HTMLElement) => void,
 ) {
   const handlerRef = useLatest(handler)
+  const element = target && 'current' in target ? target.current : target
 
   useLayoutEffect(() => {
-    const element = target && 'current' in target ? target.current : target
     if (!element) return
 
     const observer = new ResizeObserver(() => {
@@ -27,5 +27,5 @@ export function useSizeObserver(
     return () => {
       observer.disconnect()
     }
-  }, [target])
+  }, [element])
 }

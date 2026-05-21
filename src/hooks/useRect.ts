@@ -16,6 +16,7 @@ import { useViewportSize } from './useViewportSize.js'
 export function useRect(target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined): Rect.Rect {
   const [rect, setRect] = useState<Rect.Rect>(Rect.zero)
   const viewportSize = useViewportSize()
+  const element = target && 'current' in target ? target.current : target
 
   useSizeObserver(target, el => {
     const newRect = Rect.from(el)
@@ -30,13 +31,12 @@ export function useRect(target: HTMLElement | null | RefObject<HTMLElement> | Re
   })
 
   useLayoutEffect(() => {
-    const element = target && 'current' in target ? target.current : target
     if (!element) return
 
     const newRect = Rect.from(element)
 
     setRect(prev => Rect.isEqual(prev, newRect) ? prev : newRect)
-  }, [target, viewportSize])
+  }, [element, viewportSize])
 
   return rect
 }
