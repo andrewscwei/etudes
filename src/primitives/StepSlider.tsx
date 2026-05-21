@@ -69,6 +69,8 @@ export function StepSlider({
     switch (orientation) {
       case 'horizontal': {
         const maxWidth = isClipped ? bodyRect.width - knobWidth : bodyRect.width
+        if (maxWidth <= 0) return pos
+
         const newX = vPos * maxWidth + dx
         const newVPos = _clamped(newX / maxWidth)
 
@@ -76,6 +78,8 @@ export function StepSlider({
       }
       case 'vertical': {
         const maxHeight = isClipped ? bodyRect.height - knobHeight : bodyRect.height
+        if (maxHeight <= 0) return pos
+
         const newY = vPos * maxHeight + dy
         const newVPos = _clamped(newY / maxHeight)
 
@@ -129,11 +133,15 @@ export function StepSlider({
 
     switch (orientation) {
       case 'horizontal': {
+        if (bodyRect.width <= 0) return
+
         const newVPos = (event.clientX + vrect.left - bodyRect.left) / bodyRect.width
         newPos = _mapVisualPositionToValuePosition(newVPos, isInverted)
         break
       }
       case 'vertical': {
+        if (bodyRect.height <= 0) return
+
         const newVPos = (event.clientY + vrect.top - bodyRect.top) / bodyRect.height
         newPos = _mapVisualPositionToValuePosition(newVPos, isInverted)
 
@@ -239,7 +247,11 @@ export function StepSlider({
       aria-valuenow={index}
       role='slider'
     >
-      <div ref={bodyRef} style={fixedStyles.body}>
+      <div
+        key={orientation}
+        ref={bodyRef}
+        style={fixedStyles.body}
+      >
         <Styled
           className={fixedClassNames.track}
           ref={startTrackRef}
