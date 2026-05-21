@@ -35,8 +35,8 @@ export function Panorama({
   const isDraggingRef = useRef(false)
   const displacementRef = useRef(0)
 
-  const mapDragPositionToDisplacement = useCallback((pos: number, dx: number): number => {
-    return pos - dx * speed
+  const withDraggedValue = useCallback((displacement: number, dx: number): number => {
+    return displacement - dx * speed
   }, [speed])
 
   const applyDisplacement = useCallback((value: number) => {
@@ -66,7 +66,7 @@ export function Panorama({
     onDragMove: ({ x }) => {
       if (!imageSize) return
 
-      const newDisplacement = mapDragPositionToDisplacement(displacementRef.current, x)
+      const newDisplacement = withDraggedValue(displacementRef.current, x)
       const newAngle = _mapDisplacementToAngle(newDisplacement, imageSize, bodySize, zeroAnchor)
       const newPosition = _mapAngleToPosition(newAngle)
 
