@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { styles } from './styles.js'
+import { styles } from '../styles.js'
 
 describe('styles', () => {
   it('returns an empty object with no arguments', () => {

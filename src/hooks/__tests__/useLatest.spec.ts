@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { useLatest } from './useLatest.js'
+import { useLatest } from '../useLatest.js'
 
 describe('useLatest', () => {
   it('returns a ref containing the initial value', () => {

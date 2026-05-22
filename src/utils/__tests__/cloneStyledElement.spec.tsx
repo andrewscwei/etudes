@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { cloneStyledElement } from './cloneStyledElement.js'
+import { cloneStyledElement } from '../cloneStyledElement.js'
 
 describe('cloneStyledElement', () => {
   it('merges classNames from both element and props', () => {

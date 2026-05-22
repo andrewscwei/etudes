@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createKey } from './createKey.js'
+import { createKey } from '../createKey.js'
 
 describe('createKey', () => {
   it('returns empty string for null', () => {

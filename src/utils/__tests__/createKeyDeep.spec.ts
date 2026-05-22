@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createKeyDeep } from './createKeyDeep.js'
+import { createKeyDeep } from '../createKeyDeep.js'
 
 describe('createKeyDeep', () => {
   it('returns empty string for null and undefined', () => {

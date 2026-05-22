@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useTimeout } from './useTimeout.js'
+import { useTimeout } from '../useTimeout.js'
 
 describe('useTimeout', () => {
   beforeEach(() => {

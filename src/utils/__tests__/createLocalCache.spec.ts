@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createSessionCache } from './createSessionCache.js'
+import { createLocalCache } from '../createLocalCache.js'
 
-describe('createSessionCache', () => {
+describe('createLocalCache', () => {
   beforeEach(() => {
-    sessionStorage.clear()
+    localStorage.clear()
     vi.useFakeTimers()
   })
 
@@ -13,44 +13,52 @@ describe('createSessionCache', () => {
   })
 
   it('returns undefined for a missing key', () => {
-    const cache = createSessionCache()
+    const cache = createLocalCache()
     expect(cache.get('missing')).toBeUndefined()
   })
 
   it('stores and retrieves a value', () => {
-    const cache = createSessionCache()
+    const cache = createLocalCache()
     cache.set('hello', 'key')
     expect(cache.get('key')).toBe('hello')
   })
 
   it('returns the set value', () => {
-    const cache = createSessionCache()
-    expect(cache.set(42, 'num')).toBe(42)
+    const cache = createLocalCache()
+    const result = cache.set(42, 'num')
+    expect(result).toBe(42)
+  })
+
+  it('stores complex values', () => {
+    const cache = createLocalCache()
+    const obj = { a: 1, b: [2, 3] }
+    cache.set(obj, 'obj')
+    expect(cache.get('obj')).toEqual(obj)
   })
 
   it('invalidates a key', () => {
-    const cache = createSessionCache()
+    const cache = createLocalCache()
     cache.set('value', 'key')
     cache.invalidate('key')
     expect(cache.get('key')).toBeUndefined()
   })
 
   it('returns undefined for an expired entry', () => {
-    const cache = createSessionCache({ defaultTTL: 10 })
+    const cache = createLocalCache({ defaultTTL: 10 })
     cache.set('value', 'key')
     vi.advanceTimersByTime(11_000)
     expect(cache.get('key')).toBeUndefined()
   })
 
   it('returns value for a non-expired entry', () => {
-    const cache = createSessionCache({ defaultTTL: 10 })
+    const cache = createLocalCache({ defaultTTL: 10 })
     cache.set('value', 'key')
     vi.advanceTimersByTime(9_000)
     expect(cache.get('key')).toBe('value')
   })
 
   it('respects a per-entry TTL override', () => {
-    const cache = createSessionCache({ defaultTTL: 60 })
+    const cache = createLocalCache({ defaultTTL: 60 })
     cache.set('value', 'key', 5)
     vi.advanceTimersByTime(6_000)
     expect(cache.get('key')).toBeUndefined()

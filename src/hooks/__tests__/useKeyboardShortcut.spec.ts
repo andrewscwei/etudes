@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { useKeyboardShortcut } from './useKeyboardShortcut.js'
+import { useKeyboardShortcut } from '../useKeyboardShortcut.js'
 
 function pressKey(key: string, modifiers: { altKey?: boolean; ctrlKey?: boolean; metaKey?: boolean; shiftKey?: boolean } = {}) {
   window.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...modifiers }))
