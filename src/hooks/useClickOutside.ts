@@ -63,5 +63,5 @@ export function useClickOutside(
       window.removeEventListener('pointerdown', pointerDownListener, true)
       window.removeEventListener('click', clickListener, true)
     }
-  }, [isEnabled])
+  }, [...([] as Target[]).concat(target).map(t => t && 'current' in t ? t.current : undefined), isEnabled])
 }

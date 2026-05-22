@@ -64,10 +64,11 @@ export function useInertiaDrag(
   const dragStartHandlerRef = useLatest(onDragStart)
   const dragMoveHandlerRef = useLatest(onDragMove)
   const dragEndHandlerRef = useLatest(onDragEnd)
-  const element = target && 'current' in target ? target.current : target
 
   useLayoutEffect(() => {
     if (!isEnabled) return
+
+    const element = target && 'current' in target ? target.current : target
     if (!element) return
 
     let isDragging = false
@@ -106,5 +107,5 @@ export function useInertiaDrag(
         dragEndHandlerRef.current?.(Point.zero, Point.zero)
       }
     }
-  }, [element, isEnabled, createKey(options)])
+  }, [(target && ('current' in target)) ? target.current : target, isEnabled, createKey(options)])
 }

@@ -24,17 +24,18 @@ export function useMouseEnter(
   }: Options = {},
 ) {
   const handlerRef = useLatest(handler)
-  const element = target && 'current' in target ? target.current : target
 
   useLayoutEffect(() => {
     if (!isEnabled) return
+
+    const element = target && 'current' in target ? target.current : target
     if (!element) return
 
     const listener = (event: MouseEvent) => {
       const viewport = Rect.fromViewport()
       const point = Point.make([event.x + viewport.left, event.y + viewport.top])
 
-      if (hitTest(point, element)) {
+      if (element && hitTest(point, element)) {
         handlerRef.current()
       }
     }
@@ -44,5 +45,5 @@ export function useMouseEnter(
     return () => {
       window.removeEventListener('mousemove', listener)
     }
-  }, [isEnabled, element])
+  }, [target && 'current' in target ? target.current : target, isEnabled])
 }
