@@ -1,11 +1,8 @@
-import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react'
-import { type HTMLAttributes, type Ref, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { Rect } from 'spase'
+import { type HTMLAttributes, type Ref, type RefObject, useCallback, useLayoutEffect, useMemo, useRef } from 'react'
 
 import { useInertiaDrag } from '../hooks/useInertiaDrag.js'
-import { useRect } from '../hooks/useRect.js'
-import { asClassNameDict } from '../utils/asClassNameDict.js'
+import { useSize } from '../hooks/useSize.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
@@ -21,7 +18,6 @@ import { styles } from '../utils/styles.js'
  * @exports RangeSlider.TrackHighlight Component for the track highlight.
  */
 export function RangeSlider({
-  className,
   ref,
   children,
   knobHeight = 28,
@@ -39,21 +35,19 @@ export function RangeSlider({
   onDragStart,
   ...props
 }: RangeSlider.Props) {
+  const rootRef = ref as RefObject<HTMLDivElement> ?? useRef<HTMLDivElement>(null)
   const bodyRef = useRef<HTMLDivElement>(null)
   const startKnobContainerRef = useRef<HTMLDivElement>(null)
   const endKnobContainerRef = useRef<HTMLDivElement>(null)
   const trackHighlightRef = useRef<HTMLDivElement>(null)
+  const isDraggingStartKnobRef = useRef(false)
+  const isDraggingEndKnobRef = useRef(false)
 
   const [startValue, endValue] = range
   const startValueRef = useRef(startValue)
   const endValueRef = useRef(endValue)
 
-  const bodyRect = useRect(bodyRef)
-
-  const [isDraggingStartKnob, setIsDraggingStartKnob] = useState(false)
-  const [isReleasingStartKnob, setIsReleasingStartKnob] = useState(false)
-  const [isDraggingEndKnob, setIsDraggingEndKnob] = useState(false)
-  const [isReleasingEndKnob, setIsReleasingEndKnob] = useState(false)
+  const bodySize = useSize(bodyRef)
 
   const breakpoints = useMemo(() => _createBreakpoints(minValue, maxValue, steps), [minValue, maxValue, steps])
   const components = asComponentDict(children, {
@@ -66,25 +60,25 @@ export function RangeSlider({
 
   const withDraggedStartValue = useCallback((value: number, dx: number, dy: number) => {
     const delta = orientation === 'horizontal' ? dx : dy
-    const dMin = _getDisplacementByValue(minValue, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
-    const dMax = _getDisplacementByValue(endValueRef.current, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
-    const dCurr = _getDisplacementByValue(value, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped) + delta
+    const dMin = _getDisplacementByValue(minValue, minValue, maxValue, orientation, bodySize.width, bodySize.height, knobWidth, knobHeight, isClipped)
+    const dMax = _getDisplacementByValue(endValueRef.current, minValue, maxValue, orientation, bodySize.width, bodySize.height, knobWidth, knobHeight, isClipped)
+    const dCurr = _getDisplacementByValue(value, minValue, maxValue, orientation, bodySize.width, bodySize.height, knobWidth, knobHeight, isClipped) + delta
 
-    return _getValueByDisplacement(Math.max(dMin, Math.min(dMax, dCurr)), minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
-  }, [knobWidth, knobHeight, isClipped, minValue, maxValue, orientation, Rect.toString(bodyRect)])
+    return _getValueByDisplacement(_clamped(dCurr, dMax, dMin), minValue, maxValue, orientation, bodySize.width, bodySize.height, knobWidth, knobHeight, isClipped)
+  }, [knobWidth, knobHeight, isClipped, minValue, maxValue, orientation, bodySize.width, bodySize.height])
 
   const withDraggedEndValue = useCallback((value: number, dx: number, dy: number) => {
     const delta = orientation === 'horizontal' ? dx : dy
-    const dMin = _getDisplacementByValue(startValueRef.current, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
-    const dMax = _getDisplacementByValue(maxValue, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
-    const dCurr = _getDisplacementByValue(value, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped) + delta
+    const dMin = _getDisplacementByValue(startValueRef.current, minValue, maxValue, orientation, bodySize.width, bodySize.height, knobWidth, knobHeight, isClipped)
+    const dMax = _getDisplacementByValue(maxValue, minValue, maxValue, orientation, bodySize.width, bodySize.height, knobWidth, knobHeight, isClipped)
+    const dCurr = _getDisplacementByValue(value, minValue, maxValue, orientation, bodySize.width, bodySize.height, knobWidth, knobHeight, isClipped) + delta
 
-    return _getValueByDisplacement(Math.max(dMin, Math.min(dMax, dCurr)), minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
-  }, [knobWidth, knobHeight, isClipped, minValue, maxValue, orientation, Rect.toString(bodyRect)])
+    return _getValueByDisplacement(_clamped(dCurr, dMax, dMin), minValue, maxValue, orientation, bodySize.width, bodySize.height, knobWidth, knobHeight, isClipped)
+  }, [knobWidth, knobHeight, isClipped, minValue, maxValue, orientation, bodySize.width, bodySize.height])
 
   const applyKnobs = useCallback(() => {
-    const startDisplacement = _getDisplacementByValue(startValueRef.current, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
-    const endDisplacement = _getDisplacementByValue(endValueRef.current, minValue, maxValue, orientation, bodyRect, knobWidth, knobHeight, isClipped)
+    const startDisplacement = _getDisplacementByValue(startValueRef.current, minValue, maxValue, orientation, bodySize.width, bodySize.height, knobWidth, knobHeight, isClipped)
+    const endDisplacement = _getDisplacementByValue(endValueRef.current, minValue, maxValue, orientation, bodySize.width, bodySize.height, knobWidth, knobHeight, isClipped)
     const startKnob = startKnobContainerRef.current
     const endKnob = endKnobContainerRef.current
     const trackHighlight = trackHighlightRef.current
@@ -104,7 +98,7 @@ export function RangeSlider({
         trackHighlight.style.height = `${endDisplacement - startDisplacement}px`
       }
     }
-  }, [isClipped, knobHeight, knobWidth, maxValue, minValue, orientation, Rect.toString(bodyRect)])
+  }, [isClipped, knobHeight, knobWidth, maxValue, minValue, orientation, bodySize.width, bodySize.height])
 
   const suppressTransitions = useCallback((knob: HTMLElement | null, suppressed: boolean) => {
     const value = suppressed ? 'none' : ''
@@ -121,8 +115,10 @@ export function RangeSlider({
       const snapped = breakpoints ? _getClosestSteppedValue(startValueRef.current, breakpoints) : startValueRef.current
       startValueRef.current = snapped
 
-      setIsDraggingStartKnob(false)
-      setIsReleasingStartKnob(true)
+      isDraggingStartKnobRef.current = false
+      rootRef.current?.classList.remove('dragging')
+      startKnobContainerRef.current?.classList.remove('dragging')
+      endKnobContainerRef.current?.classList.remove('dragging')
 
       onChange?.([snapped, endValueRef.current], false)
       onDragEnd?.()
@@ -137,14 +133,18 @@ export function RangeSlider({
         onChange?.([newValue, endValueRef.current], true)
       }
 
-      setIsDraggingStartKnob(true)
-      setIsReleasingStartKnob(false)
+      isDraggingStartKnobRef.current = true
+      rootRef.current?.classList.add('dragging')
+      startKnobContainerRef.current?.classList.add('dragging')
+      endKnobContainerRef.current?.classList.remove('dragging')
     },
     onDragStart: () => {
       suppressTransitions(startKnobContainerRef.current, true)
 
-      setIsDraggingStartKnob(true)
-      setIsReleasingStartKnob(false)
+      isDraggingStartKnobRef.current = true
+      rootRef.current?.classList.add('dragging')
+      startKnobContainerRef.current?.classList.add('dragging')
+      endKnobContainerRef.current?.classList.remove('dragging')
 
       onDragStart?.()
     },
@@ -157,8 +157,10 @@ export function RangeSlider({
       const snapped = breakpoints ? _getClosestSteppedValue(endValueRef.current, breakpoints) : endValueRef.current
       endValueRef.current = snapped
 
-      setIsDraggingEndKnob(false)
-      setIsReleasingEndKnob(true)
+      isDraggingEndKnobRef.current = false
+      rootRef.current?.classList.remove('dragging')
+      startKnobContainerRef.current?.classList.remove('dragging')
+      endKnobContainerRef.current?.classList.remove('dragging')
 
       onChange?.([startValueRef.current, snapped], false)
       onDragEnd?.()
@@ -173,41 +175,48 @@ export function RangeSlider({
         onChange?.([startValueRef.current, newValue], true)
       }
 
-      setIsDraggingEndKnob(true)
-      setIsReleasingEndKnob(false)
+      isDraggingEndKnobRef.current = true
+      rootRef.current?.classList.add('dragging')
+      startKnobContainerRef.current?.classList.remove('dragging')
+      endKnobContainerRef.current?.classList.add('dragging')
     },
     onDragStart: () => {
       suppressTransitions(endKnobContainerRef.current, true)
 
-      setIsDraggingEndKnob(true)
-      setIsReleasingEndKnob(false)
+      isDraggingEndKnobRef.current = true
+      rootRef.current?.classList.add('dragging')
+      startKnobContainerRef.current?.classList.remove('dragging')
+      endKnobContainerRef.current?.classList.add('dragging')
 
       onDragStart?.()
     },
   })
 
   useLayoutEffect(() => {
-    if (isDraggingStartKnob || isDraggingEndKnob) return
+    if (isDraggingStartKnobRef.current || isDraggingEndKnobRef.current) return
 
     startValueRef.current = startValue
     endValueRef.current = endValue
 
     applyKnobs()
-  }, [startValue, endValue, isDraggingStartKnob, isDraggingEndKnob, applyKnobs])
+  }, [startValue, endValue, applyKnobs])
 
-  const fixedClassNames = useMemo(() => _getFixedClassNames({ isDraggingEndKnob, isDraggingStartKnob, isReleasingEndKnob, isReleasingStartKnob }), [isDraggingEndKnob, isDraggingStartKnob, isReleasingEndKnob, isReleasingStartKnob])
   const fixedStyles = useMemo(() => _getFixedStyles({ knobHeight, knobPadding, knobWidth, orientation }), [knobHeight, knobPadding, knobWidth, orientation])
 
   return (
     <div
       {...props}
-      className={clsx(className, orientation)}
-      ref={ref}
+      ref={rootRef}
+      aria-orientation={orientation}
       aria-valuemax={maxValue}
       aria-valuemin={minValue}
+      data-orientation={orientation}
       role='slider'
     >
-      <div ref={bodyRef} style={fixedStyles.body}>
+      <div
+        ref={bodyRef}
+        style={fixedStyles.body}
+      >
         <Styled
           style={styles(fixedStyles.track)}
           element={components.track ?? <RangeSlider.Track/>}
@@ -218,7 +227,6 @@ export function RangeSlider({
           element={components.trackHighlight ?? <RangeSlider.TrackHighlight/>}
         />
         <Styled
-          className={fixedClassNames.startKnobContainer}
           ref={startKnobContainerRef}
           style={styles(fixedStyles.knobContainer, {
             pointerEvents: isDeepEqual([startValue, endValue], [minValue, minValue]) ? 'none' : 'auto',
@@ -231,14 +239,12 @@ export function RangeSlider({
           element={components.knobContainer ?? <RangeSlider.KnobContainer/>}
         >
           <Styled
-            className={fixedClassNames.startKnob}
             style={styles(fixedStyles.knob)}
             element={components.knob ?? <RangeSlider.Knob/>}
           >
             <div style={fixedStyles.knobHitBox}/>
             {components.label && formatLabel && (
               <Styled
-                className={fixedClassNames.startLabel}
                 style={styles(fixedStyles.label)}
                 element={components.label ?? <RangeSlider.Label/>}
               >
@@ -248,7 +254,6 @@ export function RangeSlider({
           </Styled>
         </Styled>
         <Styled
-          className={fixedClassNames.endKnobContainer}
           ref={endKnobContainerRef}
           style={styles(fixedStyles.knobContainer, {
             pointerEvents: isDeepEqual([startValue, endValue], [maxValue, maxValue]) ? 'none' : 'auto',
@@ -261,14 +266,12 @@ export function RangeSlider({
           element={components.knobContainer ?? <RangeSlider.KnobContainer/>}
         >
           <Styled
-            className={fixedClassNames.endKnob}
             style={styles(fixedStyles.knob)}
             element={components.knob ?? <RangeSlider.Knob/>}
           >
             <div style={fixedStyles.knobHitBox}/>
             {components.label && formatLabel && (
               <Styled
-                className={fixedClassNames.endLabel}
                 style={styles(fixedStyles.label)}
                 element={components.label ?? <RangeSlider.Label/>}
               >
@@ -420,35 +423,6 @@ export namespace RangeSlider {
   )
 }
 
-function _getFixedClassNames({ isDraggingEndKnob = false, isDraggingStartKnob = false, isReleasingEndKnob = false, isReleasingStartKnob = false }) {
-  return asClassNameDict({
-    endKnob: clsx({
-      dragging: isDraggingEndKnob,
-      releasing: isReleasingEndKnob,
-    }),
-    endKnobContainer: clsx({
-      dragging: isDraggingEndKnob,
-      releasing: isReleasingEndKnob,
-    }),
-    endLabel: clsx({
-      dragging: isDraggingEndKnob,
-      releasing: isReleasingEndKnob,
-    }),
-    startKnob: clsx({
-      dragging: isDraggingStartKnob,
-      releasing: isReleasingStartKnob,
-    }),
-    startKnobContainer: clsx({
-      dragging: isDraggingStartKnob,
-      releasing: isReleasingStartKnob,
-    }),
-    startLabel: clsx({
-      dragging: isDraggingStartKnob,
-      releasing: isReleasingStartKnob,
-    }),
-  })
-}
-
 function _getFixedStyles({ knobHeight = 0, knobPadding = 0, knobWidth = 0, orientation = 'horizontal' }) {
   return asStyleDict({
     body: {
@@ -503,16 +477,16 @@ function _getPositionByValue(value: number, min: number, max: number) {
   return (value - min) / (max - min)
 }
 
-function _getPositionByDisplacement(displacement: number, orientation: RangeSlider.Orientation, rect: Rect.Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
+function _getPositionByDisplacement(displacement: number, orientation: RangeSlider.Orientation, bodyWidth: number, bodyHeight: number, knobWidth: number, knobHeight: number, isClipped: boolean) {
   switch (orientation) {
     case 'horizontal': {
-      const maxWidth = isClipped ? rect.width - knobWidth : rect.width
+      const maxWidth = isClipped ? bodyWidth - knobWidth : bodyWidth
       if (maxWidth <= 0) return 0
 
       return (displacement - (isClipped ? knobWidth * 0.5 : 0)) / maxWidth
     }
     case 'vertical': {
-      const maxHeight = isClipped ? rect.height - knobHeight : rect.height
+      const maxHeight = isClipped ? bodyHeight - knobHeight : bodyHeight
       if (maxHeight <= 0) return 0
 
       return (displacement - (isClipped ? knobHeight * 0.5 : 0)) / maxHeight
@@ -528,20 +502,22 @@ function _getValueByPosition(position: number, min: number, max: number) {
   return position * (max - min) + min
 }
 
-function _getValueByDisplacement(displacement: number, min: number, max: number, orientation: RangeSlider.Orientation, rect: Rect.Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
-  const position = _getPositionByDisplacement(displacement, orientation, rect, knobWidth, knobHeight, isClipped)
+function _getValueByDisplacement(displacement: number, min: number, max: number, orientation: RangeSlider.Orientation, bodyWidth: number, bodyHeight: number, knobWidth: number, knobHeight: number, isClipped: boolean) {
+  const position = _getPositionByDisplacement(displacement, orientation, bodyWidth, bodyHeight, knobWidth, knobHeight, isClipped)
 
   return _getValueByPosition(position, min, max)
 }
 
-function _getDisplacementByPosition(position: number, orientation: RangeSlider.Orientation, rect: Rect.Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
+function _getDisplacementByPosition(position: number, orientation: RangeSlider.Orientation, bodyWidth: number, bodyHeight: number, knobWidth: number, knobHeight: number, isClipped: boolean) {
   switch (orientation) {
     case 'horizontal': {
-      const maxWidth = isClipped ? rect.width - knobWidth : rect.width
+      const maxWidth = isClipped ? bodyWidth - knobWidth : bodyWidth
+
       return position * maxWidth + (isClipped ? knobWidth * 0.5 : 0)
     }
     case 'vertical': {
-      const maxHeight = isClipped ? rect.height - knobHeight : rect.height
+      const maxHeight = isClipped ? bodyHeight - knobHeight : bodyHeight
+
       return position * maxHeight + (isClipped ? knobHeight * 0.5 : 0)
     }
     default:
@@ -551,10 +527,10 @@ function _getDisplacementByPosition(position: number, orientation: RangeSlider.O
   }
 }
 
-function _getDisplacementByValue(value: number, min: number, max: number, orientation: RangeSlider.Orientation, rect: Rect.Rect, knobWidth: number, knobHeight: number, isClipped: boolean) {
+function _getDisplacementByValue(value: number, min: number, max: number, orientation: RangeSlider.Orientation, bodyWidth: number, bodyHeight: number, knobWidth: number, knobHeight: number, isClipped: boolean) {
   const position = _getPositionByValue(value, min, max)
 
-  return _getDisplacementByPosition(position, orientation, rect, knobWidth, knobHeight, isClipped)
+  return _getDisplacementByPosition(position, orientation, bodyWidth, bodyHeight, knobWidth, knobHeight, isClipped)
 }
 
 function _getClosestSteppedValue(value: number, breakpoints: number[]) {
@@ -583,6 +559,10 @@ function _createBreakpoints(min: number, max: number, steps: number): number[] |
     ...[...Array(steps)].map((_, i) => min + (i + 1) * (max - min) / (1 + steps)),
     max,
   ]
+}
+
+function _clamped(value: number, max: number, min: number): number {
+  return Math.max(min, Math.min(max, value))
 }
 
 if (process.env.NODE_ENV === 'development') {

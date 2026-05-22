@@ -46,12 +46,17 @@ export function RangeSliderDemo() {
           }}
         >
           <RangeSlider.Track className='bg-dark/40'/>
-          <RangeSlider.TrackHighlight className='bg-dark'/>
+          <RangeSlider.TrackHighlight
+            className={clsx('bg-dark', {
+              'transition-[height]': orientation === 'vertical',
+              'transition-[width]': orientation === 'horizontal',
+            })}
+          />
           <RangeSlider.Knob className='ia flex items-center justify-center border border-dark bg-dark'/>
           <RangeSlider.KnobContainer
             className={clsx({
-              '[.releasing]:transition-[left]': orientation === 'horizontal',
-              '[.releasing]:transition-[top]': orientation === 'vertical',
+              'transition-[left]': orientation === 'horizontal',
+              'transition-[top]': orientation === 'vertical',
             })}
           />
           <RangeSlider.Label className='text-base text-light'/>
