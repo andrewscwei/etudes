@@ -51,7 +51,6 @@ export type UseDragOptions = {
  *
  * @param target The target element or reference
  * @param options Additional options.
- * @param deps Dependencies that trigger this effect.
  *
  * @returns The states created for this effect.
  */
