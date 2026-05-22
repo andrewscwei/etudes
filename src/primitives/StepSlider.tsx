@@ -1,10 +1,8 @@
-import clsx from 'clsx'
-import { type HTMLAttributes, type MouseEvent, type Ref, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { type HTMLAttributes, type MouseEvent, type Ref, type RefObject, useCallback, useLayoutEffect, useMemo, useRef } from 'react'
 import { Rect } from 'spase'
 
 import { useInertiaDrag } from '../hooks/useInertiaDrag.js'
 import { useRect } from '../hooks/useRect.js'
-import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { createKey } from '../utils/createKey.js'
@@ -31,7 +29,6 @@ import { styles } from '../utils/styles.js'
  *                           knob.
  */
 export function StepSlider({
-  className,
   ref,
   children,
   index = 0,
@@ -51,17 +48,16 @@ export function StepSlider({
   onPositionChange,
   ...props
 }: StepSlider.Props) {
+  const rootRef = ref as RefObject<HTMLDivElement> || useRef<HTMLDivElement>(null)
   const bodyRef = useRef<HTMLDivElement>(null)
   const knobContainerRef = useRef<HTMLButtonElement>(null)
   const startTrackRef = useRef<HTMLDivElement>(null)
   const endTrackRef = useRef<HTMLDivElement>(null)
   const positionRef = useRef(_getPositionAt(index, steps))
   const indexRef = useRef(index)
+  const isDraggingRef = useRef(false)
 
   const bodyRect = useRect(bodyRef)
-
-  const [isDragging, setIsDragging] = useState(false)
-  const [isReleasing, setIsReleasing] = useState(false)
 
   const withDraggedValue = useCallback((pos: number, dx: number, dy: number) => {
     const vPos = _mapValuePositionToVisualPosition(pos, isInverted)
@@ -175,13 +171,16 @@ export function StepSlider({
     onDragEnd: () => {
       suppressTransitions(false)
 
-      setIsDragging(false)
-      setIsReleasing(true)
+      isDraggingRef.current = false
+      rootRef.current?.classList.remove('dragging')
+      knobContainerRef.current?.classList.remove('dragging')
 
       const nearestIndex = _getNearestIndexByPosition(positionRef.current, steps)
       const nearestPosition = _getPositionAt(nearestIndex, steps)
       positionRef.current = nearestPosition
       indexRef.current = nearestIndex
+
+      applyPosition(nearestPosition)
 
       onPositionChange?.(nearestPosition, false)
       onIndexChange?.(nearestIndex, false)
@@ -204,33 +203,34 @@ export function StepSlider({
         }
       }
 
-      setIsDragging(true)
-      setIsReleasing(false)
+      isDraggingRef.current = true
+      rootRef.current?.classList.add('dragging')
+      knobContainerRef.current?.classList.add('dragging')
     },
     onDragStart: () => {
       suppressTransitions(true)
 
-      setIsDragging(true)
-      setIsReleasing(false)
+      isDraggingRef.current = true
+      rootRef.current?.classList.add('dragging')
+      knobContainerRef.current?.classList.add('dragging')
 
       onDragStart?.()
     },
   })
 
   useLayoutEffect(() => {
-    if (isDragging) return
+    if (isDraggingRef.current) return
 
     const target = _getPositionAt(index, steps)
     indexRef.current = index
     positionRef.current = target
 
     applyPosition(target)
-  }, [index, isDragging, applyPosition, createKey(steps)])
+  }, [index, applyPosition, createKey(steps)])
 
   const position = _getPositionAt(index, steps)
   const isAtEnd = isInverted ? position === 0 : position === 1
   const isAtStart = isInverted ? position === 1 : position === 0
-  const fixedClassNames = useMemo(() => _getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing }), [orientation, isAtEnd, isAtStart, isDragging, isReleasing])
   const fixedStyles = useMemo(() => _getFixedStyles({ knobHeight, knobPadding, knobWidth, orientation, isTrackInteractive }), [knobHeight, knobPadding, knobWidth, orientation, isTrackInteractive])
   const components = asComponentDict(children, {
     knob: StepSlider.Knob,
@@ -242,9 +242,12 @@ export function StepSlider({
   return (
     <div
       {...props}
-      className={clsx(className, fixedClassNames.root)}
-      ref={ref}
+      ref={rootRef}
+      aria-orientation={orientation}
       aria-valuenow={index}
+      data-at-end={isAtEnd ? '' : undefined}
+      data-at-start={isAtStart ? '' : undefined}
+      data-orientation={orientation}
       role='slider'
     >
       <div
@@ -253,7 +256,6 @@ export function StepSlider({
         style={fixedStyles.body}
       >
         <Styled
-          className={fixedClassNames.track}
           ref={startTrackRef}
           style={styles(fixedStyles.track, orientation === 'vertical' ? { top: '0' } : { left: '0' })}
           data-side={isInverted ? 'end' : 'start'}
@@ -263,7 +265,6 @@ export function StepSlider({
           <div style={fixedStyles.trackHitBox}/>
         </Styled>
         <Styled
-          className={fixedClassNames.track}
           ref={endTrackRef}
           style={styles(fixedStyles.track, orientation === 'vertical' ? { bottom: '0' } : { right: '0' })}
           data-side={isInverted ? 'start' : 'end'}
@@ -273,20 +274,17 @@ export function StepSlider({
           <div style={fixedStyles.trackHitBox}/>
         </Styled>
         <Styled
-          className={fixedClassNames.knobContainer}
           ref={knobContainerRef}
           style={styles(fixedStyles.knobContainer)}
           element={components.knobContainer ?? <StepSlider.KnobContainer/>}
         >
           <Styled
-            className={fixedClassNames.knob}
             style={styles(fixedStyles.knob)}
             element={components.knob ?? <StepSlider.Knob/>}
           >
             <div style={fixedStyles.knobHitBox}/>
             {labelProvider && (
               <Styled
-                className={fixedClassNames.label}
                 style={styles(fixedStyles.label)}
                 element={components.label ?? <StepSlider.Label/>}
               >
@@ -454,101 +452,6 @@ export namespace StepSlider {
   export const generateSteps = _generateSteps
 }
 
-function _generateSteps(length: number): readonly number[] {
-  if (length <= 1) {
-    console.error('[etudes::StepSlider] `length` value must be greater than or equal to 2')
-
-    return []
-  }
-
-  if (Math.round(length) !== length) {
-    console.error('[etudes::StepSlider] `length` value must be an integer')
-
-    return []
-  }
-
-  const interval = 1 / (length - 1)
-
-  return Array(length).fill(null).map((_, i) => {
-    const position = interval * i
-
-    return position
-  })
-}
-
-function _getNearestIndexByPosition(position: number, steps: readonly number[]): number {
-  let index = -1
-  let minDelta = NaN
-
-  for (let i = 0, n = steps.length; i < n; i++) {
-    const step = _getPositionAt(i, steps)
-
-    if (isNaN(step)) continue
-
-    const delta = Math.abs(position - step)
-
-    if (isNaN(minDelta) || delta < minDelta) {
-      minDelta = delta
-      index = i
-    }
-  }
-
-  return index
-}
-
-function _getPositionAt(index: number, steps: readonly number[]): number {
-  if (index >= steps.length) return NaN
-
-  return steps[index]
-}
-
-function _mapVisualPositionToValuePosition(vPos: number, isInverted: boolean): number {
-  return isInverted ? 1 - vPos : vPos
-}
-
-function _mapValuePositionToVisualPosition(pos: number, isInverted: boolean): number {
-  return isInverted ? 1 - pos : pos
-}
-
-function _clamped(value: number, max: number = 1, min: number = 0): number {
-  return Math.max(min, Math.min(max, value))
-}
-
-function _getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtStart = false, isDragging = false, isReleasing = false }) {
-  return asClassNameDict({
-    knob: clsx(orientation, {
-      'at-end': isAtEnd,
-      'at-start': isAtStart,
-      'dragging': isDragging,
-      'releasing': isReleasing,
-    }),
-    knobContainer: clsx(orientation, {
-      'at-end': isAtEnd,
-      'at-start': isAtStart,
-      'dragging': isDragging,
-      'releasing': isReleasing,
-    }),
-    label: clsx(orientation, {
-      'at-end': isAtEnd,
-      'at-start': isAtStart,
-      'dragging': isDragging,
-      'releasing': isReleasing,
-    }),
-    root: clsx(orientation, {
-      'at-end': isAtEnd,
-      'at-start': isAtStart,
-      'dragging': isDragging,
-      'releasing': isReleasing,
-    }),
-    track: clsx(orientation, {
-      'at-end': isAtEnd,
-      'at-start': isAtStart,
-      'dragging': isDragging,
-      'releasing': isReleasing,
-    }),
-  })
-}
-
 function _getFixedStyles({ knobHeight = 0, knobPadding = 0, knobWidth = 0, orientation = 'vertical', isTrackInteractive = false }) {
   return asStyleDict({
     body: {
@@ -607,6 +510,66 @@ function _getFixedStyles({ knobHeight = 0, knobPadding = 0, knobWidth = 0, orien
       width: '100%',
     },
   })
+}
+
+function _generateSteps(length: number): readonly number[] {
+  if (length <= 1) {
+    console.error('[etudes::StepSlider] `length` value must be greater than or equal to 2')
+
+    return []
+  }
+
+  if (Math.round(length) !== length) {
+    console.error('[etudes::StepSlider] `length` value must be an integer')
+
+    return []
+  }
+
+  const interval = 1 / (length - 1)
+
+  return Array(length).fill(null).map((_, i) => {
+    const position = interval * i
+
+    return position
+  })
+}
+
+function _getNearestIndexByPosition(position: number, steps: readonly number[]): number {
+  let index = -1
+  let minDelta = NaN
+
+  for (let i = 0, n = steps.length; i < n; i++) {
+    const step = _getPositionAt(i, steps)
+
+    if (isNaN(step)) continue
+
+    const delta = Math.abs(position - step)
+
+    if (isNaN(minDelta) || delta < minDelta) {
+      minDelta = delta
+      index = i
+    }
+  }
+
+  return index
+}
+
+function _getPositionAt(index: number, steps: readonly number[]): number {
+  if (index >= steps.length) return NaN
+
+  return steps[index]
+}
+
+function _mapVisualPositionToValuePosition(vPos: number, isInverted: boolean): number {
+  return isInverted ? 1 - vPos : vPos
+}
+
+function _mapValuePositionToVisualPosition(pos: number, isInverted: boolean): number {
+  return isInverted ? 1 - pos : pos
+}
+
+function _clamped(value: number, max: number = 1, min: number = 0): number {
+  return Math.max(min, Math.min(max, value))
 }
 
 if (process.env.NODE_ENV === 'development') {

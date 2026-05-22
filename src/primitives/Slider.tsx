@@ -1,10 +1,8 @@
-import clsx from 'clsx'
-import { type HTMLAttributes, type MouseEvent, type Ref, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { type HTMLAttributes, type MouseEvent, type Ref, type RefObject, useCallback, useLayoutEffect, useMemo, useRef } from 'react'
 import { Rect } from 'spase'
 
 import { useInertiaDrag } from '../hooks/useInertiaDrag.js'
 import { useRect } from '../hooks/useRect.js'
-import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'
@@ -25,7 +23,6 @@ import { styles } from '../utils/styles.js'
  *                       knob.
  */
 export function Slider({
-  className,
   ref,
   children,
   knobHeight = 30,
@@ -43,16 +40,15 @@ export function Slider({
   onDragStart,
   ...props
 }: Readonly<Slider.Props>) {
+  const rootRef = ref as RefObject<HTMLDivElement> ?? useRef<HTMLDivElement>(null)
   const bodyRef = useRef<HTMLDivElement>(null)
   const knobContainerRef = useRef<HTMLButtonElement>(null)
   const startTrackRef = useRef<HTMLDivElement>(null)
   const endTrackRef = useRef<HTMLDivElement>(null)
   const positionRef = useRef(position)
+  const isDraggingRef = useRef(false)
 
   const bodyRect = useRect(bodyRef)
-
-  const [isDragging, setIsDragging] = useState(false)
-  const [isReleasing, setIsReleasing] = useState(false)
 
   const withDraggedValue = useCallback((pos: number, dx: number, dy: number) => {
     const vPos = _mapValuePositionToVisualPosition(pos, isInverted)
@@ -158,8 +154,9 @@ export function Slider({
     onDragEnd: () => {
       suppressTransitions(false)
 
-      setIsDragging(false)
-      setIsReleasing(true)
+      isDraggingRef.current = false
+      rootRef.current?.classList.remove('dragging')
+      knobContainerRef.current?.classList.remove('dragging')
 
       onChange?.(positionRef.current, false)
       onDragEnd?.()
@@ -174,30 +171,31 @@ export function Slider({
         onChange?.(newPosition, true)
       }
 
-      setIsDragging(true)
-      setIsReleasing(false)
+      isDraggingRef.current = true
+      rootRef.current?.classList.add('dragging')
+      knobContainerRef.current?.classList.add('dragging')
     },
     onDragStart: () => {
       suppressTransitions(true)
 
-      setIsDragging(true)
-      setIsReleasing(false)
+      isDraggingRef.current = true
+      rootRef.current?.classList.add('dragging')
+      knobContainerRef.current?.classList.add('dragging')
 
       onDragStart?.()
     },
   })
 
   useLayoutEffect(() => {
-    if (isDragging) return
+    if (isDraggingRef.current) return
 
     positionRef.current = position
 
     applyPosition(position)
-  }, [position, isDragging, applyPosition])
+  }, [position, applyPosition])
 
   const isAtEnd = isInverted ? position === 0 : position === 1
   const isAtStart = isInverted ? position === 1 : position === 0
-  const fixedClassNames = useMemo(() => _getFixedClassNames({ orientation, isAtEnd, isAtStart, isDragging, isReleasing }), [orientation, isAtEnd, isAtStart, isDragging, isReleasing])
   const fixedStyles = useMemo(() => _getFixedStyles({ knobHeight, knobPadding, knobWidth, orientation, isTrackInteractive }), [knobHeight, knobPadding, knobWidth, orientation, isTrackInteractive])
 
   const components = asComponentDict(children, {
@@ -210,10 +208,12 @@ export function Slider({
   return (
     <div
       {...props}
-      className={clsx(className, fixedClassNames.root)}
-      ref={ref}
+      ref={rootRef}
       aria-orientation={orientation}
       aria-valuenow={position}
+      data-at-end={isAtEnd ? '' : undefined}
+      data-at-start={isAtStart ? '' : undefined}
+      data-orientation={orientation}
       role='slider'
     >
       <div
@@ -222,7 +222,6 @@ export function Slider({
         style={fixedStyles.body}
       >
         <Styled
-          className={fixedClassNames.track}
           ref={startTrackRef}
           style={styles(fixedStyles.track, orientation === 'vertical' ? { top: '0' } : { left: '0' })}
           data-side={isInverted ? 'end' : 'start'}
@@ -232,7 +231,6 @@ export function Slider({
           <div style={fixedStyles.trackHitBox}/>
         </Styled>
         <Styled
-          className={fixedClassNames.track}
           ref={endTrackRef}
           style={styles(fixedStyles.track, orientation === 'vertical' ? { bottom: '0' } : { right: '0' })}
           data-side={isInverted ? 'start' : 'end'}
@@ -242,20 +240,17 @@ export function Slider({
           <div style={fixedStyles.trackHitBox}/>
         </Styled>
         <Styled
-          className={fixedClassNames.knobContainer}
           ref={knobContainerRef}
           style={fixedStyles.knobContainer}
           element={components.knobContainer ?? <Slider.KnobContainer/>}
         >
           <Styled
-            className={fixedClassNames.knob}
             style={styles(fixedStyles.knob)}
             element={components.knob ?? <Slider.Knob/>}
           >
             <div style={fixedStyles.knobHitBox}/>
             {formatLabel && (
               <Styled
-                className={fixedClassNames.label}
                 style={styles(fixedStyles.label)}
                 element={components.label ?? <Slider.Label/>}
               >
@@ -390,53 +385,6 @@ export namespace Slider {
   )
 }
 
-function _mapVisualPositionToValuePosition(vPos: number, isInverted: boolean) {
-  return isInverted ? 1 - vPos : vPos
-}
-
-function _mapValuePositionToVisualPosition(pos: number, isInverted: boolean) {
-  return isInverted ? 1 - pos : pos
-}
-
-function _clamped(value: number, max: number = 1, min: number = 0): number {
-  return Math.max(min, Math.min(max, value))
-}
-
-function _getFixedClassNames({ orientation = 'vertical', isAtEnd = false, isAtStart = false, isDragging = false, isReleasing = false }) {
-  return asClassNameDict({
-    knob: clsx(orientation, {
-      'at-end': isAtEnd,
-      'at-start': isAtStart,
-      'dragging': isDragging,
-      'releasing': isReleasing,
-    }),
-    knobContainer: clsx(orientation, {
-      'at-end': isAtEnd,
-      'at-start': isAtStart,
-      'dragging': isDragging,
-      'releasing': isReleasing,
-    }),
-    label: clsx(orientation, {
-      'at-end': isAtEnd,
-      'at-start': isAtStart,
-      'dragging': isDragging,
-      'releasing': isReleasing,
-    }),
-    root: clsx(orientation, {
-      'at-end': isAtEnd,
-      'at-start': isAtStart,
-      'dragging': isDragging,
-      'releasing': isReleasing,
-    }),
-    track: clsx(orientation, {
-      'at-end': isAtEnd,
-      'at-start': isAtStart,
-      'dragging': isDragging,
-      'releasing': isReleasing,
-    }),
-  })
-}
-
 function _getFixedStyles({ knobHeight = 0, knobPadding = 0, knobWidth = 0, orientation = 'vertical', isTrackInteractive = true }) {
   return asStyleDict({
     body: {
@@ -495,6 +443,18 @@ function _getFixedStyles({ knobHeight = 0, knobPadding = 0, knobWidth = 0, orien
       width: '100%',
     },
   })
+}
+
+function _mapVisualPositionToValuePosition(vPos: number, isInverted: boolean) {
+  return isInverted ? 1 - vPos : vPos
+}
+
+function _mapValuePositionToVisualPosition(pos: number, isInverted: boolean) {
+  return isInverted ? 1 - pos : pos
+}
+
+function _clamped(value: number, max: number = 1, min: number = 0): number {
+  return Math.max(min, Math.min(max, value))
 }
 
 if (process.env.NODE_ENV === 'development') {
