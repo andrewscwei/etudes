@@ -76,29 +76,32 @@ export function RangeSlider({
     return _getValueByDisplacement(_clamped(dCurr, dMax, dMin), minValue, maxValue, orientation, bodySize.width, bodySize.height, knobWidth, knobHeight, isClipped)
   }, [knobWidth, knobHeight, isClipped, minValue, maxValue, orientation, bodySize.width, bodySize.height])
 
-  const applyKnobs = useCallback(() => {
-    const startDisplacement = _getDisplacementByValue(startValueRef.current, minValue, maxValue, orientation, bodySize.width, bodySize.height, knobWidth, knobHeight, isClipped)
-    const endDisplacement = _getDisplacementByValue(endValueRef.current, minValue, maxValue, orientation, bodySize.width, bodySize.height, knobWidth, knobHeight, isClipped)
+  const applyRange = useCallback(([start, end]: [number, number]) => {
     const startKnob = startKnobContainerRef.current
     const endKnob = endKnobContainerRef.current
     const trackHighlight = trackHighlightRef.current
 
+    const startPos = _getPositionByValue(start, minValue, maxValue)
+    const startPerc = `${startPos * 100}%`
+    const endPos = _getPositionByValue(end, minValue, maxValue)
+    const endPerc = `${endPos * 100}%`
+
     if (orientation === 'horizontal') {
-      if (startKnob) startKnob.style.left = `${startDisplacement}px`
-      if (endKnob) endKnob.style.left = `${endDisplacement}px`
+      if (startKnob) startKnob.style.left = isClipped ? `calc(${startPerc} + ${knobWidth * 0.5 - startPos * knobWidth}px)` : startPerc
+      if (endKnob) endKnob.style.left = isClipped ? `calc(${endPerc} + ${knobWidth * 0.5 - endPos * knobWidth}px)` : endPerc
       if (trackHighlight) {
-        trackHighlight.style.transform = `translate(${startDisplacement}px, 0)`
-        trackHighlight.style.width = `${endDisplacement - startDisplacement}px`
+        trackHighlight.style.left = startPerc
+        trackHighlight.style.width = `${(endPos - startPos) * 100}%`
       }
     } else {
-      if (startKnob) startKnob.style.top = `${startDisplacement}px`
-      if (endKnob) endKnob.style.top = `${endDisplacement}px`
+      if (startKnob) startKnob.style.top = isClipped ? `calc(${startPerc} + ${knobHeight * 0.5 - startPos * knobHeight}px)` : startPerc
+      if (endKnob) endKnob.style.top = isClipped ? `calc(${endPerc} + ${knobHeight * 0.5 - endPos * knobHeight}px)` : endPerc
       if (trackHighlight) {
-        trackHighlight.style.transform = `translate(0, ${startDisplacement}px)`
-        trackHighlight.style.height = `${endDisplacement - startDisplacement}px`
+        trackHighlight.style.top = startPerc
+        trackHighlight.style.height = `${(endPos - startPos) * 100}%`
       }
     }
-  }, [isClipped, knobHeight, knobWidth, maxValue, minValue, orientation, bodySize.width, bodySize.height])
+  }, [isClipped, knobWidth, knobHeight, minValue, maxValue, orientation])
 
   const suppressTransitions = useCallback((knob: HTMLElement | null, suppressed: boolean) => {
     const value = suppressed ? 'none' : ''
@@ -129,7 +132,8 @@ export function RangeSlider({
 
       if (hasChanged) {
         startValueRef.current = newValue
-        applyKnobs()
+
+        applyRange([newValue, endValueRef.current])
         onChange?.([newValue, endValueRef.current], true)
       }
 
@@ -171,7 +175,8 @@ export function RangeSlider({
 
       if (hasChanged) {
         endValueRef.current = newValue
-        applyKnobs()
+
+        applyRange([startValueRef.current, newValue])
         onChange?.([startValueRef.current, newValue], true)
       }
 
@@ -198,8 +203,8 @@ export function RangeSlider({
     startValueRef.current = startValue
     endValueRef.current = endValue
 
-    applyKnobs()
-  }, [startValue, endValue, applyKnobs])
+    applyRange([startValue, endValue])
+  }, [startValue, endValue, applyRange])
 
   const fixedStyles = useMemo(() => _getFixedStyles({ knobHeight, knobPadding, knobWidth, orientation }), [knobHeight, knobPadding, knobWidth, orientation])
 
@@ -214,6 +219,7 @@ export function RangeSlider({
       role='slider'
     >
       <div
+        key={orientation}
         ref={bodyRef}
         style={fixedStyles.body}
       >
