@@ -20,16 +20,16 @@ type Target = HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElemen
  * @param onChange Handler invoked when the scroll position changes.
  * @param deps Optional dependency list to control when the hook should re-run.
  */
-export function useScrollPosition(
+export function useScrollPositionObserver(
   target: Target,
   onChange: (newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void,
   deps?: DependencyList,
 ): void
-export function useScrollPosition(
+export function useScrollPositionObserver(
   onChange: (newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void,
   deps?: DependencyList,
 ): void
-export function useScrollPosition(...args:
+export function useScrollPositionObserver(...args:
   | [(newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void, DependencyList?]
   | [Target, (newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void, DependencyList?]) {
   const target = typeof args[0] === 'function' ? undefined : args[0]

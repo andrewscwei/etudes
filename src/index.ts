@@ -35,7 +35,7 @@ export * from './hooks/useMouseLeave.js'
 export * from './hooks/useOS.js'
 export * from './hooks/usePrevious.js'
 export * from './hooks/useRect.js'
-export * from './hooks/useScrollPosition.js'
+export * from './hooks/useScrollPositionObserver.js'
 export * from './hooks/useSessionCache.js'
 export * from './hooks/useSize.js'
 export * from './hooks/useSizeObserver.js'
@@ -69,6 +69,8 @@ export * from './primitives/TextArea.js'
 export * from './primitives/TextField.js'
 export * from './primitives/Toggle.js'
 export * from './primitives/Video.js'
+
+export * from './providers/ScrollPositionProvider.js'
 
 export * from './types/ImageSource.js'
 
