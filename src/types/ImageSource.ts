@@ -60,14 +60,24 @@ export type ImageSource = {
 }
 
 export namespace ImageSource {
+  /**
+   * Converts an `ImageSource` object into props that can be spread onto a
+   * `<source>` or `<img>` element, including validation of the `ImageSource`
+   * object.
+   *
+   * @param imageSource The `ImageSource` object to convert into props.
+   *
+   * @returns An object containing the props to spread onto a `<source>` or
+   *          `<img>` element.
+   */
   export function asProps(imageSource: ImageSource) {
     try {
       validate(imageSource)
 
       return {
         media: imageSource.media,
-        sizes: resolveSizes(imageSource),
-        srcSet: resolveSourceSet(imageSource),
+        sizes: asSizes(imageSource),
+        srcSet: asSourceSet(imageSource),
         type: imageSource.type,
       }
     } catch (error) {
@@ -77,6 +87,58 @@ export namespace ImageSource {
     }
   }
 
+  /**
+   * Converts an `ImageSource` object into a string suitable for the `srcSet`
+   * attribute of an `<img>` or `<source>` element.
+   *
+   * @param imageSource The `ImageSource` object to convert into a `srcSet`
+   *                    string.
+   *
+   * @returns A string suitable for the `srcSet` attribute of an `<img>` or
+   *          `<source>` element.
+   */
+  function asSourceSet(imageSource: ImageSource): string {
+    return imageSource.srcSet.map(({ pixelDensity, src, width }) => {
+      let res = src
+
+      if (width !== undefined) {
+        res += ` ${width}w`
+      } else if (pixelDensity !== undefined) {
+        res += ` ${pixelDensity}x`
+      }
+
+      return res
+    }).filter(Boolean).join(', ')
+  }
+
+  /**
+   * Converts an `ImageSource` object into a string suitable for the `sizes`
+   * attribute of an `<img>` or `<source>` element.
+   *
+   * @param imageSource The `ImageSource` object to convert into a `sizes`
+   *                    string.
+   *
+   * @returns A string suitable for the `sizes` attribute of an `<img>` or
+   *          `<source>` element.
+   */
+  function asSizes(imageSource: ImageSource): string | undefined {
+    return imageSource.sizes?.map(({ media, width }) => {
+      let t = width
+
+      if (media) t = `${media} ${t}`
+
+      return t
+    }).filter(Boolean).join(', ')
+  }
+
+  /**
+   * Validates an `ImageSource` object, throwing an error if the object is
+   * invalid.
+   *
+   * @param imageSource The `ImageSource` object to validate.
+   *
+   * @throws If the `ImageSource` object is invalid.
+   */
   function validate({ sizes = [], srcSet: sourceSet }: ImageSource): void {
     if (sizes.length > 0 && !sourceSet.some(({ width }) => width !== undefined)) {
       throw Error('If `sizes` is specified, at least one entry in `sourceSet` must have a `width` specified')
@@ -107,29 +169,5 @@ export namespace ImageSource {
         throw Error('Only one of `width` or `pixelDensity` can be specified')
       }
     })
-  }
-
-  function resolveSourceSet(imageSource: ImageSource): string {
-    return imageSource.srcSet.map(({ pixelDensity, src, width }) => {
-      let res = src
-
-      if (width !== undefined) {
-        res += ` ${width}w`
-      } else if (pixelDensity !== undefined) {
-        res += ` ${pixelDensity}x`
-      }
-
-      return res
-    }).filter(Boolean).join(', ')
-  }
-
-  function resolveSizes(imageSource: ImageSource): string | undefined {
-    return imageSource.sizes?.map(({ media, width }) => {
-      let t = width
-
-      if (media) t = `${media} ${t}`
-
-      return t
-    }).filter(Boolean).join(', ')
   }
 }
