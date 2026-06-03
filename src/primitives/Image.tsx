@@ -64,7 +64,18 @@ export namespace Image {
  * A component that renders an image with support for lazy loading, `srcSet`,
  * and `sizes` attributes.
  */
-export function Image({ ref, alt, loadingMode, source, src: fallbackSrc, onError, onLoad, onLoadStart, onSizeChange, ...props }: Image.Props) {
+export function Image({
+  ref,
+  alt,
+  loadingMode,
+  source,
+  src: fallbackSrc,
+  onError,
+  onLoad,
+  onLoadStart,
+  onSizeChange,
+  ...props
+}: Image.Props) {
   const resolvedImageSource = source ? ImageSource.asProps(source) : undefined
 
   const size = useImageSize({

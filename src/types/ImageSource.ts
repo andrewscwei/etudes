@@ -72,7 +72,7 @@ export namespace ImageSource {
    */
   export function asProps(imageSource: ImageSource) {
     try {
-      validate(imageSource)
+      assert(imageSource)
 
       return {
         media: imageSource.media,
@@ -132,29 +132,35 @@ export namespace ImageSource {
   }
 
   /**
-   * Validates an `ImageSource` object, throwing an error if the object is
+   * Asserts an `ImageSource` object, throwing an error if the object is
    * invalid.
    *
-   * @param imageSource The `ImageSource` object to validate.
+   * @param imageSource The `ImageSource` object to assert.
    *
    * @throws If the `ImageSource` object is invalid.
    */
-  function validate({ sizes = [], srcSet: sourceSet }: ImageSource): void {
-    if (sizes.length > 0 && !sourceSet.some(({ width }) => width !== undefined)) {
-      throw Error('If `sizes` is specified, at least one entry in `sourceSet` must have a `width` specified')
+  function assert(value?: any): asserts value is ImageSource {
+    if (!is(value)) {
+      throw Error('Invalid `ImageSource` object')
+    }
+
+    const { sizes = [], srcSet } = value
+
+    if (sizes.length > 0 && !srcSet.some(({ width }) => width !== undefined)) {
+      throw Error('If `sizes` is specified, at least one entry in `srcSet` must have a `width` specified')
     }
 
     if (sizes.length > 0 && sizes[sizes.length - 1].media !== undefined) {
       throw Error('The last item in `sizes` must not have a `media` condition')
     }
 
-    if (sourceSet.length === 0) {
-      throw Error('At least one entry in `sourceSet` must be specified')
+    if (srcSet.length === 0) {
+      throw Error('At least one entry in `srcSet` must be specified')
     }
 
-    sourceSet.forEach(({ pixelDensity, src, width }) => {
+    srcSet.forEach(({ pixelDensity, src, width }) => {
       if (src === undefined || src === '') {
-        throw Error('Each entry in `sourceSet` must have a non-empty `src`')
+        throw Error('Each entry in `srcSet` must have a non-empty `src`')
       }
 
       if (width !== undefined && (!isFinite(width) || !Number.isInteger(width) || width <= 0)) {
@@ -169,5 +175,47 @@ export namespace ImageSource {
         throw Error('Only one of `width` or `pixelDensity` can be specified')
       }
     })
+  }
+
+  /**
+   * Type guard to check if a value is an `ImageSource` object.
+   *
+   * @param value The value to check.
+   *
+   * @returns `true` if the value is an `ImageSource` object, `false` otherwise.
+   */
+  function is(value?: any): value is ImageSource {
+    if (typeof value !== 'object' || value === null) return false
+    if (value.media !== undefined && typeof value.media !== 'string') return false
+    if (value.type !== undefined && typeof value.type !== 'string') return false
+
+    if (value.sizes !== undefined) {
+      if (!Array.isArray(value.sizes)) return false
+
+      for (const size of value.sizes) {
+        if (typeof size !== 'object' || size === null) return false
+        if (size.media !== undefined && typeof size.media !== 'string') return false
+        if (typeof size.width !== 'string') return false
+      }
+    }
+
+    if (!Array.isArray(value.srcSet)) return false
+
+    for (const srcSetEntry of value.srcSet) {
+      if (typeof srcSetEntry !== 'object' || srcSetEntry === null) return false
+      if (typeof srcSetEntry.src !== 'string') return false
+
+      if (srcSetEntry.width !== undefined) {
+        if (!isFinite(srcSetEntry.width) || !Number.isInteger(srcSetEntry.width) || srcSetEntry.width <= 0) return false
+      }
+
+      if (srcSetEntry.pixelDensity !== undefined) {
+        if (!isFinite(srcSetEntry.pixelDensity) || srcSetEntry.pixelDensity <= 0) return false
+      }
+
+      if (srcSetEntry.width !== undefined && srcSetEntry.pixelDensity !== undefined) return false
+    }
+
+    return true
   }
 }
