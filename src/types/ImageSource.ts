@@ -61,6 +61,30 @@ export type ImageSource = {
 
 export namespace ImageSource {
   /**
+   * Convenience function to create an `ImageSource` object from a list of image
+   * sources and a size descriptor.
+   *
+   * @param size A CSS size value indicating the size of the image's slot on the
+   *             page, i.e. `100px`, `100vw`, `50%`, etc.
+   * @param srcSet A list of tuples, where each tuple contains a URL specifying
+   *               an image location and either an intrinsic width (in pixels)
+   *               of the image expressed as a positive integer or a pixel
+   *               density of the image expressed as a positive floating number.
+   *
+   * @returns An `ImageSource` object with the specified size and image sources.
+   */
+  export function make(size: string, srcSet: [string, number][]): ImageSource {
+    const out = {
+      sizes: [{ width: size }],
+      srcSet: srcSet.map(([src, width]) => ({ src, width })),
+    }
+
+    assert(out)
+
+    return out
+  }
+
+  /**
    * Converts an `ImageSource` object into props that can be spread onto a
    * `<source>` or `<img>` element, including validation of the `ImageSource`
    * object.
