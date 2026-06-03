@@ -1,5 +1,5 @@
 import { createContext, type PropsWithChildren, type RefObject, use, useState } from 'react'
-import { Point } from 'spase'
+import { type Point } from 'spase'
 
 import { useScrollPositionObserver } from '../hooks/useScrollPositionObserver.js'
 
@@ -16,28 +16,21 @@ type ProviderProps = PropsWithChildren<{
   target?: Target
 }>
 
-const initialValue: ContextValue = {
-  current: Point.zero,
-  end: Point.zero,
-  progress: Point.zero,
-  start: Point.zero,
-}
-
 /**
  * Provides information about the current scroll position of a scrollable area.
  */
-const ScrollPositionContext = createContext<ContextValue>(initialValue)
+const ScrollPositionContext = createContext<ContextValue | undefined>(undefined)
 
 /**
  * Indicates whether the scroll position is at the top of the scrollable area.
  */
-const ScrollTopContext = createContext(false)
+const ScrollTopContext = createContext<boolean | undefined>(undefined)
 
 /**
  * Indicates whether the scroll position is at the bottom of the scrollable
  * area.
  */
-const ScrollBottomContext = createContext(false)
+const ScrollBottomContext = createContext<boolean | undefined>(undefined)
 
 /**
  * Provides scroll position information to its descendants.
@@ -46,14 +39,9 @@ export function ScrollPositionProvider({
   children,
   target,
 }: ProviderProps) {
-  const [isScrollTop, setIsScrollTop] = useState(false)
-  const [isScrollBottom, setIsScrollBottom] = useState(false)
-  const [info, setInfo] = useState<ContextValue>({
-    current: Point.zero,
-    end: Point.zero,
-    progress: Point.zero,
-    start: Point.zero,
-  })
+  const [isScrollTop, setIsScrollTop] = useState<boolean | undefined>()
+  const [isScrollBottom, setIsScrollBottom] = useState<boolean | undefined>()
+  const [info, setInfo] = useState<ContextValue | undefined>()
 
   useScrollPositionObserver(target, newInfo => {
     setInfo(newInfo)
@@ -84,7 +72,7 @@ export function useIsScrollTop() {
     console.warn('[etudes::useIsScrollTop] `useIsScrollTop` must be used within a `ScrollPositionProvider`')
   }
 
-  return context ?? false
+  return context
 }
 
 /**
@@ -99,7 +87,7 @@ export function useIsScrollBottom() {
     console.warn('[etudes::useIsScrollBottom] `useIsScrollBottom` must be used within a `ScrollPositionProvider`')
   }
 
-  return context ?? false
+  return context
 }
 
 /**
@@ -116,10 +104,5 @@ export function useScrollPosition() {
     console.warn('[etudes::useScrollPosition] `useScrollPosition` must be used within a `ScrollPositionProvider`')
   }
 
-  return context ?? {
-    current: Point.zero,
-    end: Point.zero,
-    progress: Point.zero,
-    start: Point.zero,
-  }
+  return context
 }
