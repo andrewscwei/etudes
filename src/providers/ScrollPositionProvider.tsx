@@ -122,3 +122,10 @@ export function useScrollPosition() {
     start: Point.zero,
   }
 }
+
+if (process.env.NODE_ENV === 'development') {
+  ScrollPositionProvider.displayName = 'ScrollPositionProvider'
+  ScrollPositionContext.displayName = 'ScrollPositionContext'
+  ScrollTopContext.displayName = 'ScrollTopContext'
+  ScrollBottomContext.displayName = 'ScrollBottomContext'
+}
