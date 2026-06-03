@@ -20,6 +20,8 @@ type ContextValue = {
 }
 
 type ProviderProps = PropsWithChildren<{
+  scrollBottomOffset?: number
+  scrollTopOffset?: number
   target?: Target
 }>
 
@@ -44,6 +46,8 @@ const ScrollBottomContext = createContext(false)
  */
 export function ScrollPositionProvider({
   children,
+  scrollBottomOffset = 0,
+  scrollTopOffset = 0,
   target,
 }: ProviderProps) {
   const [isScrollTop, setIsScrollTop] = useState(true)
@@ -52,8 +56,8 @@ export function ScrollPositionProvider({
 
   useScrollPositionObserver(target, newInfo => {
     setInfo(newInfo)
-    setIsScrollTop(newInfo.current.y <= newInfo.start.y)
-    setIsScrollBottom(newInfo.current.y >= newInfo.end.y)
+    setIsScrollTop(newInfo.current.y <= (newInfo.start.y + scrollTopOffset))
+    setIsScrollBottom(newInfo.current.y >= (newInfo.end.y - scrollBottomOffset))
   })
 
   return (
