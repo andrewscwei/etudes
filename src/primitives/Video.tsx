@@ -36,7 +36,7 @@ export namespace Video {
     /**
      * The URL of the video poster when video is unavailable or loading.
      */
-    posterSrc?: string
+    poster?: string
 
     /**
      * Reference to the root element.
@@ -46,7 +46,7 @@ export namespace Video {
     /**
      * The URL of the video to play.
      */
-    src: string
+    source: string
 
     /**
      * Handler invoked when the video is ready to play.
@@ -124,8 +124,8 @@ export function Video({
   autoLoop = true,
   autoPlay = true,
   playsInline = true,
-  posterSrc,
-  src,
+  poster,
+  source,
   hasControls = false,
   isMuted = true,
   onCanPlay,
@@ -142,7 +142,7 @@ export function Video({
 }: Video.Props) {
   const localRef = useRef<HTMLVideoElement>(null)
   const videoRef = ref as RefObject<HTMLVideoElement> ?? localRef
-  const size = useVideoSize(src, {
+  const size = useVideoSize(source, {
     onError: onLoadMetadataError,
     onLoad: onLoadMetadataComplete,
     onLoadStart: onLoadMetadata,
@@ -151,13 +151,13 @@ export function Video({
   useEffect(() => {
     if (!videoRef.current) return
 
-    if (src.toLowerCase().endsWith('.m3u8')) {
+    if (source.toLowerCase().endsWith('.m3u8')) {
       const canMaybePlay = !!videoRef.current.canPlayType('application/x-mpegURL')
       const Hls = typeof (window as any).Hls !== 'undefined' ? (window as any).Hls : undefined
 
       if (!canMaybePlay && Hls?.isSupported()) {
         const hls = new Hls()
-        hls.loadSource(src)
+        hls.loadSource(source)
         hls.attachMedia(videoRef.current)
       }
     }
@@ -181,7 +181,7 @@ export function Video({
       videoRef.current?.removeEventListener('mozfullscreenchange', listener)
       videoRef.current?.removeEventListener('fullscreenchange', listener)
     }
-  }, [src])
+  }, [source])
 
   useEffect(() => {
     onSizeChange?.(size)
@@ -234,14 +234,14 @@ export function Video({
       loop={autoLoop}
       muted={isMuted}
       playsInline={playsInline}
-      poster={posterSrc}
+      poster={poster}
       onCanPlay={canPlayHandler}
       onEnded={endHandler}
       onPause={pauseHandler}
       onPlay={playHandler}
       onTimeUpdate={timeUpdateHandler}
     >
-      <source src={src}/>
+      <source src={source}/>
     </video>
   )
 }

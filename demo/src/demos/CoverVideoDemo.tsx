@@ -11,7 +11,7 @@ export function CoverVideoDemo() {
           className='relative size-full grayscale'
           autoLoop={true}
           autoPlay={true}
-          src={$$Video}
+          source={$$Video}
           onEnd={() => toast('Stopped')}
           onPause={() => toast('Paused')}
           onPlay={() => toast('Playing')}

@@ -25,16 +25,14 @@ export namespace Image {
     loadingMode?: 'eager' | 'lazy'
 
     /**
-     * Optional image source. If provided, this will be used to set the `sizes`
-     * and `srcSet` attributes of the `<img>` element.
+     * Either a string URL or a tuple of the form `[src, ImageSource]`, where
+     * `src` is a fallback image URL and `ImageSource` provides additional
+     * information for responsive images. If a tuple is provided, the `src` will
+     * be used as the `src` attribute of the `<img>` element, while the
+     * properties of `ImageSource` will be used to set the `sizes` and `srcSet`
+     * attributes.
      */
-    source?: Omit<ImageSource, 'media' | 'type'>
-
-    /**
-     * Fallback image URL for browsers that do not support the `srcSet`
-     * attribute.
-     */
-    src: string
+    source: [string, Omit<ImageSource, 'media' | 'type'>] | string
 
     /**
      * Handler invoked when image load begins.
@@ -69,14 +67,15 @@ export function Image({
   alt,
   loadingMode,
   source,
-  src: fallbackSrc,
   onError,
   onLoad,
   onLoadStart,
   onSizeChange,
   ...props
 }: Image.Props) {
-  const resolvedImageSource = source ? ImageSource.asProps(source) : undefined
+  const fallbackSrc = typeof source === 'string' ? source : source[0]
+  const imageSource = typeof source === 'string' ? undefined : source[1]
+  const resolvedImageSource = imageSource ? ImageSource.asProps(imageSource) : undefined
 
   const size = useImageSize({
     sizes: resolvedImageSource?.sizes,

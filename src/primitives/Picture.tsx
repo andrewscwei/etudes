@@ -13,21 +13,24 @@ export namespace Picture {
      */
     ref?: Ref<HTMLPictureElement>
 
-    sources?: ImageSource[]
-  } & HTMLAttributes<HTMLPictureElement> & Pick<Image.Props, 'alt' | 'loadingMode' | 'onError' | 'onLoad' | 'onLoadStart' | 'onSizeChange' | 'src'>
+    source: [string, ...ImageSource[]] | string
+  } & HTMLAttributes<HTMLPictureElement> & Pick<Image.Props, 'alt' | 'loadingMode' | 'onError' | 'onLoad' | 'onLoadStart' | 'onSizeChange'>
 }
 
-export function Picture({ ref, alt, loadingMode, sources = [], src, onError, onLoad, onLoadStart, onSizeChange, ...props }: Picture.Props) {
+export function Picture({ ref, alt, loadingMode, source, onError, onLoad, onLoadStart, onSizeChange, ...props }: Picture.Props) {
+  const src = typeof source === 'string' ? source : source[0]
+  const sources = typeof source === 'string' ? [] : source.slice(1) as ImageSource[]
+
   return (
     <picture {...props} ref={ref}>
-      {sources.map((source, idx) => (
-        <source key={idx} {...ImageSource.asProps(source)}/>
+      {sources.map((s, idx) => (
+        <source key={idx} {...ImageSource.asProps(s)}/>
       ))}
       <Image
         style={{ height: '100%', width: '100%' }}
         alt={alt}
         loadingMode={loadingMode}
-        src={src}
+        source={src}
         onError={onError}
         onLoad={onLoad}
         onLoadStart={onLoadStart}

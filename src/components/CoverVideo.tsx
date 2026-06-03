@@ -24,8 +24,8 @@ export function CoverVideo({
   autoPlay,
   children,
   playsInline,
-  posterSrc,
-  src,
+  poster,
+  source,
   hasControls,
   isMuted,
   onCanPlay,
@@ -79,8 +79,8 @@ export function CoverVideo({
         autoLoop={autoLoop}
         autoPlay={autoPlay}
         playsInline={playsInline}
-        posterSrc={posterSrc}
-        src={src}
+        poster={poster}
+        source={source}
         hasControls={hasControls}
         isMuted={isMuted}
         onCanPlay={onCanPlay}
@@ -123,7 +123,7 @@ export namespace CoverVideo {
      * unprovided, it will be inferred after loading the video.
      */
     aspectRatio?: number
-  } & Omit<HTMLAttributes<HTMLDivElement>, 'onCanPlay' | 'onPause' | 'onPlay'> & Pick<Video.Props, 'autoLoop' | 'autoPlay' | 'hasControls' | 'isMuted' | 'onCanPlay' | 'onEnd' | 'onFullscreenChange' | 'onLoadMetadata' | 'onLoadMetadataComplete' | 'onLoadMetadataError' | 'onPause' | 'onPlay' | 'onSizeChange' | 'playsInline' | 'posterSrc' | 'src'>
+  } & Omit<HTMLAttributes<HTMLDivElement>, 'onCanPlay' | 'onPause' | 'onPlay'> & Pick<Video.Props, 'autoLoop' | 'autoPlay' | 'hasControls' | 'isMuted' | 'onCanPlay' | 'onEnd' | 'onFullscreenChange' | 'onLoadMetadata' | 'onLoadMetadataComplete' | 'onLoadMetadataError' | 'onPause' | 'onPlay' | 'onSizeChange' | 'playsInline' | 'poster' | 'source'>
 
   /**
    * Component for optional content inside a {@link CoverVideo}.
@@ -158,7 +158,6 @@ const FIXED_STYLES = asStyleDict({
 
 if (process.env.NODE_ENV === 'development') {
   CoverVideo.displayName = 'CoverVideo'
-
   CoverVideo.Content.displayName = 'CoverVideo.Content'
   CoverVideo.Viewport.displayName = 'CoverVideo.Viewport'
 }

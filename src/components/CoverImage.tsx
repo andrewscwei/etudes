@@ -22,8 +22,7 @@ export function CoverImage({
   aspectRatio: externalAspectRatio = NaN,
   children,
   loadingMode,
-  sources,
-  src,
+  source,
   onError,
   onLoad,
   onLoadStart,
@@ -66,8 +65,7 @@ export function CoverImage({
           width: `${imageSize.width}px`,
         })}
         alt={alt}
-        sources={sources}
-        src={src}
+        source={source}
         onError={onError}
         onLoad={onLoad}
         onLoadStart={onLoadStart}
@@ -103,7 +101,7 @@ export namespace CoverImage {
      * unprovided, it will be inferred after loading the image.
      */
     aspectRatio?: number
-  } & Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<Picture.Props, 'alt' | 'loadingMode' | 'onError' | 'onLoad' | 'onLoadStart' | 'sources' | 'src'>
+  } & Omit<HTMLAttributes<HTMLDivElement>, 'onLoadStart'> & Pick<Picture.Props, 'alt' | 'loadingMode' | 'onError' | 'onLoad' | 'onLoadStart' | 'source'>
 
   /**
    * Component for optional content inside a {@link CoverImage}.

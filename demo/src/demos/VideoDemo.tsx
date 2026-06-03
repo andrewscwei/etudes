@@ -17,7 +17,7 @@ export function VideoDemo() {
           className='grayscale'
           autoLoop={autoLoop === 'true'}
           autoPlay={true}
-          src={$$Video}
+          source={$$Video}
           hasControls={hasControls === 'true'}
           onEnd={() => toast('Stopped')}
           onPause={() => toast('Paused')}

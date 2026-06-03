@@ -9,7 +9,7 @@ export function PictureDemo() {
       {(_, toast) => (
         <Picture
           className='size-full [&_img]:size-full [&_img]:object-cover'
-          src={$$Image}
+          source={$$Image}
           onLoad={() => toast('Loaded')}
           onLoadStart={() => toast('Loading')}
         />

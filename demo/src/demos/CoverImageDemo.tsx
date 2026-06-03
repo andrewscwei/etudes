@@ -8,7 +8,7 @@ export function CoverImageDemo() {
     <Frame title='CoverImage' usesMaxHeight={true}>
       <CoverImage
         className='relative size-full'
-        src={$$Image}
+        source={$$Image}
       >
         <CoverImage.Viewport className='z-10 flex items-center justify-center'>
           <div className='text-light bg-dark flex items-center justify-center px-2 py-1 text-sm'>Cover</div>
