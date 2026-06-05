@@ -1,26 +1,7 @@
 import { useLayoutEffect, useRef } from 'react'
 
+import { ImageSource } from '../types/ImageSource.js'
 import { useLatest } from './useLatest.js'
-
-/**
- * Type describing the parameters of {@link useImageLoader}.
- */
-export type UseImageLoaderParams = {
-  /**
-   * `src` attribute of the image.
-   */
-  src: string
-
-  /**
-   * `srcSet` attribute of the image.
-   */
-  srcSet?: string
-
-  /**
-   * `sizes` attribute of the image.
-   */
-  sizes?: string
-}
 
 /**
  * Type describing the options of {@link useImageLoader}.
@@ -51,13 +32,23 @@ export type UseImageLoaderOptions = {
 /**
  * Hook for preloading an image.
  *
- * @param params See {@link UseImageLoaderParams}.
+ * @param source Either a string URL or a tuple of the form `[src,
+ *               ImageSource]`, where `src` is a fallback image URL and
+ *               `ImageSource` provides additional information for responsive
+ *               images. If a tuple is provided, the `src` will be used as the
+ *               `src` attribute of the `<img>` element, while the properties of
+ *               `ImageSource` will be used to set the `sizes` and `srcSet`
+ *               attributes.
  * @param options See {@link UseImageLoaderOptions}.
  */
 export function useImageLoader(
-  { sizes, src, srcSet }: UseImageLoaderParams,
+  source: [string, Omit<ImageSource, 'media' | 'type'>] | string,
   { onError, onLoad, onLoadStart }: UseImageLoaderOptions = {},
 ) {
+  const fallbackSrc = typeof source === 'string' ? source : source[0]
+  const imageSource = typeof source === 'string' ? undefined : source[1]
+  const resolvedImageSource = imageSource ? ImageSource.asProps(imageSource) : undefined
+
   const imageRef = useRef<HTMLImageElement>(undefined)
   const loadStartHandlerRef = useLatest(onLoadStart)
   const loadCompleteHandlerRef = useLatest(onLoad)
@@ -86,9 +77,9 @@ export function useImageLoader(
 
     loadStartHandlerRef.current?.(image)
 
-    if (srcSet) image.srcset = srcSet
-    if (sizes) image.sizes = sizes
-    image.src = src
+    if (resolvedImageSource?.srcSet) image.srcset = resolvedImageSource.srcSet
+    if (resolvedImageSource?.sizes) image.sizes = resolvedImageSource.sizes
+    image.src = fallbackSrc
 
     imageRef.current = image
 
@@ -99,5 +90,5 @@ export function useImageLoader(
       image.removeEventListener('error', errorListener)
       imageRef.current = undefined
     }
-  }, [src, srcSet, sizes])
+  }, [fallbackSrc, resolvedImageSource?.srcSet, resolvedImageSource?.sizes])
 }

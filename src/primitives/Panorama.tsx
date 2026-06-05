@@ -27,7 +27,7 @@ export function Panorama({
 }: Panorama.Props) {
   const bodyRef = useRef<HTMLDivElement>(null)
   const bodySize = useSize(bodyRef)
-  const imageSize = useImageSize({ src }, {
+  const imageSize = useImageSize(src, {
     onError: onLoadImageError,
     onLoad: onLoadImageComplete,
     onLoadStart: onLoadImageStart,

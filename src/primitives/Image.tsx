@@ -77,11 +77,7 @@ export function Image({
   const imageSource = typeof source === 'string' ? undefined : source[1]
   const resolvedImageSource = imageSource ? ImageSource.asProps(imageSource) : undefined
 
-  const size = useImageSize({
-    sizes: resolvedImageSource?.sizes,
-    src: fallbackSrc,
-    srcSet: resolvedImageSource?.srcSet,
-  }, {
+  const size = useImageSize(source, {
     onError,
     onLoad,
     onLoadStart,

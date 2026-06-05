@@ -1,13 +1,9 @@
 import { useCallback, useState } from 'react'
 import { Size } from 'spase'
 
-import { useImageLoader, type UseImageLoaderOptions, type UseImageLoaderParams } from './useImageLoader.js'
+import { type ImageSource } from '../types/ImageSource.js'
+import { useImageLoader, type UseImageLoaderOptions } from './useImageLoader.js'
 import { useLatest } from './useLatest.js'
-
-/**
- * Type describing the parameters of {@link useImageSize}.
- */
-export type UseImageSizeParams = UseImageLoaderParams
 
 /**
  * Type describing the options of {@link useImageSize}.
@@ -23,22 +19,27 @@ export type UseImageSizeOptions = {
 /**
  * Hook for retrieving the size of an image.
  *
- * @param params See {@link UseImageSizeParams}.
+ * @param source Either a string URL or a tuple of the form `[src,
+ *               ImageSource]`, where `src` is a fallback image URL and
+ *               `ImageSource` provides additional information for responsive
+ *               images. If a tuple is provided, the `src` will be used as the
+ *               `src` attribute of the `<img>` element, while the properties of
+ *               `ImageSource` will be used to set the `sizes` and `srcSet`
+ *               attributes.
  * @param options See {@link UseImageSizeOptions}.
  *
  * @returns The actual size of the image if loading was successful, `undefined`
  *          otherwise.
  */
-export function useImageSize({
-  sizes,
-  src,
-  srcSet,
-}: UseImageSizeParams, {
-  preservesSizeBetweenLoads = true,
-  onError,
-  onLoad,
-  onLoadStart,
-}: UseImageSizeOptions = {}): Size.Size | undefined {
+export function useImageSize(
+  source: [string, Omit<ImageSource, 'media' | 'type'>] | string,
+  {
+    preservesSizeBetweenLoads = true,
+    onError,
+    onLoad,
+    onLoadStart,
+  }: UseImageSizeOptions = {},
+): Size.Size | undefined {
   const [size, setSize] = useState<Size.Size | undefined>()
   const loadStartHandlerRef = useLatest(onLoadStart)
   const loadCompleteHandlerRef = useLatest(onLoad)
@@ -62,7 +63,7 @@ export function useImageSize({
     loadErrorHandlerRef.current?.(element)
   }, [preservesSizeBetweenLoads])
 
-  useImageLoader({ sizes, src, srcSet }, {
+  useImageLoader(source, {
     onError: loadErrorHandler,
     onLoad: loadCompleteHandler,
     onLoadStart: loadStartHandler,
