@@ -56,12 +56,23 @@ export function useClickOutside(
       handlerRef.current()
     }
 
+    const rightClickListener = (event: MouseEvent) => {
+      if (!isFromOutside || hitTest(event.target)) return
+
+      event.preventDefault()
+
+      isFromOutside = false
+      handlerRef.current()
+    }
+
     window.addEventListener('pointerdown', pointerDownListener, true)
     window.addEventListener('click', clickListener, true)
+    window.addEventListener('contextmenu', rightClickListener, true)
 
     return () => {
       window.removeEventListener('pointerdown', pointerDownListener, true)
       window.removeEventListener('click', clickListener, true)
+      window.removeEventListener('contextmenu', rightClickListener, true)
     }
   }, [...([] as Target[]).concat(target).map(t => t && 'current' in t ? t.current : undefined), isEnabled])
 }
