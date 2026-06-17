@@ -37,9 +37,7 @@ export function useRightClick(targetRefOrAction: (() => void) | Target, actionOr
 
   const target = typeof targetRefOrAction === 'function'
     ? undefined
-    : targetRefOrAction && 'current' in targetRefOrAction
-      ? targetRefOrAction.current
-      : targetRefOrAction
+    : targetRefOrAction
 
   const { isEnabled = true } = typeof actionOrOptions === 'function' ? options : actionOrOptions ?? {}
 
@@ -60,10 +58,12 @@ export function useRightClick(targetRefOrAction: (() => void) | Target, actionOr
         window.removeEventListener('contextmenu', listener)
       }
     } else {
-      target?.addEventListener('contextmenu', listener)
+      const element = target && 'current' in target ? target.current : target
+
+      element?.addEventListener('contextmenu', listener)
 
       return () => {
-        target?.removeEventListener('contextmenu', listener)
+        element?.removeEventListener('contextmenu', listener)
       }
     }
   }, [isWindow, target, isEnabled])
