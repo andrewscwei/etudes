@@ -8,6 +8,11 @@ function pointerDownClick(el: Element) {
   el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
 }
 
+function pointerDownContextMenu(el: Element) {
+  el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }))
+  el.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }))
+}
+
 describe('useClickOutside', () => {
   it('triggers when clicking outside the target', () => {
     const handler = vi.fn()
@@ -113,6 +118,70 @@ describe('useClickOutside', () => {
     renderHook(() => useClickOutside(target, handler))
     outside.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }))
     target.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+
+    expect(handler).not.toHaveBeenCalled()
+
+    document.body.removeChild(target)
+    document.body.removeChild(outside)
+  })
+
+  it('triggers when right clicking outside the target', () => {
+    const handler = vi.fn()
+    const target = document.createElement('div')
+    const outside = document.createElement('button')
+    document.body.appendChild(target)
+    document.body.appendChild(outside)
+
+    renderHook(() => useClickOutside(target, handler))
+    pointerDownContextMenu(outside)
+
+    expect(handler).toHaveBeenCalledOnce()
+
+    document.body.removeChild(target)
+    document.body.removeChild(outside)
+  })
+
+  it('does not trigger when right clicking the target itself', () => {
+    const handler = vi.fn()
+    const target = document.createElement('div')
+    document.body.appendChild(target)
+
+    renderHook(() => useClickOutside(target, handler))
+    pointerDownContextMenu(target)
+
+    expect(handler).not.toHaveBeenCalled()
+
+    document.body.removeChild(target)
+  })
+
+  it('prevents the default context menu when right clicking outside the target', () => {
+    const handler = vi.fn()
+    const target = document.createElement('div')
+    const outside = document.createElement('button')
+    document.body.appendChild(target)
+    document.body.appendChild(outside)
+
+    renderHook(() => useClickOutside(target, handler))
+    outside.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }))
+    const event = new MouseEvent('contextmenu', { bubbles: true, cancelable: true })
+    outside.dispatchEvent(event)
+
+    expect(event.defaultPrevented).toBe(true)
+
+    document.body.removeChild(target)
+    document.body.removeChild(outside)
+  })
+
+  it('does not trigger when pointer down is inside and right click is outside', () => {
+    const handler = vi.fn()
+    const target = document.createElement('div')
+    const outside = document.createElement('button')
+    document.body.appendChild(target)
+    document.body.appendChild(outside)
+
+    renderHook(() => useClickOutside(target, handler))
+    target.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }))
+    outside.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }))
 
     expect(handler).not.toHaveBeenCalled()
 
