@@ -12,10 +12,11 @@ type Options = {
  * Hook for overriding the browser-default right click context menu action on
  * the window.
  *
- * @param action The function to invoke instead.
+ * @param action The function to invoke instead. Receives the originating
+ *               `contextmenu` event.
  * @param options See {@link Options}.
  */
-export function useRightClick(action: () => void, options?: Options): void
+export function useRightClick(action: (event: MouseEvent) => void, options?: Options): void
 
 /**
  * Hook for overriding the browser-default right click context menu action for
@@ -23,12 +24,13 @@ export function useRightClick(action: () => void, options?: Options): void
  *
  * @param targetRef The target to override. If undefined, the window will be
  *                  used.
- * @param action The function to invoke instead.
+ * @param action The function to invoke instead. Receives the originating
+ *               `contextmenu` event.
  * @param options See {@link Options}.
  */
-export function useRightClick(targetRef: Target, action?: () => void, options?: Options): void
+export function useRightClick(targetRef: Target, action?: (event: MouseEvent) => void, options?: Options): void
 
-export function useRightClick(targetRefOrAction: (() => void) | Target, actionOrOptions?: (() => void) | Options, options: Options = {}) {
+export function useRightClick(targetRefOrAction: ((event: MouseEvent) => void) | Target, actionOrOptions?: ((event: MouseEvent) => void) | Options, options: Options = {}) {
   const actionRef = useLatest(typeof targetRefOrAction === 'function'
     ? targetRefOrAction
     : typeof actionOrOptions === 'function'
@@ -48,7 +50,7 @@ export function useRightClick(targetRefOrAction: (() => void) | Target, actionOr
 
     const listener = (e: MouseEvent) => {
       e.preventDefault()
-      actionRef.current?.()
+      actionRef.current?.(e)
     }
 
     if (isWindow) {
