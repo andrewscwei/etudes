@@ -32,7 +32,7 @@ export namespace Image {
      * properties of `ImageSource` will be used to set the `sizes` and `srcSet`
      * attributes.
      */
-    source: [string, Omit<ImageSource, 'media' | 'type'>] | string
+    source?: [string, Omit<ImageSource, 'media' | 'type'>] | string
 
     /**
      * Handler invoked when image load begins.
@@ -73,8 +73,8 @@ export function Image({
   onSizeChange,
   ...props
 }: Image.Props) {
-  const fallbackSrc = typeof source === 'string' ? source : source[0]
-  const imageSource = typeof source === 'string' ? undefined : source[1]
+  const fallbackSrc = typeof source === 'string' ? source : source?.[0]
+  const imageSource = typeof source === 'string' ? undefined : source?.[1]
   const resolvedImageSource = imageSource ? ImageSource.asProps(imageSource) : undefined
 
   const size = useImageSize(source, {

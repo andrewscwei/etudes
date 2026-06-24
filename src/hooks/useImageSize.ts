@@ -32,7 +32,7 @@ export type UseImageSizeOptions = {
  *          otherwise.
  */
 export function useImageSize(
-  source: [string, Omit<ImageSource, 'media' | 'type'>] | string,
+  source?: [string, Omit<ImageSource, 'media' | 'type'>] | string,
   {
     preservesSizeBetweenLoads = true,
     onError,

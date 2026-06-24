@@ -46,7 +46,7 @@ export namespace Video {
     /**
      * The URL of the video to play.
      */
-    source: string
+    source?: string
 
     /**
      * Handler invoked when the video is ready to play.
@@ -151,7 +151,7 @@ export function Video({
   useEffect(() => {
     if (!videoRef.current) return
 
-    if (source.toLowerCase().endsWith('.m3u8')) {
+    if (source?.toLowerCase().endsWith('.m3u8')) {
       const canMaybePlay = !!videoRef.current.canPlayType('application/x-mpegURL')
       const Hls = typeof (window as any).Hls !== 'undefined' ? (window as any).Hls : undefined
 

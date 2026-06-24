@@ -42,11 +42,11 @@ export type UseImageLoaderOptions = {
  * @param options See {@link UseImageLoaderOptions}.
  */
 export function useImageLoader(
-  source: [string, Omit<ImageSource, 'media' | 'type'>] | string,
+  source?: [string, Omit<ImageSource, 'media' | 'type'>] | string,
   { onError, onLoad, onLoadStart }: UseImageLoaderOptions = {},
 ) {
-  const fallbackSrc = typeof source === 'string' ? source : source[0]
-  const imageSource = typeof source === 'string' ? undefined : source[1]
+  const fallbackSrc = typeof source === 'string' ? source : source?.[0]
+  const imageSource = typeof source === 'string' ? undefined : source?.[1]
   const resolvedImageSource = imageSource ? ImageSource.asProps(imageSource) : undefined
 
   const imageRef = useRef<HTMLImageElement>(undefined)
@@ -79,7 +79,9 @@ export function useImageLoader(
 
     if (resolvedImageSource?.srcSet) image.srcset = resolvedImageSource.srcSet
     if (resolvedImageSource?.sizes) image.sizes = resolvedImageSource.sizes
-    image.src = fallbackSrc
+    if (fallbackSrc !== undefined) {
+      image.src = fallbackSrc
+    }
 
     imageRef.current = image
 
