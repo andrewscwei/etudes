@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { type ChangeEvent, type FocusEvent, type HTMLInputTypeAttribute, type InputHTMLAttributes, type Ref, useCallback } from 'react'
+import { type ChangeEvent, type FocusEvent, type HTMLInputTypeAttribute, type InputHTMLAttributes, type Ref, type RefObject, useCallback, useEffect, useRef } from 'react'
 
 export namespace TextField {
   /**
@@ -10,6 +10,11 @@ export namespace TextField {
      * Reference to the root element.
      */
     ref?: Ref<HTMLInputElement>
+
+    /**
+     * Specifies if the text field should be focused when it is mounted.
+     */
+    autoFocus?: boolean
 
     /**
      * The value to set to when the text field is empty.
@@ -48,7 +53,7 @@ export namespace TextField {
      *
      * @returns The formatted value.
      */
-    formatter?: (value: string) => string
+    formatValue?: (value: string) => string
 
     /**
      * Handler invoked the text field is focused.
@@ -70,25 +75,57 @@ export namespace TextField {
      * @param value The new value of the text field.
      */
     onChange?: (value: string) => void
-  } & Omit<InputHTMLAttributes<HTMLInputElement>, 'aria-disabled' | 'aria-placeholder' | 'aria-required' | 'disabled' | 'onBlur' | 'onChange' | 'onFocus' | 'placeholder' | 'required' | 'type' | 'value'>
+  } & Omit<InputHTMLAttributes<HTMLInputElement>, 'aria-disabled' | 'aria-placeholder' | 'aria-required' | 'autoFocus' | 'disabled' | 'onBlur' | 'onChange' | 'onFocus' | 'placeholder' | 'required' | 'type' | 'value'>
 }
 
 /**
  * A text field that supports custom value formatting and empty value.
  */
-export function TextField({ className, ref, emptyValue = '', formatter, placeholder, type = 'text', value, isDisabled = false, isRequired = false, onChange, onFocus, onUnfocus, ...props }: TextField.Props) {
+export function TextField({
+  className,
+  ref,
+  autoFocus = false,
+  emptyValue = '',
+  placeholder,
+  type = 'text',
+  value,
+  isDisabled = false,
+  isRequired = false,
+  formatValue,
+  onChange,
+  onFocus,
+  onUnfocus,
+  ...props
+}: TextField.Props) {
+  const rootRef = ref as RefObject<HTMLInputElement> ?? useRef<HTMLInputElement>(null)
+
   const handleValueChange = useCallback((newValue: string) => {
-    const formatted = (formatter?.(newValue) ?? newValue) || emptyValue
+    const formatted = (formatValue?.(newValue) ?? newValue) || emptyValue
 
     onChange?.(formatted)
-  }, [onChange, formatter])
+  }, [onChange, formatValue])
+
+  useEffect(() => {
+    if (!autoFocus) return
+
+    const element = rootRef.current
+    if (!element) return
+
+    const timeoutId = setTimeout(() => {
+      const length = element.value.length
+      element.focus({ preventScroll: true })
+      element.setSelectionRange(length, length)
+    }, 0)
+
+    return () => clearTimeout(timeoutId)
+  }, [autoFocus])
 
   return (
     <input
       {...props}
       {...isDisabled ? { 'aria-disabled': true } : {}}
       className={clsx(className, { disabled: isDisabled })}
-      ref={ref}
+      ref={rootRef}
       aria-placeholder={placeholder}
       aria-required={isRequired}
       disabled={isDisabled}
