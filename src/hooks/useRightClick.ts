@@ -71,5 +71,5 @@ export function useRightClick(targetOrAction: (() => void) | Target, actionOrOpt
         element?.removeEventListener('contextmenu', listener)
       }
     }
-  }, [isWindow, target, isEnabled])
+  }, [isWindow, target && 'current' in target ? target.current : target, isEnabled])
 }

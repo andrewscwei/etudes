@@ -109,5 +109,5 @@ export function useInertiaDrag(
         dragEndHandlerRef.current?.(Point.zero, Point.zero)
       }
     }
-  }, [(target && ('current' in target)) ? target.current : target, isEnabled, createKey(options)])
+  }, [target && 'current' in target ? target.current : target, isEnabled, createKey(options)])
 }
