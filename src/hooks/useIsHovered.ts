@@ -1,7 +1,10 @@
-import { type RefObject, useEffect, useState } from 'react'
+import { type RefObject, useState } from 'react'
 
 import { isTouchDevice } from '../utils/isTouchDevice.js'
+import { useMouseEnter } from './useMouseEnter.js'
 import { useMouseLeave } from './useMouseLeave.js'
+
+type Target = HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined
 
 type Options = {
   isEnabled?: boolean
@@ -15,32 +18,13 @@ type Options = {
  *
  * @returns A boolean indicating whether the target element is hovered.
  */
-export function useIsHovered(
-  target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined,
-  {
-    isEnabled = true,
-  }: Options = {},
-): boolean {
+export function useIsHovered(target: Target, { isEnabled = true }: Options = {}): boolean {
   const isTouch = isTouchDevice()
   const [isHovered, setIsHovered] = useState(false)
 
-  const el = target && 'current' in target ? target.current : target
-
-  useEffect(() => {
-    if (isTouch || !isEnabled || !el) {
-      setIsHovered(false)
-
-      return
-    }
-
-    const handler = () => setIsHovered(true)
-
-    el.addEventListener('pointerover', handler)
-
-    return () => {
-      el.removeEventListener('pointerover', handler)
-    }
-  }, [el, isEnabled, isTouch])
+  useMouseEnter(target, () => {
+    setIsHovered(true)
+  }, { isEnabled: !isTouch && isEnabled })
 
   useMouseLeave(target, () => {
     setIsHovered(false)
