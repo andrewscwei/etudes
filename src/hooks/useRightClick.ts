@@ -21,27 +21,26 @@ export function useRightClick(action: () => void, options?: Options): void
  * Hook for overriding the browser-default right click context menu action for
  * an element.
  *
- * @param targetRef The target to override. If undefined, the window will be
- *                  used.
+ * @param target The target to override. If undefined, the window will be used.
  * @param action The function to invoke instead.
  * @param options See {@link Options}.
  */
-export function useRightClick(targetRef: Target, action?: () => void, options?: Options): void
+export function useRightClick(target: Target, action?: () => void, options?: Options): void
 
-export function useRightClick(targetRefOrAction: (() => void) | Target, actionOrOptions?: (() => void) | Options, options: Options = {}) {
-  const actionRef = useLatest(typeof targetRefOrAction === 'function'
-    ? targetRefOrAction
+export function useRightClick(targetOrAction: (() => void) | Target, actionOrOptions?: (() => void) | Options, options: Options = {}) {
+  const actionRef = useLatest(typeof targetOrAction === 'function'
+    ? targetOrAction
     : typeof actionOrOptions === 'function'
       ? actionOrOptions
       : () => {})
 
-  const target = typeof targetRefOrAction === 'function'
+  const target = typeof targetOrAction === 'function'
     ? undefined
-    : targetRefOrAction
+    : targetOrAction
 
   const { isEnabled = true } = typeof actionOrOptions === 'function' ? options : actionOrOptions ?? {}
 
-  const isWindow = typeof targetRefOrAction === 'function'
+  const isWindow = typeof targetOrAction === 'function'
 
   useEffect(() => {
     if (!isEnabled) return
