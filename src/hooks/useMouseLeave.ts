@@ -3,6 +3,8 @@ import { hitTest, Point, Rect } from 'spase'
 
 import { useLatest } from './useLatest.js'
 
+type Target = HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined
+
 type Options = {
   isEnabled?: boolean
 }
@@ -17,25 +19,27 @@ type Options = {
  * @param options See {@link Options}.
  */
 export function useMouseLeave(
-  target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined,
+  target: Target,
   handler: () => void,
   {
     isEnabled = true,
   }: Options = {},
 ) {
   const handlerRef = useLatest(handler)
+  const targetRef = useLatest(target)
 
   useLayoutEffect(() => {
     if (!isEnabled) return
 
-    const element = target && 'current' in target ? target.current : target
-    if (!element) return
-
     const listener = (event: MouseEvent) => {
+      const t = targetRef.current
+      const element = t && 'current' in t ? t.current : t
+      if (!element) return
+
       const viewport = Rect.fromViewport()
       const point = Point.make([event.x + viewport.left, event.y + viewport.top])
 
-      if (element && !hitTest(point, element)) {
+      if (!hitTest(point, element)) {
         handlerRef.current()
       }
     }
@@ -45,5 +49,5 @@ export function useMouseLeave(
     return () => {
       window.removeEventListener('mousemove', listener)
     }
-  }, [target && 'current' in target ? target.current : target, isEnabled])
+  }, [isEnabled])
 }
