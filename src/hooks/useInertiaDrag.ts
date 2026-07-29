@@ -7,6 +7,8 @@ import { Point } from 'spase'
 import { createKey } from '../utils/createKey.js'
 import { useLatest } from './useLatest.js'
 
+type Target = HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined
+
 /**
  * Type describing the options of {@link useInertiaDrag}.
  */
@@ -52,7 +54,7 @@ export type UseInertiaDragOptions = {
  * @returns The states created for this effect.
  */
 export function useInertiaDrag(
-  target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined,
+  target: Target,
   {
     isEnabled = true,
     onDragEnd,

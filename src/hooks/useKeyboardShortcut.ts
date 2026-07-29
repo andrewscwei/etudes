@@ -2,6 +2,8 @@ import { type KeyboardEvent, type RefObject, useEffect, useMemo } from 'react'
 
 import { useLatest } from './useLatest.js'
 
+type Target = HTMLElement | RefObject<HTMLElement | null | Window> | RefObject<HTMLElement | undefined | Window> | RefObject<HTMLElement | Window> | Window
+
 /**
  * A type representing the keys that can be used in a keyboard shortcut.
  */
@@ -114,7 +116,7 @@ type Options = {
   /**
    * The target element to attach the event listener to. Defaults to `window`.
    */
-  target?: HTMLElement | RefObject<HTMLElement | null | Window> | RefObject<HTMLElement | undefined | Window> | RefObject<HTMLElement | Window> | Window
+  target?: Target
 }
 
 /**

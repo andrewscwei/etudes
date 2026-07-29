@@ -5,6 +5,8 @@ import { useIntersectionObserver } from './useIntersectionObserver.js'
 import { useSizeObserver } from './useSizeObserver.js'
 import { useViewportSize } from './useViewportSize.js'
 
+type Target = HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined
+
 /**
  * Hook for monitoring changes in and returning the size and position of the
  * target element.
@@ -13,7 +15,7 @@ import { useViewportSize } from './useViewportSize.js'
  *
  * @returns The most current rect of the target element.
  */
-export function useRect(target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined): Rect.Rect {
+export function useRect(target: Target): Rect.Rect {
   const [rect, setRect] = useState<Rect.Rect>(Rect.zero)
   const viewportSize = useViewportSize()
 

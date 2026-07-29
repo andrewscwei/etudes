@@ -3,6 +3,8 @@ import { Rect, Size } from 'spase'
 
 import { useSizeObserver } from './useSizeObserver.js'
 
+type Target = HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined
+
 /**
  * Hook for monitoring changes in and returning the size of the target element.
  *
@@ -10,7 +12,7 @@ import { useSizeObserver } from './useSizeObserver.js'
  *
  * @returns The most current size of the target element.
  */
-export function useSize(target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined): Size.Size {
+export function useSize(target: Target): Size.Size {
   const [size, setSize] = useState<Size.Size>(Size.zero)
 
   useSizeObserver(target, el => {

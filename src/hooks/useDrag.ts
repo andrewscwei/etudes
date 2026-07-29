@@ -3,6 +3,8 @@ import { Point } from 'spase'
 
 import { useLatest } from './useLatest.js'
 
+type Target = HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined
+
 /**
  * Type describing the options of {@link useDrag}.
  */
@@ -55,7 +57,7 @@ export type UseDragOptions = {
  * @returns The states created for this effect.
  */
 export function useDrag(
-  target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined,
+  target: Target,
   {
     isEnabled = true,
     shouldUpdateCursor = true,

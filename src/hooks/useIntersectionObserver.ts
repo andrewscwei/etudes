@@ -2,6 +2,8 @@ import { type RefObject, useLayoutEffect } from 'react'
 
 import { useLatest } from './useLatest.js'
 
+type Target = HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined
+
 /**
  * Hook for monitoring the change in intersection between the target element and
  * the viewport.
@@ -10,7 +12,7 @@ import { useLatest } from './useLatest.js'
  * @param handler Handler invoked when the intersection changes.
  */
 export function useIntersectionObserver(
-  target: HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined,
+  target: Target,
   handler: (element: HTMLElement) => void,
 ) {
   const handlerRef = useLatest(handler)
