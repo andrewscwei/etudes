@@ -20,13 +20,7 @@ type Options = {
  * @param options See {@link Options}.
  */
 
-export function useClickOutside(
-  target: Target | Target[],
-  handler: () => void,
-  {
-    isEnabled = true,
-  }: Options = {},
-) {
+export function useClickOutside(target: Target | Target[], handler: () => void, { isEnabled = true }: Options = {}) {
   const handlerRef = useLatest(handler)
   const targetsRef = useLatest(([] as Target[]).concat(target))
 
@@ -74,5 +68,5 @@ export function useClickOutside(
       window.removeEventListener('click', clickListener, true)
       window.removeEventListener('contextmenu', rightClickListener, true)
     }
-  }, [...([] as Target[]).concat(target).map(t => t && 'current' in t ? t.current : undefined), isEnabled])
+  }, [isEnabled])
 }
