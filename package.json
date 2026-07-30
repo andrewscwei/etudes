@@ -4,14 +4,12 @@
   "description": "A study of headless React components",
   "type": "module",
   "sideEffects": false,
-  "main": "./build/etudes.umd.cjs",
-  "module": "./build/etudes.js",
+  "module": "./build/index.js",
   "types": "./build/index.d.ts",
   "exports": {
     ".": {
       "types": "./build/index.d.ts",
-      "import": "./build/etudes.js",
-      "require": "./build/etudes.umd.cjs"
+      "import": "./build/index.js"
     }
   },
   "files": [

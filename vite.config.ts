@@ -1,32 +1,31 @@
 import { resolve } from 'node:path'
-import { esmExternalRequirePlugin } from 'vite'
 import dts from 'vite-plugin-dts'
 import { defineConfig } from 'vitest/config'
+
+import { dependencies, peerDependencies } from './package.json' with { type: 'json' }
 
 export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      formats: ['es', 'umd'],
-      name: 'etudes',
+      formats: ['es'],
     },
     outDir: resolve(__dirname, 'build'),
     rollupOptions: {
+      external: [
+        ...Object.keys(dependencies),
+        ...Object.keys(peerDependencies),
+      ].map(name => new RegExp(`^${name}($|/)`)),
       output: {
-        globals: {
-          react: 'react',
-        },
+        entryFileNames: '[name].js',
+        preserveModules: true,
+        preserveModulesRoot: 'src',
       },
       treeshake: true,
     },
   },
   plugins: [
     dts(),
-    esmExternalRequirePlugin({
-      external: [
-        'react',
-      ],
-    }),
   ],
   test: {
     coverage: {
