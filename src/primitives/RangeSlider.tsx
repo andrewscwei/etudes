@@ -1,4 +1,4 @@
-import isDeepEqual from 'fast-deep-equal/react'
+import isDeepEqual from 'fast-deep-equal/react.js'
 import { type HTMLAttributes, type Ref, type RefObject, useCallback, useLayoutEffect, useMemo, useRef } from 'react'
 
 import { useInertiaDrag } from '../hooks/useInertiaDrag.js'

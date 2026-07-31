@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import isDeepEqual from 'fast-deep-equal/react'
+import isDeepEqual from 'fast-deep-equal/react.js'
 import { type ComponentType, type HTMLAttributes, type Ref, useEffect } from 'react'
 
 import { Each } from '../flows/Each.js'
