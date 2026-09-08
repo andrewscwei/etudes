@@ -16,6 +16,7 @@ import { styles } from '../utils/styles.js'
 export function Select<T extends string>({
   id,
   ref,
+  style,
   children,
   name,
   options,
@@ -33,7 +34,7 @@ export function Select<T extends string>({
   })
 
   return (
-    <div {...props} ref={ref} style={FIXED_STYLES.root}>
+    <div {...props} ref={ref} style={styles(style, FIXED_STYLES.root)}>
       <Styled
         style={FIXED_STYLES.select}
         aria-required={isRequired ? 'true' : undefined}
