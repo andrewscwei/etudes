@@ -54,6 +54,12 @@ type Options = {
   capture?: boolean
 
   /**
+   * Specifies whether the shortcut ignores the auto-repeated key events fired
+   * while the key is held down. Defaults to `true`.
+   */
+  ignoresRepeat?: boolean
+
+  /**
    * Specifies whether the keyboard shortcut is enabled.
    */
   isEnabled?: boolean
@@ -164,6 +170,7 @@ export function useKeyboardShortcut(
   action: () => void,
   {
     capture = false,
+    ignoresRepeat = true,
     preventsDefault = true,
     stopsPropagation = true,
     target,
@@ -186,6 +193,7 @@ export function useKeyboardShortcut(
 
     const listener = (event: KeyboardEvent) => {
       if (event.isComposing || event.keyCode === IME_COMPOSITION_KEY_CODE) return
+      if (ignoresRepeat && event.repeat) return
       if (yieldsToTextInput && isTextInput(event.target)) return
 
       const key = getKey(event)
@@ -215,7 +223,7 @@ export function useKeyboardShortcut(
     return () => {
       eventTarget.removeEventListener('keydown', listener as EventListener, { capture })
     }
-  }, [shortcutId, isEnabled, shouldYieldToTextInput, preventsDefault, stopsPropagation, capture, target])
+  }, [shortcutId, isEnabled, ignoresRepeat, shouldYieldToTextInput, preventsDefault, stopsPropagation, capture, target])
 }
 
 function isTextInputShortcut(keys: string[]): boolean {

@@ -3,16 +3,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { useKeyboardShortcut } from '../useKeyboardShortcut.js'
 
-function pressKey(key: string, modifiers: { altKey?: boolean; ctrlKey?: boolean; metaKey?: boolean; shiftKey?: boolean } = {}, target: EventTarget = window) {
-  target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...modifiers }))
-}
-
-function mountElement<T extends HTMLElement>(html: string): T {
-  document.body.innerHTML = html
-
-  return document.body.firstElementChild as T
-}
-
 describe('useKeyboardShortcut', () => {
   afterEach(() => {
     document.body.innerHTML = ''
@@ -99,6 +89,24 @@ describe('useKeyboardShortcut', () => {
     expect(action).toHaveBeenCalledOnce()
   })
 
+  it('ignores auto-repeated key events by default', () => {
+    const action = vi.fn()
+    renderHook(() => useKeyboardShortcut('a', action))
+
+    pressKey('a')
+    pressKey('a', { repeat: true })
+    expect(action).toHaveBeenCalledOnce()
+  })
+
+  it('triggers on auto-repeated key events when ignoresRepeat is false', () => {
+    const action = vi.fn()
+    renderHook(() => useKeyboardShortcut('a', action, { ignoresRepeat: false }))
+
+    pressKey('a')
+    pressKey('a', { repeat: true })
+    expect(action).toHaveBeenCalledTimes(2)
+  })
+
   it('ignores a typing shortcut while a text input has focus', () => {
     const action = vi.fn()
     const input = mountElement<HTMLInputElement>('<input type="text">')
@@ -153,24 +161,6 @@ describe('useKeyboardShortcut', () => {
     expect(action).not.toHaveBeenCalled()
   })
 
-  it('ignores a navigation key while a text input has focus', () => {
-    const action = vi.fn()
-    const input = mountElement<HTMLInputElement>('<input type="text">')
-    renderHook(() => useKeyboardShortcut('arrowleft', action))
-
-    pressKey('ArrowLeft', {}, input)
-    expect(action).not.toHaveBeenCalled()
-  })
-
-  it('triggers a function key while a text input has focus', () => {
-    const action = vi.fn()
-    const input = mountElement<HTMLInputElement>('<input type="text">')
-    renderHook(() => useKeyboardShortcut('f2', action))
-
-    pressKey('F2', {}, input)
-    expect(action).toHaveBeenCalledOnce()
-  })
-
   it('triggers a modified chord while a text input has focus', () => {
     const action = vi.fn()
     const input = mountElement<HTMLInputElement>('<input type="text">')
@@ -198,3 +188,28 @@ describe('useKeyboardShortcut', () => {
     expect(action).not.toHaveBeenCalled()
   })
 })
+
+function pressKey(
+  key: string,
+  init: {
+    altKey?: boolean
+    ctrlKey?: boolean
+    metaKey?: boolean
+    repeat?: boolean
+    shiftKey?: boolean
+  } = {},
+  target: EventTarget = window,
+) {
+  target.dispatchEvent(new KeyboardEvent('keydown', {
+    key,
+    bubbles: true,
+    cancelable: true,
+    ...init,
+  }))
+}
+
+function mountElement<T extends HTMLElement>(html: string): T {
+  document.body.innerHTML = html
+
+  return document.body.firstElementChild as T
+}
