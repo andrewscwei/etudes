@@ -196,21 +196,28 @@ export function useKeyboardShortcut(
       if (ignoresRepeat && event.repeat) return
       if (yieldsToTextInput && isTextInput(event.target)) return
 
-      const key = getKey(event)
+      const matches = (key: string, ignoresShift: boolean) => {
+        const pressed = new Set<string>([key])
+
+        if (event.ctrlKey) pressed.add('control')
+        if (event.metaKey) pressed.add('meta')
+        if (event.altKey) pressed.add('alt')
+        if (event.shiftKey && !ignoresShift) pressed.add('shift')
+
+        const required = ignoresShift ? requiredKeys.filter(k => k !== 'shift') : requiredKeys
+
+        return required.length === pressed.size && required.every(k => pressed.has(k))
+      }
+
+      const layoutKey = getKey(event)
+      const physicalKey = keyFromCode(event.code)
 
       // Shift is implied by non-letter characters (i.e. Shift+/ yields '?'), so
-      // it is ignored for those keys on both sides of the comparison.
-      const ignoresShift = key.length === 1 && !/^[a-z]$/.test(key)
+      // it is ignored for those keys on both sides of the comparison. The
+      // physical key is also tried so that ['shift', '/'] matches Shift+/.
+      const ignoresShift = layoutKey.length === 1 && !/^[a-z]$/.test(layoutKey)
 
-      const pressed = new Set<string>([key])
-
-      if (event.ctrlKey) pressed.add('control')
-      if (event.metaKey) pressed.add('meta')
-      if (event.altKey) pressed.add('alt')
-      if (event.shiftKey && !ignoresShift) pressed.add('shift')
-
-      const required = ignoresShift ? requiredKeys.filter(k => k !== 'shift') : requiredKeys
-      if (required.length !== pressed.size || !required.every(k => pressed.has(k))) return
+      if (!matches(layoutKey, ignoresShift) && !(physicalKey && matches(physicalKey, false))) return
 
       if (preventsDefault) event.preventDefault()
       if (stopsPropagation) event.stopPropagation()

@@ -89,6 +89,30 @@ describe('useKeyboardShortcut', () => {
     expect(action).toHaveBeenCalledOnce()
   })
 
+  it('triggers a shifted punctuation shortcut bound by its produced character', () => {
+    const action = vi.fn()
+    renderHook(() => useKeyboardShortcut('?', action))
+
+    pressKey('?', { code: 'Slash', shiftKey: true })
+    expect(action).toHaveBeenCalledOnce()
+  })
+
+  it('triggers a shifted punctuation shortcut bound by its physical key', () => {
+    const action = vi.fn()
+    renderHook(() => useKeyboardShortcut(['shift', '/'], action))
+
+    pressKey('?', { code: 'Slash', shiftKey: true })
+    expect(action).toHaveBeenCalledOnce()
+  })
+
+  it('does not trigger an unshifted punctuation shortcut when shift is held', () => {
+    const action = vi.fn()
+    renderHook(() => useKeyboardShortcut('/', action))
+
+    pressKey('?', { code: 'Slash', shiftKey: true })
+    expect(action).not.toHaveBeenCalled()
+  })
+
   it('ignores auto-repeated key events by default', () => {
     const action = vi.fn()
     renderHook(() => useKeyboardShortcut('a', action))
@@ -202,6 +226,7 @@ function pressKey(
   key: string,
   init: {
     altKey?: boolean
+    code?: string
     ctrlKey?: boolean
     metaKey?: boolean
     repeat?: boolean
