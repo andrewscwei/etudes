@@ -183,7 +183,7 @@ function isTextInputElement(target: EventTarget | null): boolean {
 
 function isTextInputShortcut(keys: string[]): boolean {
   const modifiers = new Set(['alt', 'control', 'meta'])
-  if (keys.some(modifiers.has)) return false
+  if (keys.some(k => modifiers.has(k))) return false
 
   const nonTextKeys = new Set([
     'altgraph',
