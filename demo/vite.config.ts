@@ -6,10 +6,12 @@ import svgr from 'vite-plugin-svgr'
 
 import packageJson from '../package.json'
 
+const __dirname = import.meta.dirname
+
 export default defineConfig(({ mode }) => ({
   base: loadEnv(mode, process.cwd(), '').BASE_PATH ?? '/',
   build: {
-    outDir: resolve(__dirname, '../.gh-pages'),
+    outDir: resolve(import.meta.dirname, '../.gh-pages'),
     rollupOptions: {
       treeshake: true,
     },
