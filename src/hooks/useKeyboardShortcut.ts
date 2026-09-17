@@ -90,71 +90,9 @@ type Options = {
   target?: Target
 }
 
-const KEY_ALIASES: Record<string, string> = {
-  ' ': 'space',
-  'apps': 'contextmenu',
-  'del': 'delete',
-  'down': 'arrowdown',
-  'esc': 'escape',
-  'left': 'arrowleft',
-  'os': 'meta',
-  'right': 'arrowright',
-  'spacebar': 'space',
-  'up': 'arrowup',
-  'win': 'meta',
-}
-
 const IME_COMPOSITION_KEY_CODE = 229
 
-const EDITING_MODIFIERS = new Set(['alt', 'control', 'meta'])
-
-const NON_TEXT_INPUT_KEYS = new Set([
-  'altgraph',
-  'capslock',
-  'numlock',
-  'scrolllock',
-  'shift',
-  'contextmenu',
-  'escape',
-  'pause',
-  'printscreen',
-  'f1',
-  'f2',
-  'f3',
-  'f4',
-  'f5',
-  'f6',
-  'f7',
-  'f8',
-  'f9',
-  'f10',
-  'f11',
-  'f12',
-  'audiovolumedown',
-  'audiovolumemute',
-  'audiovolumeup',
-  'mediaplaypause',
-  'mediastop',
-  'mediatracknext',
-  'mediatrackprevious',
-])
-
 const NON_TEXT_INPUT_TYPES = new Set(['button', 'checkbox', 'color', 'file', 'image', 'radio', 'range', 'reset', 'submit'])
-
-const CODE_TO_KEY: Record<string, string> = {
-  Backquote: '`',
-  Backslash: '\\',
-  BracketLeft: '[',
-  BracketRight: ']',
-  Comma: ',',
-  Equal: '=',
-  Minus: '-',
-  Period: '.',
-  Quote: "'",
-  Semicolon: ';',
-  Slash: '/',
-  Space: 'space',
-}
 
 const KEY_DELIMITER = '\u0000'
 
@@ -194,7 +132,7 @@ export function useKeyboardShortcut(
     const listener = (event: KeyboardEvent) => {
       if (event.isComposing || event.keyCode === IME_COMPOSITION_KEY_CODE) return
       if (ignoresRepeat && event.repeat) return
-      if (yieldsToTextInput && isTextInput(event.target)) return
+      if (yieldsToTextInput && isTextInputElement(event.target)) return
 
       const matches = (key: string, ignoresShift: boolean) => {
         const pressed = new Set<string>([key])
@@ -209,8 +147,8 @@ export function useKeyboardShortcut(
         return required.length === pressed.size && required.every(k => pressed.has(k))
       }
 
-      const layoutKey = getKey(event)
-      const physicalKey = keyFromCode(event.code)
+      const layoutKey = getKeyByEvent(event)
+      const physicalKey = getKeyByCode(event.code)
 
       // Shift is implied by non-letter characters (i.e. Shift+/ yields '?'), so
       // it is ignored for those keys on both sides of the comparison. The
@@ -233,13 +171,7 @@ export function useKeyboardShortcut(
   }, [shortcutId, isEnabled, ignoresRepeat, shouldYieldToTextInput, preventsDefault, stopsPropagation, capture, target && 'current' in target ? target.current : target])
 }
 
-function isTextInputShortcut(keys: string[]): boolean {
-  if (keys.some(k => EDITING_MODIFIERS.has(k))) return false
-
-  return keys.some(k => !NON_TEXT_INPUT_KEYS.has(k))
-}
-
-function isTextInput(target: EventTarget | null): boolean {
+function isTextInputElement(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false
   if (target.isContentEditable) return true
   if (target instanceof HTMLSelectElement) return true
@@ -249,22 +181,89 @@ function isTextInput(target: EventTarget | null): boolean {
   return false
 }
 
-function keyFromCode(code: string): string | undefined {
-  if (/^Key[A-Z]$/.test(code)) return code.slice(3).toLowerCase()
-  if (/^Digit[0-9]$/.test(code)) return code.slice(5)
+function isTextInputShortcut(keys: string[]): boolean {
+  const modifiers = new Set(['alt', 'control', 'meta'])
+  if (keys.some(modifiers.has)) return false
 
-  return CODE_TO_KEY[code]
+  const nonTextKeys = new Set([
+    'altgraph',
+    'capslock',
+    'numlock',
+    'scrolllock',
+    'shift',
+    'contextmenu',
+    'escape',
+    'pause',
+    'printscreen',
+    'f1',
+    'f2',
+    'f3',
+    'f4',
+    'f5',
+    'f6',
+    'f7',
+    'f8',
+    'f9',
+    'f10',
+    'f11',
+    'f12',
+    'audiovolumedown',
+    'audiovolumemute',
+    'audiovolumeup',
+    'mediaplaypause',
+    'mediastop',
+    'mediatracknext',
+    'mediatrackprevious',
+  ])
+
+  return keys.some(k => !nonTextKeys.has(k))
 }
 
-function getKey(event: KeyboardEvent): string {
+function getKeyByEvent(event: KeyboardEvent): string {
+  const aliases: Record<string, string> = {
+    ' ': 'space',
+    'apps': 'contextmenu',
+    'del': 'delete',
+    'down': 'arrowdown',
+    'esc': 'escape',
+    'left': 'arrowleft',
+    'os': 'meta',
+    'right': 'arrowright',
+    'spacebar': 'space',
+    'up': 'arrowup',
+    'win': 'meta',
+  }
+
   const raw = event.key.toLowerCase()
-  const key = KEY_ALIASES[raw] ?? raw
+  const key = aliases[raw] ?? raw
 
   // Option+key on macOS produces composed characters (e.g. 'ß') or dead keys,
   // so fall back to the physical key.
   if (event.altKey && (key === 'dead' || (key.length === 1 && !/^[\x20-\x7E]$/.test(key)))) {
-    return keyFromCode(event.code) ?? key
+    return getKeyByCode(event.code) ?? key
   }
 
   return key
+}
+
+function getKeyByCode(code: string): string | undefined {
+  const map: Record<string, string> = {
+    Backquote: '`',
+    Backslash: '\\',
+    BracketLeft: '[',
+    BracketRight: ']',
+    Comma: ',',
+    Equal: '=',
+    Minus: '-',
+    Period: '.',
+    Quote: "'",
+    Semicolon: ';',
+    Slash: '/',
+    Space: 'space',
+  }
+
+  if (/^Key[A-Z]$/.test(code)) return code.slice(3).toLowerCase()
+  if (/^Digit[0-9]$/.test(code)) return code.slice(5)
+
+  return map[code]
 }
