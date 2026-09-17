@@ -223,7 +223,7 @@ export function useKeyboardShortcut(
     return () => {
       eventTarget.removeEventListener('keydown', listener as EventListener, { capture })
     }
-  }, [shortcutId, isEnabled, ignoresRepeat, shouldYieldToTextInput, preventsDefault, stopsPropagation, capture, target])
+  }, [shortcutId, isEnabled, ignoresRepeat, shouldYieldToTextInput, preventsDefault, stopsPropagation, capture, target && 'current' in target ? target.current : target])
 }
 
 function isTextInputShortcut(keys: string[]): boolean {
