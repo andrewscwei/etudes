@@ -64,6 +64,16 @@ type Options = {
   preventsDefault?: boolean
 
   /**
+   * Specifies whether the shortcut is ignored while a text input, textarea,
+   * select or contenteditable element has focus.
+   *
+   * Defaults to `true` for shortcuts that would otherwise type a character
+   * (i.e. alphanumeric, punctuations, etc. unless paired with `control`, `meta`
+   * or `alt`), `false` otherwise.
+   */
+  shouldYieldToTextInput?: boolean
+
+  /**
    * Specifies whether to stop propagation of the keyboard event.
    */
   stopsPropagation?: boolean
@@ -88,6 +98,12 @@ const KEY_ALIASES: Record<string, string> = {
   'win': 'meta',
 }
 
+const IME_COMPOSITION_KEY_CODE = 229
+
+const EDITING_MODIFIERS = new Set(['alt', 'control', 'meta'])
+
+const NON_TEXT_INPUT_TYPES = new Set(['button', 'checkbox', 'color', 'file', 'image', 'radio', 'range', 'reset', 'submit'])
+
 const CODE_TO_KEY: Record<string, string> = {
   Backquote: '`',
   Backslash: '\\',
@@ -102,6 +118,8 @@ const CODE_TO_KEY: Record<string, string> = {
   Slash: '/',
   Space: 'space',
 }
+
+const KEY_DELIMITER = '\u0000'
 
 /**
  * A hook that listens for a keyboard shortcut and triggers an action.
@@ -119,11 +137,12 @@ export function useKeyboardShortcut(
     stopsPropagation = true,
     target,
     isEnabled = true,
+    shouldYieldToTextInput,
   }: Options = {},
 ) {
   const actionRef = useLatest(action)
   const keyList = Array.isArray(keyOrKeys) ? keyOrKeys : [keyOrKeys]
-  const shortcutId = [...new Set(keyList.map(k => k.toLowerCase()))].sort().join('\u0000')
+  const shortcutId = [...new Set(keyList.map(k => k.toLowerCase()))].sort().join(KEY_DELIMITER)
 
   useEffect(() => {
     if (!isEnabled || !shortcutId) return
@@ -131,15 +150,18 @@ export function useKeyboardShortcut(
     const eventTarget = target && 'current' in target ? target.current : target ?? window
     if (!eventTarget) return
 
-    const requiredKeys = shortcutId.split('\u0000')
+    const requiredKeys = shortcutId.split(KEY_DELIMITER)
+
+    const yieldsToTextInput = shouldYieldToTextInput ?? isTypingShortcut(requiredKeys)
 
     const listener = (event: KeyboardEvent) => {
-      if (event.isComposing || event.keyCode === 229) return
+      if (event.isComposing || event.keyCode === IME_COMPOSITION_KEY_CODE) return
+      if (yieldsToTextInput && isTextInput(event.target)) return
 
       const key = getKey(event)
 
-      // Shift is implied by non-letter characters (Shift+/ yields '?'), so it
-      // is ignored for those keys on both sides of the comparison.
+      // Shift is implied by non-letter characters (i.e. Shift+/ yields '?'), so
+      // it is ignored for those keys on both sides of the comparison.
       const ignoresShift = key.length === 1 && !/^[a-z]$/.test(key)
 
       const pressed = new Set<string>([key])
@@ -163,7 +185,22 @@ export function useKeyboardShortcut(
     return () => {
       eventTarget.removeEventListener('keydown', listener as EventListener, { capture })
     }
-  }, [shortcutId, isEnabled, preventsDefault, stopsPropagation, capture, target])
+  }, [shortcutId, isEnabled, shouldYieldToTextInput, preventsDefault, stopsPropagation, capture, target])
+}
+
+function isTypingShortcut(keys: string[]): boolean {
+  if (keys.some(k => EDITING_MODIFIERS.has(k))) return false
+
+  return keys.filter(k => k !== 'shift').every(k => k.length === 1 || k === 'space')
+}
+
+function isTextInput(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false
+  if (target.isContentEditable) return true
+  if (target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) return true
+  if (target instanceof HTMLInputElement) return !NON_TEXT_INPUT_TYPES.has(target.type)
+
+  return false
 }
 
 function keyFromCode(code: string): string | undefined {

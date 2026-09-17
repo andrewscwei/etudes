@@ -1,13 +1,23 @@
 import { renderHook } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { useKeyboardShortcut } from '../useKeyboardShortcut.js'
 
-function pressKey(key: string, modifiers: { altKey?: boolean; ctrlKey?: boolean; metaKey?: boolean; shiftKey?: boolean } = {}) {
-  window.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...modifiers }))
+function pressKey(key: string, modifiers: { altKey?: boolean; ctrlKey?: boolean; metaKey?: boolean; shiftKey?: boolean } = {}, target: EventTarget = window) {
+  target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...modifiers }))
+}
+
+function mountElement<T extends HTMLElement>(html: string): T {
+  document.body.innerHTML = html
+
+  return document.body.firstElementChild as T
 }
 
 describe('useKeyboardShortcut', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
   it('triggers the action when the bound key is pressed', () => {
     const action = vi.fn()
     renderHook(() => useKeyboardShortcut('a', action))
@@ -87,5 +97,77 @@ describe('useKeyboardShortcut', () => {
 
     pressKey('A')
     expect(action).toHaveBeenCalledOnce()
+  })
+
+  it('ignores a typing shortcut while a text input has focus', () => {
+    const action = vi.fn()
+    const input = mountElement<HTMLInputElement>('<input type="text">')
+    renderHook(() => useKeyboardShortcut('p', action))
+
+    pressKey('p', {}, input)
+    expect(action).not.toHaveBeenCalled()
+  })
+
+  it('ignores a typing shortcut while a textarea has focus', () => {
+    const action = vi.fn()
+    const textarea = mountElement<HTMLTextAreaElement>('<textarea></textarea>')
+    renderHook(() => useKeyboardShortcut('p', action))
+
+    pressKey('p', {}, textarea)
+    expect(action).not.toHaveBeenCalled()
+  })
+
+  it('ignores a typing shortcut while a contenteditable element has focus', () => {
+    const action = vi.fn()
+    const editable = mountElement<HTMLDivElement>('<div contenteditable="true"></div>')
+    renderHook(() => useKeyboardShortcut('p', action))
+
+    pressKey('p', {}, editable)
+    expect(action).not.toHaveBeenCalled()
+  })
+
+  it('triggers a typing shortcut on a non-text input', () => {
+    const action = vi.fn()
+    const checkbox = mountElement<HTMLInputElement>('<input type="checkbox">')
+    renderHook(() => useKeyboardShortcut('p', action))
+
+    pressKey('p', {}, checkbox)
+    expect(action).toHaveBeenCalledOnce()
+  })
+
+  it('triggers a non-printable key while a text input has focus', () => {
+    const action = vi.fn()
+    const input = mountElement<HTMLInputElement>('<input type="text">')
+    renderHook(() => useKeyboardShortcut('escape', action))
+
+    pressKey('Escape', {}, input)
+    expect(action).toHaveBeenCalledOnce()
+  })
+
+  it('triggers a modified chord while a text input has focus', () => {
+    const action = vi.fn()
+    const input = mountElement<HTMLInputElement>('<input type="text">')
+    renderHook(() => useKeyboardShortcut(['meta', 's'], action))
+
+    pressKey('s', { metaKey: true }, input)
+    expect(action).toHaveBeenCalledOnce()
+  })
+
+  it('triggers a typing shortcut in a text input when shouldYieldToTextInput is false', () => {
+    const action = vi.fn()
+    const input = mountElement<HTMLInputElement>('<input type="text">')
+    renderHook(() => useKeyboardShortcut('p', action, { shouldYieldToTextInput: false }))
+
+    pressKey('p', {}, input)
+    expect(action).toHaveBeenCalledOnce()
+  })
+
+  it('ignores a non-printable key in a text input when shouldYieldToTextInput is true', () => {
+    const action = vi.fn()
+    const input = mountElement<HTMLInputElement>('<input type="text">')
+    renderHook(() => useKeyboardShortcut('escape', action, { shouldYieldToTextInput: true }))
+
+    pressKey('Escape', {}, input)
+    expect(action).not.toHaveBeenCalled()
   })
 })
