@@ -143,6 +143,15 @@ describe('useKeyboardShortcut', () => {
     expect(action).toHaveBeenCalledOnce()
   })
 
+  it('triggers a typing shortcut on a read-only text input', () => {
+    const action = vi.fn()
+    const input = mountElement<HTMLInputElement>('<input type="text" readonly>')
+    renderHook(() => useKeyboardShortcut('p', action))
+
+    pressKey('p', {}, input)
+    expect(action).toHaveBeenCalledOnce()
+  })
+
   it('triggers a non-printable key while a text input has focus', () => {
     const action = vi.fn()
     const input = mountElement<HTMLInputElement>('<input type="text">')

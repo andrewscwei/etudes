@@ -235,8 +235,9 @@ function isTextInputShortcut(keys: string[]): boolean {
 function isTextInput(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false
   if (target.isContentEditable) return true
-  if (target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) return true
-  if (target instanceof HTMLInputElement) return !NON_TEXT_INPUT_TYPES.has(target.type)
+  if (target instanceof HTMLSelectElement) return true
+  if (target instanceof HTMLTextAreaElement) return !target.readOnly
+  if (target instanceof HTMLInputElement) return !target.readOnly && !NON_TEXT_INPUT_TYPES.has(target.type)
 
   return false
 }
