@@ -2,7 +2,7 @@ import { resolve } from 'node:path'
 import dts from 'vite-plugin-dts'
 import { defineConfig } from 'vitest/config'
 
-import { dependencies, peerDependencies } from './package.json' with { type: 'json' }
+import packageJson from './package.json' with { type: 'json' }
 
 const __dirname = import.meta.dirname
 
@@ -15,8 +15,8 @@ export default defineConfig({
     outDir: resolve(__dirname, 'build'),
     rollupOptions: {
       external: [
-        ...Object.keys(dependencies),
-        ...Object.keys(peerDependencies),
+        ...Object.keys(packageJson.dependencies),
+        ...Object.keys(packageJson.peerDependencies),
       ].map(name => new RegExp(`^${name}($|/)`)),
       output: {
         entryFileNames: '[name].js',
