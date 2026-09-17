@@ -80,7 +80,9 @@ type Options = {
   shouldYieldToTextInput?: boolean
 
   /**
-   * Specifies whether to stop propagation of the keyboard event.
+   * Specifies whether to stop propagation of the keyboard event. Only takes
+   * effect when `target` is an element or `capture` is `true`, as the default
+   * `window` target is the last stop of the bubbling phase.
    */
   stopsPropagation?: boolean
 
