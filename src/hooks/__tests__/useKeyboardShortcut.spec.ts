@@ -144,6 +144,33 @@ describe('useKeyboardShortcut', () => {
     expect(action).toHaveBeenCalledOnce()
   })
 
+  it('ignores an editing key while a text input has focus', () => {
+    const action = vi.fn()
+    const input = mountElement<HTMLInputElement>('<input type="text">')
+    renderHook(() => useKeyboardShortcut('backspace', action))
+
+    pressKey('Backspace', {}, input)
+    expect(action).not.toHaveBeenCalled()
+  })
+
+  it('ignores a navigation key while a text input has focus', () => {
+    const action = vi.fn()
+    const input = mountElement<HTMLInputElement>('<input type="text">')
+    renderHook(() => useKeyboardShortcut('arrowleft', action))
+
+    pressKey('ArrowLeft', {}, input)
+    expect(action).not.toHaveBeenCalled()
+  })
+
+  it('triggers a function key while a text input has focus', () => {
+    const action = vi.fn()
+    const input = mountElement<HTMLInputElement>('<input type="text">')
+    renderHook(() => useKeyboardShortcut('f2', action))
+
+    pressKey('F2', {}, input)
+    expect(action).toHaveBeenCalledOnce()
+  })
+
   it('triggers a modified chord while a text input has focus', () => {
     const action = vi.fn()
     const input = mountElement<HTMLInputElement>('<input type="text">')

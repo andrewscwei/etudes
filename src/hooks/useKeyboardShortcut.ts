@@ -64,12 +64,12 @@ type Options = {
   preventsDefault?: boolean
 
   /**
-   * Specifies whether the shortcut is ignored while a text input, textarea,
-   * select or contenteditable element has focus.
+   * Specifies whether the shortcut is ignored while a text `input`, `textarea`,
+   * `select` or `contenteditable` element has focus.
    *
-   * Defaults to `true` for shortcuts that would otherwise type a character
-   * (i.e. alphanumeric, punctuations, etc. unless paired with `control`, `meta`
-   * or `alt`), `false` otherwise.
+   * Defaults to `true` for shortcuts the focused element would otherwise
+   * consume (i.e. alphanumeric, punctuations, editing and navigation keys
+   * unless paired with `control`, `meta` or `alt`), `false` otherwise.
    */
   shouldYieldToTextInput?: boolean
 
@@ -101,6 +101,37 @@ const KEY_ALIASES: Record<string, string> = {
 const IME_COMPOSITION_KEY_CODE = 229
 
 const EDITING_MODIFIERS = new Set(['alt', 'control', 'meta'])
+
+const NON_TEXT_INPUT_KEYS = new Set([
+  'altgraph',
+  'capslock',
+  'numlock',
+  'scrolllock',
+  'shift',
+  'contextmenu',
+  'escape',
+  'pause',
+  'printscreen',
+  'f1',
+  'f2',
+  'f3',
+  'f4',
+  'f5',
+  'f6',
+  'f7',
+  'f8',
+  'f9',
+  'f10',
+  'f11',
+  'f12',
+  'audiovolumedown',
+  'audiovolumemute',
+  'audiovolumeup',
+  'mediaplaypause',
+  'mediastop',
+  'mediatracknext',
+  'mediatrackprevious',
+])
 
 const NON_TEXT_INPUT_TYPES = new Set(['button', 'checkbox', 'color', 'file', 'image', 'radio', 'range', 'reset', 'submit'])
 
@@ -151,8 +182,7 @@ export function useKeyboardShortcut(
     if (!eventTarget) return
 
     const requiredKeys = shortcutId.split(KEY_DELIMITER)
-
-    const yieldsToTextInput = shouldYieldToTextInput ?? isTypingShortcut(requiredKeys)
+    const yieldsToTextInput = shouldYieldToTextInput ?? isTextInputShortcut(requiredKeys)
 
     const listener = (event: KeyboardEvent) => {
       if (event.isComposing || event.keyCode === IME_COMPOSITION_KEY_CODE) return
@@ -188,10 +218,10 @@ export function useKeyboardShortcut(
   }, [shortcutId, isEnabled, shouldYieldToTextInput, preventsDefault, stopsPropagation, capture, target])
 }
 
-function isTypingShortcut(keys: string[]): boolean {
+function isTextInputShortcut(keys: string[]): boolean {
   if (keys.some(k => EDITING_MODIFIERS.has(k))) return false
 
-  return keys.filter(k => k !== 'shift').every(k => k.length === 1 || k === 'space')
+  return keys.some(k => !NON_TEXT_INPUT_KEYS.has(k))
 }
 
 function isTextInput(target: EventTarget | null): boolean {
