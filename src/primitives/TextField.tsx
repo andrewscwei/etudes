@@ -114,7 +114,10 @@ export function TextField({
     const timeoutId = setTimeout(() => {
       const length = element.value.length
       element.focus({ preventScroll: true })
-      element.setSelectionRange(length, length)
+
+      if (element.selectionStart !== null) {
+        element.setSelectionRange(length, length)
+      }
     }, 0)
 
     return () => clearTimeout(timeoutId)
