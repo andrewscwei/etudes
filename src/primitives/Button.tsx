@@ -36,7 +36,7 @@ export function Button(props: Button.Props) {
           {...uniqProps}
           {...isDisabled ? { 'aria-disabled': true } : {}}
           className={clsx(className, { disabled: isDisabled })}
-          ref={ref as React.Ref<HTMLAnchorElement>}
+          ref={ref as Ref<HTMLAnchorElement>}
           aria-label={label ?? title}
           href={action}
           rel={opensInNewTab ? 'noopener,noreferrer' : undefined}
@@ -55,7 +55,7 @@ export function Button(props: Button.Props) {
           {...uniqProps}
           {...isDisabled ? { 'aria-disabled': true } : {}}
           className={className}
-          ref={ref as React.Ref<HTMLButtonElement>}
+          ref={ref as Ref<HTMLButtonElement>}
           aria-label={label ?? title}
           disabled={isDisabled}
           title={title}
