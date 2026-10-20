@@ -1,4 +1,4 @@
-import { type CSSProperties, type HTMLAttributes, type RefObject, useCallback, useEffect, useRef } from 'react'
+import { type CSSProperties, type HTMLAttributes, type PointerEvent, type RefObject, useCallback, useEffect, useRef } from 'react'
 import { Rect, Size } from 'spase'
 
 import { ExtractChild } from '../utils/ExtractChild.js'
@@ -36,7 +36,7 @@ export namespace WithTooltip {
      * Specifies if the tooltip should be wrapped in a container element,
      * defaults to `true`. If `false`, the tooltip will be directly attached to
      * the child element, and the child element must be able to accept a ref and
-     * mouse event handlers.
+     * pointer event handlers.
      */
     forwardProps?: boolean
 
@@ -53,6 +53,12 @@ export namespace WithTooltip {
     gap?: number
 
     /**
+     * Specifies if the tooltip should be displayed when the target element is
+     * touched, defaults to `false`.
+     */
+    isTouchEnabled?: boolean
+
+    /**
      * The maximum width (in pixels) of the tooltip.
      */
     maxWidth?: number
@@ -66,15 +72,16 @@ export namespace WithTooltip {
  * dynamically computed based on the target element's position and the specified
  * alignment. The tooltip automatically realigns itself if the target element is
  * too close to the edge of the window, and is dismissed when the window is
- * resized or when the page or any scrollable ancestor of the target element is
- * scrolled.
+ * resized, when the page or any scrollable ancestor of the target element is
+ * scrolled, or when a pointer is pressed outside of the target element.
  *
  * The following requirements must be met:
  *   1. The child component must be a single React element
  *   2. The child component must support a forwarding ref to an HTML element,
  *      which will be used as the target of the tooltip
- *   3. The child component must have `onMouseEnter` and `onMouseLeave` props,
- *      which will be used to trigger the tooltip display and hide, respectively
+ *   3. The child component must have `onPointerEnter` and `onPointerLeave`
+ *      props, which will be used to trigger the tooltip display and hide,
+ *      respectively
  */
 export function WithTooltip({
   className = '',
@@ -87,6 +94,7 @@ export function WithTooltip({
   gap = 4,
   hint,
   maxWidth = 200,
+  isTouchEnabled = false,
 }: Readonly<WithTooltip.Props>) {
   const dialogRef = useRef<HTMLElement>(null)
   const arrowRef = useRef<HTMLElement>(null)
@@ -117,7 +125,7 @@ export function WithTooltip({
     setStyles(_makeDynamicArrowStyle(alignment, dialogSize, arrowSize, anchorRect), { target: arrow })
   }, [externalAlignment, maxWidth, style, arrowHeight, arrowWidth, gap])
 
-  const mouseLeaveHandler = useCallback(() => {
+  const hideTooltip = useCallback(() => {
     const dialog = dialogRef.current
     if (!dialog) return
 
@@ -132,7 +140,7 @@ export function WithTooltip({
     }
   }, [])
 
-  const mouseEnterHandler = useCallback(() => {
+  const showTooltip = useCallback(() => {
     const dialog = dialogRef.current
     const target = targetRef.current
     if (!dialog || !target) return
@@ -154,15 +162,34 @@ export function WithTooltip({
     const listenersAbortController = new AbortController()
     abortControllerRef.current = listenersAbortController
 
-    window.addEventListener('resize', mouseLeaveHandler, { signal: listenersAbortController.signal })
-    window.addEventListener('scroll', mouseLeaveHandler, { capture: true, passive: true, signal: listenersAbortController.signal })
+    window.addEventListener('resize', hideTooltip, { signal: listenersAbortController.signal })
+    window.addEventListener('scroll', hideTooltip, { capture: true, passive: true, signal: listenersAbortController.signal })
+    window.addEventListener('pointerdown', event => {
+      if (event.target instanceof Node && target.contains(event.target)) return
+
+      hideTooltip()
+    }, { capture: true, signal: listenersAbortController.signal })
 
     applyStyle()
 
     if (!dialog.isConnected) {
       window.document.body.appendChild(dialog)
     }
-  }, [applyStyle, mouseLeaveHandler])
+  }, [applyStyle, hideTooltip])
+
+  const pointerEnterHandler = useCallback((event: PointerEvent) => {
+    if (event.pointerType === 'touch' && !isTouchEnabled) return
+
+    showTooltip()
+  }, [isTouchEnabled, showTooltip])
+
+  const pointerLeaveHandler = useCallback((event: PointerEvent) => {
+    // For touch, `pointerleave` fires as soon as the finger lifts, so a tooltip
+    // opened by touch is instead dismissed by pressing outside of the target.
+    if (event.pointerType === 'touch') return
+
+    hideTooltip()
+  }, [hideTooltip])
 
   useEffect(() => {
     const { arrow, dialog } = _createDialog(className, hint)
@@ -189,8 +216,8 @@ export function WithTooltip({
     return (
       <ExtractChild
         ref={targetRef}
-        onMouseEnter={mouseEnterHandler}
-        onMouseLeave={mouseLeaveHandler}
+        onPointerEnter={pointerEnterHandler}
+        onPointerLeave={pointerLeaveHandler}
       >
         {children}
       </ExtractChild>
@@ -199,8 +226,8 @@ export function WithTooltip({
     return (
       <div
         ref={targetRef as RefObject<HTMLDivElement>}
-        onMouseEnter={mouseEnterHandler}
-        onMouseLeave={mouseLeaveHandler}
+        onPointerEnter={pointerEnterHandler}
+        onPointerLeave={pointerLeaveHandler}
       >
         {children}
       </div>
