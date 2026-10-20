@@ -4,7 +4,6 @@ import { Point, Rect } from 'spase'
 import { Each } from '../flows/Each.js'
 import { useDrag } from '../hooks/useDrag.js'
 import { useInterval } from '../hooks/useInterval.js'
-import { useIsTouchDevice } from '../hooks/useIsTouchDevice.js'
 import { useLatest } from '../hooks/useLatest.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { styles } from '../utils/styles.js'
@@ -126,12 +125,11 @@ export function ScrollableCarousel<I extends HTMLAttributes<HTMLElement>>({
   const dragAccumulatorRef = useRef(Point.zero)
   const isDragTickingRef = useRef(false)
   const isScrollTickingRef = useRef(false)
-  const isTouchDevice = useIsTouchDevice()
 
   const [exposures, setExposures] = useState<number[] | undefined>(_getItemExposures(viewportRef, orientation))
   const [isPointerDown, setIsPointerDown] = useState(false)
 
-  const fixedStyles = _getFixedStyles({ orientation, scrollSnapEnabled: isTouchDevice || !isPointerDown })
+  const fixedStyles = _getFixedStyles({ orientation, scrollSnapEnabled: !isPointerDown })
   const shouldAutoAdvance = autoAdvanceInterval > 0
 
   const unlockScrollEffect = useCallback(() => {
@@ -164,22 +162,22 @@ export function ScrollableCarousel<I extends HTMLAttributes<HTMLElement>>({
   }, [orientation])
 
   const pointerDownHandler = useCallback((event: PointerEvent) => {
-    if (isTouchDevice) return
+    if (event.pointerType === 'touch') return
 
     pointerDownPositionRef.current = Point.make(event.clientX, event.clientY)
 
     setIsPointerDown(true)
-  }, [isTouchDevice])
+  }, [])
 
   const pointerUpHandler = useCallback((event: PointerEvent) => {
-    if (isTouchDevice) return
+    if (event.pointerType === 'touch') return
 
     pointerUpPositionRef.current = Point.make(event.clientX, event.clientY)
 
     normalizeScrollPosition()
 
     setIsPointerDown(false)
-  }, [isTouchDevice, normalizeScrollPosition])
+  }, [normalizeScrollPosition])
 
   const clickHandler = useCallback((event: MouseEvent) => {
     // Prevent click event from propagating if the pointer was moved enough to
@@ -274,7 +272,7 @@ export function ScrollableCarousel<I extends HTMLAttributes<HTMLElement>>({
   }, [items.length, index, orientation, shouldTrackExposure, updateExposures])
 
   useDrag(viewportRef, {
-    isEnabled: !isTouchDevice && isDragEnabled && items.length > 1,
+    isEnabled: isDragEnabled && items.length > 1,
     onDragMove: dragHandler,
   })
 
@@ -283,14 +281,14 @@ export function ScrollableCarousel<I extends HTMLAttributes<HTMLElement>>({
   }, [index])
 
   useLayoutEffect(() => {
-    if (!shouldAutoAdvance || isTouchDevice) return
+    if (!shouldAutoAdvance) return
 
     if (isPointerDown) {
       autoAdvancePauseHandlerRef.current?.()
     } else {
       autoAdvanceResumeHandlerRef.current?.()
     }
-  }, [isTouchDevice, isPointerDown, shouldAutoAdvance])
+  }, [isPointerDown, shouldAutoAdvance])
 
   useLayoutEffect(() => {
     const viewport = viewportRef.current
