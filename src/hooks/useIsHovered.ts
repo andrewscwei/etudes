@@ -1,8 +1,7 @@
-import { type RefObject, useState } from 'react'
+import { type RefObject, useLayoutEffect, useState } from 'react'
+import { hitTest, Point, Rect } from 'spase'
 
-import { isTouchDevice } from '../utils/isTouchDevice.js'
-import { useMouseEnter } from './useMouseEnter.js'
-import { useMouseLeave } from './useMouseLeave.js'
+import { useLatest } from './useLatest.js'
 
 type Target = HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined
 
@@ -11,7 +10,8 @@ type Options = {
 }
 
 /**
- * Hook for determining if an element is hovered.
+ * Hook for determining if an element is hovered. Touch input is ignored since
+ * it cannot hover.
  *
  * @param target The target element or reference to determine hover state for.
  * @param options See {@link Options}.
@@ -19,16 +19,31 @@ type Options = {
  * @returns A boolean indicating whether the target element is hovered.
  */
 export function useIsHovered(target: Target, { isEnabled = true }: Options = {}): boolean {
-  const isTouch = isTouchDevice()
+  const targetRef = useLatest(target)
   const [isHovered, setIsHovered] = useState(false)
 
-  useMouseEnter(target, () => {
-    setIsHovered(true)
-  }, { isEnabled: !isTouch && isEnabled })
+  useLayoutEffect(() => {
+    if (!isEnabled) return
 
-  useMouseLeave(target, () => {
-    setIsHovered(false)
-  }, { isEnabled: !isTouch && isEnabled })
+    const listener = (event: PointerEvent) => {
+      if (event.pointerType === 'touch') return
+
+      const t = targetRef.current
+      const element = t && 'current' in t ? t.current : t
+      if (!element) return
+
+      const viewport = Rect.fromViewport()
+      const point = Point.make([event.x + viewport.left, event.y + viewport.top])
+
+      setIsHovered(hitTest(point, element))
+    }
+
+    window.addEventListener('pointermove', listener)
+
+    return () => {
+      window.removeEventListener('pointermove', listener)
+    }
+  }, [isEnabled])
 
   return isHovered
 }
