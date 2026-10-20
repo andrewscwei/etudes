@@ -65,7 +65,9 @@ export namespace WithTooltip {
  * fixed-position element appended to the document body, and its position is
  * dynamically computed based on the target element's position and the specified
  * alignment. The tooltip automatically realigns itself if the target element is
- * too close to the edge of the window.
+ * too close to the edge of the window, and is dismissed when the window is
+ * resized or when the page or any scrollable ancestor of the target element is
+ * scrolled.
  *
  * The following requirements must be met:
  *   1. The child component must be a single React element
@@ -90,6 +92,7 @@ export function WithTooltip({
   const arrowRef = useRef<HTMLElement>(null)
   const targetRef = useRef<HTMLElement>(null)
   const intersectionObserverRef = useRef<IntersectionObserver>(undefined)
+  const abortControllerRef = useRef<AbortController>(undefined)
 
   const applyStyle = useCallback(() => {
     const dialog = dialogRef.current
@@ -114,6 +117,21 @@ export function WithTooltip({
     setStyles(_makeDynamicArrowStyle(alignment, dialogSize, arrowSize, anchorRect), { target: arrow })
   }, [externalAlignment, maxWidth, style, arrowHeight, arrowWidth, gap])
 
+  const mouseLeaveHandler = useCallback(() => {
+    const dialog = dialogRef.current
+    if (!dialog) return
+
+    intersectionObserverRef.current?.disconnect()
+    intersectionObserverRef.current = undefined
+
+    abortControllerRef.current?.abort()
+    abortControllerRef.current = undefined
+
+    if (dialog.isConnected) {
+      window.document.body.removeChild(dialog)
+    }
+  }, [])
+
   const mouseEnterHandler = useCallback(() => {
     const dialog = dialogRef.current
     const target = targetRef.current
@@ -131,28 +149,20 @@ export function WithTooltip({
     intersectionObserver.observe(target)
     intersectionObserverRef.current = intersectionObserver
 
-    window.addEventListener('resize', applyStyle)
+    abortControllerRef.current?.abort()
+
+    const listenersAbortController = new AbortController()
+    abortControllerRef.current = listenersAbortController
+
+    window.addEventListener('resize', mouseLeaveHandler, { signal: listenersAbortController.signal })
+    window.addEventListener('scroll', mouseLeaveHandler, { capture: true, passive: true, signal: listenersAbortController.signal })
 
     applyStyle()
 
     if (!dialog.isConnected) {
       window.document.body.appendChild(dialog)
     }
-  }, [applyStyle])
-
-  const mouseLeaveHandler = useCallback(() => {
-    const dialog = dialogRef.current
-    if (!dialog) return
-
-    intersectionObserverRef.current?.disconnect()
-    intersectionObserverRef.current = undefined
-
-    window.removeEventListener('resize', applyStyle)
-
-    if (dialog.isConnected) {
-      window.document.body.removeChild(dialog)
-    }
-  }, [applyStyle])
+  }, [applyStyle, mouseLeaveHandler])
 
   useEffect(() => {
     const { arrow, dialog } = _createDialog(className, hint)
@@ -170,7 +180,8 @@ export function WithTooltip({
       intersectionObserverRef.current?.disconnect()
       intersectionObserverRef.current = undefined
 
-      window.removeEventListener('resize', applyStyle)
+      abortControllerRef.current?.abort()
+      abortControllerRef.current = undefined
     }
   }, [className, hint])
 
