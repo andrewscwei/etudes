@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { useKeyboardShortcut } from '../useKeyboardShortcut.js'
+import { useKeyboardShortcut } from './useKeyboardShortcut.js'
 
 describe('useKeyboardShortcut', () => {
   afterEach(() => {
