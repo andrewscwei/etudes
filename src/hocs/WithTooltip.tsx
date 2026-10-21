@@ -1,5 +1,5 @@
 import { type CSSProperties, type HTMLAttributes, type PointerEvent, type RefObject, useCallback, useEffect, useRef } from 'react'
-import { Rect, Size } from 'spase'
+import { Point, Rect, Size } from 'spase'
 
 import { ExtractChild } from '../utils/ExtractChild.js'
 import { measureIntrinsicSize } from '../utils/measureIntrinsicSize.js'
@@ -108,18 +108,27 @@ export function WithTooltip({
     const target = targetRef.current
     if (!dialog || !arrow || !target) return
 
-    const targetRect = Rect.from(target)
+    const { origin, scale } = _measureFixedSpace(dialog)
+    const targetRect = target.getBoundingClientRect()
     const viewportRect = Rect.fromViewport()
-    const anchorRect = Rect.make({
+
+    const clientRect = Rect.make({
       height: targetRect.height,
       width: targetRect.width,
-      x: targetRect.left - viewportRect.left,
-      y: targetRect.top - viewportRect.top,
+      x: targetRect.left,
+      y: targetRect.top,
+    })
+
+    const anchorRect = Rect.make({
+      height: targetRect.height / scale,
+      width: targetRect.width / scale,
+      x: (targetRect.left - origin.x) / scale,
+      y: (targetRect.top - origin.y) / scale,
     })
 
     const arrowSize = Size.make(arrowWidth, arrowHeight)
-    const dialogSize = measureIntrinsicSize(dialog, maxWidth)
-    const alignment = externalAlignment ?? _computeAlignment(anchorRect, viewportRect)
+    const dialogSize = Size.divide(measureIntrinsicSize(dialog, maxWidth), Size.make(scale, scale))
+    const alignment = externalAlignment ?? _computeAlignment(clientRect, viewportRect)
 
     setStyles(styles(style, _makeDynamicDialogStyle(alignment, dialogSize, arrowSize, gap, anchorRect)), { target: dialog })
     setStyles(_makeDynamicArrowStyle(alignment, dialogSize, arrowSize, anchorRect), { target: arrow })
@@ -170,11 +179,11 @@ export function WithTooltip({
       hideTooltip()
     }, { capture: true, signal: listenersAbortController.signal })
 
-    applyStyle()
-
     if (!dialog.isConnected) {
       window.document.body.appendChild(dialog)
     }
+
+    applyStyle()
   }, [applyStyle, hideTooltip])
 
   const pointerEnterHandler = useCallback((event: PointerEvent) => {
@@ -261,6 +270,36 @@ function _createDialog(className: string, content: string): { arrow: HTMLElement
   dialog.appendChild(arrow)
 
   return { arrow, dialog }
+}
+
+function _measureFixedSpace(dialog: HTMLElement): { origin: Point.Point; scale: number } {
+  const probeSize = 100
+  const { left, top, transform, width } = dialog.style
+
+  setStyles({
+    left: '0',
+    top: '0',
+    transform: 'none',
+    width: `${probeSize}px`,
+  }, {
+    target: dialog,
+  })
+
+  const rect = dialog.getBoundingClientRect()
+
+  setStyles({
+    left,
+    top,
+    transform,
+    width,
+  }, {
+    target: dialog,
+  })
+
+  return {
+    origin: Point.make({ x: rect.left, y: rect.top }),
+    scale: rect.width > 0 ? rect.width / probeSize : 1,
+  }
 }
 
 function _computeAlignment(anchorRect: Rect.Rect, viewportRect: Rect.Rect): Alignment {
