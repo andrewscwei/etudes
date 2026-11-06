@@ -139,7 +139,9 @@ export function Carousel({
       <Styled
         ref={viewportRef}
         style={styles(FIXED_STYLES.viewport, {
-          cursor: isDragging ? 'grabbing' : 'grab',
+          ...itemCount > 1 ? {
+            cursor: isDragging ? 'grabbing' : 'grab',
+          } : {},
           touchAction: itemCount > 1 ? (orientation === 'horizontal' ? 'pan-y' : 'pan-x') : 'auto',
         })}
         element={components.viewport ?? <Carousel.Viewport/>}
