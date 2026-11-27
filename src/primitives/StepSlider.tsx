@@ -456,6 +456,7 @@ function _getFixedStyles({ knobHeight = 0, knobPadding = 0, knobWidth = 0, orien
   return asStyleDict({
     body: {
       height: '100%',
+      position: 'relative',
       width: '100%',
     },
     knob: {
