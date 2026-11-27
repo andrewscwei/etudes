@@ -272,6 +272,7 @@ export function ScrollableCarousel<I extends HTMLAttributes<HTMLElement>>({
   }, [items.length, index, orientation, shouldTrackExposure, updateExposures])
 
   useDrag(viewportRef, {
+    pointerTypes: ['mouse'],
     isEnabled: isDragEnabled && items.length > 1,
     onDragMove: dragHandler,
   })

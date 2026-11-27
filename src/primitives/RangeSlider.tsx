@@ -1,7 +1,7 @@
 import isDeepEqual from 'fast-deep-equal/react.js'
 import { type HTMLAttributes, type Ref, useCallback, useLayoutEffect, useMemo, useRef } from 'react'
 
-import { useInertiaDrag } from '../hooks/useInertiaDrag.js'
+import { useDrag } from '../hooks/useDrag.js'
 import { useSize } from '../hooks/useSize.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
@@ -113,7 +113,7 @@ export function RangeSlider({
     }
   }, [])
 
-  useInertiaDrag(startKnobContainerRef, {
+  useDrag(startKnobContainerRef, {
     onDragEnd: () => {
       suppressTransitions(startKnobContainerRef.current, false)
 
@@ -156,7 +156,7 @@ export function RangeSlider({
     },
   })
 
-  useInertiaDrag(endKnobContainerRef, {
+  useDrag(endKnobContainerRef, {
     onDragEnd: () => {
       suppressTransitions(endKnobContainerRef.current, false)
 
@@ -440,7 +440,6 @@ function _getFixedStyles({ knobHeight = 0, knobPadding = 0, knobWidth = 0, orien
     },
     knob: {
       height: `${knobHeight}px`,
-      touchAction: 'none',
       width: `${knobWidth}px`,
     },
     knobContainer: {

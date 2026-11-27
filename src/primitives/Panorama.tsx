@@ -1,8 +1,8 @@
 import { type HTMLAttributes, type Ref, useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import { Size } from 'spase'
 
+import { useDrag } from '../hooks/useDrag.js'
 import { useImageSize } from '../hooks/useImageSize.js'
-import { useInertiaDrag } from '../hooks/useInertiaDrag.js'
 import { useSize } from '../hooks/useSize.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 
@@ -58,7 +58,7 @@ export function Panorama({
     onImageSizeChange?.(imageSize)
   }, [imageSize])
 
-  useInertiaDrag(bodyRef, {
+  useDrag(bodyRef, {
     onDragEnd: () => {
       isDraggingRef.current = false
       onDragEnd?.()
@@ -190,7 +190,6 @@ const FIXED_STYLES = asStyleDict({
     backgroundRepeat: 'repeat',
     backgroundSize: 'auto 100%',
     height: '100%',
-    touchAction: 'none',
     width: '100%',
   },
 })

@@ -1,7 +1,7 @@
 import { type HTMLAttributes, type MouseEvent, type Ref, useCallback, useLayoutEffect, useMemo, useRef } from 'react'
 import { Rect } from 'spase'
 
-import { useInertiaDrag } from '../hooks/useInertiaDrag.js'
+import { useDrag } from '../hooks/useDrag.js'
 import { useRect } from '../hooks/useRect.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
@@ -152,7 +152,7 @@ export function Slider({
     }
   }, [bodyRect.left, bodyRect.top, bodyRect.width, bodyRect.height, isInverted, isTrackInteractive, orientation])
 
-  useInertiaDrag(knobContainerRef, {
+  useDrag(knobContainerRef, {
     onDragEnd: () => {
       suppressTransitions(false)
 
@@ -396,7 +396,6 @@ function _getFixedStyles({ knobHeight = 0, knobPadding = 0, knobWidth = 0, orien
     },
     knob: {
       height: `${knobHeight}px`,
-      touchAction: 'none',
       width: `${knobWidth}px`,
     },
     knobContainer: {
