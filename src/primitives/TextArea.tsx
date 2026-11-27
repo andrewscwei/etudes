@@ -1,4 +1,6 @@
-import { type Ref, type RefObject, type TextareaHTMLAttributes, useEffect, useRef } from 'react'
+import { type Ref, type TextareaHTMLAttributes, useEffect, useMemo, useRef } from 'react'
+
+import { mergeRefs } from '../utils/mergeRefs.js'
 
 export namespace TextArea {
   /**
@@ -28,7 +30,8 @@ export function TextArea({
   onChange,
   ...props
 }: TextArea.Props) {
-  const rootRef = ref as RefObject<HTMLTextAreaElement> ?? useRef<HTMLTextAreaElement>(null)
+  const rootRef = useRef<HTMLTextAreaElement>(null)
+  const mergedRef = useMemo(() => mergeRefs(ref, rootRef), [ref])
 
   useEffect(() => {
     if (!autoFocus) return
@@ -48,7 +51,7 @@ export function TextArea({
   return (
     <textarea
       {...props}
-      ref={rootRef}
+      ref={mergedRef}
       onChange={event => onChange(event.target.value)}
     />
   )

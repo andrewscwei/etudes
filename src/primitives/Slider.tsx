@@ -1,10 +1,11 @@
-import { type HTMLAttributes, type MouseEvent, type Ref, type RefObject, useCallback, useLayoutEffect, useMemo, useRef } from 'react'
+import { type HTMLAttributes, type MouseEvent, type Ref, useCallback, useLayoutEffect, useMemo, useRef } from 'react'
 import { Rect } from 'spase'
 
 import { useInertiaDrag } from '../hooks/useInertiaDrag.js'
 import { useRect } from '../hooks/useRect.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
+import { mergeRefs } from '../utils/mergeRefs.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
@@ -40,7 +41,8 @@ export function Slider({
   onDragStart,
   ...props
 }: Readonly<Slider.Props>) {
-  const rootRef = ref as RefObject<HTMLDivElement> ?? useRef<HTMLDivElement>(null)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const mergedRef = useMemo(() => mergeRefs(ref, rootRef), [ref])
   const bodyRef = useRef<HTMLDivElement>(null)
   const knobContainerRef = useRef<HTMLButtonElement>(null)
   const startTrackRef = useRef<HTMLDivElement>(null)
@@ -208,7 +210,7 @@ export function Slider({
   return (
     <div
       {...props}
-      ref={rootRef}
+      ref={mergedRef}
       aria-orientation={orientation}
       aria-valuenow={position}
       data-at-end={isAtEnd ? '' : undefined}

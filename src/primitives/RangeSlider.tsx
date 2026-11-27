@@ -1,10 +1,11 @@
 import isDeepEqual from 'fast-deep-equal/react.js'
-import { type HTMLAttributes, type Ref, type RefObject, useCallback, useLayoutEffect, useMemo, useRef } from 'react'
+import { type HTMLAttributes, type Ref, useCallback, useLayoutEffect, useMemo, useRef } from 'react'
 
 import { useInertiaDrag } from '../hooks/useInertiaDrag.js'
 import { useSize } from '../hooks/useSize.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
+import { mergeRefs } from '../utils/mergeRefs.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
@@ -35,7 +36,8 @@ export function RangeSlider({
   onDragStart,
   ...props
 }: RangeSlider.Props) {
-  const rootRef = ref as RefObject<HTMLDivElement> ?? useRef<HTMLDivElement>(null)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const mergedRef = useMemo(() => mergeRefs(ref, rootRef), [ref])
   const bodyRef = useRef<HTMLDivElement>(null)
   const startKnobContainerRef = useRef<HTMLDivElement>(null)
   const endKnobContainerRef = useRef<HTMLDivElement>(null)
@@ -211,7 +213,7 @@ export function RangeSlider({
   return (
     <div
       {...props}
-      ref={rootRef}
+      ref={mergedRef}
       aria-orientation={orientation}
       aria-valuemax={maxValue}
       aria-valuemin={minValue}

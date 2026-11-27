@@ -1,10 +1,11 @@
-import { type HTMLAttributes, type Ref, type RefObject, useRef, useState } from 'react'
+import { type HTMLAttributes, type Ref, useMemo, useRef, useState } from 'react'
 import { Size } from 'spase'
 
 import { useRect } from '../hooks/useRect.js'
 import { Picture } from '../primitives/Picture.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
+import { mergeRefs } from '../utils/mergeRefs.js'
 import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 
@@ -32,8 +33,8 @@ export function CoverImage({
     setLocalAspectRatio(size ? size.width / size.height : NaN)
   }
 
-  const localRef = useRef<HTMLDivElement>(null)
-  const rootRef = ref as RefObject<HTMLDivElement> ?? localRef
+  const rootRef = useRef<HTMLDivElement>(null)
+  const mergedRef = useMemo(() => mergeRefs(ref, rootRef), [ref])
   const [localAspectRatio, setLocalAspectRatio] = useState(NaN)
   const aspectRatio = isNaN(externalAspectRatio) ? localAspectRatio : externalAspectRatio
   const rootRect = useRect(rootRef)
@@ -55,7 +56,7 @@ export function CoverImage({
   return (
     <div
       {...props}
-      ref={rootRef}
+      ref={mergedRef}
       style={styles(style, FIXED_STYLES.root)}
     >
       <Picture

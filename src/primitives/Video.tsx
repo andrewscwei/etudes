@@ -1,7 +1,8 @@
-import { type ReactEventHandler, type Ref, type RefObject, useEffect, useRef, type VideoHTMLAttributes } from 'react'
+import { type ReactEventHandler, type Ref, useEffect, useMemo, useRef, type VideoHTMLAttributes } from 'react'
 import { type Size } from 'spase'
 
 import { useVideoSize } from '../hooks/useVideoSize.js'
+import { mergeRefs } from '../utils/mergeRefs.js'
 
 export namespace Video {
   /**
@@ -140,8 +141,8 @@ export function Video({
   onTimeUpdate,
   ...props
 }: Video.Props) {
-  const localRef = useRef<HTMLVideoElement>(null)
-  const videoRef = ref as RefObject<HTMLVideoElement> ?? localRef
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const mergedRef = useMemo(() => mergeRefs(ref, videoRef), [ref])
   const size = useVideoSize(source, {
     onError: onLoadMetadataError,
     onLoad: onLoadMetadataComplete,
@@ -228,7 +229,7 @@ export function Video({
   return (
     <video
       {...props}
-      ref={videoRef}
+      ref={mergedRef}
       autoPlay={autoPlay}
       controls={hasControls}
       loop={autoLoop}

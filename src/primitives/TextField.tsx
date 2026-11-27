@@ -1,5 +1,7 @@
 import clsx from 'clsx'
-import { type ChangeEvent, type FocusEvent, type HTMLInputTypeAttribute, type InputHTMLAttributes, type Ref, type RefObject, useCallback, useEffect, useRef } from 'react'
+import { type ChangeEvent, type FocusEvent, type HTMLInputTypeAttribute, type InputHTMLAttributes, type Ref, useCallback, useEffect, useMemo, useRef } from 'react'
+
+import { mergeRefs } from '../utils/mergeRefs.js'
 
 export namespace TextField {
   /**
@@ -97,7 +99,8 @@ export function TextField({
   onUnfocus,
   ...props
 }: TextField.Props) {
-  const rootRef = ref as RefObject<HTMLInputElement> ?? useRef<HTMLInputElement>(null)
+  const rootRef = useRef<HTMLInputElement>(null)
+  const mergedRef = useMemo(() => mergeRefs(ref, rootRef), [ref])
 
   const handleValueChange = useCallback((newValue: string) => {
     const formatted = (formatValue?.(newValue) ?? newValue) || emptyValue
@@ -128,7 +131,7 @@ export function TextField({
       {...props}
       {...isDisabled ? { 'aria-disabled': true } : {}}
       className={clsx(className, { disabled: isDisabled })}
-      ref={rootRef}
+      ref={mergedRef}
       aria-placeholder={placeholder}
       aria-required={isRequired}
       disabled={isDisabled}
