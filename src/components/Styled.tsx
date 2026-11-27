@@ -1,6 +1,6 @@
 import { type ComponentProps, type ElementType, type ReactElement, type ReactNode } from 'react'
 
-import { cloneStyledElement } from './cloneStyledElement.js'
+import { cloneStyledElement } from '../utils/cloneStyledElement.js'
 
 export type StyledProps<T extends ElementType> = {
   children?: ReactNode | ReactNode[]

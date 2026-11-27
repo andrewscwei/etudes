@@ -6,8 +6,8 @@ import { useSize } from '../hooks/useSize.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
-import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
+import { Styled } from './Styled.js'
 
 /**
  * A toggle switch component that allows users to switch between on or off.

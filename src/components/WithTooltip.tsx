@@ -1,10 +1,10 @@
 import { type CSSProperties, type HTMLAttributes, type PointerEvent, type RefObject, useCallback, useEffect, useRef } from 'react'
 import { Point, Rect, Size } from 'spase'
 
-import { ExtractChild } from '../utils/ExtractChild.js'
 import { measureIntrinsicSize } from '../utils/measureIntrinsicSize.js'
 import { setStyles } from '../utils/setStyles.js'
 import { styles } from '../utils/styles.js'
+import { Slot } from './Slot.js'
 
 /**
  * Type describing the alignment of the tooltip relative to the wrapped element.
@@ -223,13 +223,13 @@ export function WithTooltip({
 
   if (forwardProps) {
     return (
-      <ExtractChild
+      <Slot
         ref={targetRef}
         onPointerEnter={pointerEnterHandler}
         onPointerLeave={pointerLeaveHandler}
       >
         {children}
-      </ExtractChild>
+      </Slot>
     )
   } else {
     return (

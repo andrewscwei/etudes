@@ -3,11 +3,11 @@ import { type HTMLAttributes, type Ref, useCallback, useRef, useState } from 're
 import { Rect, type Size } from 'spase'
 
 import { useRect } from '../hooks/useRect.js'
-import { Panorama } from './Panorama.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
-import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
+import { Panorama } from './Panorama.js'
+import { Styled } from './Styled.js'
 
 /**
  * A slider for a {@link Panorama}.

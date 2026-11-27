@@ -4,9 +4,9 @@ import { type ComponentType, type HTMLAttributes, type Ref, useEffect, useRef, u
 import { useRect } from '../hooks/useRect.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
-import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
 import { Collection as _Collection } from './Collection.js'
+import { Styled } from './Styled.js'
 
 /**
  * A dropdown component that is invertible (i.e. can "dropup" instead) and

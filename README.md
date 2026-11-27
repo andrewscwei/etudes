@@ -24,8 +24,8 @@ npm run lint:fix
 
 ## Components
 
-- **`components/`** — UI components
+- **`components/`** — UI components and composition helpers
 - **`hooks/`** — Standalone React hooks covering drag/gestures, observers, media, storage, and general utilities
 - **`control/`** — Control-flow components
-- **`utils/`** — Pure utility functions for style manipulation, data transformation, key generation, device detection, and React helpers
+- **`utils/`** — Pure utility functions for style manipulation, data transformation, key generation, and device detection
 - **`types/`** — Shared type definitions used across the library

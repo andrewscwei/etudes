@@ -6,8 +6,8 @@ import { useRect } from '../hooks/useRect.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { mergeRefs } from '../utils/mergeRefs.js'
-import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
+import { Styled } from './Styled.js'
 
 /**
  * A slider component supporting both horizontal and vertical orientations. The

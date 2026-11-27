@@ -7,8 +7,8 @@ import { usePrevious } from '../hooks/usePrevious.js'
 import { useSize } from '../hooks/useSize.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
-import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
+import { Styled } from './Styled.js'
 
 // Translation (in px) is considered settled when within this distance of the
 // target.

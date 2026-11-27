@@ -2,12 +2,12 @@ import { type HTMLAttributes, type Ref, useMemo, useRef, useState } from 'react'
 import { Size } from 'spase'
 
 import { useRect } from '../hooks/useRect.js'
-import { Picture } from './Picture.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { mergeRefs } from '../utils/mergeRefs.js'
-import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
+import { Picture } from './Picture.js'
+import { Styled } from './Styled.js'
 
 /**
  * A component that displays an image with a fixed aspect ratio. The image is

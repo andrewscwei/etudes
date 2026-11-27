@@ -6,8 +6,8 @@ import { useSize } from '../hooks/useSize.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { mergeRefs } from '../utils/mergeRefs.js'
-import { Styled } from '../utils/Styled.js'
 import { styles } from '../utils/styles.js'
+import { Styled } from './Styled.js'
 
 /**
  * A slider component that allows the user to select a range of values.
