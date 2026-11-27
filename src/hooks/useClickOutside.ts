@@ -20,7 +20,13 @@ type Options = {
  * @param options See {@link Options}.
  */
 
-export function useClickOutside(target: Target | Target[], handler: () => void, { isEnabled = true }: Options = {}) {
+export function useClickOutside(
+  target: Target | Target[],
+  handler: () => void,
+  {
+    isEnabled = true,
+  }: Options = {},
+) {
   const handlerRef = useLatest(handler)
   const targetsRef = useLatest(([] as Target[]).concat(target))
 

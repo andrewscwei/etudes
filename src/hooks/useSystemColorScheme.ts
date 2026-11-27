@@ -8,7 +8,9 @@ type ColorScheme = 'dark' | 'light'
  *
  * @returns The current system color scheme.
  */
-export function useSystemColorScheme(defaultValue: ColorScheme = 'light'): ColorScheme {
+export function useSystemColorScheme(
+  defaultValue: ColorScheme = 'light',
+): ColorScheme {
   const [colorScheme, setColorScheme] = useState<ColorScheme>(defaultValue)
 
   useLayoutEffect(() => {

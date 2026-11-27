@@ -12,7 +12,9 @@ type Target = HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElemen
  *
  * @returns The most current size of the target element.
  */
-export function useSize(target: Target): Size.Size {
+export function useSize(
+  target: Target,
+): Size.Size {
   const [size, setSize] = useState<Size.Size>(Size.zero)
 
   useSizeObserver(target, el => {

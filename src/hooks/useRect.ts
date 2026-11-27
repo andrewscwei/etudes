@@ -15,7 +15,9 @@ type Target = HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElemen
  *
  * @returns The most current rect of the target element.
  */
-export function useRect(target: Target): Rect.Rect {
+export function useRect(
+  target: Target,
+): Rect.Rect {
   const [rect, setRect] = useState<Rect.Rect>(Rect.zero)
   const viewportSize = useViewportSize()
 

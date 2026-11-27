@@ -23,9 +23,26 @@ type ChangeHandler = (newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo |
  * @param onChange Handler invoked when the scroll position changes.
  * @param deps Optional dependency list to control when the hook should re-run.
  */
-export function useScrollPositionObserver(target: Target, onChange: ChangeHandler, deps?: DependencyList): void
-export function useScrollPositionObserver(onChange: ChangeHandler, deps?: DependencyList): void
-export function useScrollPositionObserver(...args: | [ChangeHandler, DependencyList?] | [Target, ChangeHandler, DependencyList?]) {
+export function useScrollPositionObserver(
+  target: Target,
+  onChange: ChangeHandler,
+  deps?: DependencyList,
+): void
+
+/**
+ * Hook for tracking the scroll position of the viewport.
+ *
+ * @param onChange Handler invoked when the scroll position changes.
+ * @param deps Optional dependency list to control when the hook should re-run.
+ */
+export function useScrollPositionObserver(
+  onChange: ChangeHandler,
+  deps?: DependencyList,
+): void
+
+export function useScrollPositionObserver(
+  ...args: | [ChangeHandler, DependencyList?] | [Target, ChangeHandler, DependencyList?]
+) {
   const target = typeof args[0] === 'function' ? undefined : args[0]
   const onChange = typeof args[0] === 'function' ? args[0] : args[1] as (newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void
   const deps = typeof args[0] === 'function' ? (args[1] as DependencyList | undefined) ?? [] : (args[2] as DependencyList | undefined) ?? []

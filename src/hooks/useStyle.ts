@@ -29,7 +29,14 @@ type Options = {
  *              will be removed.
  * @param options See {@link Options}.
  */
-export function useStyle(name: string, value?: string, { target, isEnabled = true }: Options = {}) {
+export function useStyle(
+  name: string,
+  value?: string,
+  {
+    target,
+    isEnabled = true,
+  }: Options = {},
+) {
   useLayoutEffect(() => {
     if (!isEnabled) return
 

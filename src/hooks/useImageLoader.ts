@@ -43,7 +43,11 @@ export type UseImageLoaderOptions = {
  */
 export function useImageLoader(
   source?: [string, Omit<ImageSource, 'media' | 'type'>] | string,
-  { onError, onLoad, onLoadStart }: UseImageLoaderOptions = {},
+  {
+    onError,
+    onLoad,
+    onLoadStart,
+  }: UseImageLoaderOptions = {},
 ) {
   const fallbackSrc = typeof source === 'string' ? source : source?.[0]
   const imageSource = typeof source === 'string' ? undefined : source?.[1]

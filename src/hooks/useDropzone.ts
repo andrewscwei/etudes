@@ -43,7 +43,9 @@ export type UseDropzoneOutput<T = HTMLElement> = {
  *
  * @returns See {@link UseDropzoneOutput}.
  */
-export function useDropzone<T = HTMLElement>(action: (file: File) => void): UseDropzoneOutput<T> {
+export function useDropzone<T = HTMLElement>(
+  action: (file: File) => void,
+): UseDropzoneOutput<T> {
   const actionRef = useLatest(action)
   const [isDropping, setIsDropping] = useState(false)
 

@@ -15,7 +15,10 @@ type Options = {
  * @param action The function to invoke instead.
  * @param options See {@link Options}.
  */
-export function useRightClick(action: () => void, options?: Options): void
+export function useRightClick(
+  action: () => void,
+  options?: Options,
+): void
 
 /**
  * Hook for overriding the browser-default right click context menu action for
@@ -25,9 +28,17 @@ export function useRightClick(action: () => void, options?: Options): void
  * @param action The function to invoke instead.
  * @param options See {@link Options}.
  */
-export function useRightClick(target: Target, action?: () => void, options?: Options): void
+export function useRightClick(
+  target: Target,
+  action?: () => void,
+  options?: Options,
+): void
 
-export function useRightClick(targetOrAction: (() => void) | Target, actionOrOptions?: (() => void) | Options, options: Options = {}) {
+export function useRightClick(
+  targetOrAction: (() => void) | Target,
+  actionOrOptions?: (() => void) | Options,
+  options: Options = {},
+) {
   const actionRef = useLatest(typeof targetOrAction === 'function'
     ? targetOrAction
     : typeof actionOrOptions === 'function'

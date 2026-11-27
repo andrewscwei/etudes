@@ -34,11 +34,14 @@ export type UseVideoMetadataLoaderOptions = {
  * @param src Video source URL.
  * @param options See {@link UseVideoMetadataLoaderOptions}.
  */
-export function useVideoMetadataLoader(src?: string, {
-  onError,
-  onLoad,
-  onLoadStart,
-}: UseVideoMetadataLoaderOptions = {}) {
+export function useVideoMetadataLoader(
+  src?: string,
+  {
+    onError,
+    onLoad,
+    onLoadStart,
+  }: UseVideoMetadataLoaderOptions = {},
+) {
   const loadStartHandlerRef = useLatest(onLoadStart)
   const loadCompleteHandlerRef = useLatest(onLoad)
   const loadErrorHandlerRef = useLatest(onError)

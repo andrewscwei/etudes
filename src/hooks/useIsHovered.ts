@@ -18,7 +18,12 @@ type Options = {
  *
  * @returns A boolean indicating whether the target element is hovered.
  */
-export function useIsHovered(target: Target, { isEnabled = true }: Options = {}): boolean {
+export function useIsHovered(
+  target: Target,
+  {
+    isEnabled = true,
+  }: Options = {},
+): boolean {
   const targetRef = useLatest(target)
   const [isHovered, setIsHovered] = useState(false)
 

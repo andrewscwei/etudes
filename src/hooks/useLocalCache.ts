@@ -10,7 +10,9 @@ import { createLocalCache, type LocalCache } from '../utils/createLocalCache.js'
  *
  * @returns The local cache.
  */
-export function useLocalCache(defaultTTL?: number): LocalCache {
+export function useLocalCache(
+  defaultTTL?: number,
+): LocalCache {
   const cache = useMemo(() => createLocalCache({ defaultTTL }), [defaultTTL])
 
   return cache

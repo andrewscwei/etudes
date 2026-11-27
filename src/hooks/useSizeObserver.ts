@@ -10,7 +10,10 @@ type Target = HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElemen
  * @param target The target element or reference.
  * @param options See {@link UseSizeObserverOptions}.
  */
-export function useSizeObserver(target: Target, handler: (element: HTMLElement) => void) {
+export function useSizeObserver(
+  target: Target,
+  handler: (element: HTMLElement) => void,
+) {
   const handlerRef = useLatest(handler)
 
   useLayoutEffect(() => {

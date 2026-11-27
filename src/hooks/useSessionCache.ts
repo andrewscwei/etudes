@@ -10,7 +10,9 @@ import { createSessionCache, type SessionCache } from '../utils/createSessionCac
  *
  * @returns The session cache.
  */
-export function useSessionCache(defaultTTL?: number): SessionCache {
+export function useSessionCache(
+  defaultTTL?: number,
+): SessionCache {
   const cache = useMemo(() => createSessionCache({ defaultTTL }), [defaultTTL])
 
   return cache

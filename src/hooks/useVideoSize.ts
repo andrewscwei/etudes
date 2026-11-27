@@ -24,12 +24,15 @@ type UseVideoSizeOptions = {
  * @returns The actual size of the video if loading was successful, `undefined`
  *          otherwise.
  */
-export function useVideoSize(src?: string, {
-  preservesSizeBetweenLoads = true,
-  onError,
-  onLoad,
-  onLoadStart,
-}: UseVideoSizeOptions = {}): Size.Size | undefined {
+export function useVideoSize(
+  src?: string,
+  {
+    preservesSizeBetweenLoads = true,
+    onError,
+    onLoad,
+    onLoadStart,
+  }: UseVideoSizeOptions = {},
+): Size.Size | undefined {
   const [size, setSize] = useState<Size.Size>()
   const loadStartHandlerRef = useLatest(onLoadStart)
   const loadCompleteHandlerRef = useLatest(onLoad)

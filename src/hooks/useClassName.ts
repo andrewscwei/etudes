@@ -23,7 +23,13 @@ type Options = {
  * @param className The class name to add to the document's root element.
  * @param options See {@link Options}.
  */
-export function useClassName(className: string, { target, isEnabled = true }: Options = {}) {
+export function useClassName(
+  className: string,
+  {
+    target,
+    isEnabled = true,
+  }: Options = {},
+) {
   useLayoutEffect(() => {
     if (!isEnabled) return
 
