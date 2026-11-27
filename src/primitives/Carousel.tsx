@@ -224,7 +224,7 @@ function useGesture({
   const translationRef = useRef(0)
   const velocityRef = useRef(0)
   const targetTranslationRef = useRef(0)
-  const rafRef = useRef(0)
+  const frameIdRef = useRef(0)
   const swipeTrackerRef = useRef(_createSwipeTracker(SWIPE_VELOCITY_WINDOW_MS))
   const pointerRef = useRef<PointerState>({ activeId: undefined, didDrag: false, gesture: 'idle', startAxial: 0, startPosition: Point.zero, startTranslation: 0 })
   const prevViewportLengthRef = useRef(0)
@@ -285,16 +285,16 @@ function useGesture({
   }
 
   const startTicking = () => {
-    if (rafRef.current) return
+    if (frameIdRef.current) return
 
-    rafRef.current = requestAnimationFrame(tick)
+    frameIdRef.current = requestAnimationFrame(tick)
   }
 
   const stopTicking = () => {
-    if (!rafRef.current) return
+    if (!frameIdRef.current) return
 
-    cancelAnimationFrame(rafRef.current)
-    rafRef.current = 0
+    cancelAnimationFrame(frameIdRef.current)
+    frameIdRef.current = 0
   }
 
   const tick = () => {
@@ -313,14 +313,14 @@ function useGesture({
     if (isSettled) {
       translationRef.current = targetPos
       velocityRef.current = 0
-      rafRef.current = 0
+      frameIdRef.current = 0
       render()
 
       return
     }
 
     render()
-    rafRef.current = requestAnimationFrame(tick)
+    frameIdRef.current = requestAnimationFrame(tick)
   }
 
   useLayoutEffect(() => {
