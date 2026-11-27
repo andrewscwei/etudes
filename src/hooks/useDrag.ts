@@ -1,4 +1,4 @@
-import { type RefObject, useLayoutEffect } from 'react'
+import { type RefObject, useLayoutEffect, useState } from 'react'
 import { Point } from 'spase'
 
 import { useLatest } from './useLatest.js'
@@ -84,8 +84,15 @@ export function useDrag(
   const dragEndHandlerRef = useLatest(onDragEnd)
   const pointerTypesRef = useLatest(pointerTypes)
 
+  const [element, setElement] = useState<HTMLElement | undefined>()
+
+  const handlesTouch = !pointerTypes || pointerTypes.includes('touch') || pointerTypes.includes('pen')
+
   useLayoutEffect(() => {
-    const element = target && 'current' in target ? target.current : target
+    setElement((target && 'current' in target ? target.current : target) ?? undefined)
+  })
+
+  useLayoutEffect(() => {
     if (!element || !isEnabled || !shouldUpdateCursor) return
 
     const defaultCursor = element.style.cursor
@@ -94,14 +101,11 @@ export function useDrag(
     return () => {
       element.style.cursor = defaultCursor
     }
-  }, [target && 'current' in target ? target.current : target, isEnabled, shouldUpdateCursor])
+  }, [element, isEnabled, shouldUpdateCursor])
 
   // Touch and pen gestures pan the page by default, which cancels the pointer
   // mid-drag. Disable that while those pointer types are handled.
-  const handlesTouch = !pointerTypes || pointerTypes.includes('touch') || pointerTypes.includes('pen')
-
   useLayoutEffect(() => {
-    const element = target && 'current' in target ? target.current : target
     if (!element || !isEnabled || !handlesTouch) return
 
     const defaultTouchAction = element.style.touchAction
@@ -110,10 +114,9 @@ export function useDrag(
     return () => {
       element.style.touchAction = defaultTouchAction
     }
-  }, [target && 'current' in target ? target.current : target, isEnabled, handlesTouch])
+  }, [element, handlesTouch, isEnabled])
 
   useLayoutEffect(() => {
-    const element = target && 'current' in target ? target.current : target
     if (!element || !isEnabled) return
 
     let pointerId: number | undefined
@@ -204,5 +207,5 @@ export function useDrag(
         dragEndHandlerRef.current?.(Point.zero, dragPosition, startPosition)
       }
     }
-  }, [target && 'current' in target ? target.current : target, isEnabled, shouldUpdateCursor])
+  }, [element, isEnabled, shouldUpdateCursor])
 }
