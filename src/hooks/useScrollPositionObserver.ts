@@ -1,4 +1,4 @@
-import { type DependencyList, type RefObject, useLayoutEffect, useRef } from 'react'
+import { type DependencyList, type RefObject, useLayoutEffect, useRef, useState } from 'react'
 import { Point } from 'spase'
 
 import { useLatest } from './useLatest.js'
@@ -12,39 +12,46 @@ export type ScrollPositionInfo = {
 
 type Target = HTMLElement | null | RefObject<HTMLElement> | RefObject<HTMLElement | null> | RefObject<HTMLElement | undefined> | undefined
 
+type ChangeHandler = (newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void
+
 /**
  * Hook for tracking the scroll position of a target element or the viewport.
  *
- * @param target Optional target element or ref to track. If not provided, the
- *               viewport is tracked instead.
+ * @param target Optional target element or ref to track. If `undefined`, the
+ *               viewport is tracked instead. If `null` (or a ref that is not
+ *               yet populated), nothing is tracked until the element mounts.
  * @param onChange Handler invoked when the scroll position changes.
  * @param deps Optional dependency list to control when the hook should re-run.
  */
-export function useScrollPositionObserver(
-  target: Target,
-  onChange: (newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void,
-  deps?: DependencyList,
-): void
-export function useScrollPositionObserver(
-  onChange: (newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void,
-  deps?: DependencyList,
-): void
-export function useScrollPositionObserver(...args:
-  | [(newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void, DependencyList?]
-  | [Target, (newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void, DependencyList?]) {
+export function useScrollPositionObserver(target: Target, onChange: ChangeHandler, deps?: DependencyList): void
+export function useScrollPositionObserver(onChange: ChangeHandler, deps?: DependencyList): void
+export function useScrollPositionObserver(...args: | [ChangeHandler, DependencyList?] | [Target, ChangeHandler, DependencyList?]) {
   const target = typeof args[0] === 'function' ? undefined : args[0]
   const onChange = typeof args[0] === 'function' ? args[0] : args[1] as (newInfo: ScrollPositionInfo, oldInfo: ScrollPositionInfo | undefined) => void
   const deps = typeof args[0] === 'function' ? (args[1] as DependencyList | undefined) ?? [] : (args[2] as DependencyList | undefined) ?? []
 
   const changeHandlerRef = useLatest(onChange)
   const prevInfoRef = useRef<ScrollPositionInfo>(undefined)
-  const isTickingRef = useRef(false)
+  const prevScrollTargetRef = useRef<HTMLElement | Window>(undefined)
+
+  const [scrollTarget, setScrollTarget] = useState<HTMLElement | undefined | Window>()
 
   useLayoutEffect(() => {
-    const el = _resolveTarget(target)
+    setScrollTarget(_resolveScrollTarget(target))
+  })
+
+  useLayoutEffect(() => {
+    if (!scrollTarget) return
+
+    if (prevScrollTargetRef.current !== scrollTarget) {
+      prevInfoRef.current = undefined
+      prevScrollTargetRef.current = scrollTarget
+    }
+
+    let frameId: number | undefined
 
     const handler = () => {
-      const newInfo = el ? _getElementScrollPositionInfo(el) : _getViewportScrollPositionInfo()
+      const newInfo = scrollTarget instanceof HTMLElement ? _getElementScrollPositionInfo(scrollTarget) : _getViewportScrollPositionInfo()
       if (!newInfo) return
 
       changeHandlerRef.current(newInfo, prevInfoRef.current)
@@ -52,18 +59,14 @@ export function useScrollPositionObserver(...args:
     }
 
     const tick = () => {
-      if (isTickingRef.current) return
+      if (frameId !== undefined) return
       if (typeof requestAnimationFrame !== 'function') return
 
-      isTickingRef.current = true
-
-      requestAnimationFrame(() => {
+      frameId = requestAnimationFrame(() => {
+        frameId = undefined
         handler()
-        isTickingRef.current = false
       })
     }
-
-    const scrollTarget = el ?? window
 
     scrollTarget.addEventListener('scroll', tick, { passive: true })
     window.addEventListener('resize', tick)
@@ -72,15 +75,18 @@ export function useScrollPositionObserver(...args:
     tick()
 
     return () => {
+      if (frameId !== undefined) cancelAnimationFrame(frameId)
+
       scrollTarget.removeEventListener('scroll', tick)
       window.removeEventListener('resize', tick)
       window.removeEventListener('orientationchange', tick)
     }
-  }, [...deps])
+  }, [scrollTarget, ...deps])
 }
 
-function _resolveTarget(target: Target): HTMLElement | undefined {
-  if (target == null) return undefined
+function _resolveScrollTarget(target: Target): HTMLElement | undefined | Window {
+  if (target === undefined) return window
+  if (target === null) return undefined
   if (target instanceof HTMLElement) return target
 
   return target.current ?? undefined
