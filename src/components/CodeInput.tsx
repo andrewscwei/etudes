@@ -1,6 +1,6 @@
 import { type ChangeEvent, type ClipboardEvent, type HTMLAttributes, type HTMLInputAutoCompleteAttribute, type KeyboardEvent, type Ref, useEffect, useRef } from 'react'
 
-import { Repeat } from '../flows/Repeat.js'
+import { Repeat } from '../control/Repeat.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { Styled } from '../utils/Styled.js'

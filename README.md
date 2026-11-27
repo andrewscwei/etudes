@@ -24,10 +24,8 @@ npm run lint:fix
 
 ## Components
 
-- **`primitives/`** — Base UI building blocks, headless/unstyled by design
-- **`components/`** — Higher-level components built on top of primitives
+- **`components/`** — UI components
 - **`hooks/`** — Standalone React hooks covering drag/gestures, observers, media, storage, and general utilities
-- **`flows/`** — Control-flow JSX components
-- **`hocs/`** — Higher-order components
+- **`control/`** — Control-flow components
 - **`utils/`** — Pure utility functions for style manipulation, data transformation, key generation, device detection, and React helpers
 - **`types/`** — Shared type definitions used across the library

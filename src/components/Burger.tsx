@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { type HTMLAttributes, type Ref } from 'react'
 
-import { Repeat } from '../flows/Repeat.js'
+import { Repeat } from '../control/Repeat.js'
 import { asClassNameDict } from '../utils/asClassNameDict.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'

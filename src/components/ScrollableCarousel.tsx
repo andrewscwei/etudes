@@ -1,7 +1,7 @@
 import { type ComponentType, type HTMLAttributes, type MouseEvent, type PointerEvent, type Ref, type RefObject, useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { Point, Rect } from 'spase'
 
-import { Each } from '../flows/Each.js'
+import { Each } from '../control/Each.js'
 import { useDrag } from '../hooks/useDrag.js'
 import { useInterval } from '../hooks/useInterval.js'
 import { useLatest } from '../hooks/useLatest.js'

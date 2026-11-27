@@ -1,6 +1,6 @@
 import { type ButtonHTMLAttributes, type Ref, useCallback } from 'react'
 
-import { Button } from '../primitives/Button.js'
+import { Button } from './Button.js'
 
 export namespace OptionButton {
   /**

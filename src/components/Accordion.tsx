@@ -2,7 +2,7 @@ import clsx from 'clsx'
 import isDeepEqual from 'fast-deep-equal/react.js'
 import { type ComponentType, type HTMLAttributes, type Ref, type RefObject, useRef } from 'react'
 
-import { Each } from '../flows/Each.js'
+import { Each } from '../control/Each.js'
 import { useSize } from '../hooks/useSize.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'

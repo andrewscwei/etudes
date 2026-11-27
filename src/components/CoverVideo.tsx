@@ -2,7 +2,7 @@ import { type HTMLAttributes, type Ref, useMemo, useRef, useState } from 'react'
 import { Size } from 'spase'
 
 import { useRect } from '../hooks/useRect.js'
-import { Video } from '../primitives/Video.js'
+import { Video } from './Video.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { mergeRefs } from '../utils/mergeRefs.js'

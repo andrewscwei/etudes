@@ -18,11 +18,7 @@ export namespace MasonryGrid {
    * Type describing the props of {@link MasonryGrid}.
    */
   export type Props = {
-    /**
-     * Reference to the root element.
-     */
     ref?: Ref<HTMLDivElement>
-
     alignSections?: boolean
     horizontalSpacing?: number
     orientation?: Orientation
