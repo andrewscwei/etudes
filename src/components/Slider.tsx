@@ -1,8 +1,6 @@
 import { type HTMLAttributes, type MouseEvent, type Ref, useCallback, useLayoutEffect, useMemo, useRef } from 'react'
-import { Rect } from 'spase'
 
 import { useDrag } from '../hooks/useDrag.js'
-import { useRect } from '../hooks/useRect.js'
 import { asComponentDict } from '../utils/asComponentDict.js'
 import { asStyleDict } from '../utils/asStyleDict.js'
 import { mergeRefs } from '../utils/mergeRefs.js'
@@ -50,14 +48,16 @@ export function Slider({
   const positionRef = useRef(position)
   const isDraggingRef = useRef(false)
 
-  const bodyRect = useRect(bodyRef)
-
   const withDraggedValue = useCallback((pos: number, dx: number, dy: number) => {
+    const body = bodyRef.current
+    if (!body) return pos
+
+    const { height, width } = body.getBoundingClientRect()
     const vPos = _mapValuePositionToVisualPosition(pos, isInverted)
 
     switch (orientation) {
       case 'horizontal': {
-        const maxWidth = isClipped ? bodyRect.width - knobWidth : bodyRect.width
+        const maxWidth = isClipped ? width - knobWidth : width
         if (maxWidth <= 0) return pos
 
         const newX = vPos * maxWidth + dx
@@ -66,7 +66,7 @@ export function Slider({
         return _mapVisualPositionToValuePosition(newVPos, isInverted)
       }
       case 'vertical': {
-        const maxHeight = isClipped ? bodyRect.height - knobHeight : bodyRect.height
+        const maxHeight = isClipped ? height - knobHeight : height
         if (maxHeight <= 0) return pos
 
         const newY = vPos * maxHeight + dy
@@ -79,7 +79,7 @@ export function Slider({
 
         return NaN
     }
-  }, [bodyRect.width, bodyRect.height, isClipped, isInverted, knobWidth, knobHeight, orientation])
+  }, [isClipped, isInverted, knobWidth, knobHeight, orientation])
 
   const applyPosition = useCallback((pos: number) => {
     const vPos = _mapValuePositionToVisualPosition(pos, isInverted)
@@ -106,6 +106,14 @@ export function Slider({
     }
   }, [isClipped, isInverted, knobHeight, knobWidth, orientation, trackPadding])
 
+  const updatePosition = useCallback((pos: number, isDragging: boolean) => {
+    if (pos === positionRef.current) return
+
+    positionRef.current = pos
+    applyPosition(pos)
+    onChange?.(pos, isDragging)
+  }, [applyPosition, onChange])
+
   const suppressTransitions = useCallback((suppressed: boolean) => {
     const value = suppressed ? 'none' : ''
 
@@ -117,23 +125,28 @@ export function Slider({
   const trackClickHandler = useCallback((event: MouseEvent) => {
     if (!isTrackInteractive) return
 
-    const vrect = Rect.fromViewport()
-    let newPos: number
+    const body = bodyRef.current
+    if (!body) return
+
+    const rect = body.getBoundingClientRect()
+    let newVPos: number
 
     switch (orientation) {
       case 'horizontal': {
-        if (bodyRect.width <= 0) return
+        const knobSize = isClipped ? knobWidth : 0
+        const maxWidth = rect.width - knobSize
+        if (maxWidth <= 0) return
 
-        const newVPos = (event.clientX + vrect.left - bodyRect.left) / bodyRect.width
-        newPos = _mapVisualPositionToValuePosition(newVPos, isInverted)
+        newVPos = (event.clientX - rect.left - knobSize * 0.5) / maxWidth
 
         break
       }
       case 'vertical': {
-        if (bodyRect.height <= 0) return
+        const knobSize = isClipped ? knobHeight : 0
+        const maxHeight = rect.height - knobSize
+        if (maxHeight <= 0) return
 
-        const newVPos = (event.clientY + vrect.top - bodyRect.top) / bodyRect.height
-        newPos = _mapVisualPositionToValuePosition(newVPos, isInverted)
+        newVPos = (event.clientY - rect.top - knobSize * 0.5) / maxHeight
 
         break
       }
@@ -143,14 +156,8 @@ export function Slider({
         return
     }
 
-    const hasChanged = newPos !== positionRef.current
-
-    if (hasChanged) {
-      positionRef.current = newPos
-      applyPosition(newPos)
-      onChange?.(newPos, false)
-    }
-  }, [bodyRect.left, bodyRect.top, bodyRect.width, bodyRect.height, isInverted, isTrackInteractive, orientation])
+    updatePosition(_mapVisualPositionToValuePosition(_clamped(newVPos), isInverted), false)
+  }, [isClipped, isInverted, isTrackInteractive, knobHeight, knobWidth, orientation, updatePosition])
 
   useDrag(knobContainerRef, {
     onDragEnd: () => {
@@ -164,14 +171,7 @@ export function Slider({
       onDragEnd?.()
     },
     onDragMove: ({ x, y }) => {
-      const newPosition = withDraggedValue(positionRef.current, x, y)
-      const hasChanged = newPosition !== positionRef.current
-
-      if (hasChanged) {
-        positionRef.current = newPosition
-        applyPosition(newPosition)
-        onChange?.(newPosition, true)
-      }
+      updatePosition(withDraggedValue(positionRef.current, x, y), true)
 
       isDraggingRef.current = true
       rootRef.current?.classList.add('dragging')
@@ -192,9 +192,12 @@ export function Slider({
     if (isDraggingRef.current) return
 
     positionRef.current = position
-
     applyPosition(position)
-  }, [position, applyPosition])
+  }, [position])
+
+  useLayoutEffect(() => {
+    applyPosition(positionRef.current)
+  }, [applyPosition])
 
   const isAtEnd = isInverted ? position === 0 : position === 1
   const isAtStart = isInverted ? position === 1 : position === 0
@@ -376,7 +379,7 @@ export namespace Slider {
    * Component for the container of the knob of a {@link Slider}.
    */
   export const KnobContainer = ({ ...props }: HTMLAttributes<HTMLButtonElement>) => (
-    <button {...props}/>
+    <button type='button' {...props}/>
   )
 
   /**
@@ -443,6 +446,7 @@ function _getFixedStyles({ knobHeight = 0, knobPadding = 0, knobWidth = 0, orien
       position: 'absolute',
       transform: orientation === 'horizontal' ? 'translate(0, -50%)' : 'translate(-50%, 0)',
       width: '100%',
+      ...orientation === 'horizontal' ? { left: '0', top: '50%' } : { left: '50%', top: '0' },
     },
   })
 }

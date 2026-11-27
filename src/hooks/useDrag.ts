@@ -173,7 +173,7 @@ export function useDrag(
       if (shouldUpdateCursor) element.style.cursor = 'grab'
 
       const position = Point.make(event.clientX, event.clientY)
-      const displacement = Point.subtract(dragPosition, position)
+      const displacement = Point.subtract(position, dragPosition)
 
       dragEndHandlerRef.current?.(displacement, position, startPosition)
     }
