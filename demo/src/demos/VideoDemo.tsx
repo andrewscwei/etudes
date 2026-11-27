@@ -1,6 +1,6 @@
 import { Video } from 'etudes'
 
-import $$Video from '../assets/video.mov'
+import $$Video from '../assets/video.mp4'
 import { Frame } from '../components/Frame.js'
 
 export function VideoDemo() {
